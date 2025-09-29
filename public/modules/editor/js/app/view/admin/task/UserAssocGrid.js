@@ -177,11 +177,17 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         xtype: 'button',
                         glyph: 'f234@FontAwesome5FreeSolid',
                         itemId: 'add-user-btn',
+                        bind: {
+                            disabled: '{!enablePanel}'
+                        },
                         text: me.strings.addUser,
                         tooltip: me.strings.addUserTip
                     }, {
                         xtype: 'button',
                         glyph: 'f503@FontAwesome5FreeSolid',
+                        bind: {
+                            disabled: '{!enablePanel}'
+                        },
                         disabled: true,
                         itemId: 'remove-user-btn',
                         handler: function () {
@@ -214,12 +220,18 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                         glyph: 'f674@FontAwesome5FreeSolid',
                         text: me.strings.notifyButtonText,
                         tooltip: me.strings.notifyButtonTooltip,
+                        bind: {
+                            disabled: '{!enablePanel}'
+                        },
                     }, '->', {
                         xtype: 'button',
                         hidden: !Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
                         itemId: 'userSpecialPropertiesBtn',
                         glyph: 'f509@FontAwesome5FreeSolid',
-                        text: me.strings.userSpecialProperties
+                        text: me.strings.userSpecialProperties,
+                        bind: {
+                            disabled: '{!enablePanel}'
+                        },
                     }]
                 }]
             };

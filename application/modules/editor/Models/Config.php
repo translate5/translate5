@@ -251,11 +251,14 @@ class editor_Models_Config extends ZfExtended_Models_Config
             $excludeMaps,
             $accessRestricted,
         );
-        array_walk($customerBase, function (&$r) use ($taskGuid, $isImportDisabled) {
+        array_walk($customerBase, function (&$r) use ($taskGuid, $isImportDisabled, $task) {
             $r['taskGuid'] = $taskGuid;
             //it is readonly when the config is import config and the task is not in import state
             //or when the current config is customer level config
-            $r['isReadOnly'] = ($isImportDisabled && $r['level'] == self::CONFIG_LEVEL_TASKIMPORT) || $r['level'] == self::CONFIG_LEVEL_CUSTOMER;
+            //or when the task is ended already
+            $r['isReadOnly'] = ($isImportDisabled && $r['level'] == self::CONFIG_LEVEL_TASKIMPORT)
+                || $r['level'] == self::CONFIG_LEVEL_CUSTOMER
+                || $task->getState() == $task::STATE_END;
         });
         $s = $this->db->select()
             ->setIntegrityCheck(false)

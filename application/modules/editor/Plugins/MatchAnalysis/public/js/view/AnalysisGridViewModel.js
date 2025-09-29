@@ -43,13 +43,13 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewModel', {
         },
         enablePanel : {
             get : function (task) {
-                // if import status error disabled
-                return (task && !task.isErroneous() && !task.isImporting());
+                return (task && !task.isErroneous() && !task.isImporting() && !task.isEnded());
             },
             bind : {
                 bindTo : '{currentTask}',
                 deep : true
             }
-        }
+        },
+        pricingPresetAllowed: get => Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset')
     }
 });

@@ -249,7 +249,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 dock:'bottom',
                 glyph: 'f200@FontAwesome5FreeSolid',
                 bind:{
-                    disabled:'{!enableDockedToolbar || !hasLanguageResourcesAssoc}',
+                    disabled:'{!enableDockedToolbar || !hasLanguageResourcesAssoc || !enablePanel}',
                     hidden:'{isAnalysisButtonHidden}'
                 },
                 listeners:{
@@ -294,10 +294,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 value: 1,
                 boxLabel: me.strings.internalFuzzy,
                 itemId: 'cbInternalFuzzy',
+                bind: {
+                    disabled: '{!enablePanel}'
+                },
             },{
                 xtype:'checkbox',
-                bind:{
-                    disabled:'{!hasTmOrCollection}'
+                bind: {
+                    disabled: '{!hasTmOrCollection || !enablePanel}'
                 },
                 value: 1,
                 cls: 'lableInfoIcon',
@@ -315,6 +318,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 fieldLabel: me.strings.pretranslateMatchRate,
                 labelWidth: 120,
                 tooltip:me.strings.pretranslateMatchRateTooltip,
+                bind: {
+                    disabled:'{!enablePanel}'
+                },
                 store: Ext.create('Ext.data.Store', {
                     fields: ['id', 'value'],
                     data : storeData
@@ -326,7 +332,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },{
                 xtype:'checkbox',
                 bind:{
-                    disabled:'{!hasMt}'
+                    disabled:'{!hasMt || !enablePanel}'
                 },
                 value: 1,
                 cls:'lableInfoIcon',

@@ -69,8 +69,7 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
             tabs.push({
                 xtype: 'languageResourceTaskAssocPanel',
                 bind:{
-                    loading:'{isLoadingActive}',
-                    disabled: '{!enablePanel}'
+                    loading:'{isLoadingActive}'
                 },
             });
         }

@@ -65,7 +65,6 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                         itemId: 'languageResourcesTaskAssocGrid',
                         bind: {
                             store: '{taskAssoc}',
-                            disabled: '{!enablePanel}',
                         },
                         plugins: ['gridfilters', 'cellediting'],
                         emptyText: me.strings.empty,
@@ -102,6 +101,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                 tooltip: me.strings.checked,
                                 text: me.strings.checked,
                                 dataIndex: 'checked',
+                                bind: {
+                                    disabled: '{!enablePanel}',
+                                },
                                 sortable: true,
                                 cls: 'taskAssocChecked',
                                 width: 60,
@@ -122,6 +124,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                 cls: 'segmentsUpdateable',
                                 dataIndex: 'segmentsUpdateable',
                                 sortable: true,
+                                bind: {
+                                    disabled: '{!enablePanel}',
+                                },
                                 renderer: function (value, meta, record) {
                                     return record.get('writable') ? this.defaultRenderer(value, meta, record) : '';
                                 },
@@ -250,6 +255,13 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                 }
                             }
                         ],
+                        listeners: {
+                            beforeedit: function(plugin) {
+                                if (plugin.grid.lookupViewModel().get('enablePanel') === false) {
+                                    return false;
+                                }
+                            }
+                        }
                     },
                 ],
             };
