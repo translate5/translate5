@@ -86,25 +86,19 @@ translate5:trackChanges="ins" reflect inserted strings and translate5:trackChang
 The other attributes of these mrk tags are self-explaining. The value of the id is random, since inside of translate5 there is no id for these tags.
 The value of translate5:date is in the format  "2017-12-06 13:12:34"
 -->
-<target>
-<mrk id="1" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:28+01:00" ><sc id="1"/></mrk>back <mrk id="2" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:27+01:00" ><sc id="1"/></mrk>to the house<ec id="1" startRef="1" />
-</target>
+<target><mrk id="1" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:28+01:00" ><sc id="1"/></mrk>back <mrk id="2" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:27+01:00" ><sc id="1"/></mrk>to the house<ec id="1" startRef="1" /></target>
 </segment>
 </unit>
 <unit id="unit2" its:revPerson="test lector" translate5:revPersonGuid="{00000000-0000-0000-C100-CCDDEE000002}">
 <segment id="seg2" translate5:matchRate="0" state="reviewed" subState="translate5Autostate:reviewed">
 <source><pc id="1">das Haus</pc> ist zurück</source>
-<target>
-<sc id="1"/>the house<mrk id="4" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:14+01:00" ><ec id="1" startRef="1" /></mrk>\u00a0is<mrk id="3" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:15+01:00" ><ec id="1" startRef="1" /></mrk> back
-</target>
+<target><sc id="1"/>the house<mrk id="4" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:14+01:00" ><ec id="1" startRef="1" /></mrk>\u00a0is<mrk id="3" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:15+01:00" ><ec id="1" startRef="1" /></mrk> back</target>
 </segment>
 </unit>
 <unit id="unit3" its:revPerson="test lector" translate5:revPersonGuid="{00000000-0000-0000-C100-CCDDEE000002}">
 <segment id="seg3" translate5:matchRate="0" state="translated" subState="translate5Autostate:translated">
 <source><pc id="1">aus die maus</pc>ENDE</source>
-<target>
-<pc id="1">off the mouse</pc>ENDE
-</target>
+<target><pc id="1">off the mouse</pc>ENDE</target>
 </segment>
 </unit>
 </file>
