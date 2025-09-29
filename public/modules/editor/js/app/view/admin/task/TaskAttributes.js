@@ -65,9 +65,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     viewModel:{
     	type:'taskattributes'
     },
-    bind:{
-        disabled:'{!enablePanel}'
-    },
     title: '#UT#Eigenschaften',
     border: 0,
     initConfig: function(instanceConfig) {
@@ -104,6 +101,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                             xtype: 'button',
                             itemId: 'cancelTaskAttributes',
                             glyph: 'f00d@FontAwesome5FreeSolid',
+                            bind: {
+                                disabled: '{!enablePanel}'
+                            },
                             listeners:{
                                 click:'onCancelTaskAttributesClick'
                             },
@@ -113,6 +113,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                             xtype: 'button',
                             itemId: 'reloadTaskAttributes',
                             glyph: 'f2f1@FontAwesome5FreeSolid',
+                            bind: {
+                                disabled: '{!enablePanel}'
+                            },
                             listeners:{
                                 click:'onReloadTaskAttributesClick'
                             },
@@ -121,6 +124,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                             xtype: 'button',
                             itemId: 'saveTaskAttributes',
                             glyph: 'f00c@FontAwesome5FreeSolid',
+                            bind: {
+                                disabled: '{!enablePanel}'
+                            },
                             listeners:{
                                 click:'onSaveTaskAttributesClick'
                             },
@@ -163,6 +169,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             xtype: auth.isAllowed('editorEditTaskTaskName') ? 'textfield' : 'displayfield',
             fieldLabel: me.strings.taskName,
             bind: {
+                disabled: '{!enablePanel}',
                 value: '{currentTask.taskName}'
             },
             name:'taskName',
@@ -173,7 +180,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             xtype: 'datefield',
             name: 'deadlineDate',
             itemId:'deadlineDate',
-            bind:'{currentTask.deadlineDate}',
+            bind: {
+                disabled: '{!enablePanel}',
+                value: '{currentTask.deadlineDate}'
+            },
             fieldLabel: me.strings.deadlineDateLabel
         });
 
@@ -181,7 +191,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             //lazy: just use the same right as for editTaskName
             xtype: auth.isAllowed('editorEditTaskTaskName') ? 'textarea' : 'displayfield',
             fieldLabel: me.strings.description,
-            bind:'{currentTask.description}',
+            bind: {
+                disabled: '{!enablePanel}',
+                value: '{currentTask.description}'
+            },
             name:'description',
             itemId:'description'
         });
@@ -191,7 +204,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push(me.applyIfNotAllowed({
             xtype: 'datefield',
             fieldLabel: me.strings.orderDate,
-            bind:'{currentTask.orderdate}',
+            bind: {
+                disabled: '{!enablePanel}',
+                value: '{currentTask.orderdate}'
+            },
             name:'orderdate',
             itemId:'orderdate'
         },'editorEditTaskOrderDate',{
@@ -203,7 +219,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push(me.applyIfNotAllowed({
             xtype: 'checkbox',
             fieldLabel:me.strings.fullMatchLabel,
-            bind:'{currentTask.edit100PercentMatch}',
+            bind: {
+                disabled: '{!enablePanel}',
+                value: '{currentTask.edit100PercentMatch}'
+            },
             name:'edit100PercentMatch',
             listeners:{
                 change:'onEdit100PercentMatchChange'
@@ -262,7 +281,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             xtype: 'radiogroup',
             name:'usageMode',
             simpleValue:true,
-            bind :'{currentTask.usageMode}',
+            bind: {
+                disabled: '{!enablePanel}',
+                value: '{currentTask.usageMode}'
+            },
             fieldLabel : me.strings.usageModeTitle,
             columns: 1,
             anchor: '100%',
@@ -299,7 +321,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             return {
                 xtype: 'combo',
                 fieldLabel: me.strings.pmGuid,
-                bind:'{currentTask.pmGuid}',
+                bind: {
+                    disabled: '{!enablePanel}',
+                    value: '{currentTask.pmGuid}'
+                },
                 allowBlank: false,
                 typeAhead: false,
                 forceSelection: true,
