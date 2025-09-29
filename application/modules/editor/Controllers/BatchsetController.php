@@ -28,14 +28,16 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
-use MittagQI\Translate5\Task\BatchSet\DTO\TaskGuidsQueryDto;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidValueProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\Task\BatchSet\TaskBatchSetter;
+use MittagQI\Translate5\Task\BatchOperations\BatchSetTaskGuidsProvider;
+use MittagQI\Translate5\Task\BatchOperations\DTO\TaskGuidsQueryDto;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidDeadlineDateStringProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidValueProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowStepProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\MaintenanceScheduledException;
+use MittagQI\Translate5\Task\BatchOperations\TaskBatchHandler;
 
 /**
  * Controller for Batch Updates
@@ -54,6 +56,8 @@ class Editor_BatchsetController extends ZfExtended_RestController
      * @var array
      */
     protected $postBlacklist = ['id'];
+
+    private const TASKS_LIMIT_DEFAULT = 30;
 
     public function init(): void
     {
@@ -96,9 +100,25 @@ class Editor_BatchsetController extends ZfExtended_RestController
             return;
         }
 
+        if ($this->getParam('previewTasks')) {
+            $this->previewTasks((int) $this->getParam('tasksLimit', self::TASKS_LIMIT_DEFAULT));
+
+            return;
+        }
+
         try {
-            TaskBatchSetter::create()->process($this->getRequest());
+            $nextUrl = TaskBatchHandler::create()->process($this->getRequest());
+            if (! empty($nextUrl)) {
+                $this->view->nextUrl = $nextUrl;
+            }
             $this->view->success = true;
+        } catch (MaintenanceScheduledException $e) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1401',
+                [
+                    'export' => 'Maintenance is scheduled, exports are not possible at the moment',
+                ],
+            );
         } catch (InvalidValueProvidedException $e) {
             $param = match ($e::class) {
                 InvalidDeadlineDateStringProvidedException::class => 'deadlineDate',
@@ -116,5 +136,36 @@ class Editor_BatchsetController extends ZfExtended_RestController
                 ],
             );
         }
+    }
+
+    private function previewTasks(int $tasksMax): void
+    {
+        $this->view->rows = [];
+        $this->view->success = true;
+        $taskIds = BatchSetTaskGuidsProvider::create()->getAllowedTaskIds(
+            TaskGuidsQueryDto::fromRequest($this->getRequest())
+        );
+
+        if ($tasksMax < 1) {
+            $tasksMax = self::TASKS_LIMIT_DEFAULT;
+        }
+        if (count($taskIds) > $tasksMax) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+            $this->view->error = str_replace('{0}', (string) $tasksMax, $translate->_('Es können nur maximal {0} Aufgaben als Batch verarbeitet werden'));
+            $this->view->success = false;
+        } elseif (count($taskIds) > 0) {
+            $taskRepository = TaskRepository::create();
+            sort($taskIds, SORT_NUMERIC);
+            $tasks = $taskRepository->getTaskListByIds($taskIds);
+            foreach ($tasks as $task) {
+                $row = new stdClass();
+                $row->taskId = $task->getId();
+                $row->taskName = $task->getTaskName();
+                $row->busy = $task->isLocked($task->getTaskGuid()) || $task->isOperating() || $task->isErroneous();
+                $row->checked = ! $row->busy;
+                $this->view->rows[] = $row;
+            }
+        }
+        $this->view->total = count($this->view->rows);
     }
 }

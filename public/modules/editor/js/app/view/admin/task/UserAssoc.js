@@ -56,9 +56,6 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     },
     title: '#UT#Benutzer-Plural',
     layout: 'border',
-    bind: {
-        disabled: '{!enablePanel}'
-    },
     border: 0,
     task: null,
     initConfig: function (instanceConfig) {
@@ -77,6 +74,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                     region: 'east',
                     autoScroll: true,
                     height: 'auto',
+                    bind: {
+                        disabled: '{!enablePanel}'
+                    },
                     width: 300,
                     items: [
                         {

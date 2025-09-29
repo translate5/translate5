@@ -201,6 +201,12 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     onEditorInstantiate: function (editor) {
         this.editor = editor;
+
+        // If retry flag was set - try findMatches once again
+        if (this.retryFindMatchesOnEditorInstantiate) {
+            this.findMatches();
+            delete this.retryFindMatchesOnEditorInstantiate;
+        }
     },
 
     /**
@@ -937,6 +943,12 @@ Ext.define('Editor.controller.SearchReplace', {
         rangy.init();
 
         if (!rangy.supported || !classApplierModule || !classApplierModule.supported) {
+            return;
+        }
+
+        // If editor is not yet instantiated
+        if (!this.editor.editor) {
+            me.retryFindMatchesOnEditorInstantiate = true;
             return;
         }
 

@@ -191,6 +191,9 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                         xtype: 'button',
                         text: me.strings.newAnalysis,
                         width: 150,
+                        bind: {
+                            disabled: '{!enablePanel}'
+                        },
                         glyph: 'xf200@FontAwesome5FreeSolid',
                         listeners: {
                             click: function(btn){

@@ -45,7 +45,7 @@ Ext.define('Editor.view.quality.admin.TaskQualitiesViewModel', {
         enablePanel : {
             get : function (task) {
                 // if import status error disabled
-                return (task && !task.isErroneous() && !task.isImporting());
+                return (task && !task.isErroneous() && !task.isImporting() && !task.isEnded());
             },
             bind : {
                 bindTo : '{currentTask}',

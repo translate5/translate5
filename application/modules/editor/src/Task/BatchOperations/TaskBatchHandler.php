@@ -28,31 +28,45 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet\DTO;
+namespace MittagQI\Translate5\Task\BatchOperations;
 
-use REST_Controller_Request_Http as Request;
+use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchExport;
+use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchSetDeadlineDate;
+use REST_Controller_Request_Http;
 
-class TaskGuidsQueryDto
+class TaskBatchHandler
 {
     /**
-     * @param int[] $projectAndTaskIds
+     * @param TaskBatchHandlerInterface[] $handlers
      */
     public function __construct(
-        public readonly ?array $projectAndTaskIds,
-        public readonly ?string $filter,
+        private readonly array $handlers,
     ) {
     }
 
-    public static function fromRequest(Request $request): self
+    public static function create(): self
     {
-        $projectsAndTasks = null;
-        if (! empty($request->getParam('projectsAndTasks'))) {
-            $projectsAndTasks = explode(',', $request->getParam('projectsAndTasks'));
+        return new self(
+            [
+                TaskBatchSetDeadlineDate::create(),
+                TaskBatchExport::create(),
+            ],
+        );
+    }
+
+    public function process(REST_Controller_Request_Http $request): ?string
+    {
+        return $this->getHandler($request->getParam('batchType'))?->process($request);
+    }
+
+    private function getHandler(string $batchType): ?TaskBatchHandlerInterface
+    {
+        foreach ($this->handlers as $handler) {
+            if ($handler->supports($batchType)) {
+                return $handler;
+            }
         }
 
-        return new self(
-            $projectsAndTasks,
-            $request->getParam('filter'),
-        );
+        return null;
     }
 }
