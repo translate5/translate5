@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 /* @var $this Zend_View */
+
 $this->render('general.phtml');
 
 // Setup subject
@@ -61,6 +62,15 @@ if ($this->createdByUser) {
 <strong>Erstellt von:</strong> {createdByUser}';
 }
 
+if(!empty($this->taskCustomFields)) {
+    foreach ($this->taskCustomFields as $customField) {
+        $message .= ' <br />'
+            . '<strong>' .
+            $customField['label']
+            . ':</strong> ' . $customField['value'];
+    }
+}
+
 $data['body'] = $this->templateApply($message, $data);
 
 // Build mail body
@@ -70,7 +80,7 @@ $mailBody = $this->templateApply('
 {footer}'
 , $data);
 
-// Prepare text version
+// Prepare a text version
 $this->textbody = strip_tags($mailBody);
 
 // Print mail body
