@@ -28,23 +28,23 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet\Setter;
+namespace MittagQI\Translate5\Task\BatchOperations\Handler;
 
 use DateTime;
 use Exception;
 use MittagQI\Translate5\JobAssignment\UserJob\BatchUpdate\UserJobDeadlineBatchUpdater;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
-use MittagQI\Translate5\Task\BatchSet\DTO\TaskGuidsQueryDto;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\Task\BatchSet\TaskBatchSetterInterface;
+use MittagQI\Translate5\Task\BatchOperations\BatchSetTaskGuidsProvider;
+use MittagQI\Translate5\Task\BatchOperations\DTO\TaskGuidsQueryDto;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidDeadlineDateStringProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowStepProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\TaskBatchHandlerInterface;
 use REST_Controller_Request_Http as Request;
 use Zend_Registry;
 use ZfExtended_Logger;
 
-class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
+class TaskBatchSetDeadlineDate implements TaskBatchHandlerInterface
 {
     public function __construct(
         private readonly ZfExtended_Logger $logger,
@@ -64,9 +64,9 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
         );
     }
 
-    public function supports(string $updateType): bool
+    public function supports(string $batchType): bool
     {
-        return 'deadlineDate' === $updateType;
+        return 'deadlineDate' === $batchType;
     }
 
     /**
@@ -74,7 +74,7 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
      * @throws InvalidWorkflowProvidedException
      * @throws InvalidWorkflowStepProvidedException
      */
-    public function process(Request $request): void
+    public function process(Request $request): ?string
     {
         $deadlineDate = $request->getParam('deadlineDate');
         $workflow = $request->getParam('batchWorkflow');
@@ -113,5 +113,7 @@ class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
                 ]
             );
         }
+
+        return null;
     }
 }

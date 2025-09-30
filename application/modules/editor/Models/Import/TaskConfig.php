@@ -92,6 +92,11 @@ class editor_Models_Import_TaskConfig
      */
     private function checkConfigLevel(editor_Models_Config $dbConfig, string $name, array $logData): void
     {
+        // for API-tests, we allow setting of sys-level configs to enable special tests.
+        // this global constant can only be set for instances set up explicitly for API-tests, so it's no security issue
+        if (defined('APPLICATION_APITEST') && APPLICATION_APITEST) {
+            return;
+        }
         $dbConfig->loadByName($name);
         $level = (int) $dbConfig->getLevel();
 

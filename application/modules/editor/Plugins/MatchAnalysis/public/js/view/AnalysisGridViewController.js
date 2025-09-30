@@ -150,7 +150,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
         // Get preset
         var preset = pricingPresetCombo.getSelection();
         if (Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset')) {
-            pricingPresetCombo.setDisabled(!preset);
+            pricingPresetCombo.setDisabled(!preset || !vm.get('enablePanel'));
         }
 
         // Set price adjustment and final amount

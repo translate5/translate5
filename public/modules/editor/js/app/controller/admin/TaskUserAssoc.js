@@ -203,15 +203,17 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 
     /**
      * Disable Delete Button if no User is selected
-     * @param {Ext.grid.Panel} grid
+     * @param {Ext.selection.RowModel} selectionModel
      * @param {Array} selection
      */
-    handleAssocSelection: function (grid, selection) {
+    handleAssocSelection: function (selectionModel, selection) {
         var me = this,
             formPanel = me.getUserAssocForm(),
             emptySel = selection.length === 0;
 
-        me.getAssocDelBtn().setDisabled(emptySel);
+        if (selectionModel.view.lookupViewModel().get('enablePanel')) {
+            me.getAssocDelBtn().setDisabled(emptySel);
+        }
 
         me.getEditInfo().setVisible(emptySel);
 

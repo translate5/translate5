@@ -153,8 +153,11 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                     isCustom  : true
                 };
 
-                if(editMode){
-                    config.bind = '{currentTask.customField' + field.id+'}';
+                if (editMode) {
+                    config.bind = {
+                        disabled: '{!enablePanel}',
+                        value: '{currentTask.customField' + field.id + '}'
+                    };
                 }
 
                 // If it's a checkbox

@@ -84,9 +84,9 @@ Ext.define('Editor.view.admin.task.batchSet.BatchSetViewController', {
     },
 
     submitBatchParams: function (tasksData, batchParams) {
-        for (const [updateType, params] of Object.entries(batchParams)) {
+        for (const [batchType, params] of Object.entries(batchParams)) {
 
-            params.updateType = updateType;
+            params.batchType = batchType;
 
             if(this.withFileUpload) {
                 const view = this.getView(), form = view.down('form');

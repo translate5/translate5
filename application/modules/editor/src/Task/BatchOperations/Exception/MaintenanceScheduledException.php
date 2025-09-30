@@ -28,10 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet\Exception;
+namespace MittagQI\Translate5\Task\BatchOperations\Exception;
 
-use InvalidArgumentException;
-
-abstract class InvalidValueProvidedException extends InvalidArgumentException
+class MaintenanceScheduledException extends \RuntimeException
 {
 }

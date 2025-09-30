@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet;
+namespace MittagQI\Translate5\Task\BatchOperations;
 
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\Translate5\Task\BatchSet\DTO\TaskGuidsQueryDto;
+use MittagQI\Translate5\Task\BatchOperations\DTO\TaskGuidsQueryDto;
 use MittagQI\Translate5\Task\DataProvider\TaskQuerySelectFactory;
 use MittagQI\Translate5\Task\Filtering\TaskQueryFilterAndSort;
 use Zend_Db_Table;

@@ -61,7 +61,7 @@ class BatchSetDeadlineTest extends JsonTestAbstract
                 'batchWorkflowStep' => 'reviewing',
                 'deadlineDate' => $deadlineDate,
                 'projectsAndTasks' => $task->getId(),
-                'updateType' => 'deadlineDate',
+                'batchType' => 'deadlineDate',
             ]
         );
 

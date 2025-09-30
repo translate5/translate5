@@ -76,7 +76,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
 
     bind: {
         loading: '{isAnalysisRunning}',
-        disabled: '{!enablePanel}'
     },
 
     initConfig: function (instanceConfig) {
@@ -86,7 +85,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                 store: 'Editor.plugins.MatchAnalysis.store.MatchAnalysis',
                 bind: {
                     loading: '{isAnalysisRunning}',
-                    disabled: '{!enablePanel}'
                 },
                 columns: me.getColumnConfig(),
                 dockedItems: [{
@@ -129,6 +127,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         forceSelection : true,
                         disableKeyFilter : true,
                         fieldLabel: me.strings.basedOn,
+                        bind: {
+                            disabled: '{!enablePanel || !pricingPresetAllowed}'
+                        },
                         store: Ext.create('Ext.data.ArrayStore', {
                             fields: ['id', 'type'],
                             data : [
@@ -150,9 +151,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         itemId: 'pricingPresetId',
                         name: 'pricingPresetId',
                         valueField: 'id',
-                        disabled: true,
                         value: Editor.data.plugins.MatchAnalysis.pricing.systemDefaultPresetId,
                         bind: {
+                            disabled: '{!enablePanel || !pricingPresetAllowed}',
                             fieldLabel: '{l10n.MatchAnalysis.pricing.preset.combo}'
                         }
                     }, {
@@ -175,7 +176,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         itemId: 'priceAdjustment',
                         bind: {
                             fieldLabel: '{l10n.MatchAnalysis.pricing.preset.priceAdjustment}',
-                            value: '{priceAdjustment} {currency}'
+                            value: '{priceAdjustment} {currency}',
+                            disabled: '{!enablePanel}'
                         },
                         labelWidth: 110,
                         width: 220,
@@ -185,7 +187,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         itemId: 'finalAmount',
                         bind: {
                             fieldLabel: '{l10n.MatchAnalysis.analysisWindow.finalAmount}',
-                            value: '{finalAmount} {currency}'
+                            value: '{finalAmount} {currency}',
+                            disabled: '{!enablePanel}'
                         },
                         labelWidth: 90,
                         width: 190,
