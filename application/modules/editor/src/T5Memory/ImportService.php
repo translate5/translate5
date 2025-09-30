@@ -60,7 +60,6 @@ class ImportService
         private readonly FlushMemoryService $flushMemoryService,
         private readonly CreateMemoryService $createMemoryService,
         private readonly RetryService $waitingService,
-        private readonly MemoryNameGenerator $memoryNameGenerator,
         private readonly WipeMemoryService $wipeMemoryService,
     ) {
     }
@@ -76,7 +75,6 @@ class ImportService
             FlushMemoryService::create(),
             CreateMemoryService::create(),
             RetryService::create(),
-            new MemoryNameGenerator(),
             WipeMemoryService::create(),
         );
     }

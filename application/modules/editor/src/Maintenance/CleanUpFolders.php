@@ -40,12 +40,12 @@ class CleanUpFolders
 {
     public function deleteOldDateFolders(string $parentDir, DateTime $threshold): void
     {
-        if (!is_dir($parentDir)) {
+        if (! is_dir($parentDir)) {
             throw new InvalidArgumentException("Invalid directory: $parentDir");
         }
 
         foreach (new DirectoryIterator($parentDir) as $fileInfo) {
-            if ($fileInfo->isDot() || !$fileInfo->isDir()) {
+            if ($fileInfo->isDot() || ! $fileInfo->isDir()) {
                 continue;
             }
 

@@ -28,8 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\T5Memory\Exception;
 
-use Exception;
-
 class ImportResultedInReorganizeException extends ImportResultedInErrorException
 {
 }

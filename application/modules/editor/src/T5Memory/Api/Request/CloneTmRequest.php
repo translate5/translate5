@@ -39,9 +39,11 @@ class CloneTmRequest extends Request
         string $tmName,
         string $newName,
     ) {
+        $tmName = urlencode($tmName);
+
         parent::__construct(
             'POST',
-            rtrim($baseUrl, '/'),
+            rtrim($baseUrl, '/')  . "/$tmName/clone",
             [
                 'Accept-charset' => 'UTF-8',
                 'Accept' => 'application/json',

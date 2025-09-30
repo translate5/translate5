@@ -36,7 +36,7 @@ use MittagQI\Translate5\T5Memory\PersistenceService;
 
 class CleanUpCronJob
 {
-    public const string THRESHOLD_DAYS = '-10 days';
+    private const string THRESHOLD_DAYS = '-10 days';
 
     public function __construct(
         private readonly CleanUpFolders $cleanUpFolders,

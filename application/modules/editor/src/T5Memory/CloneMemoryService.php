@@ -72,7 +72,7 @@ class CloneMemoryService
         }
 
         if ($response->memoryAlreadyExists()) {
-            throw new CloneException($tmName, $newTmName,);
+            throw new CloneException($tmName, $newTmName);
         }
     }
 }
