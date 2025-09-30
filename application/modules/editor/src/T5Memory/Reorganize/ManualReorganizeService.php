@@ -129,6 +129,7 @@ class ManualReorganizeService
                     'file' => $file,
                 ]
             );
+
             throw new ReorganizeException(sprintf('Reorganize failed: Moving file [%s] to export dir failed', $file));
         }
 
@@ -227,7 +228,7 @@ class ManualReorganizeService
 
     private function failReorganize(LanguageResource $languageResource, bool $isInternalFuzzy): void
     {
-        if (!$isInternalFuzzy) {
+        if (! $isInternalFuzzy) {
             $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_FAILED);
             $languageResource->save();
         }

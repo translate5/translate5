@@ -43,7 +43,7 @@ class CloneTmRequest extends Request
 
         parent::__construct(
             'POST',
-            rtrim($baseUrl, '/')  . "/$tmName/clone",
+            rtrim($baseUrl, '/') . "/$tmName/clone",
             [
                 'Accept-charset' => 'UTF-8',
                 'Accept' => 'application/json',
