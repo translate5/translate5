@@ -10614,6 +10614,30 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Verfügbare Sprachressource für Dateiübersetzung</source>
                 <target>Verfügbare Sprachressource für Dateiübersetzung</target>
             </trans-unit>
+            <trans-unit id='RXMga8O2bm5lbiBudXIgbWF4aW1hbCB7MH0gQXVmZ2FiZW4gYWxzIEJhdGNoIHZlcmFyYmVpdGV0IHdlcmRlbg=='>
+                <source>Es können nur maximal {0} Aufgaben als Batch verarbeitet werden</source>
+                <target>Es können nur maximal {0} Aufgaben als Batch verarbeitet werden</target>
+            </trans-unit>
+            <trans-unit id='R2VzcGVycnRlIEF1Z2ZnYWJlbiBrw7ZubmVuIG5pY2h0IGF1c2dld8OkaGx0IHdlcmRlbg=='>
+                <source>Gesperrte Augfgaben können nicht ausgewählt werden</source>
+                <target>Gesperrte Augfgaben können nicht ausgewählt werden</target>
+            </trans-unit>
+            <trans-unit id='RXhwb3J0aWVyZW4gU2llIGRpZSBaaWVsZGF0ZWkoZW4pIGbDvHIgbWVocmVyZSBQcm9qZWt0ZSB1bmQgQXVmZ2FiZW4gZ2xlaWNoemVpdGln'>
+                <source>Exportieren Sie die Zieldatei(en) für mehrere Projekte und Aufgaben gleichzeitig</source>
+                <target>Exportieren Sie die Zieldatei(en) für mehrere Projekte und Aufgaben gleichzeitig</target>
+            </trans-unit>
+            <trans-unit id='QWt0dWFsaXNpZXJlbiBTaWUgZGllIExpc3RlLCBmYWxscyBnZXNwZXJydGUgQXVmZ2FiZW4gKHJvdCkgZW50aGFsdGVuIHNpbmQsIHVtIHp1IHByw7xmZW4sIG9iIHNpZSBqZXR6dCB3aWVkZXIgdmVyZsO8Z2JhciBzaW5k'>
+                <source>Aktualisieren Sie die Liste, falls gesperrte Aufgaben (rot) enthalten sind, um zu prüfen, ob sie jetzt wieder verfügbar sind</source>
+                <target>Aktualisieren Sie die Liste, falls gesperrte Aufgaben (rot) enthalten sind, um zu prüfen, ob sie jetzt wieder verfügbar sind</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBpbiBGaWx0ZXJ1bmcgZXhwb3J0aWVyZW4=">
+                <source>Alle in Filterung exportieren</source>
+                <target>Alle in Filterung exportieren</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBzZWxla3RpZXJ0ZW4gZXhwb3J0aWVyZW4=">
+                <source>Alle selektierten exportieren</source>
+                <target>Alle selektierten exportieren</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

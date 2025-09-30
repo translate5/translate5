@@ -40,6 +40,12 @@ Ext.define('Editor.view.admin.task.menu.TaskBatchActionMenu', {
                         text: '{l10n.taskBatchActionMenu.batchSetProperties}',
                         tooltip: '{l10n.taskBatchActionMenu.batchSetPropertiesTip}'
                     }
+                },{
+                    itemId: 'batch-export-btn',
+                    bind: {
+                        text: '{l10n.taskBatchActionMenu.batchExport}',
+                        tooltip: '{l10n.taskBatchActionMenu.batchExportTip}'
+                    }
                 }]
             };
 

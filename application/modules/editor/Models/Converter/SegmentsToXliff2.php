@@ -507,26 +507,18 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             return;
         }
 
-        $lang = $this->data['targetLang'];
         if ($this->data['firstTarget'] == $field->name) {
-            $altTransName = $field->name;
-            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
-
-            $this->result[] = '<target>';
-
-            //if there are qms for the segment add the mrk tag
-            if (! empty($qualityData)) {
-                $this->result[] = '<mrk id="' . $this->escape(self::QM_ID_PREFIX . implode('_', array_keys($qualityData))) . '" its:type="generic" translate="yes" its:locQualityIssuesRef="' . $this->escape(self::QM_ID_PREFIX . implode('_', array_keys($qualityData))) . '">';
-            }
-            //add the target edit text
-            $this->result[] = $targetEdit;
-
-            //if there are qms for this segment close the mark tag
-            if (! empty($qualityData)) {
-                $this->result[] = '</mrk>';
-            }
-
-            $this->result[] = '</target>';
+            $withMrk = ! empty($qualityData);
+            $mrkId = $withMrk ? $this->escape(self::QM_ID_PREFIX . implode('_', array_keys($qualityData))) : '';
+            $this->result[] = '<target>' .
+                //if there are qms for the segment add the mrk tag
+                ($withMrk ? '<mrk id="' . $mrkId . '" its:type="generic" translate="yes" its:locQualityIssuesRef="' .
+                    $mrkId . '">' : '') .
+                //add the target edit text
+                $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]) .
+                //if there are qms for this segment close the mark tag
+                ($withMrk ? '</mrk>' : '') .
+                '</target>';
         }
     }
 

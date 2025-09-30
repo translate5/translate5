@@ -478,6 +478,7 @@ Ext.define('Editor.controller.TmOverview', {
                     break;
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
+                    break;
                 case 'specific':
                     me.handleEditSpecific(view, cell, col, newRecord);
                     break;

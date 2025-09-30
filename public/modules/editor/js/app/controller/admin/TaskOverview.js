@@ -260,6 +260,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             '#projectGrid #batch-set-btn': {
                 click: 'batchSetPropsShow'
             },
+            '#projectGrid #batch-export-btn': {
+                click: 'batchExportShow'
+            },
             '#adminTaskAddWindow': {
                 close: 'onAdminTaskAddWindowClose'
             },
@@ -591,6 +594,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 
     batchSetPropsShow: function () {
         Ext.widget('adminTaskBatchSetDeadlineWindow').show();
+    },
+
+    batchExportShow: function () {
+        let win = Ext.create('Editor.view.admin.task.batchSet.BatchExportWindow');
+        win.show();
     },
 
     /***

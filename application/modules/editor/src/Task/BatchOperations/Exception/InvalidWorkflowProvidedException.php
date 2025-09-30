@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,13 +28,8 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\BatchSet;
+namespace MittagQI\Translate5\Task\BatchOperations\Exception;
 
-use REST_Controller_Request_Http;
-
-interface TaskBatchSetterInterface
+class InvalidWorkflowProvidedException extends InvalidValueProvidedException
 {
-    public function supports(string $updateType): bool;
-
-    public function process(REST_Controller_Request_Http $request): void;
 }
