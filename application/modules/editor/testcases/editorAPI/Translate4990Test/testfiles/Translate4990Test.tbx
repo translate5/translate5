@@ -1,0 +1,61 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at https://translate5.local by the user Project Manager</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="idfdab9dcf-2ccf-413e-8a21-d3909e2ac3bd">
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea261ac">Drosselventil-de</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de-LI">
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea262ac">Drosselventil-de-LI</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de-CH">
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea263ac">Drosselventil-de-CH</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea261aa">Throttle valve-en</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en-GB">
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea261ba">Throttle valve-en-GB</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en-US">
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea261ca">Throttle valve-en-US</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+    </text>
+</martif>
