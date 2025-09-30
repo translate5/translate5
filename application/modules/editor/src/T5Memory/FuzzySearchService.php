@@ -344,24 +344,14 @@ class FuzzySearchService
         );
 
         $retryTms = [];
-        $saveDifferentTargetsForSameSource = (bool) $config
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
-        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
 
         foreach ($responses as $tmName => $response) {
+            // currently reorganizing tm can't be here as it is filtered before in self::getQueryableMemories
             if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName)) {
                 unset($responses[$tmName]);
 
                 try {
-                    $this->reorganizeService->startReorganize(
-                        $languageResource,
-                        $tmName,
-                        $reorganizeOptions,
-                        $isInternalFuzzy
-                    );
+                    $this->reorganizeTm($languageResource, $tmName, $config, $isInternalFuzzy);
 
                     $retryTms[] = $tmName;
                 } catch (ReorganizeException $e) {
@@ -434,6 +424,41 @@ class FuzzySearchService
         }
 
         return [$responses, $hasSkippedTms];
+    }
+
+    /**
+     * @throws ReorganizeException
+     */
+    private function reorganizeTm(
+        LanguageResource $languageResource,
+        string $tmName,
+        Zend_Config $config,
+        bool $isInternalFuzzy
+    ): void {
+        $saveDifferentTargetsForSameSource = (bool) $config
+            ->runtimeOptions
+            ->LanguageResources
+            ->t5memory
+            ->saveDifferentTargetsForSameSource;
+        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
+
+        if ($isInternalFuzzy || $this->retryService->canWaitLongTaskFinish()) {
+            $this->reorganizeService->reorganizeTm(
+                $languageResource,
+                $tmName,
+                $reorganizeOptions,
+                $isInternalFuzzy
+            );
+
+            return;
+        }
+
+        $this->reorganizeService->startReorganize(
+            $languageResource,
+            $tmName,
+            $reorganizeOptions,
+            $isInternalFuzzy
+        );
     }
 
     private function isLockingTimeoutOccurred(FuzzySearchResponse $response): bool

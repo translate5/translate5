@@ -76,7 +76,7 @@ class CreateMemoryService
         }
 
         throw new UnableToCreateMemoryException(
-            'Unable to create memory: ' . $response->getErrorMessage()
+            "Unable to create memory [$tmName]: " . $response->getErrorMessage()
         );
     }
 
@@ -116,7 +116,7 @@ class CreateMemoryService
         $memoryName = $this->waitingService->callAwaiting($createEmptyMemory);
 
         if (null === $memoryName) {
-            throw new UnableToCreateMemoryException('Retry failed to create memory');
+            throw new UnableToCreateMemoryException("Retry failed to create memory [$name]");
         }
 
         return $memoryName;
@@ -141,7 +141,23 @@ class CreateMemoryService
         }
 
         throw new UnableToCreateMemoryException(
-            'Unable to create memory: ' . $response->getErrorMessage()
+            "Unable to create memory [$tmName]: " . $response->getErrorMessage()
         );
+    }
+
+    /**
+     * @throws HttpException
+     * @throws UnableToCreateMemoryException
+     */
+    public function recreateEmptyMemory(
+        LanguageResource $languageResource,
+        string $tmName,
+    ): string {
+        $this->t5MemoryApi->deleteTm(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName),
+        );
+
+        return $this->createEmptyMemory($languageResource, $tmName);
     }
 }

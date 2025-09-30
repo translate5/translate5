@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,19 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Contract;
+namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use Zend_Config;
-
-interface ResponseInterface
+class ImportTmxResponse extends Response
 {
-    public function getBody(): array;
-
-    public function successful(): bool;
-
-    public function getErrorMessage(): ?string;
-
-    public function getCode(): int;
-
-    public function needsReorganizing(Zend_Config $config): bool;
+    use LockingTimeoutTrait;
 }

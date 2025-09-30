@@ -156,8 +156,11 @@ class PersistenceService
         }
     }
 
-    public function removeMemoryFromLanguageResource(LanguageResource $languageResource, string $tmName): void
-    {
+    public function removeMemoryFromLanguageResource(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false,
+    ): void {
         $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
 
         if (! empty($prefix)) {
@@ -195,7 +198,9 @@ class PersistenceService
 
         $languageResource->addSpecificData('memories', $memories);
 
-        $languageResource->save();
+        if (! $isInternalFuzzy) {
+            $languageResource->save();
+        }
     }
 
     public function setMemoryReadonly(

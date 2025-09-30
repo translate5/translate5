@@ -28,33 +28,26 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\DTO;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
+use GuzzleHttp\Psr7\Request;
 
-class ImportOptions
+class PingRequest extends Request
 {
-    public function __construct(
-        public readonly StripFramingTags $stripFramingTags,
-        public readonly bool $resegmentTmx = false,
-        public readonly bool $saveDifferentTargetsForSameSource = false,
-        public readonly ?int $customerId = null,
-    ) {
-    }
-
-    public static function fromParams(array $params, ?int $customerId = null): self
+    public function __construct(string $baseUrl)
     {
-        return new self(
-            self::getStripFramingTagsValue($params),
-            (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
-            (bool) ($params[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
-            $customerId,
+        parent::__construct(
+            'POST',
+            rtrim($baseUrl, '/'),
+            [
+                'Accept-charset' => 'UTF-8',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+            json_encode([
+                'name' => 'ping_tm',
+                'sourceLang' => 'de',
+            ], JSON_PRETTY_PRINT)
         );
-    }
-
-    private static function getStripFramingTagsValue(?array $params): StripFramingTags
-    {
-        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
 }
