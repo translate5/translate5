@@ -1,0 +1,50 @@
+[
+    {
+        "segmentNrInTask": "1",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "isRepeated": "0",
+        "source": "<div class=\"term admittedTerm exact transFound\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261ac\">Drosselventil-de<\/div>",
+        "sourceMd5": "bb2ed551b88d3f867924f506b4bffb8d",
+        "sourceToSort": "Drosselventil-de",
+        "target": "<div class=\"term admittedTerm exact\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261aa\">Throttle valve-en<\/div>",
+        "targetMd5": "da470076d15c0fbf97635fc106c1adc2",
+        "targetToSort": "Throttle valve-en",
+        "targetEdit": "<div class=\"term admittedTerm exact\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261aa\">Throttle valve-en<\/div>",
+        "targetEditToSort": "Throttle valve-en"
+    },
+    {
+        "segmentNrInTask": "2",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "isRepeated": "0",
+        "source": "<div class=\"term admittedTerm exact transFound\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261ac\">Drosselventil-de<\/div>-LI",
+        "sourceMd5": "6f940678f0d1aa68ca943f0513f86af5",
+        "sourceToSort": "Drosselventil-de-LI",
+        "target": "<div class=\"term admittedTerm exact\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261ba\">Throttle valve-en-GB<\/div>",
+        "targetMd5": "a96a885a85251ce8e9a667cd3c3a37f6",
+        "targetToSort": "Throttle valve-en-GB",
+        "targetEdit": "<div class=\"term admittedTerm exact\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261ba\">Throttle valve-en-GB<\/div>",
+        "targetEditToSort": "Throttle valve-en-GB"
+    },
+    {
+        "segmentNrInTask": "3",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "isRepeated": "0",
+        "source": "<div class=\"term admittedTerm exact transFound\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea263ac\">Drosselventil-de-CH<\/div>",
+        "sourceMd5": "b7fc627778a78b880a8bf3d04d046041",
+        "sourceToSort": "Drosselventil-de-CH",
+        "target": "<div class=\"term admittedTerm exact\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261aa\">Throttle valve-en<\/div>-US",
+        "targetMd5": "38a1c52443ce0c7d88013862e00f2770",
+        "targetToSort": "Throttle valve-en-US",
+        "targetEdit": "<div class=\"term admittedTerm exact\" title=\"\" data-tbxid=\"ida9424fcf-9a84-4047-b3c1-c7835ea261aa\">Throttle valve-en<\/div>-US",
+        "targetEditToSort": "Throttle valve-en-US"
+    }
+]

@@ -292,36 +292,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TermportalDatatypecheckCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCleanupCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$category\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCreateFaultySegmentCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$field\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCreateFaultySegmentCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCreateFaultySegmentCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$taskGuid\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCreateFaultySegmentCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCreateFaultySegmentCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Models_Segment\\:\\:setTargetEdit\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/TestCreateFaultySegmentCommand.php',
@@ -608,11 +578,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$workflow\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/AlikesegmentController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$editable\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/AlikesegmentController.php',
 ];
@@ -2967,36 +2932,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentMeta.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$category\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$categoryIndex\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$taskGuid\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Else branch is unreachable because ternary operator condition is always true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Db/SegmentQuality.php',
@@ -3427,11 +3362,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Export/FileParser/Xlf.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/FileParser/Xlf.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property editor_Models_Export_FileParser_Xlf\\:\\:\\$transUnitLength\\.$#',
 	'count' => 5,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Export/FileParser/Xlf.php',
@@ -3515,31 +3445,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method editor_Models_LanguageResources_LanguageResource\\:\\:setResourceId\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Export/TaskHistoryExcel.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$languageId\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Terminology/Tbx.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$status\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Terminology/Tbx.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$term\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Terminology/Tbx.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$termEntryTbxId\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Terminology/Tbx.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$termTbxId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Terminology/Tbx.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Binary operation "/" between string and int results in an error\\.$#',
@@ -3685,11 +3590,6 @@ $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$taskGuid$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Xliff2Worker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$fileId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/File/FilterManager.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Models_File_Filter\\:\\:setFileId\\(\\) invoked with 1 parameter, 0 required\\.$#',
@@ -4029,11 +3929,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
 	'count' => 4,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Import/FileParser/Csv.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$editable\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Import/FileParser/Csv.php',
 ];
 $ignoreErrors[] = [
@@ -5427,76 +5322,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$cnt\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$editable\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$edited\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$editedToSort\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$fileId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$mid\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$name\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$numrows\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$original\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$originalMd5\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$originalToSort\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentsPerFile\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$taskGuid\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Binary operation "\\." between \'count\\(`\' and Zend_Db_Table_Abstract results in an error\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
@@ -5962,21 +5787,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/SegmentField.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$editable\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/SegmentFieldManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$name\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Models/SegmentFieldManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$type\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/SegmentFieldManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Models_SegmentField\\:\\:setEditable\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/SegmentFieldManager.php',
@@ -6085,16 +5895,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$row might not be defined\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/SegmentUserAssoc.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$numrows\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Task.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$qmSubsegmentFlags\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Task.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$internalSessionUniqId\\.$#',
@@ -6230,11 +6030,6 @@ $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$rows$#',
 	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Task/Export/Metadata.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$pricingPresetId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Task/Meta.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$customerId of method MittagQI\\\\Translate5\\\\Plugins\\\\MatchAnalysis\\\\Models\\\\Pricing\\\\Preset\\:\\:getDefaultPresetId\\(\\) expects null, int given\\.$#',
@@ -7027,16 +6822,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Workflow.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$userGuid\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Workflow/Userpref.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$workflowStep\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Workflow/Userpref.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method setTaskGuid\\(\\) on string\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Workflow/Userpref.php',
@@ -7238,11 +7023,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$socketServer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$session_id\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Init.php',
 ];
@@ -7952,11 +7732,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/LockSegmentsBasedOnConfig/Worker.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$unsetStatusCount\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/ManualStatusCheck/Bootstrap.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_ManualStatusCheck_Bootstrap\\)\\|string\\> given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/ManualStatusCheck/Bootstrap.php',
@@ -8202,11 +7977,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/MatchAnalysis/Init.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/MatchAnalysis/Models/Pricing/Preset.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^If condition is always false\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/MatchAnalysis/Models/Pricing/Preset.php',
@@ -8359,11 +8129,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/Okapi/Bconf/Entity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/Okapi/Bconf/Entity.php',
 ];
 $ignoreErrors[] = [
@@ -8982,31 +8747,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Export/Xml.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$fileId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Statistics.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$foundSum\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Statistics.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$notFoundSum\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Statistics.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segCount\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Statistics.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$stateId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Statistics.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$editable$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Models/Statistics.php',
@@ -9039,11 +8779,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Db_Table_Row\\:\\:\\$type\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Worker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$term\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/SegmentStatistics/Worker.php',
 ];
 $ignoreErrors[] = [
@@ -10807,11 +10542,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/ReflowWorker.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Remark/List.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method ZfExtended_RestController\\:\\:getWfAnonymize\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Remark/List.php',
@@ -10905,21 +10635,6 @@ $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @return with type hexnumber\\|null is not subtype of native type string\\|null\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Segmentation/Html/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$aliasPages\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Segmentation/MappingEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$reviewFileId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Segmentation/MappingEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Segmentation/MappingEntity.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Static method editor_Plugins_VisualReview_Segmentation_SpecialChars\\:\\:removeProblematic\\(\\) is unused\\.$#',
@@ -11252,26 +10967,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Video/Timecode.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$from\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentNrInTask\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$to\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Plugins_VisualReview_Source_Configuration\\:\\:getVideoProps\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/VideoHtmlWorker.php',
@@ -11375,11 +11070,6 @@ $ignoreErrors[] = [
 	'message' => '#^Undefined variable\\: \\$logger$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/XmlXsl/AlignParser.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$original\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/VisualReview/XmlXsl/AlignSegments.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$relaisSource$#',
@@ -11620,11 +11310,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_AcrossHotfolder_Init\\)\\|string\\> given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/AcrossHotfolder/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$value\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/AcrossHotfolder/Service/Filesystem/FilesystemFactory.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Traversable\\<mixed, League\\\\Flysystem\\\\StorageAttributes\\>\\:\\:valid\\(\\)\\.$#',
@@ -14272,11 +13957,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/ReflowWorker.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Remark/List.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method ZfExtended_RestController\\:\\:getWfAnonymize\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Remark/List.php',
@@ -14370,21 +14050,6 @@ $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @return with type hexnumber\\|null is not subtype of native type string\\|null\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Segmentation/Html/Segment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$aliasPages\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Segmentation/MappingEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$reviewFileId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Segmentation/MappingEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Segmentation/MappingEntity.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Static method editor_Plugins_VisualReview_Segmentation_SpecialChars\\:\\:removeProblematic\\(\\) is unused\\.$#',
@@ -14722,26 +14387,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Video/Timecode.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$from\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentNrInTask\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$to\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/Video/TimecodesEntity.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Plugins_VisualReview_Source_Configuration\\:\\:getVideoProps\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/VideoHtmlWorker.php',
@@ -14845,11 +14490,6 @@ $ignoreErrors[] = [
 	'message' => '#^Undefined variable\\: \\$logger$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/XmlXsl/AlignParser.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$original\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/VisualReview/XmlXsl/AlignSegments.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$relaisSource$#',
@@ -14989,31 +14629,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$enableSegmentConsistentCheck\\.$#',
 	'count' => 4,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Consistent/QualityProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$category\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Consistent/QualityProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$field\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Consistent/QualityProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Consistent/QualityProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$taskGuid\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Consistent/QualityProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$type\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Segment/Consistent/QualityProvider.php',
 ];
 $ignoreErrors[] = [
@@ -15497,61 +15112,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Segment/Qm/Provider.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$category\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$endIndex\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$falsePositive\\.$#',
-	'count' => 5,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$field\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$hidden\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$processingState\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$startIndex\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$taskGuid\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Zend_Db_Table_Row_Abstract\\:\\:setAdditionalData\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Segment/Qualities.php',
@@ -15687,11 +15247,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Services/Connector.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$editable\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/Connector/Abstract.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Models_LanguageResources_UsageLogger\\:\\:setLanguageResourceId\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Services/Connector/Abstract.php',
@@ -15780,11 +15335,6 @@ $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$segmentContent$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Services/Connector/TagHandler/Xliff.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$target\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/DummyFileTm/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Comparison operation "\\<" between int and \\(array\\|float\\|int\\) results in an error\\.$#',
@@ -17382,16 +16932,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/src/Segment/Operations.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$segmentId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/src/Segment/Processing/State.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$tagsJson\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/src/Segment/Processing/State.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method MittagQI\\\\Translate5\\\\Segment\\\\Processing\\\\State\\:\\:isDeadlockException\\(\\) is unused\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/src/Segment/Processing/State.php',
@@ -17885,16 +17425,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$previous of class MittagQI\\\\Translate5\\\\Workflow\\\\ArchiveException constructor expects Exception\\|null, League\\\\Flysystem\\\\FilesystemException given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/src/Workflow/ArchiveWorker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/src/Workflow/DeleteOpenidUsersAction.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$login\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/src/Workflow/DeleteOpenidUsersAction.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Models_LoginLog\\:\\:setCreated\\(\\) invoked with 1 parameter, 0 required\\.$#',
@@ -18907,11 +18437,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/Plugins/ViewSetup.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$session_id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$locale\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
@@ -19554,64 +19079,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Config.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$lifetime\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$modified\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$name\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$session_data\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$session_id\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$userId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Zend_Session_SaveHandler_Interface\\:\\:getLifeTime\\(\\)\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/Session.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$internalSessionUniqId\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/SessionMapInternalUniqId.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$modified\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/SessionMapInternalUniqId.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$session_id\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/SessionMapInternalUniqId.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$withFromPart of method Zend_Db_Table_Abstract\\:\\:select\\(\\) expects bool, array\\<int, string\\> given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Db/SessionUserLock.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$numrows\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/Abstract.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_Models_Entity_Abstract\\:\\:\\$defaultGroupBy\\.$#',
@@ -19867,21 +19342,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$return of function print_r expects bool, int given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Installer/DbFileFinder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$filename\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Installer/DbUpdater.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$md5\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Installer/DbUpdater.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$origin\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Installer/DbUpdater.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:error\\(\\) invoked with 3 parameters, 0 required\\.$#',
@@ -20211,16 +19671,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$resources\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$modified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$session_id\\.$#',
-	'count' => 2,
 	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
 ];
 $ignoreErrors[] = [
@@ -20900,16 +20350,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property ZfExtended_Zendoverwrites_Translate_Adapter_Xliff\\:\\:\\$_cleared is never read, only written\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Zendoverwrites/Translate/Adapter/Xliff.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/database/040-TRANSLATE-3051-passwd-hash.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$passwd\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/database/040-TRANSLATE-3051-passwd-hash.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',

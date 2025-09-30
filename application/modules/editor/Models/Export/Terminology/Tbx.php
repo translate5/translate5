@@ -153,7 +153,7 @@ class editor_Models_Export_Terminology_Tbx
      * exports the internally stored data
      * @return string the generated data
      */
-    public function export(bool $format = false): string
+    public function export(bool $prettyPrint = false, ?string $spoofLangIfSameMajor = null): string
     {
         $body = $this->createTbx();
 
@@ -174,9 +174,35 @@ class editor_Models_Export_Terminology_Tbx
             }
             if ($oldLanguage != $row->languageId) {
                 $langSet = $termEntry->addChild('langSet');
-                $langSet->addAttribute('lang', $this->getLanguage($row->languageId));
+                $langSet->addAttribute('lang', $this->getLanguage((int) $row->languageId));
                 $oldLanguage = $row->languageId;
             }
+
+            // If $spoofLangIfSameMajor arg is given
+            if ($spoofLangIfSameMajor) {
+                // Get term actual lang
+                $termLang = $this->getLanguage((int) $row->languageId);
+
+                // Get term major lang
+                $termMajorLang = ZfExtended_Languages::primaryCodeByRfc5646($termLang);
+
+                // Get major lang for language given as $spoofLangIfSameMajor
+                $spoofMajorLang = ZfExtended_Languages::primaryCodeByRfc5646($spoofLangIfSameMajor);
+
+                // If task source language HAS sub-language
+                if ($spoofLangIfSameMajor !== $spoofMajorLang) {
+                    // If term language HAS NO sub-language
+                    if ($termLang === $termMajorLang) {
+                        // If term language is same as task source major language
+                        if ($termLang === $spoofMajorLang) {
+                            // Spoof term language for it to exactly match task source language
+                            // as otherwise this term will be ignored by TermTagger
+                            $langSet['lang'] = $spoofLangIfSameMajor;
+                        }
+                    }
+                }
+            }
+
             $tig = $langSet->addChild('tig');
             if (isset($row->tigId)) {
                 $tigId = $row->tigId;
@@ -197,7 +223,7 @@ class editor_Models_Export_Terminology_Tbx
 
         $toFile = strlen($this->target) > 0;
 
-        if ($format) {
+        if ($prettyPrint) {
             $dom = dom_import_simplexml($this->tbx)->ownerDocument;
             $dom->formatOutput = true;
             if ($toFile) {
