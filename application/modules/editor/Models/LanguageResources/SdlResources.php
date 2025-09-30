@@ -110,8 +110,7 @@ class editor_Models_LanguageResources_SdlResources
             return $ret;
         };
 
-        $sdlService = ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_Service');
-        /* @var $sdlService editor_Services_SDLLanguageCloud_Service */
+        $sdlService = new editor_Services_SDLLanguageCloud_Service();
 
         //check if the resource supports the file upload. (Current instruction: all MT resources.)
         $isFileUpload = function ($engine) {
@@ -123,6 +122,18 @@ class editor_Models_LanguageResources_SdlResources
             }
 
             return false;
+        };
+
+        // Normalize customers field to unique values
+        $uniqueCustomers = function ($customers) {
+            if (empty($customers)) {
+                return '';
+            }
+            $parts = explode(',', $customers);
+            $parts = array_filter($parts, static fn ($v) => $v !== '' && $v !== null);
+            $parts = array_values(array_unique($parts));
+
+            return implode(',', $parts);
         };
 
         $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
@@ -141,7 +152,7 @@ class editor_Models_LanguageResources_SdlResources
             //get character limit per engine (if configured)
             $engineLimit = $engineCharacterLimit[$id] ?? PHP_INT_MAX;
 
-            //check if the engine support file uploads
+            //check if the engine supports file uploads
             $fileUpload = $isFileUpload($engine);
 
             $data = [
@@ -155,6 +166,9 @@ class editor_Models_LanguageResources_SdlResources
                 'characterLimit' => $getCharacterLimit([$customerLimit, $engineLimit]),
                 'fileUpload' => $fileUpload,
                 'serviceName' => is_array($engine) ? $engine['serviceName'] : $sdlService->getName(),
+                'customers' => $uniqueCustomers(
+                    is_array($engine) ? $engine['customers'] : $engine->customers
+                ),
             ];
 
             if ($addArrayId) {

@@ -460,8 +460,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             return $engines;
         }
 
-        $sdl = ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
-        /* @var $sdl editor_Models_LanguageResources_SdlResources */
+        $sdl = ZfExtended_Factory::get(editor_Models_LanguageResources_SdlResources::class);
 
         //merge the data as instanttransalte format
         return $sdl->mergeEngineData($engines, $addArrayId);
@@ -514,8 +513,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         array $sourceLang = [],
         array $targetLang = [],
         array $serviceTypes = [],
+        array $customers = []
     ): array {
-        $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();
+        if (empty($customers)) {
+            $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();
+        }
 
         if (empty($customers)) {
             return [];
@@ -535,7 +537,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                     'ca' => 'LEK_languageresources_customerassoc',
                 ],
                 'tm.id = ca.languageResourceId',
-                ''
+                ['GROUP_CONCAT(`ca`.`customerId`) as customers']
             )
             ->join(
                 [
