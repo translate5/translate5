@@ -55,7 +55,7 @@ use ZfExtended_Logger;
 
 class ManualReorganizeService
 {
-    public const string REORGANIZE_DIR = APPLICATION_DATA . '/reorganize';
+    public const REORGANIZE_DIR = APPLICATION_DATA . '/reorganize';
 
     public function __construct(
         private readonly ZfExtended_Logger $logger,
@@ -203,7 +203,7 @@ class ManualReorganizeService
             $this->cloneService->clone(
                 $languageResource,
                 $tmName,
-                $tmName . ".reorganise.$timestamp.before-flush",
+                $tmName . ".reorganise.before-flush.$timestamp",
             );
 
             $this->flushService->flush($languageResource, $tmName);
@@ -211,7 +211,7 @@ class ManualReorganizeService
             $this->cloneService->clone(
                 $languageResource,
                 $tmName,
-                $tmName . ".reorganise.$timestamp.after-flush",
+                $tmName . ".reorganise.after-flush.$timestamp",
             );
         } catch (ClientExceptionInterface|HttpException|CloneException $e) {
             $this->logger->warn(

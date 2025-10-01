@@ -144,20 +144,4 @@ class CreateMemoryService
             "Unable to create memory [$tmName]: " . $response->getErrorMessage()
         );
     }
-
-    /**
-     * @throws HttpException
-     * @throws UnableToCreateMemoryException
-     */
-    public function recreateEmptyMemory(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): string {
-        $this->t5MemoryApi->deleteTm(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
-        );
-
-        return $this->createEmptyMemory($languageResource, $tmName);
-    }
 }
