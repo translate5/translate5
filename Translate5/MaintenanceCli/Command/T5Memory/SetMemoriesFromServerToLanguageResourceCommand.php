@@ -48,9 +48,8 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
         $this
             ->setName('t5memory:set-memories-from-server-to-language-resource')
             ->setDescription('Looks for memories on the t5memory side and sets them to language resources.')
-            ->addOption(
+            ->addArgument(
                 'lrId',
-                'l',
                 InputOption::VALUE_REQUIRED,
                 'Language Resource ID to set memories for',
             )
@@ -60,10 +59,21 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
                 InputOption::VALUE_OPTIONAL,
                 'JSON with memories to set, e.g. [{"id":0,"filename":"ID1-test","readonly":true},{"id":1,"filename":"ID1-test_next-1","readonly":false}]',
             )
+            ->addOption(
+                'prefix',
+                'p',
+                InputOption::VALUE_OPTIONAL,
+                'Prefix to filter memories on t5memory server side',
+            )
+            ->addOption(
+                'yes',
+                'y',
+                InputOption::VALUE_NONE
+            )
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
@@ -71,7 +81,7 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
         $languageResourceRepository = LanguageResourceRepository::create();
 
         $languageResource = $languageResourceRepository->get(
-            (int) $input->getOption('lrId')
+            (int) $input->getArgument('lrId')
         );
 
         $this->io->info(
@@ -111,8 +121,13 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
         $api = T5MemoryApi::create();
         $config = \Zend_Registry::get('config');
         $persistenceService = PersistenceService::create();
-        $tmPrefix = $persistenceService->addTmPrefix('');
         $lrBaseUrl = $languageResource->getResource()->getUrl();
+
+        if ($input->getOption('prefix')) {
+            $tmPrefix = $input->getOption('prefix');
+        } else {
+            $tmPrefix = $persistenceService->addTmPrefix('ID' . $languageResource->getId() . '-');
+        }
 
         $serverMemoryList = [];
 
@@ -134,10 +149,6 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
                     continue;
                 }
 
-                if (! str_contains($memory->name, 'ID' . $languageResource->getId() . '-')) {
-                    continue;
-                }
-
                 $serverMemoryList[] = $memory->name;
             }
         }
@@ -156,7 +167,7 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
             false
         );
 
-        $proceed = $this->io->askQuestion($question);
+        $proceed = $input->getOption('yes') || $this->io->askQuestion($question);
 
         if (! $proceed) {
             $this->io->info('Cancelled.');
