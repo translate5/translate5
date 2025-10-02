@@ -68,7 +68,7 @@ class Field extends ZfExtended_Models_Entity_Abstract
      */
     public function onAfterInsert()
     {
-        $this->alterTasksTable('insert', $this->getId());
+        $this->alterTasksTable('insert', (int) $this->getId());
     }
 
     public function isReadOnly(): bool
@@ -88,7 +88,7 @@ class Field extends ZfExtended_Models_Entity_Abstract
         parent::delete();
 
         // Drop column from tasks table
-        $this->alterTasksTable('delete', $id);
+        $this->alterTasksTable('delete', (int) $id);
 
         // Get db adapter
         $this->db->getAdapter()->query(
@@ -237,5 +237,39 @@ class Field extends ZfExtended_Models_Entity_Abstract
 
         // Do clear
         $db->query("UPDATE `LEK_task` SET `$column` = '' WHERE $where");
+    }
+
+    /**
+     * Get localized label and tooltip from JSON data with a fallback strategy.
+     *
+     * @param string|null $json JSON string containing locale translations
+     * @param string $fallback Default value when no valid translation is found
+     */
+    public function localizeLabel(?string $json, string $fallback = '', string $userLocale = 'en'): string
+    {
+        if (empty($json)) {
+            return $fallback;
+        }
+
+        $localeData = json_decode($json, true);
+
+        if (empty($localeData)) {
+            return $fallback;
+        }
+
+        // try the user-preferred locale first
+        if (isset($localeData[$userLocale])) {
+            return $localeData[$userLocale];
+        }
+
+        // fallback to en
+        if (isset($localeData['en'])) {
+            return $localeData['en'];
+        }
+
+        // fallback to the first available locale
+        $firstAvailable = reset($localeData);
+
+        return $firstAvailable ?: $fallback;
     }
 }

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\CustomFields\FieldFilter;
 use MittagQI\Translate5\Workflow\NextStepCalculator;
 
 /**
@@ -521,8 +522,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
      */
     public function notifyNewProjectForPm()
     {
-        /** @var ZfExtended_Models_User $user */
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $user->loadByGuid($this->config->task->getPmGuid());
 
         // Create notification
@@ -530,6 +530,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             'project' => $project = $this->config->task,
             'user' => (array) $user->getDataObject(),
             'createdByUser' => $this->config->createdByUser,
+            'taskCustomFields' => $this->getHumanRevisionCustomFields($project, $user),
         ]);
 
         // Get trigger config
@@ -816,8 +817,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     }
 
     /**
-     * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
-     * When the trignotification trigger is periodical, the deadline date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time
+     * Deadline notifier. It will send notification to the configured user assocs days before or after the current day
+     * (days +/- can be defined in config default to 1) When the trignotification trigger is periodical, the deadline
+     * date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time
      * @param string $template  template to be used for the mail
      * @param bool $isApproaching default will notify daysOffset before deadline
      */
@@ -874,8 +876,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     }
 
     /***
-     * Check if the workflow notifications are disabled by config. If the current request is in task context, task config will be used.
-     * Otherwise, the system config value will be used.
+     * Check if the workflow notifications are disabled by config. If the current request is in task context, task
+     * config will be used. Otherwise, the system config value will be used.
      * @return bool
      * @throws editor_Models_ConfigException|Zend_Exception
      */
@@ -888,5 +890,51 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
         }
 
         return (bool) $config->runtimeOptions->workflow->disableNotifications;
+    }
+
+    /**
+     * Get task custom fields which where available in human revision popup. This is workaround until we implement
+     * separate template for human revision.
+     * TODO: move this to separate human revision template
+     * @throws Zend_Exception
+     */
+    private function getHumanRevisionCustomFields(editor_Models_Task $task, ZfExtended_Models_User $user): array
+    {
+        $reduced = [];
+
+        try {
+            $customFieldModel = new MittagQI\Translate5\Task\CustomFields\Field();
+            $customFieldFilter = FieldFilter::create();
+            $allowedCustomFields = $customFieldFilter->getAllowedCustomFieldsByUserRoles($customFieldModel, $user->getRoles());
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+
+            foreach ($allowedCustomFields as $customField) {
+                $value = $task->{'getCustomField' . $customField['id']}();
+
+                // special case. For booleans we need to convert this to human understandable "flags"
+                if ($customField['type'] == 'checkbox') {
+                    $value = $value === '1' ? $translate->_('Ja') : $translate->_('Nein');
+                }
+
+                if ($customField['type'] == 'combobox' && ! empty($customField['comboboxData'])) {
+                    try {
+                        $jsonDecoded = json_decode($customField['comboboxData'], true);
+                        $value = $customFieldModel->localizeLabel(json_encode($jsonDecoded[$value]), '', $user->getLocale());
+                    } catch (Exception $e) {
+                        // fallback in case something is wrong with json translation. You never know..
+                        $value = $task->{'getCustomField' . $customField['id']}();
+                    }
+                }
+
+                $reduced[] = [
+                    'label' => $customFieldModel->localizeLabel($customField['label'], '', $user->getLocale()),
+                    'value' => $value,
+                ];
+            }
+        } catch (Zend_Acl_Exception $e) {
+            $reduced = [];
+        }
+
+        return $reduced;
     }
 }
