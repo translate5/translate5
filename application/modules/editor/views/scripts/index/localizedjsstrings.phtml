@@ -1989,6 +1989,21 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.view.admin.task.batchSet.BatchExportWindow", {
+        override: "Editor.view.admin.task.batchSet.BatchExportWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Exportieren');?>',
+            btnExport: '<?php echo $this->translate->_('Exportieren');?>',
+            info: '<?php echo str_replace('{0}',$this->translate->_('übersetzt').'/'.$this->translate->_('lektoriert'),$this->translate->_('Originalformat, {0}'));?>',
+            lockedTasksUnselectable: '<?php echo $this->translate->_('Gesperrte Augfgaben können nicht ausgewählt werden');?>',
+            colId: '<?php echo $this->translate->_('Id');?>',
+            colName: '<?php echo $this->translate->_('Name');?>',
+            exportSelected:'<?php echo $this->translate->_('Alle selektierten exportieren');?>',
+            exportFiltered:'<?php echo $this->translate->_('Alle in Filterung exportieren');?>',
+            reloadTooltip:'<?php echo $this->translate->_('Aktualisieren Sie die Liste, falls gesperrte Aufgaben (rot) enthalten sind, um zu prüfen, ob sie jetzt wieder verfügbar sind');?>',
+        }
+    });
+
     Ext.define("Editor.locale.de.view.MaintenancePanel", {
         override: "Editor.view.MaintenancePanel",
         maintenanceMessage: '<?php echo $this->translate->_("<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>");?>'
@@ -2204,6 +2219,8 @@ Editor.data.l10n = {
     taskBatchActionMenu: {
         batchSetProperties: '<?php echo $this->translate->_('Massenänderungen');?>',
         batchSetPropertiesTip: '<?php echo $this->translate->_('Ändern Sie die Eigenschaften mehrerer Projekte in einer Massenoperation. Beispiel: Ändern Sie die Deadline für alle Jobs "Übersetzung" aller markierten Projekte gleichzeitig');?>',
+        batchExport: '<?php echo $this->translate->_('Exportieren');?>',
+        batchExportTip: '<?php echo $this->translate->_('Exportieren Sie die Zieldatei(en) für mehrere Projekte und Aufgaben gleichzeitig');?>',
     },
     tasksGrid: {
         tooltip: '<?php echo $this->translate->_('Zur Aufgabenliste wechseln');?>',
@@ -2269,7 +2286,8 @@ Editor.data.l10n = {
                 data: [
                     {value: 'projectWizard', name: '<?php echo $this->translate->_('Projekt-Assistent');?>'},
                     {value: 'projectGrid',   name: '<?php echo $this->translate->_('Projektraster');?>'},
-                    {value: 'taskGrid',      name: '<?php echo $this->translate->_('Aufgabenraster');?>'}
+                    {value: 'taskGrid',      name: '<?php echo $this->translate->_('Aufgabenraster');?>'},
+                    {value: 'instantTranslate',      name: '<?php echo $this->translate->_('InstantTranslate');?>'},
                 ]
             },
             roles: {

@@ -32,9 +32,9 @@ namespace MittagQI\Translate5\Test\Functional\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
-use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
+use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ContentProtection\QueryStringGuesser;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
@@ -46,6 +46,7 @@ use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
+use MittagQI\Translate5\T5Memory\TagHandlerProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
@@ -56,7 +57,7 @@ class FuzzySearchServiceTest extends TestCase
 {
     private MockObject & ReorganizeService $reorganizeService;
 
-    private MockObject & TagHandlerFactory $tagHandlerFactory;
+    private MockObject & TagHandlerProvider $tagHandlerProvider;
 
     private ZfExtended_Logger $logger;
 
@@ -73,7 +74,7 @@ class FuzzySearchServiceTest extends TestCase
     public function setUp(): void
     {
         $this->reorganizeService = $this->createMock(ReorganizeService::class);
-        $this->tagHandlerFactory = $this->createMock(TagHandlerFactory::class);
+        $this->tagHandlerProvider = $this->createMock(TagHandlerProvider::class);
         $this->logger = Zend_Registry::get('logger')->cloneMe('test.FuzzySearchServiceTest');
         $this->t5MemoryApi = T5MemoryApi::create();
 
@@ -104,19 +105,27 @@ class FuzzySearchServiceTest extends TestCase
             $this->t5MemoryApi,
         );
 
-        $this->tagHandlerFactory->method('createTagHandler')
+        $this->tagHandlerProvider->method('getTagHandler')
             ->willReturnCallback(
-                function (string $resourceAlias, array $params = [], ?Zend_Config $config = null) {
-                    return new \editor_Services_Connector_TagHandler_T5MemoryXliff($params);
+                function (int $sourceLang, int $targetLang, Zend_Config $config) {
+                    $handler = new \editor_Services_Connector_TagHandler_T5MemoryXliff([
+                        'gTagPairing' => false,
+                    ]);
+                    $handler->setLanguages($sourceLang, $targetLang);
+
+                    return $handler;
                 }
             );
 
         $this->fuzzySearchService = new FuzzySearchService(
             $this->reorganizeService,
             RetryService::create(),
-            $this->tagHandlerFactory,
             $this->logger,
             QueryStringGuesser::create(),
+            $this->t5MemoryApi,
+            PersistenceService::create(),
+            $this->tagHandlerProvider,
+            SegmentLengthValidator::create(),
         );
     }
 
@@ -154,7 +163,7 @@ class FuzzySearchServiceTest extends TestCase
             )
         );
 
-        $result = $this->fuzzySearchService->query(
+        $matches = $this->fuzzySearchService->query(
             $this->languageResource,
             $query,
             '',
@@ -164,7 +173,27 @@ class FuzzySearchServiceTest extends TestCase
             false
         );
 
-        $maxMatchRateResult = $result->getMaxMatchRateResult();
+        $maxMatchRate = 0;
+        $maxMatchRateResult = null;
+        $timestamp = 0;
+        $allMatches = [];
+
+        foreach ($matches as $match) {
+            $allMatches[] = $match;
+
+            if (
+                isset($match->matchrate) && $match->matchrate > $maxMatchRate
+                && (
+                    ! isset($match->timestamp)
+                    || $match->timestamp >= $timestamp
+                )
+            ) {
+                $timestamp = $match->timestamp ?? 0;
+                $maxMatchRate = $match->matchrate;
+                $maxMatchRateResult = $match;
+            }
+        }
+
         self::assertNotNull($maxMatchRateResult, 'No result found');
         self::assertSame($expectedMaxRateResult['matchRate'], $maxMatchRateResult->matchrate);
         self::assertSame($expectedMaxRateResult['source'], $maxMatchRateResult->source);
@@ -180,8 +209,6 @@ class FuzzySearchServiceTest extends TestCase
 
             self::fail("Meta data key '$key' not found in max match rate result");
         }
-
-        $allMatches = $result->getResult();
 
         foreach ($otherMatches as $index => $match) {
             $matchId = $index + 1;
@@ -214,7 +241,7 @@ class FuzzySearchServiceTest extends TestCase
                 'rawTarget' => 'Our nice 4 segment',
                 'metaData' => [
                     'timestamp' => '2016-03-23 16:24:28 CET',
-                    'guessed' => 'Some content was unprotected to get a better match',
+                    'Guessed' => 'Some content was unprotected to get a better match',
                 ],
             ],
             'otherMatches' => [

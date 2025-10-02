@@ -105,7 +105,7 @@ abstract class editor_Models_Export_DiffTagger
      * @param bool $concatDelim
      * @return array $segment
      */
-    protected function wordBreakUp($segment, $concatDelim = false) : array
+    protected function wordBreakUp($segment, $concatDelim = false): array
     {
         return editor_Utils::wordBreakUp($segment, $concatDelim);
     }

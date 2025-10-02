@@ -33,11 +33,6 @@ final class editor_Segment_TrackChanges_InsertTag extends editor_Segment_TrackCh
 {
     protected static ?string $nodeName = 'ins';
 
-    public function isDeleteTag(): bool
-    {
-        return false;
-    }
-
     public function isInsertTag(): bool
     {
         return true;

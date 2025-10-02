@@ -76,6 +76,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         }
         //END TEMP FEATURE SWITCH
 
+        self::initContainer();
+
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
@@ -191,6 +193,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             CronEventTrigger::DAILY,
             fn () => T5MemoryLanguageResourceSpecificDataSnapshot::create()->takeSnapshot()
         );
+
+        $eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            fn () => \MittagQI\Translate5\T5Memory\Reorganize\CleanUpCronJob::create()->cleanUp()
+        );
     }
 
     public static function initModuleSpecific()
@@ -219,6 +227,22 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach(PluginManager::class, PluginManager::EVENT_AFTER_PLUGIN_BOOTSTRAP, function () {
             AclResourceManager::registerResource(editor_Task_Type::class, true);
         });
+    }
+
+    public static function initContainer(): void
+    {
+        if (! \Zend_Registry::isRegistered('integration.segment.update')) {
+            \Zend_Registry::set(
+                'integration.segment.update',
+                \MittagQI\Translate5\Integration\UpdateSegmentService::create()
+            );
+        }
+        if (! \Zend_Registry::isRegistered('integration.segment.update.dto_factory')) {
+            \Zend_Registry::set(
+                'integration.segment.update.dto_factory',
+                \MittagQI\Translate5\Integration\SegmentUpdateDtoFactory::create()
+            );
+        }
     }
 
     public function _initController()

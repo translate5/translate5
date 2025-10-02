@@ -30,12 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Repository;
 
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 
 interface ReimportSegmentRepositoryInterface
 {
-    public function save(string $runId, UpdateSegmentDTO $dto): void;
+    public function save(string $runId, ReimportSegmentDTO $dto): void;
 
+    /**
+     * @return iterable<ReimportSegmentDTO>
+     */
     public function getByTask(string $runId, string $taskGuid): iterable;
 
     public function cleanByTask(string $runId, string $taskGuid): void;

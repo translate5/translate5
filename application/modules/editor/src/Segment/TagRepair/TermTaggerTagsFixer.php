@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\Segment\TagRepair;
 use editor_Plugins_TermTagger_Tag;
 use editor_Segment_FieldTags;
 use editor_Segment_Tag;
-use editor_TagSequence;
+use MittagQI\Translate5\Tag\TagSequence;
 
 /**
  * Fixes Problems of the Termtagger:
@@ -74,7 +74,7 @@ class TermTaggerTagsFixer
             }
         }
         // @phpstan-ignore-next-line
-        if (editor_TagSequence::DO_DEBUG && (count($this->nestings) > 0 || count($this->overlaps) > 0)) {
+        if (TagSequence::DO_DEBUG && (count($this->nestings) > 0 || count($this->overlaps) > 0)) {
             error_log('SEGMENT TAGS: Invalid Terminology-Tags found in TermTaggerTagsFixer');
         }
     }

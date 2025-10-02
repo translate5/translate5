@@ -32,11 +32,10 @@ namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Action;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
-use editor_Services_Connector;
-use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
+use MittagQI\Translate5\Integration\UpdateSegmentService;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsResult;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
@@ -54,11 +53,11 @@ class ReimportSnapshot
     public function __construct(
         private readonly ReimportSegmentRepositoryInterface $reimportSegmentRepository,
         private readonly LanguageResourceRepository $languageResourceRepository,
-        private readonly editor_Services_Manager $serviceManager,
         private readonly ReimportSegmentsLoggerProvider $loggerProvider,
         private readonly SegmentRepository $segmentRepository,
         private readonly TmConversionService $tmConversionService,
         private readonly FlushMemoryService $flushMemoryService,
+        private readonly UpdateSegmentService $updateSegmentService,
     ) {
     }
 
@@ -67,11 +66,11 @@ class ReimportSnapshot
         return new self(
             new JsonlReimportSegmentsRepository(),
             new LanguageResourceRepository(),
-            new editor_Services_Manager(),
             new ReimportSegmentsLoggerProvider(),
             SegmentRepository::create(),
             TmConversionService::create(),
             FlushMemoryService::create(),
+            \Zend_Registry::get('integration.segment.update'),
         );
     }
 
@@ -128,34 +127,32 @@ class ReimportSnapshot
     }
 
     /**
-     * @param iterable<UpdateSegmentDTO> $updateDTOs
+     * @param iterable<ReimportSegmentDTO> $reimportDTOS
      */
     private function updateSegments(
         LanguageResource $languageResource,
         Task $task,
-        iterable $updateDTOs,
+        iterable $reimportDTOS,
         array $updateOnlyIds = [],
     ): ReimportSegmentsResult {
-        $connector = $this->getConnector($languageResource, $task);
         $options = UpdateOptions::fromArray(
             [
-                UpdatableAdapterInterface::SAVE_TO_DISK => false,
+                UpdateOptions::SAVE_TO_DISK => false,
             ]
         );
 
         $emptySegmentsAmount = 0;
         $successfulSegmentsAmount = 0;
         $failedSegmentsIds = [];
-        $lastSegment = null;
 
-        foreach ($updateDTOs as $updateDTO) {
-            if (! empty($updateOnlyIds) && ! in_array($updateDTO->segmentId, $updateOnlyIds, true)) {
+        foreach ($reimportDTOS as $reimportDTO) {
+            if (! empty($updateOnlyIds) && ! in_array($reimportDTO->segmentId, $updateOnlyIds, true)) {
                 continue;
             }
 
-            $segment = $this->segmentRepository->get($updateDTO->segmentId);
+            $segment = $this->segmentRepository->get($reimportDTO->segmentId);
 
-            if ($updateDTO->source === '' || $updateDTO->target === '') {
+            if ($reimportDTO->source === '' || $reimportDTO->target === '') {
                 $emptySegmentsAmount++;
 
                 continue;
@@ -163,45 +160,35 @@ class ReimportSnapshot
 
             try {
                 [$source, $target] = $this->tmConversionService->convertPair(
-                    $updateDTO->source,
-                    $updateDTO->target,
+                    $reimportDTO->source,
+                    $reimportDTO->target,
                     $task->getSourceLang(),
                     $task->getTargetLang(),
                 );
 
                 $updateDTO = new UpdateSegmentDTO(
-                    $updateDTO->taskGuid,
-                    $updateDTO->segmentId,
                     $source,
                     $target,
-                    $updateDTO->fileName,
-                    $updateDTO->timestamp,
-                    $updateDTO->userName,
-                    $updateDTO->context,
+                    $reimportDTO->fileName,
+                    $reimportDTO->timestamp,
+                    $reimportDTO->userName,
+                    $reimportDTO->context,
                 );
 
-                $connector->updateWithDTO($updateDTO, $options, $segment);
+                $this->updateSegmentService->updateWithDTO(
+                    $languageResource,
+                    $segment,
+                    $updateDTO,
+                    $task->getConfig(),
+                    $options,
+                );
             } catch (Throwable) {
-                $failedSegmentsIds[] = $updateDTO->segmentId;
+                $failedSegmentsIds[] = $reimportDTO->segmentId;
 
                 continue;
             }
 
             $successfulSegmentsAmount++;
-
-            if (null === $lastSegment) {
-                // Check the first segment if update was successful
-                $connector->checkUpdatedSegment($segment);
-            }
-
-            $lastSegment = $segment;
-        }
-
-        if ($lastSegment) {
-            // And check the last segment if update was successful
-            // We consider that if first and last were successfully updated -
-            // high probability all in between were successful too
-            $connector->checkUpdatedSegment($lastSegment);
         }
 
         if (0 !== $successfulSegmentsAmount) {
@@ -261,16 +248,5 @@ class ReimportSnapshot
         ];
 
         $this->loggerProvider->getLogger()->warn('E1714', $message, $params);
-    }
-
-    private function getConnector(
-        LanguageResource $languageResource,
-        Task $task
-    ): UpdatableAdapterInterface|editor_Services_Connector {
-        return $this->serviceManager->getConnector(
-            $languageResource,
-            config: $task->getConfig(),
-            customerId: (int) $task->getCustomerId(),
-        );
     }
 }

@@ -239,7 +239,7 @@ final class Adapter
 
     /**
      * Get matches from LanguageTool.
-     * @param string $text
+     * @param string|array $text
      * @param string $language
      * @return object
      */

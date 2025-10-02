@@ -30,9 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\T5Memory\Api;
 
+use MittagQI\Translate5\T5Memory\Api\Contract\PoolAsyncClientInterface;
+use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -46,10 +49,10 @@ class T5MemoryApiTest extends TestCase
         $response->method('getBody')->willReturn($bodyMock);
         $response->method('getStatusCode')->willReturn(200);
 
-        $client = $this->createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn($response);
-
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $this->getClient($response),
+            SegmentLengthValidator::create(),
+        );
 
         $iterator = $api->downloadTmx('http://example.com', 'tmName', 20);
 
@@ -69,10 +72,10 @@ class T5MemoryApiTest extends TestCase
 
         $response->method('getHeader')->willReturnOnConsecutiveCalls(['11:1'], []);
 
-        $client = $this->createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn($response);
-
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $this->getClient($response),
+            SegmentLengthValidator::create(),
+        );
 
         $iterator = $api->downloadTmx('http://example.com', 'tmName', 20);
 
@@ -90,13 +93,36 @@ class T5MemoryApiTest extends TestCase
         $response->method('getBody')->willReturn($bodyMock);
         $response->method('getStatusCode')->willReturn(200);
 
-        $client = $this->createMock(ClientInterface::class);
-        $client->method('sendRequest')->willReturn($response);
-
-        $api = new T5MemoryApi($client);
+        $api = new T5MemoryApi(
+            $this->getClient($response),
+            SegmentLengthValidator::create(),
+        );
 
         $stream = $api->downloadTm('http://example.com', 'tmName');
 
         self::assertInstanceOf(StreamInterface::class, $stream);
+    }
+
+    private function getClient(ResponseInterface $response): PoolAsyncClientInterface & ClientInterface
+    {
+        $client = new class($response) implements ClientInterface, PoolAsyncClientInterface {
+            public function __construct(
+                private ResponseInterface $response
+            ) {
+            }
+
+            public function sendRequest(RequestInterface $request): ResponseInterface
+            {
+                return $this->response;
+            }
+
+            public function poolAsync(array $requests, int $concurrency = 10, array $perRequestOptions = []): array
+            {
+                /** @phpstan-ignore-next-line */
+                return [];
+            }
+        };
+
+        return $client;
     }
 }

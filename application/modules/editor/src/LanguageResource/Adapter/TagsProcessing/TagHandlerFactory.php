@@ -30,33 +30,27 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing;
 
-use editor_Services_Connector_TagHandler_Abstract;
+use editor_Services_Connector_TagHandler_Abstract as AbstractTagHandler;
 use editor_Services_Connector_TagHandler_HtmlRepaired;
 use editor_Services_Connector_TagHandler_PairedTags;
 use editor_Services_Connector_TagHandler_Remover;
 use editor_Services_Connector_TagHandler_T5MemoryXliff;
 use editor_Services_Connector_TagHandler_Xliff;
 use Zend_Config;
-use Zend_Registry;
 use ZfExtended_Factory as Factory;
 
 class TagHandlerFactory
 {
-    public function __construct(
-        private readonly Zend_Config $config,
-    ) {
-    }
-
     public static function create(): self
     {
-        return new self(
-            Zend_Registry::get('config'),
-        );
+        return new self();
     }
 
-    public function createTagHandler(string $resourceAlias, array $params = [], ?Zend_Config $config = null): editor_Services_Connector_TagHandler_Abstract
-    {
-        $config = $config ?? $this->config;
+    public function createTagHandler(
+        string $resourceAlias,
+        Zend_Config $config,
+        array $params = [],
+    ): AbstractTagHandler {
         $configuredHandler = $config->runtimeOptions->LanguageResources->{$resourceAlias}?->tagHandler ?? null;
 
         // Using Factory::get here for backwards compatibility as there might be overwritten tag handlers

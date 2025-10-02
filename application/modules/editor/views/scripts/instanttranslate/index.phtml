@@ -101,6 +101,11 @@ $this->translations = array(
         'title' => $translate->_('Zur menschlichen Revision senden'),
         'message' => $translate->_('Zur menschlichen Revision senden?'),
     ],
+    'humanRevision' => [
+        'descriptionLabel' => $translate->_('Projektbeschreibung'),
+        'workflowLabel' => $translate->_('Workflow'),
+        'customFieldsLabel' => $translate->_('Benutzerdefinierte Felder für Aufgaben'),
+    ],
     'inHumanRevision' => $translate->_('In menschlicher Revision'),
     'humanRevisionFinished' => $translate->_('Menschliche revision fertiggestellt'),
     'editInEditorButton' => $translate->_('Aufgabe im Editor editieren'),
@@ -108,6 +113,8 @@ $this->translations = array(
     'saveToTm' => [
         'message' => $translate->_('Aufgabe im TM speichern?'),
     ],
+    'mtResourcesComboPrefix' => $translate->_('Verwendete MT-Resource:'),
+    'customerComboPrefix' => $translate->_('Übersetzen mit den Einstellungen für:'),
 );
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
@@ -342,6 +349,14 @@ $languageSelector[] = '</form>';
                 }
                 ?>
             </select>
+
+
+            <select id="userCustomers" class="selectSourceTarget" name="userCustomers"></select>
+
+            <!-- Language Resource selector for File Translation -->
+            <select id="fileLanguageResource" class="selectSourceTarget" name="fileLanguageResource"></select>
+
+            <div id="languageResourceSelectorError" class="instant-translation-error ui-state-error ui-corner-all box marginTop" style="display:none"></div>
         </form>
         <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all box marginTop"></div>
         <div class="loadingSpinnerIndicator marginTop">
@@ -413,6 +428,7 @@ $languageSelector[] = '</form>';
 </div>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/apps/js/ErrorHandler.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/js/shared.js<?php echo $version ?>"></script>
+<script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/humanRevision.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/instanttranslate.js<?= $version ?>"></script>
 <script type="text/javascript">
 

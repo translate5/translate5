@@ -29,16 +29,15 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Plugins\SpellCheck\Segment;
 
 use editor_Models_Segment;
-use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Segment_FieldTags;
 use editor_Segment_Internal_Tag;
 use editor_Segment_Tag;
-use editor_TagSequence;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Adapter;
+use MittagQI\Translate5\Tag\TagSequence;
 use stdClass;
 use Zend_Exception;
 use ZfExtended_Exception;
@@ -307,7 +306,7 @@ class Check
     {
         // Get target text with all tags being either stripped or
         // replaced with their original contents (in case of whitespace)
-        $targetText = $target->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
+        $targetText = $target->renderReplaced(TagSequence::MODE_ORIGINAL);
 
         // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
         // Return string applicable to be sent to LanguageTool

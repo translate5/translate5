@@ -35,7 +35,8 @@ use MittagQI\Translate5\Test\ImportTestAbstract;
  */
 class TaskFilterTest extends ImportTestAbstract
 {
-    const DATE = "Y-m-d 00:00:00";
+    public const DATE = "Y-m-d 00:00:00";
+
     protected static bool $termtaggerRequired = true;
 
     /**

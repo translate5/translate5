@@ -30,6 +30,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api\Contract;
 
+use Zend_Config;
+
 interface ResponseInterface
 {
     public function getBody(): array;
@@ -39,4 +41,6 @@ interface ResponseInterface
     public function getErrorMessage(): ?string;
 
     public function getCode(): int;
+
+    public function needsReorganizing(Zend_Config $config): bool;
 }

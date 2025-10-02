@@ -17,5 +17,6 @@ parameters:
 		- Translate5
 	excludePaths:
 		- application/modules/editor/Plugins/TMMaintenance/public/resources/ext
+		- .phpstorm.meta.php
 	ignoreErrors:
 		- '#^Access to an undefined property XMLReader::\$\w+\.$#'

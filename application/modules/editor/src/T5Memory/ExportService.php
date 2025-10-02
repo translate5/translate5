@@ -75,9 +75,10 @@ class ExportService
         LanguageResource $languageResource,
         TmFileExtension $extension,
         ?string $tmName = null,
+        bool $unprotect = true,
     ): ?string {
         return match ($extension) {
-            TmFileExtension::TMX => $this->composeTmxFile($languageResource, $tmName),
+            TmFileExtension::TMX => $this->composeTmxFile($languageResource, $tmName, $unprotect),
             TmFileExtension::TM => $this->exportSingleTm($languageResource, $tmName),
             TmFileExtension::ZIP => $this->exportAllAsArchive($languageResource, $tmName),
         };
@@ -138,12 +139,12 @@ class ExportService
         );
     }
 
-    private function composeTmxFile(LanguageResource $languageResource, ?string $tmName): ?string
+    private function composeTmxFile(LanguageResource $languageResource, ?string $tmName, bool $unprotect): ?string
     {
         $tmxFilename = $this->composeFilename($languageResource, TmFileExtension::TMX);
 
         try {
-            foreach ($this->exportAllAsOneTmx($languageResource, $tmName) as $chunk) {
+            foreach ($this->exportAllAsOneTmx($languageResource, $tmName, $unprotect) as $chunk) {
                 file_put_contents($tmxFilename, $chunk, FILE_APPEND);
             }
         } catch (ExportException) {
@@ -159,7 +160,7 @@ class ExportService
      * @return iterable<string>
      * @throws ExportException
      */
-    private function exportAllAsOneTmx(LanguageResource $languageResource, ?string $tmName): iterable
+    private function exportAllAsOneTmx(LanguageResource $languageResource, ?string $tmName, bool $unprotect): iterable
     {
         $memories = $this->getMemories($languageResource, $tmName);
 
@@ -181,7 +182,8 @@ class ExportService
                     $tmName,
                     $memoryNumber,
                     $writtenElements,
-                    $atLeastOneFileRead
+                    $atLeastOneFileRead,
+                    $unprotect
                 );
             } catch (ClientExceptionInterface $e) {
                 $exceptionWasThrown = true;
@@ -221,11 +223,12 @@ class ExportService
         int $memoryNumber,
         int &$writtenElements,
         bool &$atLeastOneFileRead,
+        bool $unprotect,
     ): iterable {
         $firstChunk = true;
 
         foreach ($this->exportTmxChunk($languageResource, $tmName) as $stream) {
-            $iterator = $this->iterateTmx($stream, $firstChunk && $memoryNumber === 0, $writtenElements);
+            $iterator = $this->iterateTmx($stream, $firstChunk && $memoryNumber === 0, $writtenElements, $unprotect);
 
             if ($iterator?->valid()) {
                 $atLeastOneFileRead = true;
@@ -256,7 +259,7 @@ class ExportService
     /**
      * @return Generator<string>|null
      */
-    private function iterateTmx(StreamInterface $stream, bool $returnHeader, int &$writtenElements): ?Generator
+    private function iterateTmx(StreamInterface $stream, bool $returnHeader, int &$writtenElements, bool $unprotect): ?Generator
     {
         $reader = new XMLReader();
 
@@ -276,7 +279,13 @@ class ExportService
             if ($reader->nodeType === XMLReader::ELEMENT && $reader->name === 'tu') {
                 $writtenElements++;
 
-                yield $this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()) . PHP_EOL;
+                $tu = $reader->readOuterXML();
+
+                if ($unprotect) {
+                    $tu = $this->conversionService->convertT5MemoryTagToContent($tu);
+                }
+
+                yield $tu . PHP_EOL;
             }
 
             if (! $returnHeader) {

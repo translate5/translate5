@@ -38,9 +38,9 @@ abstract class AbstractResponse implements ResponseInterface
     private readonly int $code;
 
     public function __construct(
-        public readonly array $body,
-        public readonly ?string $errorMessage,
-        public readonly int $statusCode,
+        private readonly array $body,
+        private readonly ?string $errorMessage,
+        protected readonly int $statusCode,
     ) {
         $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
     }
@@ -65,5 +65,28 @@ abstract class AbstractResponse implements ResponseInterface
     public function getCode(): int
     {
         return $this->code;
+    }
+
+    public function needsReorganizing(\Zend_Config $config): bool
+    {
+        if (str_contains($this->getErrorMessage() ?: '', 'Failed to load tm')) {
+            return false;
+        }
+
+        $errorCodes = explode(
+            ',',
+            $config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
+        );
+
+        return in_array($this->getCode(), $errorCodes);
+    }
+
+    protected static function getContent(PsrResponseInterface $response): string
+    {
+        if ($response->getBody()->isSeekable()) {
+            $response->getBody()->rewind();
+        }
+
+        return $response->getBody()->getContents();
     }
 }

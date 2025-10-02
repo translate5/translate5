@@ -32,18 +32,18 @@ namespace MittagQI\Translate5\Test\Unit\Workflow\BatchSet;
 
 use MittagQI\Translate5\JobAssignment\UserJob\BatchUpdate\UserJobDeadlineBatchUpdater;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\BatchSet\BatchSetTaskGuidsProvider;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidDeadlineDateStringProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\Task\BatchSet\Setter\TaskBatchSetDeadlineDate;
+use MittagQI\Translate5\Task\BatchOperations\BatchSetTaskGuidsProvider;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidDeadlineDateStringProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowStepProvidedException;
+use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchSetDeadlineDate;
 use PHPUnit\Framework\TestCase;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_Logger;
 
 class TaskBatchSetDeadlineDateTest extends TestCase
 {
-    private const updateType = 'deadlineDate';
+    private const batchType = 'deadlineDate';
 
     private TaskBatchSetDeadlineDate $taskBatchSetDeadlineDate;
 
@@ -58,7 +58,7 @@ class TaskBatchSetDeadlineDateTest extends TestCase
 
     public function testSupportsDeadline(): void
     {
-        self::assertTrue($this->taskBatchSetDeadlineDate->supports(self::updateType));
+        self::assertTrue($this->taskBatchSetDeadlineDate->supports(self::batchType));
     }
 
     public function testEmptyWorkflow(): void
@@ -96,7 +96,7 @@ class TaskBatchSetDeadlineDateTest extends TestCase
     private static function getRequest(): Request
     {
         $request = new Request();
-        $request->setParam('updateType', self::updateType);
+        $request->setParam('batchType', self::batchType);
         $request->setParam('batchWorkflow', 'default');
         $request->setParam('batchWorkflowStep', 'translation');
         $request->setParam('deadlineDate', '2025-03-05T09:43:00');

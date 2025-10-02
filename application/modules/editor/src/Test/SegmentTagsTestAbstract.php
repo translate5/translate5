@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Test;
 
 use editor_Segment_FieldTags;
 use editor_Segment_Tag;
-use editor_TagSequence;
+use MittagQI\Translate5\Tag\TagSequence;
 
 /**
  * Abstraction layer for performing API tests which involve comparing Segment Texts.
@@ -56,6 +56,7 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         '<ins3>' => '<ins class="trackchanges ownttip" data-usertrackingid="2345" data-usercssnr="usernr2" data-workflowstep="no workflow1" data-timestamp="2024-11-03T12:33:09+02:00">',
         '<del1>' => '<del class="trackchanges ownttip deleted" data-usertrackingid="4270" data-usercssnr="usernr3" data-workflowstep="review1sttechnical4" data-timestamp="2021-07-05T14:14:44+02:00" data-historylist="1625486496000" data-action_history_1625486496000="INS" data-usertrackingid_history_1625486496000="4269">',
         '<del2>' => '<del class="trackchanges ownttip deleted" data-usertrackingid="4987" data-usercssnr="usernr4" data-workflowstep="review1sttechnical2" data-timestamp="2021-08-05T14:14:44+02:00" data-historylist="5412486496000" data-action_history_4534486496000="INS" data-usertrackingid_history_4534486496000="7635">',
+        '<del3>' => '<del class="trackchanges ownttip deleted" data-usertrackingid="4993" data-usercssnr="usernr5" data-workflowstep="review1sttechnical8" data-timestamp="2021-08-05T14:14:44+02:00" data-historylist="5412486496000" data-action_history_4534486496000="INS" data-usertrackingid_history_4534486496000="5432">',
         '<term1>' => '<div class="term preferredTerm exact" title="" data-tbxid="71a5458c-c4b3-49e9-af3b-c8222b91275a">',
         '<term2>' => '<div class="term deprecatedTerm" title="" data-tbxid="81a5458c-c4b3-49e9-af3b-c6222b91275a">',
         '<term3>' => '<div class="term standardizedTerm" title="" data-tbxid="91a5458c-c4b3-49e9-af3b-c4222b91275a">',
@@ -128,7 +129,7 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         $this->assertEquals($tags->getFieldText(true), $tags->renderReplaced());
         // test the replaced rendering with the labeled whitespace placeholders
         if ($replacedLabeled !== null) {
-            $this->assertEquals($replacedLabeled, $tags->renderReplaced(editor_TagSequence::MODE_LABELED));
+            $this->assertEquals($replacedLabeled, $tags->renderReplaced(TagSequence::MODE_LABELED));
         }
     }
 
@@ -215,8 +216,8 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
             $markup = str_replace($short, $full, $markup);
         }
         // end-tags
-        $markup = preg_replace('~</ins[0-3]?>~', '</ins>', $markup);
-        $markup = preg_replace('~</del[0-2]?>~', '</del>', $markup);
+        $markup = preg_replace('~</ins[0-3]>~', '</ins>', $markup);
+        $markup = preg_replace('~</del[0-3]>~', '</del>', $markup);
         $markup = preg_replace('~</term[0-3]?>~', '</div>', $markup);
 
         return $markup;

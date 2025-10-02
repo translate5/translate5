@@ -30,13 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Repository;
 
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 
 class JsonlReimportSegmentsRepository implements ReimportSegmentRepositoryInterface
 {
     public const DIRECTORY = 'ReimportSegments';
 
-    public function save(string $runId, UpdateSegmentDTO $dto): void
+    public function save(string $runId, ReimportSegmentDTO $dto): void
     {
         $filename = $this->getFileName($runId, $dto->taskGuid);
         file_put_contents(
@@ -61,7 +61,7 @@ class JsonlReimportSegmentsRepository implements ReimportSegmentRepositoryInterf
         unlink($filename);
     }
 
-    private function toArray(UpdateSegmentDTO $dto): array
+    private function toArray(ReimportSegmentDTO $dto): array
     {
         return [
             $dto->taskGuid,
@@ -75,9 +75,9 @@ class JsonlReimportSegmentsRepository implements ReimportSegmentRepositoryInterf
         ];
     }
 
-    private function fromArray(array $data): UpdateSegmentDTO
+    private function fromArray(array $data): ReimportSegmentDTO
     {
-        return new UpdateSegmentDTO(
+        return new ReimportSegmentDTO(
             taskGuid: $data[0],
             segmentId: (int) $data[1],
             source: $data[2],

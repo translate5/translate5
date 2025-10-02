@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\TagSequence;
 use MittagQI\ZfExtended\Tools\Markup;
 
 /**
@@ -136,11 +137,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
     private string $severity = '';
 
     private string $comment = '';
-
-    /**
-     * Holds the order of our closer in the phase of serialization
-     */
-    public int $rightOrder = -1;
 
     public function getCategoryIndex(): int
     {
@@ -325,7 +321,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         if ($this->getQualityId() == null || $tag->getQualityId() != $this->getQualityId()) {
             return false;
         }
-        if (editor_TagSequence::DO_DEBUG && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex) { // @phpstan-ignore-line
+        if (TagSequence::DO_DEBUG && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex) { // @phpstan-ignore-line
             error_log("\n##### MQM TAG: INVALID INDEXES FOUND [open: (" . $this->startIndex . "|" . $this->endIndex . ") close: (" . $tag->startIndex . "|" . $tag->endIndex . ")] #####\n");
         }
         $this->paired = true;
@@ -342,7 +338,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         return true;
     }
 
-    public function finalize(editor_TagSequence $tags, editor_Models_Task $task): void
+    public function finalize(editor_Segment_FieldTags $tags, editor_Models_Task $task): void
     {
         // finds our severity in our cclasses via the tasks MQM configuration
         $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');

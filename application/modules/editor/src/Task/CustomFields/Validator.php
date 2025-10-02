@@ -110,7 +110,7 @@ class Validator extends ZfExtended_Models_Validator_Abstract
             }
             $places = array_map('trim', $value);
             foreach ($places as $place) {
-                if (! in_array($place, ['projectWizard', 'projectGrid', 'taskGrid'])) {
+                if (! in_array($place, ['projectWizard', 'projectGrid', 'taskGrid', 'instantTranslate'])) {
                     return false;
                 }
             }

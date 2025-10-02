@@ -112,6 +112,9 @@ class FileTranslation
      * 1) automatically create a hidden task for the document
      * 2) pre-translate it against the available language resources for the language combination for the customer
      *    in the same way pre-translations work for tasks through the GUI (first termCollections, second TMs, third MTs)
+     *    OR in case $withMtResources is given, use this resource for mt failback. Reason is:
+     *     - saving costs and not query each of one assigned.
+     *     - feature in instant-translate where a user can pick the mt to pre-translate file
      * 3) When the document is pre-translated, we will offer it for download#
      *
      * @throws FileTranslationException
@@ -120,11 +123,14 @@ class FileTranslation
      * @throws \Zend_Http_Client_Exception
      * @throws \ZfExtended_Exception
      * @throws \ZfExtended_FileUploadException
+     * @throws ReflectionException
      */
     public function importAndTranslate(
         array $importFile,
         int $sourceLang,
-        int $targetLang
+        int $targetLang,
+        int $customerId,
+        array $withMtResources = [],
     ): editor_Models_Task {
         $acl = ZfExtended_Acl::getInstance();
         if (! $acl->isInAllowedRoles(
@@ -137,8 +143,10 @@ class FileTranslation
             ]);
         }
 
-        $task = $this->prepareTaskImport($importFile, $sourceLang, $targetLang);
-        $assignedLanguageResourceIds = $this->assignLanguageResources($task);
+        $task = $this->prepareTaskImport($importFile, $sourceLang, $targetLang, $customerId);
+
+        $assignedLanguageResourceIds = $this->manageAssociation($task, $withMtResources);
+
         // pretranslate the task
         /*
          * (Marc:)
@@ -176,16 +184,57 @@ class FileTranslation
     }
 
     /**
+     * Validate and assign the provided language resources to the task. In case no resources are given, the automatic
+     * resources assignment will take place.
+     * @throws FileTranslationException
+     * @throws ReflectionException
+     * @throws \Zend_Cache_Exception
+     * @throws \Zend_Exception
+     */
+    private function manageAssociation(editor_Models_Task $task, array $withMtResources = []): array
+    {
+        if (empty($withMtResources)) {
+            return $this->assignLanguageResources($task);
+        }
+
+        $assignable = $this->getTaskAssignableResources($task);
+
+        // Validate that all requested resources are assignable for this task
+        $requested = array_map('intval', $withMtResources);
+        $invalid = array_values(array_diff($requested, $assignable));
+        if (! empty($invalid)) {
+            throw new FileTranslationException('E1740', [
+                'msg' => 'File-Translation: Some provided language resources are not assignable for this task.',
+                'invalidResourceIds' => $invalid,
+            ]);
+        }
+
+        $assignedLanguageResourceIds = [];
+
+        foreach ($withMtResources as $withResource) {
+            $this->addLanguageResource(
+                (int) $withResource,
+                $task->getTaskGuid()
+            );
+            $assignedLanguageResourceIds[] = (int) $withResource;
+        }
+
+        return $assignedLanguageResourceIds;
+    }
+
+    /**
      * Prepare import for task with the given file.
      * Creates a task-entity for further handling, but does not run the import yet.
-     * @param array $importFile
-     * @param int $sourceLang
-     * @param int $targetLang
+     *
+     * @throws FileTranslationException
+     * @throws \MittagQI\Translate5\Task\Exception\InexistentTaskException
+     * @throws \Zend_Exception
+     * @throws \Zend_Http_Client_Exception
+     * @throws \ZfExtended_Exception
+     * @throws \ZfExtended_FileUploadException
      */
-    private function prepareTaskImport($importFile, $sourceLang, $targetLang): editor_Models_Task
+    private function prepareTaskImport(array $importFile, int $sourceLang, int $targetLang, int $customerId): editor_Models_Task
     {
-        // this selects the FIRST entry from the List configured in the user-management
-        $customerId = ZfExtended_Authentication::getInstance()->getUser()->getPrimaryCustomerId();
         $requestData = new ApiRequestDTO('POST', 'editor/task/');
         $requestData->loggerDomain = $this->loggerDomain;
         $requestData->params = [
@@ -228,42 +277,77 @@ class FileTranslation
      */
     public function assignLanguageResources(editor_Models_Task $task): array
     {
-        $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        //get source and target language fuzzies
-        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
-        $targetLangs = $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), 'id', true);
-
-        $langRes = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
-        //get the languageresources to the current user and to the given languages
-        $tobeUsed = $langRes->loadByUserCustomerAssocs([], $sourceLangs, $targetLangs);
+        $assignable = $this->getTaskAssignableResources($task);
 
         $langResTaskAssocs = ZfExtended_Factory::get(TaskAssociation::class);
-        // some LanguageResources have been already auto assigned on creating the task:
+        // some LanguageResources have been already auto-assigned on creating the task:
         $currentlyAssigned = $langResTaskAssocs->loadByTaskGuids([$task->getTaskGuid()]);
-        $currentlyAssignedIds = array_column($currentlyAssigned, 'languageResourceId');
+        $currentlyAssignedIds = array_map('intval', array_column($currentlyAssigned, 'languageResourceId'));
 
         //collect assigned
         $assignedLanguageResources = $currentlyAssignedIds;
 
         // add LanguageResources that have not been assigned already while creating the task:
-        foreach ($tobeUsed as $languageResource) {
-            if ($languageResource['isTaskTm']) {
-                continue;
-            }
-
+        foreach ($assignable as $languageResource) {
             // is it not assigned already??
-            if (in_array($languageResource['id'], $currentlyAssignedIds)) {
+            if (in_array($languageResource, $currentlyAssignedIds)) {
                 continue;
             }
 
             //collect the associated language resource id
-            $assignedLanguageResources[] = $languageResource['id'];
+            $assignedLanguageResources[] = $languageResource;
 
             // then assign it now:
-            $this->addLanguageResource((int) $languageResource['id'], $task->getTaskGuid());
+            $this->addLanguageResource((int) $languageResource, $task->getTaskGuid());
         }
 
         return $assignedLanguageResources;
+    }
+
+    /**
+     * Find all assignable resources for a task customer and language combination. Task tms will be ignored
+     * @throws ReflectionException
+     * @throws \Zend_Cache_Exception
+     * @throws \Zend_Exception
+     */
+    private function getTaskAssignableResources(editor_Models_Task $task, array $withMtResources = []): array
+    {
+        $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
+        //get source and target language fuzzy
+        $sourceLangs = $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), 'id', true);
+        $targetLangs = $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), 'id', true);
+
+        $langRes = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+        //get the language resources to the current user and to the given languages. For file-translation
+        // we can set the task customer. That is why we use the resource only of this customer.
+        $toBeUsed = $langRes->loadByUserCustomerAssocs([], $sourceLangs, $targetLangs, [], [$task->getCustomerId()]);
+
+        return $this->filterAssignableResources($toBeUsed, $withMtResources);
+    }
+
+    /**
+     * Collect(filter) all resources which can be assigned to the file-translation tasks.
+     * If $withMtResources is defined, only this mt resource will be used for file-translation.
+     */
+    private function filterAssignableResources(array $resources, array $withMtResources): array
+    {
+        $hasRestrictions = ! empty($withMtResources);
+        $mtResourcesSet = $hasRestrictions ? array_flip($withMtResources) : [];
+        $assignable = [];
+
+        foreach ($resources as $resource) {
+            if ($resource['isTaskTm']) {
+                continue;
+            }
+
+            $resourceId = (int) $resource['id'];
+
+            if (! $hasRestrictions || isset($mtResourcesSet[$resourceId])) {
+                $assignable[] = $resourceId;
+            }
+        }
+
+        return $assignable;
     }
 
     /**

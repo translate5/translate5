@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Integration\LanguageResource\ReimportSegments\Repository;
 
 use Faker\Factory;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimportSegmentsRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -59,13 +59,13 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
         $runId = bin2hex(random_bytes(5));
         $taskGuid = 'testTaskGuid';
 
-        $dto = new UpdateSegmentDTO(
+        $dto = new ReimportSegmentDTO(
             $taskGuid,
             1,
             'source text',
             'target text',
             'file.txt',
-            '2025-01-01 12:00:00',
+            time(),
             'user',
             'context',
         );
@@ -83,13 +83,13 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
         $data = [];
 
         for ($i = 1; $i < random_int(2, 10); $i++) {
-            $dto = new UpdateSegmentDTO(
+            $dto = new ReimportSegmentDTO(
                 $taskGuid,
                 1,
                 'source text',
                 'target text',
                 'file.txt',
-                '2025-01-01 12:00:00',
+                time(),
                 'user',
                 'context',
             );
@@ -106,13 +106,13 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
         $runId = bin2hex(random_bytes(5));
         $taskGuid = 'testTaskGuid';
 
-        $dto = new UpdateSegmentDTO(
+        $dto = new ReimportSegmentDTO(
             $taskGuid,
             1,
             'source text',
             'target text',
             'file.txt',
-            '2025-01-01 12:00:00',
+            time(),
             'user',
             'context',
         );
@@ -146,13 +146,13 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
 
         $this->repository->save(
             bin2hex(random_bytes(5)),
-            new UpdateSegmentDTO(
+            new ReimportSegmentDTO(
                 'testTaskGuid',
                 1,
                 'source text',
                 'target text',
                 'file.txt',
-                '2025-01-01 12:00:00',
+                time(),
                 'user',
                 'context',
             )
@@ -171,7 +171,7 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
                 'source' => $faker->realText(),
                 'target' => $faker->realText(),
                 'fileName' => $faker->word() . '.' . $faker->fileExtension(),
-                'timestamp' => $faker->dateTime()->format(\DateTimeImmutable::ATOM),
+                'timestamp' => $faker->dateTime()->getTimestamp(),
                 'userName' => $faker->userName(),
                 'context' => $faker->word(),
             ],
@@ -184,7 +184,7 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
                 'source' => $faker->realText(10) . '~`!@#$%^&*()_+-=}]{["\':;?/|\\>.<,' . $faker->realText(10),
                 'target' => $faker->realText(),
                 'fileName' => $faker->word() . '.' . $faker->fileExtension(),
-                'timestamp' => $faker->dateTime()->format(\DateTimeImmutable::ATOM),
+                'timestamp' => $faker->dateTime()->getTimestamp(),
                 'userName' => $faker->userName(),
                 'context' => $faker->word(),
             ],
@@ -197,7 +197,7 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
                 'source' => $faker->realText(100) . '\\',
                 'target' => $faker->realText(),
                 'fileName' => $faker->word() . '.' . $faker->fileExtension(),
-                'timestamp' => $faker->dateTime()->format(\DateTimeImmutable::ATOM),
+                'timestamp' => $faker->dateTime()->getTimestamp(),
                 'userName' => $faker->userName(),
                 'context' => $faker->word(),
             ],
@@ -210,7 +210,7 @@ class JsonlReimportSegmentsRepositoryTest extends TestCase
     public function testSaveAndLoadReturnsSameData(array $data): void
     {
         $runId = bin2hex(random_bytes(5));
-        $dto = new UpdateSegmentDTO(
+        $dto = new ReimportSegmentDTO(
             $data['taskGuid'],
             $data['segmentId'],
             $data['source'],

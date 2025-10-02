@@ -36,7 +36,7 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  */
 class HtmlProcessor
 {
-    private Tags $tags;
+    private RepairTags $tags;
 
     private bool $preparationFault = false;
 
@@ -55,7 +55,7 @@ class HtmlProcessor
     public function prepareRequest(string $html): string
     {
         try {
-            $this->tags = new Tags($html, $this->preserveComments);
+            $this->tags = new RepairTags($html, $this->preserveComments);
 
             return $this->tags->getRequestHtml();
         } catch (\Exception) {

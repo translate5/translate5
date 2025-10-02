@@ -113,13 +113,26 @@ class TaskRepository
      */
     public function getProjectTaskList(int $projectId): iterable
     {
-        $s = $this->db->select()
-            ->from(TaskTable::TABLE_NAME)
-            ->where('projectId = ?', $projectId)
-            ->where('id != ?', $projectId)
-        ;
-        $tasksData = $this->db->fetchAll($s);
+        return $this->getTaskListByWhere([
+            'projectId = ?' => $projectId,
+            'id != ?' => $projectId,
+        ]);
+    }
 
+    public function getTaskListByIds(array $taskIds): iterable
+    {
+        return $this->getTaskListByWhere([
+            'id IN (?)' => $taskIds,
+        ]);
+    }
+
+    private function getTaskListByWhere(array $where): iterable
+    {
+        $s = $this->db->select()->from(TaskTable::TABLE_NAME);
+        foreach ($where as $field => $value) {
+            $s = $s->where($field, $value);
+        }
+        $tasksData = $this->db->fetchAll($s);
         foreach ($tasksData as $taskData) {
             // we can't clone task instance because it's not a cloneable object
             $task = new Task();
@@ -179,5 +192,19 @@ SQL;
         $sql = $this->db->quoteInto($sql, $taskGuid, 'string', 2);
 
         $this->db->query($sql);
+    }
+
+    public function getTaskGuidsFinishedBetween(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        $s = $this->db->select()
+            ->from('LEK_task_log', ['taskGuid', 'created'])
+            ->where("message like 'job status changed from % to finished'")
+            ->where('created > ?', $startDate->format('Y-m-d H:i:s'))
+            ->where('created < ?', $endDate->format('Y-m-d H:i:s'))
+        ;
+
+        $rows = $this->db->fetchAll($s);
+
+        return array_column($rows, 'taskGuid');
     }
 }

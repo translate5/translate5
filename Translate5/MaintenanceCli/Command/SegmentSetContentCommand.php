@@ -40,48 +40,43 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class SegmentSetContentCommand extends Translate5AbstractCommand
 {
-    // the name of the command (the part after "bin/console")
     protected static $defaultName = 'segment:setcontent';
 
     protected function configure()
     {
         $this
-            // the short description shown while running "php bin/console list"
             ->setDescription('Sets a segment´s source/target.')
-
-            // the full command description shown when running the command with
-            // the "--help" option
             ->setHelp(
                 'Sets a segments source/target. If source or target should not be set, provide the string "NULL". '
                 . 'Please note, that setting individual segments may cause incorrect segment-hashes '
                 . 'and non-appropriate segment states, so this is only to hotfix tasks!'
-            );
-
-        $this->addArgument(
-            'segmentId',
-            InputArgument::REQUIRED,
-            'The ID of the segment to edit. Multiple segments can be comma-seperated (without blanks!)'
-        );
-
-        $this->addArgument(
-            'source',
-            InputArgument::REQUIRED,
-            'Source content to be set. Provide "NULL", if source should not be set.'
-        );
-
-        $this->addArgument(
-            'target',
-            InputArgument::REQUIRED,
-            'Target content to be set. Provide "NULL", if target should not be set.'
-        );
+            )
+            ->addArgument(
+                'segmentId',
+                InputArgument::REQUIRED,
+                'The ID of the segment to edit. Multiple segments can be comma-seperated (without blanks!)'
+            )
+            ->addArgument(
+                'source',
+                InputArgument::REQUIRED,
+                'Source content to be set. Provide "NULL", if source should not be set.'
+            )
+            ->addArgument(
+                'target',
+                InputArgument::REQUIRED,
+                'Target content to be set. Provide "NULL", if target should not be set.'
+            )
+            ->addOption(
+                'updateOriginals',
+                'o',
+                InputArgument::OPTIONAL,
+                'If set, the original value will be updated. If not set, only sourceEdit/targetEdit will be updated.',
+                false,
+            )
+        ;
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
@@ -94,9 +89,8 @@ class SegmentSetContentCommand extends Translate5AbstractCommand
                 )
             )
         );
-        /** @var string $source */
+
         $source = $this->input->getArgument('source');
-        /** @var string $target */
         $target = $this->input->getArgument('target');
 
         if (empty($ids)) {
@@ -105,10 +99,11 @@ class SegmentSetContentCommand extends Translate5AbstractCommand
             return self::FAILURE;
         }
 
-        if ($source === 'NULL') {
+        if (strtoupper($source) === 'NULL') {
             $source = null;
         }
-        if ($target === 'NULL') {
+
+        if (strtoupper($target) === 'NULL') {
             $target = null;
         }
 
@@ -124,48 +119,66 @@ class SegmentSetContentCommand extends Translate5AbstractCommand
         $errors = [];
         $success = [];
 
+        $updateOriginals = (bool) $this->input->getOption('updateOriginals');
+
         foreach ($ids as $id) {
             try {
                 $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
                 $segment->load((int) $id);
                 $task = editor_ModelInstances::taskByGuid($segment->getTaskGuid());
                 $fields = editor_Models_SegmentFieldManager::getForTaskGuid($segment->getTaskGuid());
-                $hasher = ZfExtended_Factory::get(editor_Models_Segment_RepetitionHash::class, [$task]);
-                $hasher->setSegment($segment);
-
-                $hashSource = ($source === null) ? $segment->getSource() : $source;
-                $hashTarget = ($target === null) ? $segment->getTarget() : $target;
-                if ($source !== null) {
-                    $toSort = $segment->stripTags($source, true);
-                    $segment->setSource($source);
-                    $segment->set('sourceToSort', $toSort);
-                    if ($fields->isEditable('source')) {
-                        $segment->setSourceEdit($source);
-                        $segment->set('sourceEditToSort', $toSort);
-                    }
-                    $segment->set('sourceMd5', $hasher->hashSource($hashSource, $hashTarget));
-                }
-                if ($target !== null) {
-                    $toSort = $segment->stripTags($target, false);
-                    $segment->setTarget($target);
-                    $segment->setTargetEdit($target);
-                    $segment->set('targetToSort', $toSort);
-                    $segment->setTargetMd5($hasher->hashTarget($hashTarget, $hashSource));
-                }
-                $segment->save();
-
-                $what = ($source !== null && $target !== null) ?
-                    'source and target' : ($source !== null ? 'only source' : 'omly target');
-                $success[] = 'Updated Segment with id "' . $id . '", ' . $what . '.';
             } catch (ZfExtended_Models_Entity_NotFoundException $e) {
                 $errors[] = 'Segment with id "' . $id . '" could not be found or had errors [ '
                     . $e->getMessage() . ' ].';
+
+                continue;
             }
+
+            $hasher = ZfExtended_Factory::get(editor_Models_Segment_RepetitionHash::class, [$task]);
+            $hasher->setSegment($segment);
+
+            $hashSource = ($source === null) ? $segment->getSource() : $source;
+            $hashTarget = ($target === null) ? $segment->getTarget() : $target;
+
+            if ($source !== null) {
+                $toSort = $segment->stripTags($source);
+
+                if ($updateOriginals) {
+                    $segment->setSource($source);
+                    $segment->set('sourceToSort', $toSort);
+                }
+
+                if ($fields->isEditable('source')) {
+                    $segment->setSourceEdit($source);
+                    $segment->set('sourceEditToSort', $toSort);
+                }
+
+                $segment->set('sourceMd5', $hasher->hashSource($hashSource, $hashTarget));
+            }
+
+            if ($target !== null) {
+                $toSort = $segment->stripTags($target, false);
+
+                if ($updateOriginals) {
+                    $segment->setTarget($target);
+                }
+
+                $segment->setTargetEdit($target);
+                $segment->set('targetToSort', $toSort);
+                $segment->setTargetMd5($hasher->hashTarget($hashTarget, $hashSource));
+            }
+
+            $segment->save();
+
+            $what = ($source !== null && $target !== null) ?
+                'source and target' : ($source !== null ? 'only source' : 'only target');
+            $success[] = 'Updated Segment with id "' . $id . '", ' . $what . '.';
         }
 
         if (! empty($errors)) {
             $this->io->error($errors);
         }
+
         if (! empty($success)) {
             $this->io->success($success);
         }

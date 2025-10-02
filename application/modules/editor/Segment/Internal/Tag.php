@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Segment_Internal_ContentTag as ContentTag;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
+use MittagQI\Translate5\Tag\TagSequence;
 use MittagQI\ZfExtended\Tools\Markup;
 use PHPHtmlParser\Dom\Node\AbstractNode;
 use PHPHtmlParser\Dom\Node\HtmlNode;
@@ -544,11 +545,11 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     {
         $content = '';
         // QUIRK: is the feature with length-attributes for whitespace-tags still in use ?
-        if ($mode === editor_TagSequence::MODE_STRIPPED) {
+        if ($mode === TagSequence::MODE_STRIPPED) {
             return '';
-        } elseif ($mode === editor_TagSequence::MODE_LABELED) {
+        } elseif ($mode === TagSequence::MODE_LABELED) {
             $content = $this->getLabeledContent();
-        } elseif ($mode === editor_TagSequence::MODE_ORIGINAL) {
+        } elseif ($mode === TagSequence::MODE_ORIGINAL) {
             $content = $this->getOriginalContent();
         }
         $length = $this->getDataLength();
@@ -628,7 +629,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     /**
      * We do not add children to the tags-container but we build our inner tags from the tags-structure
      */
-    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder = -1): void
+    public function sequenceChildren(TagSequence $tags, int $parentOrder = -1): void
     {
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
@@ -646,7 +647,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     /**
      * Handled internally
      */
-    public function addSegmentText(editor_TagSequence $tags): void
+    public function addSegmentText(TagSequence $tags): void
     {
         if ($this->startIndex < $this->endIndex) {
             $this->addText($tags->getTextPart($this->startIndex, $this->endIndex));

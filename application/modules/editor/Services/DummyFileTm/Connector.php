@@ -33,9 +33,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\Integration\DummyFileTm\UpdateSegmentService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 /**
@@ -48,7 +47,7 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
+class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface
 {
     /**
      * Paging information for search requests
@@ -71,10 +70,14 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
      */
     protected $db;
 
+    private readonly UpdateSegmentService $updateSegmentService;
+
     public function __construct()
     {
         $this->db = new editor_Services_DummyFileTm_Db();
         parent::__construct();
+
+        $this->updateSegmentService = UpdateSegmentService::create();
     }
 
     public function addTm(array $fileinfo = null, array $params = null)
@@ -125,87 +128,12 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
 
     public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
     {
-        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
-        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
-
-        $s = $this->db->select()->where('source = ?', $source);
-
-        if ($this->isInternalFuzzy()) {
-            $s->where('internalFuzzy = 1');
-        }
-
-        $row = $this->db->fetchRow($s);
-
-        if ($row) {
-            /** @phpstan-ignore-next-line */
-            $row->target = $target;
-        } else {
-            $row = $this->db->createRow([
-                'languageResourceId' => $this->languageResource->getId(),
-                'mid' => $segment->getMid(),
-                'internalFuzzy' => (int) $this->isInternalFuzzy(),
-                'source' => $source,
-                'target' => $target,
-            ]);
-        }
-
-        $row->save();
-    }
-
-    public function getUpdateDTO(
-        \editor_Models_Segment $segment,
-        UpdateOptions $updateOptions
-    ): UpdateSegmentDTO {
-        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
-        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
-
-        return new UpdateSegmentDTO(
-            $segment->getTaskGuid(),
-            (int) $segment->getId(),
-            $source,
-            $target,
-            '',
-            '',
-            '',
-            $segment->getMid(),
+        $this->updateSegmentService->update(
+            $this->languageResource,
+            $segment,
+            $this->getConfig(),
+            $updateOptions,
         );
-    }
-
-    public function updateWithDTO(
-        UpdateSegmentDTO $dto,
-        UpdateOptions $updateOptions,
-        editor_Models_Segment $segment
-    ): void {
-        $source = $this->tagHandler->prepareQuery($dto->source);
-        $target = $this->tagHandler->prepareQuery($dto->target);
-
-        $s = $this->db->select()->where('source = ?', $source);
-
-        if ($this->isInternalFuzzy()) {
-            $s->where('internalFuzzy = 1');
-        }
-
-        $row = $this->db->fetchRow($s);
-
-        if ($row) {
-            /** @phpstan-ignore-next-line */
-            $row->target = $target;
-        } else {
-            $row = $this->db->createRow([
-                'languageResourceId' => $this->languageResource->getId(),
-                'mid' => $segment->getMid(),
-                'internalFuzzy' => (int) $this->isInternalFuzzy(),
-                'source' => $source,
-                'target' => $target,
-            ]);
-        }
-
-        $row->save();
-    }
-
-    public function checkUpdatedSegment(editor_Models_Segment $segment): void
-    {
-        // nothing to do here
     }
 
     public function query(editor_Models_Segment $segment)

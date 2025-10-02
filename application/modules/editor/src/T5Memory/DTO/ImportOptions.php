@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\DTO;
 
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 
@@ -38,8 +37,8 @@ class ImportOptions
 {
     public function __construct(
         public readonly StripFramingTags $stripFramingTags,
-        public readonly bool $resegmentTmx,
-        public readonly bool $saveDifferentTargetsForSameSource,
+        public readonly bool $resegmentTmx = false,
+        public readonly bool $saveDifferentTargetsForSameSource = false,
         public readonly ?int $customerId = null,
     ) {
     }
@@ -49,7 +48,7 @@ class ImportOptions
         return new self(
             self::getStripFramingTagsValue($params),
             (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
-            (bool) ($params[UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
+            (bool) ($params[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
             $customerId,
         );
     }

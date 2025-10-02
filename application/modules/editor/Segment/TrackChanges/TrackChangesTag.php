@@ -38,6 +38,16 @@ class editor_Segment_TrackChanges_TrackChangesTag extends editor_Segment_Tag
 
     protected static ?string $identificationClass = self::CSS_CLASS;
 
+    public function isDeleteTag(): bool
+    {
+        return false;
+    }
+
+    public function isInsertTag(): bool
+    {
+        return false;
+    }
+
     public function canContain(editor_Segment_Tag $tag): bool
     {
         if ($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex) {
