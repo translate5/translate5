@@ -4,6 +4,7 @@ parameters:
 	universalObjectCratesClasses:
 		- Zend_Config
 		- Zend_View
+		- Zend_Db_Table_Row_Abstract
 	bootstrapFiles:
 		- .phpstan/constants.php
 	editorUrl: 'phpstorm://open?file=%%relFile%%&line=%%line%%'
