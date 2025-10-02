@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_Connector_TagHandler_Abstract as TagHandler;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
@@ -49,6 +48,7 @@ use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
+use MittagQI\Translate5\T5Memory\TagHandlerProvider;
 use MittagQI\Translate5\T5Memory\UpdateSegmentService;
 
 /**
@@ -102,6 +102,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly UpdateSegmentService $updateSegmentService;
 
+    private readonly TagHandlerProvider $tagHandlerProvider;
+
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -131,6 +133,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->fuzzySearchService = FuzzySearchService::create();
         $this->queryCache = QueryCache::create();
         $this->updateSegmentService = UpdateSegmentService::create();
+        $this->tagHandlerProvider = TagHandlerProvider::create();
     }
 
     public function connectTo(
@@ -144,13 +147,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
 
-        $this->tagHandler = $this->createTagHandler([
-            'gTagPairing' => false,
-            TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $this->isSendingWhitespaceAsTagEnabled(),
-        ]);
-        $this->tagHandler->setLanguages(
+        $this->tagHandler = $this->tagHandlerProvider->getTagHandler(
             (int) ($sourceLang ?: $languageResource->getSourceLang()),
             (int) ($targetLang ?: $languageResource->getSourceLang()),
+            $config ?: $this->config
         );
     }
 

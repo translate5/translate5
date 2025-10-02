@@ -37,6 +37,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
@@ -110,14 +111,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
-        $this->tagHandler = \ZfExtended_Factory::get(
-            \editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-            [[
-                'gTagPairing' => false,
-            ]]
-        );
         $this->t5MemoryConnector->connectTo($languageResource, $sourceLang, $targetLang, $config);
         parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
+    }
+
+    protected function createTagHandler(array $params = []): \editor_Services_Connector_TagHandler_Abstract
+    {
+        return new T5MemoryXliff([
+            'gTagPairing' => false,
+        ]);
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')
