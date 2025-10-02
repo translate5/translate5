@@ -113,6 +113,8 @@ $this->translations = array(
     'saveToTm' => [
         'message' => $translate->_('Aufgabe im TM speichern?'),
     ],
+    'mtResourcesComboPrefix' => $translate->_('Verwendete MT-Resource:'),
+    'customerComboPrefix' => $translate->_('Übersetzen mit den Einstellungen für:'),
 );
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
@@ -347,11 +349,14 @@ $languageSelector[] = '</form>';
                 }
                 ?>
             </select>
-            
+
+
+            <select id="userCustomers" class="selectSourceTarget" name="userCustomers"></select>
+
             <!-- Language Resource selector for File Translation -->
             <select id="fileLanguageResource" class="selectSourceTarget" name="fileLanguageResource"></select>
-            
-            <div id="languageResourceSelectorError" class="instant-translation-error ui-state-error ui-corner-all box marginTop show-if-source-is-file" style="display:none"></div>
+
+            <div id="languageResourceSelectorError" class="instant-translation-error ui-state-error ui-corner-all box marginTop" style="display:none"></div>
         </form>
         <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all box marginTop"></div>
         <div class="loadingSpinnerIndicator marginTop">

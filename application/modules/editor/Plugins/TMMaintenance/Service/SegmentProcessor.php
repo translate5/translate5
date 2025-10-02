@@ -192,11 +192,6 @@ final class SegmentProcessor
         $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $languageResource->load($languageResourceId);
 
-        ZfExtended_Factory::addOverwrite(
-            \editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-            T5MemoryXliff::class
-        );
-
         $connector = new MaintenanceService();
         $connector->connectTo(
             $languageResource,

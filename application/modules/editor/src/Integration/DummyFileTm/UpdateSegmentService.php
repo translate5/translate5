@@ -109,7 +109,7 @@ class UpdateSegmentService implements UpdateSegmentInterface
                     'target' => $dto->target,
                 ],
                 [
-                    'id => ?' => $id,
+                    'id = ?' => $id,
                 ],
             );
         } else {
