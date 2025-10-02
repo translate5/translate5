@@ -61,8 +61,19 @@ class UpdateSegmentService
         ]);
     }
 
+    /**
+     * @param class-string<UpdateSegmentInterface> $updater
+     */
     public function addService(string $updater): void
     {
+        if (! is_subclass_of($updater, UpdateSegmentInterface::class)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Service %s must implement %s',
+                $updater,
+                UpdateSegmentInterface::class
+            ));
+        }
+
         $this->updaters[] = $updater;
     }
 
