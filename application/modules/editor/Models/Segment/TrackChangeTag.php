@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TrackChange\RemoveTrackChanges;
+
 /***
  * Track changes tag replacer
  *
@@ -128,10 +130,13 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      */
     public $textWithTrackChanges;
 
+    private RemoveTrackChanges $removeTrackChanges;
+
     public function __construct()
     {
         $this->replacerRegex = self::REGEX_DEL;
         $this->placeholderTemplate = '<' . self::PLACEHOLDER_TAG_DEL . ' id="%s" />';
+        $this->removeTrackChanges = new RemoveTrackChanges();
     }
 
     /***
@@ -192,14 +197,9 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * - DEL => avoid multiple space after removing a deleted word with one or more space at both sides
      * - DEL => markup-Tag AND content inbetween is removed
      */
-    public function removeTrackChanges(string $segment)
+    public function removeTrackChanges(string $segment): string
     {
-        $segment = $this->protect($segment);
-        $segment = preg_replace(self::REGEX_INS, '', $segment);
-        $segment = preg_replace('/ +<' . self::PLACEHOLDER_TAG_DEL . '[^>]+> +/', ' ', $segment);
-        $segment = preg_replace('/<' . self::PLACEHOLDER_TAG_DEL . '[^>]+>/', '', $segment);
-
-        return $segment;
+        return $this->removeTrackChanges->remove($segment);
     }
 
     /**
