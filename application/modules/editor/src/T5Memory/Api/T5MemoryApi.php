@@ -260,7 +260,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
 
     public function deleteTm(string $baseUrl, string $tmName): void
     {
-        $response = $this->sendRequest(new DeleteTmRequest($baseUrl, $tmName));
+        $response = $this->client->sendRequest(new DeleteTmRequest($baseUrl, $tmName));
 
         if (200 === $response->getStatusCode()) {
             return;

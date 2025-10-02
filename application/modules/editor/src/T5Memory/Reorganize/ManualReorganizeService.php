@@ -48,6 +48,7 @@ use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use MittagQI\Translate5\T5Memory\ImportService;
+use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
 use MittagQI\Translate5\T5Memory\WipeMemoryService;
 use Psr\Http\Client\ClientExceptionInterface;
 use Zend_Registry;
@@ -64,6 +65,7 @@ class ManualReorganizeService
         private readonly CloneMemoryService $cloneService,
         private readonly FlushMemoryService $flushService,
         private readonly WipeMemoryService $wipeMemoryService,
+        private readonly SameTuvFilter $sameTuvFilter,
     ) {
     }
 
@@ -76,6 +78,7 @@ class ManualReorganizeService
             CloneMemoryService::create(),
             FlushMemoryService::create(),
             WipeMemoryService::create(),
+            SameTuvFilter::create(),
         );
     }
 
@@ -92,6 +95,26 @@ class ManualReorganizeService
         $exportFilePath = $exportDir . '/' . $languageResource->getId() . '_' . $tmName . '.tmx';
 
         @mkdir($exportDir, 0777, true);
+
+        $timestamp = date_format(new DateTime(), 'Y-m-d\THis');
+
+        try {
+            $this->cloneService->clone(
+                $languageResource,
+                $tmName,
+                $tmName . ".reorganise.before-flush.$timestamp",
+            );
+        } catch (ClientExceptionInterface|HttpException|CloneException $e) {
+            $this->logger->warn(
+                'E1314',
+                'Could not create backup or flush TM before reorganize. Continuing anyway.',
+                [
+                    'languageResource' => $languageResource,
+                    'error' => $e->getMessage(),
+                ]
+            );
+            $this->logger->exception($e);
+        }
 
         $file = $this->exportService->export(
             $languageResource,
@@ -115,7 +138,25 @@ class ManualReorganizeService
             throw new ReorganizeException('Reorganize failed: Nothing was exported');
         }
 
-        $this->backupTm($languageResource, $tmName);
+        try {
+            $this->flushService->flush($languageResource, $tmName);
+
+            $this->cloneService->clone(
+                $languageResource,
+                $tmName,
+                $tmName . ".reorganise.after-flush.$timestamp",
+            );
+        } catch (ClientExceptionInterface|HttpException|CloneException $e) {
+            $this->logger->warn(
+                'E1314',
+                'Could not create backup or flush TM after reorganize. Continuing anyway.',
+                [
+                    'languageResource' => $languageResource,
+                    'error' => $e->getMessage(),
+                ]
+            );
+            $this->logger->exception($e);
+        }
 
         rename($file, $exportFilePath);
 
@@ -131,6 +172,24 @@ class ManualReorganizeService
             );
 
             throw new ReorganizeException(sprintf('Reorganize failed: Moving file [%s] to export dir failed', $file));
+        }
+
+        try {
+            $this->sameTuvFilter->filter($exportFilePath);
+        } catch (\Exception $e) {
+            $this->logger->warn(
+                'E1314',
+                'Reorganize warning: Could not filter TMX file for same TUVs',
+                [
+                    'languageResource' => $languageResource,
+                    'tmName' => $tmName,
+                    'file' => $exportFilePath,
+                    'error' => $e->getMessage(),
+                ]
+            );
+            $this->logger->exception($e);
+
+            throw new ReorganizeException('Reorganize warning: Could not filter TMX file for same TUVs: ' . $e->getMessage(), previous: $e);
         }
 
         $newTmName = $this->createNewMemory($languageResource, $tmName, $isInternalFuzzy);
@@ -191,39 +250,6 @@ class ManualReorganizeService
             $this->failReorganize($languageResource, $isInternalFuzzy);
 
             throw new ReorganizeException('Reorganize failed: ' . $e->getMessage(), previous: $e);
-        }
-    }
-
-    private function backupTm(
-        LanguageResource $languageResource,
-        string $tmName
-    ): void {
-        $timestamp = date_format(new DateTime(), 'Y-m-d\THis');
-
-        try {
-            $this->cloneService->clone(
-                $languageResource,
-                $tmName,
-                $tmName . ".reorganise.before-flush.$timestamp",
-            );
-
-            $this->flushService->flush($languageResource, $tmName);
-
-            $this->cloneService->clone(
-                $languageResource,
-                $tmName,
-                $tmName . ".reorganise.after-flush.$timestamp",
-            );
-        } catch (ClientExceptionInterface|HttpException|CloneException $e) {
-            $this->logger->warn(
-                'E1314',
-                'Could not create backup or flush TM before reorganize. Continuing anyway.',
-                [
-                    'languageResource' => $languageResource,
-                    'error' => $e->getMessage(),
-                ]
-            );
-            $this->logger->exception($e);
         }
     }
 
