@@ -48,6 +48,7 @@ use MittagQI\Translate5\T5Memory\Api\Contract\SavesTmsInterface;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\Api\Exception\UnsuccessfulRequestException;
+use MittagQI\Translate5\T5Memory\Api\Request\CloneTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\CreateEmptyTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\CreateTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\DeleteTmRequest;
@@ -58,17 +59,20 @@ use MittagQI\Translate5\T5Memory\Api\Request\FuzzySearchRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\GetEntryRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ImportTmxRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\MemoryListRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\PingRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ReorganizeRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ResourcesRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\SaveTmsRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\StatusRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\UpdateRequest;
+use MittagQI\Translate5\T5Memory\Api\Response\CloneTmResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\CreateTmResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\DownloadTmResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\DownloadTmxChunkResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\FuzzySearchResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\GetEntryResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\ImportTmxResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\MemoryListResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response;
@@ -201,12 +205,12 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
     public function ping(string $baseUrl): bool
     {
         try {
-            $response = $this->client->sendRequest(new ResourcesRequest($baseUrl));
+            $response = $this->client->sendRequest(new PingRequest($baseUrl));
         } catch (ConnectException) {
             return false;
         }
 
-        return $response->getStatusCode() === 200;
+        return $response->getStatusCode() === 200 || str_contains((string) $response->getBody(), 'ERROR_MEM_NAME_EXISTS');
     }
 
     public function version(string $baseUrl): string
@@ -256,7 +260,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
 
     public function deleteTm(string $baseUrl, string $tmName): void
     {
-        $response = $this->sendRequest(new DeleteTmRequest($baseUrl, $tmName));
+        $response = $this->client->sendRequest(new DeleteTmRequest($baseUrl, $tmName));
 
         if (200 === $response->getStatusCode()) {
             return;
@@ -294,7 +298,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
         string $tmName,
         string $filePath,
         ImportOptions $importOptions,
-    ): Response {
+    ): ImportTmxResponse {
         $stream = $this->getStreamFromFile($filePath);
         $filename = basename($filePath);
 
@@ -315,7 +319,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
             throw $e;
         }
 
-        return Response::fromResponse($response);
+        return ImportTmxResponse::fromResponse($response);
     }
 
     /**
@@ -458,6 +462,18 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
         $response = $this->sendRequest($request);
 
         return GetEntryResponse::fromResponse($response);
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws HttpException
+     */
+    public function cloneTm(string $baseUrl, string $tmName, string $newTmName): CloneTmResponse
+    {
+        $request = new CloneTmRequest($baseUrl, $this->sanitizeTmName($tmName), $newTmName);
+        $response = $this->sendRequest($request);
+
+        return CloneTmResponse::fromResponse($response);
     }
 
     /**

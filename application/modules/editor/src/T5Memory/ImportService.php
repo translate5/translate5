@@ -39,10 +39,10 @@ use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
-use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\Enum\ImportStatusEnum;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInErrorException;
+use MittagQI\Translate5\T5Memory\Exception\ImportResultedInReorganizeException;
 use Psr\Http\Client\ClientExceptionInterface;
 use RuntimeException;
 use Zend_Config;
@@ -57,10 +57,10 @@ class ImportService
         private readonly T5MemoryApi $t5MemoryApi,
         private readonly TmxImportPreprocessorInterface $tmxImportPreprocessor,
         private readonly PersistenceService $persistenceService,
-        private readonly ReorganizeService $reorganizeService,
         private readonly FlushMemoryService $flushMemoryService,
         private readonly CreateMemoryService $createMemoryService,
         private readonly RetryService $waitingService,
+        private readonly WipeMemoryService $wipeMemoryService,
     ) {
     }
 
@@ -72,10 +72,10 @@ class ImportService
             T5MemoryApi::create(),
             TmxImportPreprocessor::create(),
             PersistenceService::create(),
-            ReorganizeService::create(),
             FlushMemoryService::create(),
             CreateMemoryService::create(),
             RetryService::create(),
+            WipeMemoryService::create(),
         );
     }
 
@@ -124,7 +124,7 @@ class ImportService
                 }
             }
 
-            $this->importTmxIntoMemory(
+            $this->importTmxInMemory(
                 $languageResource,
                 $importFilename,
                 $tmName ?: $this->persistenceService->getWritableMemory($languageResource),
@@ -138,34 +138,69 @@ class ImportService
     /**
      * @throws ClientExceptionInterface
      * @throws Exception\UnableToCreateMemoryException
+     * @throws ImportResultedInErrorException
      */
-    public function importTmxIntoMemory(
+    public function importTmxInMemory(
+        LanguageResource $languageResource,
+        string $importFilename,
+        string $tmName,
+        ImportOptions $importOptions,
+        int $attempts = 0,
+    ): string {
+        $maxAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
+
+        while ($attempts < $maxAttempts) {
+            $attempts++;
+
+            try {
+                $this->importTmxIntoMemory(
+                    $languageResource,
+                    $importFilename,
+                    $tmName,
+                    $importOptions,
+                );
+
+                return $tmName;
+            } catch (ImportResultedInReorganizeException) {
+                $tmName = $this->wipeMemoryService->wipeMemory($languageResource, $tmName);
+            }
+        }
+
+        throw new ImportResultedInReorganizeException();
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws Exception\UnableToCreateMemoryException
+     * @throws ImportResultedInErrorException
+     * @throws ImportResultedInReorganizeException
+     */
+    private function importTmxIntoMemory(
         LanguageResource $languageResource,
         string $importFilename,
         string $tmName,
         ImportOptions $importOptions,
     ): void {
         $gotLock = false;
+        $tmName = $this->persistenceService->addTmPrefix($tmName);
+        $baseUrl = $languageResource->getResource()->getUrl();
 
         do {
             $response = $this->t5MemoryApi->importTmx(
-                $languageResource->getResource()->getUrl(),
-                $this->persistenceService->addTmPrefix($tmName),
+                $baseUrl,
+                $tmName,
                 $importFilename,
                 $importOptions,
             );
 
-            if ($this->isLockingTimeoutOccurred($response)) {
+            if ($response->isLockingTimeoutOccurred()) {
                 sleep($this->waitingService->getRetryDelaySeconds());
 
                 continue;
             }
 
-            if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName)) {
-                $reorganizeOptions = new ReorganizeOptions($importOptions->saveDifferentTargetsForSameSource);
-                $this->reorganizeService->reorganizeTm($languageResource, $tmName, $reorganizeOptions);
-
-                continue;
+            if ($response->needsReorganizing($this->config)) {
+                throw new ImportResultedInReorganizeException();
             }
 
             $gotLock = true;
@@ -178,11 +213,8 @@ class ImportService
             ]);
         }
 
-        $waitNonImportStatus = function () use ($languageResource, $tmName) {
-            $status = $this->t5MemoryApi->getImportStatus(
-                $languageResource->getResource()->getUrl(),
-                $this->persistenceService->addTmPrefix($tmName)
-            );
+        $waitNonImportStatus = function () use ($baseUrl, $tmName) {
+            $status = $this->t5MemoryApi->getImportStatus($baseUrl, $tmName);
 
             return $status->status === ImportStatusEnum::Importing
                 ? [WaitCallState::Retry, $status]
@@ -287,7 +319,7 @@ class ImportService
 
     private function getOverflowSegmentNumberFromStatus(
         LanguageResource $languageResource,
-        ResponseInterface $statusResponse
+        ResponseInterface $statusResponse,
     ): int {
         $body = $statusResponse->getBody();
 
@@ -321,10 +353,5 @@ class ImportService
             'Language Resource [{name}] current writable memory is overflown, creating a new one',
             $params
         );
-    }
-
-    private function isLockingTimeoutOccurred(ResponseInterface $response): bool
-    {
-        return $response->getCode() === 506;
     }
 }

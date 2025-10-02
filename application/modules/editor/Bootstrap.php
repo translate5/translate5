@@ -193,6 +193,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             CronEventTrigger::DAILY,
             fn () => T5MemoryLanguageResourceSpecificDataSnapshot::create()->takeSnapshot()
         );
+
+        $eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            fn () => \MittagQI\Translate5\T5Memory\Reorganize\CleanUpCronJob::create()->cleanUp()
+        );
     }
 
     public static function initModuleSpecific()

@@ -26,35 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\T5Memory\Exception;
 
-namespace MittagQI\Translate5\T5Memory\DTO;
+use Exception;
 
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
-
-class ImportOptions
+class CloneException extends Exception
 {
     public function __construct(
-        public readonly StripFramingTags $stripFramingTags,
-        public readonly bool $resegmentTmx = false,
-        public readonly bool $saveDifferentTargetsForSameSource = false,
-        public readonly ?int $customerId = null,
+        public readonly string $tmName,
+        public readonly string $newTmName,
     ) {
-    }
-
-    public static function fromParams(array $params, ?int $customerId = null): self
-    {
-        return new self(
-            self::getStripFramingTagsValue($params),
-            (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
-            (bool) ($params[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
-            $customerId,
-        );
-    }
-
-    private static function getStripFramingTagsValue(?array $params): StripFramingTags
-    {
-        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
+        parent::__construct(sprintf('Could not clone TM "%s" to "%s": %s', $tmName, $newTmName, $this->getMessage()));
     }
 }

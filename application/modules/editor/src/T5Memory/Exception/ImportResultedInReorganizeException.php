@@ -26,35 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\T5Memory\Exception;
 
-namespace MittagQI\Translate5\T5Memory\DTO;
-
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
-
-class ImportOptions
+class ImportResultedInReorganizeException extends ImportResultedInErrorException
 {
-    public function __construct(
-        public readonly StripFramingTags $stripFramingTags,
-        public readonly bool $resegmentTmx = false,
-        public readonly bool $saveDifferentTargetsForSameSource = false,
-        public readonly ?int $customerId = null,
-    ) {
-    }
-
-    public static function fromParams(array $params, ?int $customerId = null): self
-    {
-        return new self(
-            self::getStripFramingTagsValue($params),
-            (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
-            (bool) ($params[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] ?? false),
-            $customerId,
-        );
-    }
-
-    private static function getStripFramingTagsValue(?array $params): StripFramingTags
-    {
-        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
-    }
 }

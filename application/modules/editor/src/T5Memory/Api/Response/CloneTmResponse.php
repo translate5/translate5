@@ -30,63 +30,48 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-abstract class AbstractResponse implements ResponseInterface
+class CloneTmResponse extends AbstractResponse
 {
-    private readonly int $code;
-
     public function __construct(
-        private readonly array $body,
-        private readonly ?string $errorMessage,
-        protected readonly int $statusCode,
+        array $body,
+        ?string $errorMessage,
+        int $statusCode,
     ) {
-        $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
-    }
-
-    abstract public static function fromResponse(PsrResponseInterface $response): AbstractResponse;
-
-    public function getBody(): array
-    {
-        return $this->body;
+        parent::__construct($body, $errorMessage, $statusCode);
     }
 
     public function successful(): bool
     {
-        return $this->statusCode === 200;
+        return $this->statusCode === 200 && str_contains($this->getBody()['msg'] ?? '', 'was cloned successfully');
     }
 
-    public function getErrorMessage(): ?string
+    public function memoryAlreadyExists(): bool
     {
-        return $this->errorMessage;
+        return str_contains($this->getErrorMessage(), 'already exists');
     }
 
-    public function getCode(): int
+    public static function fromResponse(PsrResponseInterface $response): self
     {
-        return $this->code;
-    }
+        $content = $response->getBody()->getContents();
+        $errorMsg = null;
 
-    public function needsReorganizing(\Zend_Config $config): bool
-    {
-        if (str_contains($this->getErrorMessage() ?: '', 'Failed to load tm')) {
-            return false;
+        try {
+            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            $errorMsg = 'Invalid JSON response: ' . $content;
+            $body = [];
         }
 
-        $errorCodes = explode(
-            ',',
-            $config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
+        if (null === $errorMsg) {
+            $errorMsg = $body['ErrorMsg'] ?? null;
+        }
+
+        return new self(
+            $body,
+            $errorMsg,
+            $response->getStatusCode(),
         );
-
-        return in_array($this->getCode(), $errorCodes);
-    }
-
-    protected static function getContent(PsrResponseInterface $response): string
-    {
-        if ($response->getBody()->isSeekable()) {
-            $response->getBody()->rewind();
-        }
-
-        return $response->getBody()->getContents();
     }
 }
