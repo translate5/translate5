@@ -389,8 +389,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
         // if language filter is set we disallow delete batch button, because language filter is not respected
         // in delete batch operation by t5memory
-        return values.sourceLanguage === ''
-            && values.targetLanguage === ''
+        return !values.sourceLanguage
+            && !values.targetLanguage
             // && (
                 // (store.getCount() >= this.readTotalAt)
                 // Uncomment this line to enable delete batch button even if amount is less, usefull for testing

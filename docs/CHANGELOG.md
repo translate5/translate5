@@ -26,6 +26,62 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.29.6] - 2025-09-30
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4006](https://jira.translate5.net/browse/TRANSLATE-4006): Translate5 CLI - CLI service:autodiscovery should work also for disabled plugins in cloud installer** <br>
+CLI: Service Autodiscovery gets a new option to run also on disabled plugins.
+
+
+### Bugfixes
+**[TRANSLATE-5022](https://jira.translate5.net/browse/TRANSLATE-5022): LanguageResources - Performance issue with languageresources log counting query** <br>
+Improved performance of log statistics queries by optimizing database indexing and query execution for faster results when counting language resource logs - executed on each language resource overview.
+
+**[TRANSLATE-5015](https://jira.translate5.net/browse/TRANSLATE-5015): VisualReview / VisualTranslation - Visual: Disable auto-conversion of Spreadsheets (XLSX, ...) on Import** <br>
+Visual: Disable automatic conversion of Excel/spreadsheets on import when automatic conversion of office files is active
+
+**[TRANSLATE-5009](https://jira.translate5.net/browse/TRANSLATE-5009): TermPortal - Optimize term image handling for huge term sets** <br>
+The query that removes unused image records has been optimized. It now uses better indexing and avoids unnecessary full table scans, resulting in a faster cleanup of old data.
+
+**[TRANSLATE-5006](https://jira.translate5.net/browse/TRANSLATE-5006): Import/Export - Multiple problems with segment materialised view** <br>
+The materialized views of per task segment data are created as innodb tables and cleaned up daily only now
+
+**[TRANSLATE-5002](https://jira.translate5.net/browse/TRANSLATE-5002): Search & Replace (editor) - RootCause: Cannot read properties of null (reading 'editor')** <br>
+Fixed JS error by doing search retry on richeditor instantiation if it was not successful within the previous attempt
+
+**[TRANSLATE-5001](https://jira.translate5.net/browse/TRANSLATE-5001): Editor general - RootCause: can't access property "setAttribute", me.inputCmp.el.down(...).dom is undefined** <br>
+Fixed JS error by adding check for opened segment editor prior it's height sync
+
+**[TRANSLATE-4991](https://jira.translate5.net/browse/TRANSLATE-4991): Editor general - comments and search fields: copy+paste not possible any more** <br>
+Copy/paste is not prevented anymore when segment is not opened
+
+**[TRANSLATE-4990](https://jira.translate5.net/browse/TRANSLATE-4990): TermTagger integration - Wrong Term - Segment connection / assignment** <br>
+Source terms' languages are now aligned to match task source language (unless there's a sublanguage mismatch) to make those terms recognizable by TermTagger
+
+**[TRANSLATE-4989](https://jira.translate5.net/browse/TRANSLATE-4989): Client management - prevent deletion of defaultcustomer** <br>
+Deletion of defaultcustomer is no longer possible as deleted defaultcustomer leads to a non working installation.
+
+**[TRANSLATE-4988](https://jira.translate5.net/browse/TRANSLATE-4988): Export - LF (Line feeds) inserted in im XLIFF 2.1 Export** <br>
+Removed extra line feeds inserted in XLIFF 2.1 export
+
+**[TRANSLATE-4970](https://jira.translate5.net/browse/TRANSLATE-4970): Editor general - Strange request to GET /Editor.model.admin.TaskUserAssoc leading to RootCause error. 3rd attempt** <br>
+Fixed reason of a strange GET request
+
+**[TRANSLATE-4959](https://jira.translate5.net/browse/TRANSLATE-4959): Auto-QA - QA logic problem for added/removed whitespaces** <br>
+Removed whitespace tags' indices from the QA detection logic
+
+**[TRANSLATE-4954](https://jira.translate5.net/browse/TRANSLATE-4954): Task Management - task property tabs not acessible for ended tasks** <br>
+Inner components (fields, cell-editors, buttons) within 'Users', 'Language resources' and 'Properties' task-tabs are now disabled instead of those tabs themselves
+
+**[TRANSLATE-4270](https://jira.translate5.net/browse/TRANSLATE-4270): Installation & Update - Service Autodiscovery does not work with custom ports** <br>
+Service autodiscovery is not able to deal with custom ports.
+
+
 ## [7.29.5] - 2025-09-17
 
 ### Important Notes:

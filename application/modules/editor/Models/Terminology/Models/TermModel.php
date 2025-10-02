@@ -1368,7 +1368,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $exporteur = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
         /* @var $exporteur editor_Models_Export_Terminology_Tbx */
         $exporteur->setData($data);
-        $result = $exporteur->export();
+        $result = $exporteur->export(false, $task->getSourceLanguage()->getRfc5646());
         if (empty($result)) {
             //collected terms could not be converted to XML.
             throw new editor_Models_Term_TbxCreationException('E1115', [
