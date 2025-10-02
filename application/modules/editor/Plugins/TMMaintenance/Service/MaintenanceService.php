@@ -221,7 +221,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
         if (
             ! $successful
-            || $this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)
+            && $this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)
         ) {
             $saveDifferentTargetsForSameSource = (bool) $this->config
                 ->runtimeOptions
