@@ -31,12 +31,10 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Segment;
-use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -47,11 +45,7 @@ class SegmentInfoCommand extends Translate5AbstractCommand
     protected function configure()
     {
         $this
-        // the short description shown while running "php bin/console list"
             ->setDescription('Prints the segments main data.')
-
-        // the full command description shown when running the command with
-        // the "--help" option
             ->setHelp('Prints the segments main data in a tabular form');
 
         $this->addArgument(
@@ -68,14 +62,7 @@ class SegmentInfoCommand extends Translate5AbstractCommand
         );
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @throws Zend_Exception
-     * @throws ReflectionException
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
@@ -101,7 +88,7 @@ class SegmentInfoCommand extends Translate5AbstractCommand
         $table = $this->io->createTable();
         $table->setHeaders($headers);
         $rows = [];
-        $values = [
+        $fieldNames = [
             'id',
             'segmentNrInTask',
             'taskGuid',
@@ -119,11 +106,25 @@ class SegmentInfoCommand extends Translate5AbstractCommand
             'targetMd5',
             'targetEdit',
         ];
-        foreach ($values as $val) {
+
+        foreach ($fieldNames as $fieldName) {
+            $value = $segment->get($fieldName);
+
+            if (
+                ! empty($value)
+                && (
+                    $fieldName === 'source'
+                    || $fieldName === 'sourceEdit'
+                    || $fieldName === 'target'
+                    || $fieldName === 'targetEdit'
+                )
+            ) {
+                $value = '\'' . str_replace("'", '\\\'', $segment->get($fieldName)) . '\'';
+            }
+
             $rows[] = [
-                'name' => $val,
-                'value' => ($val === 'source' || $val === 'sourceEdit' || $val === 'target' || $val === 'targetEdit') ?
-                    '\'' . str_replace("'", '\\\'', $segment->get($val)) . '\'' : $segment->get($val),
+                'name' => $fieldName,
+                'value' => $value,
             ];
         }
 
