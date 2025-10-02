@@ -48,6 +48,7 @@ use MittagQI\Translate5\T5Memory\Api\Contract\SavesTmsInterface;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\Api\Exception\UnsuccessfulRequestException;
+use MittagQI\Translate5\T5Memory\Api\Request\CloneTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\CreateEmptyTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\CreateTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\DeleteTmRequest;
@@ -469,7 +470,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
      */
     public function cloneTm(string $baseUrl, string $tmName, string $newTmName): CloneTmResponse
     {
-        $request = new CreateEmptyTmRequest($baseUrl, $this->sanitizeTmName($tmName), $newTmName);
+        $request = new CloneTmRequest($baseUrl, $this->sanitizeTmName($tmName), $newTmName);
         $response = $this->sendRequest($request);
 
         return CloneTmResponse::fromResponse($response);

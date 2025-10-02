@@ -192,7 +192,7 @@ class PersistenceService
             }
         }
 
-        if (! $hasWritableMemory) {
+        if (! $hasWritableMemory && ! empty($memories)) {
             $memories[0]['readonly'] = false; // ensure at least one memory is writable
         }
 

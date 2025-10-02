@@ -75,6 +75,6 @@ class WipeMemoryService
             $this->persistenceService->addTmPrefix($tmName),
         );
 
-        return $tmName;
+        return $newName;
     }
 }

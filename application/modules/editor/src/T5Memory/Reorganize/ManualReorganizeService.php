@@ -91,7 +91,7 @@ class ManualReorganizeService
         $exportDir = self::REORGANIZE_DIR . '/' . date_format(new DateTime(), 'Y-m-d');
         $exportFilePath = $exportDir . '/' . $languageResource->getId() . '_' . $tmName . '.tmx';
 
-        mkdir($exportDir, 0777, true);
+        @mkdir($exportDir, 0777, true);
 
         $file = $this->exportService->export(
             $languageResource,
@@ -157,6 +157,7 @@ class ManualReorganizeService
                 [
                     'languageResource' => $languageResource,
                     'tmName' => $tmName,
+                    'newTmName' => $newTmName,
                     'error' => $e->getMessage(),
                 ]
             );
