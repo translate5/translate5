@@ -49,15 +49,15 @@ class ManualReorganizeServiceTest extends TestCase
 {
     private const TM_NAME = 'ManualReorganizeServiceTest';
 
-    private ?string $backupBeforeTm = null;
+    private static ?string $backupBeforeTm = null;
 
-    private ?string $backupAfterTm = null;
+    private static ?string $backupAfterTm = null;
 
-    private ?string $beforeFlushTmx = null;
+    private static ?string $beforeFlushTmx = null;
 
-    private ?string $afterFlushTmx = null;
+    private static ?string $afterFlushTmx = null;
 
-    private ?string $afterReorganizeTmx = null;
+    private static ?string $afterReorganizeTmx = null;
     
     private \editor_Models_LanguageResources_LanguageResource $languageResource;
 
@@ -73,24 +73,23 @@ class ManualReorganizeServiceTest extends TestCase
 
     public function tearDown(): void
     {
-        dump('Tear down ManualReorganizeServiceTest');
-        if (null !== $this->beforeFlushTmx) {
-            unlink($this->beforeFlushTmx);
+        if (null !== self::$beforeFlushTmx) {
+            unlink(self::$beforeFlushTmx);
         }
-        if (null !== $this->afterFlushTmx) {
-            unlink($this->afterFlushTmx);
+        if (null !== self::$afterFlushTmx) {
+            unlink(self::$afterFlushTmx);
         }
-        if (null !== $this->afterReorganizeTmx) {
-            unlink($this->afterReorganizeTmx);
+        if (null !== self::$afterReorganizeTmx) {
+            unlink(self::$afterReorganizeTmx);
         }
 
         $this->deleteTm(self::TM_NAME);
 
-        if (null !== $this->backupBeforeTm) {
-            $this->deleteTm($this->backupBeforeTm);
+        if (null !== self::$backupBeforeTm) {
+            $this->deleteTm(self::$backupBeforeTm);
         }
-        if (null !== $this->backupAfterTm) {
-            $this->deleteTm($this->backupAfterTm);
+        if (null !== self::$backupAfterTm) {
+            $this->deleteTm(self::$backupAfterTm);
         }
 
         foreach ($this->languageResource->getSpecificData('memories', true) as $memory) {
@@ -170,46 +169,46 @@ class ManualReorganizeServiceTest extends TestCase
             }
 
             if (str_contains($memory->name, "$tmFullName.reorganise.before-flush")) {
-                $this->backupBeforeTm = $memory->name;
+                self::$backupBeforeTm = $memory->name;
 
                 continue;
             }
 
             if (str_contains($memory->name, "$tmFullName.reorganise.after-flush")) {
-                $this->backupAfterTm = $memory->name;
+                self::$backupAfterTm = $memory->name;
             }
         }
 
-        self::assertNotNull($this->backupBeforeTm, 'TM before flush was not saved');
-        self::assertNotNull($this->backupAfterTm, 'TM after flush was not saved');
+        self::assertNotNull(self::$backupBeforeTm, 'TM before flush was not saved');
+        self::assertNotNull(self::$backupAfterTm, 'TM after flush was not saved');
 
         $tempDir = sys_get_temp_dir() . '/test_cleanup_' . uniqid();
         mkdir($tempDir);
 
-        $this->beforeFlushTmx = $tempDir . '/beforeFlushTmx.tmx';
-        $tmxStream = $this->api->downloadTmx($url, $this->backupBeforeTm, 100);
+        self::$beforeFlushTmx = $tempDir . '/beforeFlushTmx.tmx';
+        $tmxStream = $this->api->downloadTmx($url, self::$backupBeforeTm, 100);
         foreach ($tmxStream as $stream) {
-            file_put_contents($this->beforeFlushTmx, $stream->getContents());
+            file_put_contents(self::$beforeFlushTmx, $stream->getContents());
         }
 
-        self::assertNotNull($this->beforeFlushTmx, 'Before flush backup TM has problems');
-        self::assertFileExists($this->beforeFlushTmx);
+        self::assertNotNull(self::$beforeFlushTmx, 'Before flush backup TM has problems');
+        self::assertFileExists(self::$beforeFlushTmx);
 
         self::assertStringNotContainsString(
             '<seg>Eine Segment</seg>',
-            file_get_contents($this->beforeFlushTmx)
+            file_get_contents(self::$beforeFlushTmx)
         );
 
-        $this->afterFlushTmx = $tempDir . '/afterFlushTmx.tmx';
-        $tmxStream = $this->api->downloadTmx($url, $this->backupAfterTm, 100);
+        self::$afterFlushTmx = $tempDir . '/afterFlushTmx.tmx';
+        $tmxStream = $this->api->downloadTmx($url, self::$backupAfterTm, 100);
         foreach ($tmxStream as $stream) {
-            file_put_contents($this->afterFlushTmx, $stream->getContents());
+            file_put_contents(self::$afterFlushTmx, $stream->getContents());
         }
 
-        self::assertNotNull($this->afterFlushTmx, 'After flush backup TM has problems');
-        self::assertFileExists($this->afterFlushTmx);
+        self::assertNotNull(self::$afterFlushTmx, 'After flush backup TM has problems');
+        self::assertFileExists(self::$afterFlushTmx);
 
-        $afterFlushTmx = file_get_contents($this->afterFlushTmx);
+        $afterFlushTmx = file_get_contents(self::$afterFlushTmx);
         self::assertStringContainsString(
             '<seg>Eine Segment</seg>',
             $afterFlushTmx,
@@ -222,13 +221,13 @@ class ManualReorganizeServiceTest extends TestCase
 
         $currentTm = $lrMemories[0]['filename'];
 
-        $this->afterReorganizeTmx = $tempDir . '/afterReorganizeTmx.tmx';
+        self::$afterReorganizeTmx = $tempDir . '/afterReorganizeTmx.tmx';
         $tmxStream = $this->api->downloadTmx($url, $currentTm, 100);
         foreach ($tmxStream as $stream) {
-            file_put_contents($this->afterReorganizeTmx, $stream->getContents());
+            file_put_contents(self::$afterReorganizeTmx, $stream->getContents());
         }
 
-        $afterReorganizeTmx = file_get_contents($this->afterReorganizeTmx);
+        $afterReorganizeTmx = file_get_contents(self::$afterReorganizeTmx);
         self::assertStringContainsString(
             '<seg>Eine Segment</seg>',
             $afterReorganizeTmx,
