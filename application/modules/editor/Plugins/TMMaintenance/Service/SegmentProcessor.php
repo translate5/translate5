@@ -37,7 +37,6 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\Enum\BatchMode;
-use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO as T5SearchDTO;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
