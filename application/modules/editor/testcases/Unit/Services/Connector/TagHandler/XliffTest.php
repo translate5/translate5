@@ -40,14 +40,14 @@ use MittagQI\Translate5\Test\UnitTestAbstract;
 class XliffTest extends UnitTestAbstract
 {
     private const TAGS = [
-        '<1>' => '<div class="open 1234 internal-tag ownttip"><span class="short" title="<Variable>&quot;&gt;&lt;1&gt;</span><span class="full" data-originalid="8" data-length="-1">&lt;Variable&gt;</span></div>',
-        '<2/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="<fct:Variable />&quot;&gt;&lt;2/&gt;</span><span class="full" data-originalid="9" data-length="-1">&lt;fct:Variable /&gt;</span></div>',
-        '</1>' => '<div class="close 1234 internal-tag ownttip"><span class="short" title="</Variable>&quot;&gt;&lt;/1&gt;</span><span class="full" data-originalid="8" data-length="-1">&lt;/Variable&gt;</span></div>',
-        '<3>' => '<div class="open 1234 internal-tag ownttip"><span class="short" title="<Variable>&quot;&gt;&lt;3&gt;</span><span class="full" data-originalid="10" data-length="-1">&lt;Variable&gt;</span></div>',
-        '<4/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="<fct:Variable />&quot;&gt;&lt;4/&gt;</span><span class="full" data-originalid="11" data-length="-1">&lt;fct:Variable /&gt;</span></div>',
-        '</3>' => '<div class="close 1234 internal-tag ownttip"><span class="short" title="</Variable>&quot;&gt;&lt;/3&gt;</span><span class="full" data-originalid="10" data-length="-1">&lt;/Variable&gt;</span></div>',
-        '<5/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="<fct:Variable />&quot;&gt;&lt;5/&gt;</span><span class="full" data-originalid="12" data-length="-1">another tag</span></div>',
-        '<6/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="<fct:Variable />&quot;&gt;&lt;6/&gt;</span><span class="full" data-originalid="13" data-length="-1">another tag</span></div>',
+        '<1>' => '<div class="open 1234 internal-tag ownttip"><span class="short" title="&lt;Variable&gt;">&lt;1&gt;</span><span class="full" data-originalid="8" data-length="-1">&lt;Variable&gt;</span></div>',
+        '<2/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="&lt;fct:Variable /&gt;">&lt;2/&gt;</span><span class="full" data-originalid="9" data-length="-1">&lt;fct:Variable /&gt;</span></div>',
+        '</1>' => '<div class="close 1234 internal-tag ownttip"><span class="short" title="&lt;/Variable&gt;">&lt;/1&gt;</span><span class="full" data-originalid="8" data-length="-1">&lt;/Variable&gt;</span></div>',
+        '<3>' => '<div class="open 1234 internal-tag ownttip"><span class="short" title="&lt;Variable&gt;">&lt;3&gt;</span><span class="full" data-originalid="10" data-length="-1">&lt;Variable&gt;</span></div>',
+        '<4/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="&lt;fct:Variable /&gt;">&lt;4/&gt;</span><span class="full" data-originalid="11" data-length="-1">&lt;fct:Variable /&gt;</span></div>',
+        '</3>' => '<div class="close 1234 internal-tag ownttip"><span class="short" title="&lt;/Variable&gt;">&lt;/3&gt;</span><span class="full" data-originalid="10" data-length="-1">&lt;/Variable&gt;</span></div>',
+        '<5/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="&lt;fct:Variable /&gt;">&lt;5/&gt;</span><span class="full" data-originalid="12" data-length="-1">another tag</span></div>',
+        '<6/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="&lt;fct:Variable /&gt;">&lt;6/&gt;</span><span class="full" data-originalid="13" data-length="-1">another tag</span></div>',
     ];
 
     private Xliff $xliffUnderTestPaired;
@@ -194,7 +194,7 @@ class XliffTest extends UnitTestAbstract
                 'expectedTarget' => 'test <bx id="6" rid="2"/><x id="7"/><ex id="8" rid="2"/> the <bx id="2" rid="1"/><x id="3"/><ex id="4" rid="1"/> text.',
             ],
             'test XML strict vs loose' => [
-                'source' => str_replace('Variable&gt;', 'Variable>', $this->convertToInternalTags('Teste <1><2/></1> den <3><4/></3> Text.')),
+                'source' => $this->convertToInternalTags('Teste <1><2/></1> den <3><4/></3> Text.'),
                 //it may happen that XML in source is loose with > instead &lt; at the end of replaced tags, but in target its strict
                 'target' => $this->convertToInternalTags('test <3><2/></3> the <1><4/></1> text.'),
                 'expectedSource' => 'Teste <bx id="1" rid="1"/><x id="2"/><ex id="3" rid="1"/> den <bx id="4" rid="2"/><x id="5"/><ex id="6" rid="2"/> Text.',
@@ -203,7 +203,7 @@ class XliffTest extends UnitTestAbstract
             'test XML loose vs strict' => [
                 'source' => $this->convertToInternalTags('Teste <1><2/></1> den <3><4/></3> Text.'),
                 //it may happen that XML in source is loose with > instead &lt; at the end of replaced tags, but in target its strict
-                'target' => str_replace('Variable&gt;', 'Variable>', $this->convertToInternalTags('test <3><2/></3> the <1><4/></1> text.')),
+                'target' => $this->convertToInternalTags('test <3><2/></3> the <1><4/></1> text.'),
                 'expectedSource' => 'Teste <bx id="1" rid="1"/><x id="2"/><ex id="3" rid="1"/> den <bx id="4" rid="2"/><x id="5"/><ex id="6" rid="2"/> Text.',
                 'expectedTarget' => 'test <bx id="4" rid="2"/><x id="2"/><ex id="6" rid="2"/> the <bx id="1" rid="1"/><x id="5"/><ex id="3" rid="1"/> text.',
             ],
