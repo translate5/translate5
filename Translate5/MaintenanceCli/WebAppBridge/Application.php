@@ -92,7 +92,12 @@ class Application
         \Zend_Session::$_unitTestEnabled = ! self::$startSession;
         \ZfExtended_BaseIndex::$addMaintenanceConfig = true;
         $index = \ZfExtended_BaseIndex::getInstance();
-        $index->initApplication()->bootstrap();
+        $app = $index->initApplication();
+
+        \Editor_Bootstrap::initContainer();
+
+        $app->bootstrap();
+
         $index->addModuleOptions('default');
         $index->addModuleOptions('editor');
 

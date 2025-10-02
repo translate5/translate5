@@ -28,12 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace LanguageResource;
+namespace MittagQI\Translate5\Test\Unit\LanguageResource;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment;
-use editor_Services_Manager;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -50,19 +49,23 @@ class UpdateSegmentOperationTest extends TestCase
 
     private MockObject|LanguageResourceRepository $languageResourceRepository;
 
-    private MockObject|editor_Services_Manager $serviceManager;
-
     private MockObject|TaskTmRepository $taskTmRepository;
 
     private MockObject|ZfExtended_Logger $logger;
+
+    private MockObject|UpdateSegmentService $updateSegmentService;
 
     protected function setUp(): void
     {
         $this->taskRepository = $this->createMock(TaskRepository::class);
         $this->languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
         $this->taskTmRepository = $this->createMock(TaskTmRepository::class);
-        $this->serviceManager = $this->createMock(editor_Services_Manager::class);
         $this->logger = $this->createMock(ZfExtended_Logger::class);
+        $this->updateSegmentService = $this->createMock(UpdateSegmentService::class);
+
+        $taskMock = $this->createMock(\editor_Models_Task::class);
+        $taskMock->method('getConfig')->willReturn(new Zend_Config([]));
+        $this->taskRepository->method('getByGuid')->willReturn($taskMock);
     }
 
     public function provideTestUpdateSegmentSkip(): iterable
@@ -79,7 +82,7 @@ class UpdateSegmentOperationTest extends TestCase
     {
         $segment = $this->getSegmentMock($hasEmptySource, $hasEmptyTarget);
 
-        $this->serviceManager->expects(self::never())->method('getConnector');
+        $this->updateSegmentService->expects(self::never())->method('update');
 
         $config = new Zend_Config([]);
 
@@ -87,9 +90,9 @@ class UpdateSegmentOperationTest extends TestCase
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
-            $this->serviceManager,
             $this->logger,
             $config,
+            $this->updateSegmentService,
         );
         $service->updateSegment($segment);
     }
@@ -113,10 +116,7 @@ class UpdateSegmentOperationTest extends TestCase
             ],
         ]);
 
-        $this->serviceManager->method('getCreateTaskTmOperation')
-            ->with('serviceType')
-            ->willReturn(null);
-        $this->serviceManager->expects(self::never())->method('getConnector');
+        $this->updateSegmentService->expects(self::never())->method('update');
 
         $config = new Zend_Config([
             'runtimeOptions' => [
@@ -132,9 +132,9 @@ class UpdateSegmentOperationTest extends TestCase
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
-            $this->serviceManager,
             $this->logger,
             $config,
+            $this->updateSegmentService,
         );
         $service->updateSegment($segment);
     }
@@ -163,20 +163,14 @@ class UpdateSegmentOperationTest extends TestCase
             ],
         ]);
 
-        $connectorMock1 = $this->createMock(UpdatableAdapterInterface::class);
-        $connectorMock2 = $this->createMock(UpdatableAdapterInterface::class);
-
-        $this->serviceManager->method('getCreateTaskTmOperation')
-            ->with('serviceType')
-            ->willReturn(null);
-        $this->serviceManager
-            ->method('getConnector')
-            ->willReturnOnConsecutiveCalls($connectorMock1, $connectorMock2);
-
         $expectedOptions = new UpdateOptions(false, true, false, true);
 
-        $connectorMock1->expects(self::once())->method('update')->with($segment, $expectedOptions);
-        $connectorMock2->expects(self::once())->method('update')->with($segment, $expectedOptions);
+        $this->updateSegmentService->expects(self::exactly(2))->method('update')->with(
+            self::isInstanceOf(LanguageResource::class),
+            $segment,
+            self::isInstanceOf(Zend_Config::class),
+            $expectedOptions
+        );
 
         $config = new Zend_Config([
             'runtimeOptions' => [
@@ -192,9 +186,9 @@ class UpdateSegmentOperationTest extends TestCase
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
-            $this->serviceManager,
             $this->logger,
             $config,
+            $this->updateSegmentService,
         );
         $service->updateSegment($segment);
     }
@@ -225,11 +219,8 @@ class UpdateSegmentOperationTest extends TestCase
 
         $this->taskTmRepository->method('getAllCreatedForTask')->willReturn([]);
 
-        $this->serviceManager->expects(self::never())->method('getCreateTaskTmOperation');
         // 2 times because of the 2 language resources that are actually updatable
-        $this->serviceManager->expects(self::exactly(2))
-            ->method('getConnector')
-            ->willReturn($this->createMock(UpdatableAdapterInterface::class));
+        $this->updateSegmentService->expects(self::exactly(2))->method('update');
 
         $config = new Zend_Config([
             'runtimeOptions' => [
@@ -245,9 +236,9 @@ class UpdateSegmentOperationTest extends TestCase
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
-            $this->serviceManager,
             $this->logger,
             $config,
+            $this->updateSegmentService,
         );
         $service->updateSegment($segment);
     }
@@ -280,10 +271,7 @@ class UpdateSegmentOperationTest extends TestCase
             $taskTmMock,
         ]);
 
-        $this->serviceManager->expects(self::never())->method('getCreateTaskTmOperation');
-        $this->serviceManager->expects(self::never())
-            ->method('getConnector')
-            ->willReturn($this->createMock(UpdatableAdapterInterface::class));
+        $this->updateSegmentService->expects(self::never())->method('update');
 
         $this->logger->expects(self::once())->method('__call')->with('error');
 
@@ -301,9 +289,9 @@ class UpdateSegmentOperationTest extends TestCase
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
-            $this->serviceManager,
             $this->logger,
             $config,
+            $this->updateSegmentService,
         );
         $service->updateSegment($segment);
     }
@@ -352,11 +340,8 @@ class UpdateSegmentOperationTest extends TestCase
             $taskTmMock,
         ]);
 
-        $this->serviceManager->expects(self::never())->method('getCreateTaskTmOperation');
         // 2 times because of 1 updatable language resource and 1 updatable project TM
-        $this->serviceManager->expects(self::exactly(2))
-            ->method('getConnector')
-            ->willReturn($this->createMock(UpdatableAdapterInterface::class));
+        $this->updateSegmentService->expects(self::exactly(2))->method('update');
 
         $this->logger->expects(self::never())->method('__call')->with('error');
 
@@ -374,9 +359,9 @@ class UpdateSegmentOperationTest extends TestCase
             $this->taskRepository,
             $this->languageResourceRepository,
             $this->taskTmRepository,
-            $this->serviceManager,
             $this->logger,
             $config,
+            $this->updateSegmentService,
         );
         $service->updateSegment($segment);
     }

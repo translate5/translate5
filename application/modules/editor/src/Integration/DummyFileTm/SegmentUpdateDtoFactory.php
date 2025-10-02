@@ -28,39 +28,53 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\Integration\DummyFileTm;
 
-use editor_Services_Connector_TagHandler_Abstract as TagHandler;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment as Segment;
+use MittagQI\Translate5\Integration\QueryStringProvider;
+use MittagQI\Translate5\Integration\SegmentUpdate\AbstractSegmentUpdateDtoFactory;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
+use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use Zend_Config;
 
-class TagHandlerProvider
+class SegmentUpdateDtoFactory extends AbstractSegmentUpdateDtoFactory
 {
-    public function __construct(
-        private readonly TagHandlerFactory $tagHandlerFactory,
-    ) {
-    }
-
     public static function create(): self
     {
         return new self(
             TagHandlerFactory::create(),
+            QueryStringProvider::create(),
         );
     }
 
-    public function getTagHandler(int $sourceLang, int $targetLang, Zend_Config $config): TagHandler
+    public function supports(LanguageResource $languageResource): bool
     {
-        $sendWhitespaceAsTag = (bool) $config->runtimeOptions->LanguageResources->t5memory?->sendWhitespaceAsTag;
-        $tagHandler = $this->tagHandlerFactory->createTagHandler(
-            't5memory',
-            $config,
-            [
-                'gTagPairing' => false,
-                TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $sendWhitespaceAsTag,
-            ],
-        );
-        $tagHandler->setLanguages($sourceLang, $targetLang);
+        return \editor_Services_DummyFileTm_Service::SERVICE_NAME === $languageResource->getServiceName();
+    }
 
-        return $tagHandler;
+    public function getUpdateDTO(
+        LanguageResource $languageResource,
+        Segment $segment,
+        Zend_Config $config,
+        ?UpdateOptions $updateOptions,
+    ): UpdateSegmentDTO {
+        $tagHandler = $this->getTagHandler(
+            (int) $languageResource->getSourceLang(),
+            (int) $languageResource->getTargetLang(),
+            $config,
+        );
+        $source = $tagHandler->prepareQuery($this->queryStringProvider->getQueryString($segment));
+        $target = $tagHandler->prepareQuery($segment->getTargetEdit());
+
+        return new UpdateSegmentDTO(
+            $source,
+            $target,
+            '',
+            time(),
+            '',
+            $segment->getMid(),
+        );
     }
 }

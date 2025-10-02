@@ -28,18 +28,19 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Repository;
+namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
-
-interface ReimportSegmentRepositoryInterface
+class ReimportSegmentDTO
 {
-    public function save(string $runId, ReimportSegmentDTO $dto): void;
-
-    /**
-     * @return iterable<ReimportSegmentDTO>
-     */
-    public function getByTask(string $runId, string $taskGuid): iterable;
-
-    public function cleanByTask(string $runId, string $taskGuid): void;
+    public function __construct(
+        public string $taskGuid,
+        public readonly int $segmentId,
+        public readonly string $source,
+        public readonly string $target,
+        public readonly string $fileName,
+        public readonly int $timestamp,
+        public readonly string $userName,
+        public readonly string $context,
+    ) {
+    }
 }

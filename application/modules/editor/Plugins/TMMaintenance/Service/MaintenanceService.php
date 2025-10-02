@@ -32,24 +32,26 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as SegmentModel;
-use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Connector as T5MemoryConnector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdateSegmentDTO;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
+use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
+use MittagQI\Translate5\T5Memory\UpdateRetryService;
 
 /**
  * This is a temporary service partially copying functionality from the OpenTM2Connector
  */
-class MaintenanceService extends \editor_Services_Connector_Abstract implements UpdatableAdapterInterface
+class MaintenanceService extends \editor_Services_Connector_Abstract
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
@@ -71,6 +73,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private readonly RetryService $waitingService;
 
+    private readonly UpdateRetryService $updateRetryService;
+
+    private readonly PersistenceService $persistenceService;
+
     public function __construct()
     {
         \editor_Services_Connector_Exception::addCodes([
@@ -90,6 +96,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $this->tmConversionService = TmConversionService::create();
         $this->reorganizeService = ReorganizeService::create();
         $this->waitingService = RetryService::create();
+        $this->updateRetryService = UpdateRetryService::create();
+        $this->persistenceService = PersistenceService::create();
 
         parent::__construct();
     }
@@ -103,38 +111,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
-        $this->tagHandler = \ZfExtended_Factory::get(
-            \editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-            [[
-                'gTagPairing' => false,
-            ]]
-        );
         $this->t5MemoryConnector->connectTo($languageResource, $sourceLang, $targetLang, $config);
         parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
     }
 
-    public function update(SegmentModel $segment, ?UpdateOptions $updateOptions = null): void
+    protected function createTagHandler(array $params = []): \editor_Services_Connector_TagHandler_Abstract
     {
-        // Not used
-    }
-
-    public function getUpdateDTO(SegmentModel $segment, UpdateOptions $updateOptions): UpdateSegmentDTO
-    {
-        return new UpdateSegmentDTO(
-            '',
-            (int) $segment->getId(),
-            $segment->getSource(),
-            $segment->getTarget(),
-            '',
-            $segment->getTimestamp(),
-            '',
-            ''
-        );
-    }
-
-    public function updateWithDTO(UpdateSegmentDTO $dto, UpdateOptions $updateOptions, SegmentModel $segment): void
-    {
-        // Not used
+        return new T5MemoryXliff([
+            'gTagPairing' => false,
+        ]);
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')
@@ -156,8 +141,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $source = $this->tagHandler->prepareQuery($source);
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($target, false);
-        $memoryName = $this->getWritableMemory();
-        $time = $this->api->getDate($timestamp);
+
+        $memoryName = $this->persistenceService->getWritableMemory($this->languageResource);
 
         $this->assertMemoryAvailable($memoryName);
 
@@ -166,7 +151,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $target,
             $userName,
             $context,
-            $time,
+            $timestamp,
             $fileName,
             $memoryName,
         );
@@ -209,14 +194,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $source = $this->tagHandler->prepareQuery($source);
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($target, false);
-        $time = $this->api->getDate($timestamp);
 
         $this->updateSegmentInMemory(
             $source,
             $target,
             $userName,
             $context,
-            $time,
+            $timestamp,
             $fileName,
             $memoryName,
         );
@@ -560,7 +544,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         string $target,
         string $userName,
         string $context,
-        string $time,
+        int $timestamp,
         string $fileName,
         string $memoryName,
     ): void {
@@ -577,92 +561,33 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             ->t5memory
             ->saveDifferentTargetsForSameSource;
 
-        $successful = $this->api->update(
+        $dto = new UpdateSegmentDTO(
             $source,
             $target,
+            $fileName,
+            $timestamp,
             $userName,
             $context,
-            $time,
-            $fileName,
-            $memoryName,
-            $saveDifferentTargetsForSameSource,
+        );
+        $options = new UpdateOptions(
+            useSegmentTimestamp: false,
+            saveToDisk: true,
+            saveDifferentTargetsForSameSource: $saveDifferentTargetsForSameSource,
+            recheckOnUpdate: true,
         );
 
-        if ($successful) {
-            return;
-        }
-
-        $apiError = $this->api->getError();
-        if ($this->isMemoryOverflown($apiError)) {
-            $this->addOverflowWarning();
-
-            $currentWritableMemoryName = $this->getWritableMemory();
-            if ($memoryName === $currentWritableMemoryName) {
-                $newName = $this->generateNextMemoryName($this->languageResource);
-                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
-                $this->addMemoryToLanguageResource($this->languageResource, $newName);
-            } else {
-                $newName = $currentWritableMemoryName;
-            }
-
-            $successful = $this->api->update(
-                $source,
-                $target,
-                $userName,
-                $context,
-                $time,
-                $fileName,
-                $newName,
-                $saveDifferentTargetsForSameSource,
-            );
-        }
-
-        $response = ApiResponse::fromContentAndStatus(
-            $this->api->getResponse()->getBody(),
-            $this->api->getResponse()->getStatus(),
-        );
-
-        if ($this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)) {
-            $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
-            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName, $reorganizeOptions);
-
-            $successful = $this->api->update(
-                $source,
-                $target,
-                $userName,
-                $context,
-                $time,
-                $fileName,
+        try {
+            $this->updateRetryService->updateWithRetryInMemory(
+                $this->languageResource,
                 $memoryName,
-                $saveDifferentTargetsForSameSource,
+                $dto,
+                $options,
+                $this->getConfig(),
             );
-        }
-
-        if ($this->isLockingTimeoutOccurred($apiError)) {
-            $retries = 0;
-
-            while ($retries < $this->getMaxRequestRetries() && ! $successful) {
-                sleep($this->getRetryDelaySeconds());
-                $retries++;
-
-                $successful = $this->api->update(
-                    $source,
-                    $target,
-                    $userName,
-                    $context,
-                    $time,
-                    $fileName,
-                    $memoryName,
-                    $saveDifferentTargetsForSameSource,
-                );
-            }
-        }
-
-        if (! $successful) {
-            $apiError = $this->api->getError() ?? $apiError;
+        } catch (SegmentUpdateException $exception) {
             $this->logger->error('E1306', 'Failed to save segment to TM', [
                 'languageResource' => $this->languageResource,
-                'apiError' => $apiError,
+                'apiError' => $exception->getMessage(),
             ]);
 
             throw new \editor_Services_Connector_Exception('E1306');
@@ -714,41 +639,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         return $result;
     }
 
-    /**
-     * Updates the filename of the language resource instance with the filename coming from the TM system
-     * @throws \Zend_Exception
-     */
-    private function addMemoryToLanguageResource(
-        LanguageResource $languageResource,
-        string $tmName,
-    ): void {
-        $prefix = \Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if (! empty($prefix)) {
-            //remove the prefix from being stored into the TM
-            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
-        }
-
-        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
-
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        $id = 0;
-        foreach ($memories as &$memory) {
-            $memory['id'] = $id++;
-            $memory['readonly'] = true;
-        }
-
-        $memories[] = [
-            'id' => $id,
-            'filename' => $tmName,
-            'readonly' => false,
-        ];
-
-        $languageResource->addSpecificData('memories', $memories);
-        //saving it here makes the TM available even when the TMX import was crashed
-        $languageResource->save();
-    }
-
     private function getBadGatewayException(string $tmName = ''): \editor_Services_Connector_Exception
     {
         $ecode = 'E1313';
@@ -772,38 +662,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     }
 
     // Need to move this region to a dedicated class while refactoring connector
-
-    private function addOverflowWarning(Task $task = null): void
-    {
-        $params = [
-            'name' => $this->languageResource->getName(),
-            'apiError' => $this->api->getError(),
-        ];
-
-        if (null !== $task) {
-            $params['task'] = $task;
-        }
-
-        $this->logger->warn(
-            'E1603',
-            'Language Resource [{name}] current writable memory is overflown, creating a new one',
-            $params
-        );
-    }
-
-    private function getWritableMemory(): string
-    {
-        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            if (! $memory['readonly']) {
-                return $memory['filename'];
-            }
-        }
-
-        throw new \editor_Services_Connector_Exception('E1564', [
-            'name' => $this->languageResource->getName(),
-        ]);
-    }
-
     private function getMemoryNameById(int $memoryId): ?string
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
@@ -818,40 +676,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         throw new \editor_Services_Connector_Exception('E1564', [
             'name' => $this->languageResource->getName(),
         ]);
-    }
-
-    private function isMemoryOverflown(?object $error): bool
-    {
-        if (null === $error) {
-            return false;
-        }
-
-        $errorCodes = explode(
-            ',',
-            $this->config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
-        );
-        $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
-
-        return isset($error->error)
-            && str_replace($errorCodes, '', $error->error) !== $error->error;
-    }
-
-    private function generateNextMemoryName(LanguageResource $languageResource): string
-    {
-        $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
-
-        $pattern = '/_next-(\d+)/';
-
-        $currentMax = 0;
-        foreach ($memories as $memory) {
-            if (! preg_match($pattern, $memory['filename'], $matches)) {
-                return $memory['filename'] . '_next-1';
-            }
-
-            $currentMax = $currentMax > $matches[1] ? $currentMax : (int) $matches[1];
-        }
-
-        return preg_replace($pattern, '_next-' . ($currentMax + 1), $memories[0]['filename']);
     }
 
     private function areSegmentIdsGenerated(string $tmName): bool
@@ -885,10 +709,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 'status' => $status,
             ]);
         }
-    }
-
-    public function checkUpdatedSegment(SegmentModel $segment): void
-    {
     }
 
     protected function getMaxRequestRetries(): int

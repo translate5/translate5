@@ -35,14 +35,14 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 class Response extends AbstractResponse
 {
-    public static function fromResponse(PsrResponseInterface $response): self
+    public static function fromResponse(PsrResponseInterface $response): static
     {
         $content = $response->getBody()->getContents();
 
         return static::fromContentAndStatus($content, $response->getStatusCode());
     }
 
-    public static function fromContentAndStatus(string $content, int $statusCode): self
+    public static function fromContentAndStatus(string $content, int $statusCode): static
     {
         $errorMsg = null;
 
@@ -57,7 +57,8 @@ class Response extends AbstractResponse
             $errorMsg = $body['ErrorMsg'] ?? null;
         }
 
-        return new self(
+        // @phpstan-ignore-next-line
+        return new static(
             $body,
             $errorMsg,
             $statusCode,

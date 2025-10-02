@@ -32,20 +32,17 @@ namespace MittagQI\Translate5\LanguageResource\Operation;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
-use editor_Models_Task as Task;
-use editor_Services_Connector;
 use editor_Services_Connector_Exception;
 use editor_Services_Exceptions_NoService;
 use editor_Services_Manager;
+use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
-use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use Zend_Config;
 use Zend_Registry;
-use ZfExtended_BadGateway;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
 
@@ -59,9 +56,9 @@ class UpdateSegmentOperation
         private readonly TaskRepository $taskRepository,
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly TaskTmRepository $taskTmRepository,
-        private readonly editor_Services_Manager $serviceManager,
         private readonly ZfExtended_Logger $logger,
         private readonly Zend_Config $config,
+        private readonly UpdateSegmentService $updateSegmentService,
     ) {
     }
 
@@ -74,9 +71,9 @@ class UpdateSegmentOperation
             TaskRepository::create(),
             new LanguageResourceRepository(),
             new TaskTmRepository(),
-            ZfExtended_Factory::get(editor_Services_Manager::class),
             Zend_Registry::get('logger')->cloneMe('editor.languageresource.service'),
             Zend_Registry::get('config'),
+            Zend_Registry::get('integration.segment.update'),
         );
     }
 
@@ -108,8 +105,8 @@ class UpdateSegmentOperation
             ->saveDifferentTargetsForSameSource;
         $updateOptions = UpdateOptions::fromArray(
             [
-                UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
-                UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE => $saveDifferentTargetsForSameSource,
+                UpdateOptions::RECHECK_ON_UPDATE => true,
+                UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE => $saveDifferentTargetsForSameSource,
             ]
         );
 
@@ -137,16 +134,14 @@ class UpdateSegmentOperation
 
         $updateOptions = UpdateOptions::fromArray(
             [
-                UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
-                UpdatableAdapterInterface::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE => $saveDifferentTargetsForSameSource,
+                UpdateOptions::RECHECK_ON_UPDATE => true,
+                UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE => $saveDifferentTargetsForSameSource,
             ]
         );
 
         $atLeastOneUpdated = false;
         foreach ($taskTmLanguageResources as $taskTmLanguageResource) {
-            $connector = $this->getConnector($taskTmLanguageResource, $task);
-
-            $connector->update($segment, $updateOptions);
+            $this->updateSegmentService->update($taskTmLanguageResource, $segment, $task->getConfig(), $updateOptions);
 
             $atLeastOneUpdated = true;
         }
@@ -177,12 +172,10 @@ class UpdateSegmentOperation
             }
 
             try {
-                $connector = $this->getConnector($languageResource, $task);
-
-                $connector->update($segment, $updateOptions);
+                $this->updateSegmentService->update($languageResource, $segment, $task->getConfig(), $updateOptions);
             } catch (SegmentUpdateException) {
                 // Ignore the error here as it is already logged in the connector so nothing to do here
-            } catch (editor_Services_Exceptions_NoService|editor_Services_Connector_Exception|ZfExtended_BadGateway $e) {
+            } catch (editor_Services_Exceptions_NoService|editor_Services_Connector_Exception $e) {
                 $extraData = [
                     'languageResource' => $languageResource,
                     'task' => $task,
@@ -204,16 +197,5 @@ class UpdateSegmentOperation
                 continue;
             }
         }
-    }
-
-    private function getConnector(
-        LanguageResource $languageResource,
-        Task $task
-    ): UpdatableAdapterInterface|editor_Services_Connector {
-        return $this->serviceManager->getConnector(
-            $languageResource,
-            config: $task->getConfig(),
-            customerId: (int) $task->getCustomerId(),
-        );
     }
 }

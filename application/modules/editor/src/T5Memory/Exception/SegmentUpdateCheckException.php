@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,18 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Repository;
+namespace MittagQI\Translate5\T5Memory\Exception;
 
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
-
-interface ReimportSegmentRepositoryInterface
+class SegmentUpdateCheckException extends \RuntimeException
 {
-    public function save(string $runId, ReimportSegmentDTO $dto): void;
-
-    /**
-     * @return iterable<ReimportSegmentDTO>
-     */
-    public function getByTask(string $runId, string $taskGuid): iterable;
-
-    public function cleanByTask(string $runId, string $taskGuid): void;
+    public function __construct(
+        string $message = 'Segment update check failed.',
+        public readonly string $apiResponse = '',
+    ) {
+        parent::__construct($message);
+    }
 }

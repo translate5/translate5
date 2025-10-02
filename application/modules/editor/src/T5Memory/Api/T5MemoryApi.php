@@ -35,6 +35,7 @@ use GuzzleHttp\Exception\RequestException;
 use Http\Client\Exception\HttpException;
 use JsonException;
 use MittagQI\Translate5\HTTP\ClientFactory;
+use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\T5Memory\Api\Contract\DeletesMemoryInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\FetchesStatusInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\FuzzyInterface;
@@ -54,21 +55,25 @@ use MittagQI\Translate5\T5Memory\Api\Request\DownloadTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\DownloadTmxChunkRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\FlushTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\FuzzySearchRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\GetEntryRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ImportTmxRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\MemoryListRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ReorganizeRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ResourcesRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\SaveTmsRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\StatusRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\UpdateRequest;
 use MittagQI\Translate5\T5Memory\Api\Response\CreateTmResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\DownloadTmResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\DownloadTmxChunkResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\FuzzySearchResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\GetEntryResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\ImportStatusResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\MemoryListResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response;
 use MittagQI\Translate5\T5Memory\Api\Response\StatusResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\UpdateResponse;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
@@ -403,6 +408,56 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
 
             yield $chunk->chunk;
         }
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws SegmentTooLongException
+     */
+    public function update(
+        string $baseUrl,
+        string $tmName,
+        UpdateSegmentDTO $dto,
+        string $sourceLang,
+        string $targetLang,
+        bool $saveDifferentTargetsForSameSource,
+        bool $save2disk = true,
+    ): UpdateResponse {
+        $this->segmentLengthValidator->validate($dto->source);
+        $this->segmentLengthValidator->validate($dto->target);
+
+        $request = new UpdateRequest(
+            $baseUrl,
+            $tmName,
+            $dto,
+            $sourceLang,
+            $targetLang,
+            $saveDifferentTargetsForSameSource,
+            $save2disk,
+        );
+        $response = $this->client->sendRequest($request);
+
+        return UpdateResponse::fromResponse($response);
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     */
+    public function getEntry(
+        string $baseUrl,
+        string $tmName,
+        string $internalKey,
+    ): GetEntryResponse {
+        $parts = explode(':', $internalKey);
+        $request = new GetEntryRequest(
+            $baseUrl,
+            $tmName,
+            $parts[0],
+            $parts[1] ?? 0,
+        );
+        $response = $this->sendRequest($request);
+
+        return GetEntryResponse::fromResponse($response);
     }
 
     /**

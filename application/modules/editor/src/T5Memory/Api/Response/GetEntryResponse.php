@@ -30,23 +30,46 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api\Response;
 
-use MittagQI\Translate5\T5Memory\Api\Contract\OverflowErrorInterface;
+use JsonException;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
-class UpdateResponse extends Response implements OverflowErrorInterface
+class GetEntryResponse extends AbstractResponse
 {
-    use LockingTimeoutTrait;
-    use OverflowErrorTrait;
-
-    public function getInternalKey(): string
+    public static function fromResponse(PsrResponseInterface $response): self
     {
-        return $this->getBody()['internalKey'] ?? '';
+        $content = $response->getBody()->getContents();
+        $errorMsg = null;
+
+        try {
+            $body = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            $errorMsg = 'Invalid JSON response: ' . $content;
+            $body = [];
+        }
+
+        if (null === $errorMsg) {
+            $errorMsg = $body['ErrorMsg'] ?? null;
+        }
+
+        return new self(
+            $body,
+            $errorMsg,
+            $response->getStatusCode(),
+        );
     }
 
-    public function successful(): bool
+    public function getSource(): string
     {
-        return $this->statusCode === 200
-            && empty($this->getErrorMessage())
-            && 0 === $this->getCode()
-        ;
+        return $this->getBody()['source'] ?? '';
+    }
+
+    public function getTarget(): string
+    {
+        return $this->getBody()['target'] ?? '';
+    }
+
+    public function getTimestamp(): string
+    {
+        return $this->getBody()['timestamp'] ?? '';
     }
 }

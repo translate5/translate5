@@ -46,7 +46,6 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
  * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate(string $searchString)
- * @method void update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null) editor_Services_Connector_Abstract::update()
  * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') FileBasedInterface::getTm()
@@ -311,6 +310,11 @@ class editor_Services_Connector implements ExportAdapterInterface
             $shortTagIdent,
             EntityHandlingMode::Off
         );
+    }
+
+    public function update(editor_Models_Segment $segment, ?UpdateOptions $updateOptions = null): void
+    {
+        $this->__call('update', [$segment, $updateOptions]);
     }
 
     /***

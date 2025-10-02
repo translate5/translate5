@@ -28,18 +28,31 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Repository;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
-use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
+use GuzzleHttp\Psr7\Request;
 
-interface ReimportSegmentRepositoryInterface
+class GetEntryRequest extends Request
 {
-    public function save(string $runId, ReimportSegmentDTO $dto): void;
-
-    /**
-     * @return iterable<ReimportSegmentDTO>
-     */
-    public function getByTask(string $runId, string $taskGuid): iterable;
-
-    public function cleanByTask(string $runId, string $taskGuid): void;
+    public function __construct(
+        string $baseUrl,
+        string $tmName,
+        string $recordKey,
+        string $targetKey,
+    ) {
+        $tmName = urlencode($tmName);
+        parent::__construct(
+            'POST',
+            rtrim($baseUrl, '/') . "/$tmName/getentry",
+            [
+                'Accept-charset' => 'UTF-8',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+            json_encode([
+                'recordKey' => $recordKey,
+                'targetKey' => $targetKey,
+            ], JSON_PRETTY_PRINT)
+        );
+    }
 }

@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_DummyFileTm_Service extends editor_Services_ServiceAbstract
 {
+    public const SERVICE_NAME = 'DummyFile TM';
+
     public const DEFAULT_COLOR = '00ff00';
 
     protected $resourceClass = 'editor_Services_DummyFileTm_Resource';
@@ -57,6 +59,6 @@ class editor_Services_DummyFileTm_Service extends editor_Services_ServiceAbstrac
      */
     public function getName()
     {
-        return "DummyFile TM";
+        return self::SERVICE_NAME;
     }
 }
