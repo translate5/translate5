@@ -193,4 +193,18 @@ SQL;
 
         $this->db->query($sql);
     }
+
+    public function getTaskGuidsFinishedBetween(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        $s = $this->db->select()
+            ->from('LEK_task_log', ['taskGuid', 'created'])
+            ->where("message like 'job status changed from % to finished'")
+            ->where('created > ?', $startDate->format('Y-m-d H:i:s'))
+            ->where('created < ?', $endDate->format('Y-m-d H:i:s'))
+        ;
+
+        $rows = $this->db->fetchAll($s);
+
+        return array_column($rows, 'taskGuid');
+    }
 }
