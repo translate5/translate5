@@ -45,5 +45,27 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
     public function _initApplication()
     {
+
+    }
+
+    /**
+     * Initialize Integration Segment Update container and dto factory
+     */
+    protected function _initIntegrationSegmentUpdateAndDtoFactory()
+    {
+        if (! \Zend_Registry::isRegistered('integration.segment.update')) {
+            error_log("In");
+            \Zend_Registry::set(
+                'integration.segment.update',
+                \MittagQI\Translate5\Integration\UpdateSegmentService::create()
+            );
+        }
+
+        if (! \Zend_Registry::isRegistered('integration.segment.update.dto_factory')) {
+            \Zend_Registry::set(
+                'integration.segment.update.dto_factory',
+                \MittagQI\Translate5\Integration\SegmentUpdateDtoFactory::create()
+            );
+        }
     }
 }
