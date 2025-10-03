@@ -28,6 +28,65 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.30.0] - 2025-10-03
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4797](https://jira.translate5.net/browse/TRANSLATE-4797): Export - Add batch operation for task export "original format, translated/reviewed"** <br>
+7.30.0: Added batch operation for task export "original format, translated/reviewed"
+
+**[TRANSLATE-4700](https://jira.translate5.net/browse/TRANSLATE-4700): InstantTranslate - InstantTranslate: Add form fields to "Send to human revision" for more info for PM** <br>
+InstantTranslate: When creating a task for human revision, users can set task fields before the task is created
+
+
+### Changed
+**[TRANSLATE-5016](https://jira.translate5.net/browse/TRANSLATE-5016): t5memory - Redo reorganise call** <br>
+T5Memory: replaced reorganize with export/import to avoid potential data losses
+
+**[TRANSLATE-5014](https://jira.translate5.net/browse/TRANSLATE-5014): t5memory - Improve commands for working with t5memory** <br>
+Improved t5memory CLI commands to provide more functionality
+
+**[TRANSLATE-4896](https://jira.translate5.net/browse/TRANSLATE-4896): Editor general - Check keyboard shortcuts** <br>
+Made sure all keyboard shortcuts work in new richtext editor, except trackchanges-related ones
+
+**[TRANSLATE-4877](https://jira.translate5.net/browse/TRANSLATE-4877): t5memory - Make re-try calls on update of segments in t5memory** <br>
+Updates of segments in t5memory will re-try calls now in case of service down time
+
+**[TRANSLATE-4876](https://jira.translate5.net/browse/TRANSLATE-4876): t5memory - Make re-try calls on fuzzy search with t5memory** <br>
+Fuzzy searches with t5memory will re-try calls in case when it is down
+
+**[TRANSLATE-4821](https://jira.translate5.net/browse/TRANSLATE-4821): ConnectWorldserver - Plugin ConnectWorldserver: assign customer to auto-created user** <br>
+Plugin ConnectWorldserver:
+assign the customer of the task the auto-created user
+
+**[TRANSLATE-4771](https://jira.translate5.net/browse/TRANSLATE-4771): AI - Use XLIFF as exchange-format for LLM-batches optionally** <br>
+Improvement: Optionally XLIFF can be used as agreed format with OpenAI/LLM to translate batches apart from JSON to improve the reliability of batches
+
+**[TRANSLATE-3760](https://jira.translate5.net/browse/TRANSLATE-3760): InstantTranslate - InstantTranslate: End user switch to select, which MT language resource should be used to translate a file** <br>
+InstantTranslate: New button to select which resource to use when file pre-translation is used
+
+
+### Bugfixes
+**[TRANSLATE-5028](https://jira.translate5.net/browse/TRANSLATE-5028): Editor general - RootCause: Cannot read properties of null (reading 'toString')** <br>
+FIXED: added check for non-empty text selection in richtext editor
+
+**[TRANSLATE-5024](https://jira.translate5.net/browse/TRANSLATE-5024): InstantTranslate - & escaped in InstantTranslate text field DeepL translations** <br>
+InstantTranslate: ampersand chars are not escaped anymore for single-segment translations
+
+**[TRANSLATE-5003](https://jira.translate5.net/browse/TRANSLATE-5003): TM Maintenance - TM maintenance: in DE UI the delete all button stays inactive** <br>
+TM maintenance: Fixed "Delete all" button being inactive in DE UI
+
+**[TRANSLATE-5000](https://jira.translate5.net/browse/TRANSLATE-5000): Editor general - TrackChanges Tags: The new Editor may creates nested track-changes tags** <br>
+New editor: fixed possible creation of nested TrackChanges-tags (inserts in deletions) that may create false tag-errors in the AutoQA and problems with task-export
+
+**[TRANSLATE-4967](https://jira.translate5.net/browse/TRANSLATE-4967): TrackChanges - Track changes removed incorrectly on segment save** <br>
+Fixed track changes removal logic
+
+
 ## [7.30.0] - 2025-10-02
 
 ### Important Notes:
