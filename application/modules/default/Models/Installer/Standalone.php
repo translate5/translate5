@@ -819,7 +819,11 @@ class Models_Installer_Standalone
         ZfExtended_BaseIndex::$addMaintenanceConfig = true;
         $index = ZfExtended_BaseIndex::getInstance();
         $this->waitForDatabase(function () use ($index) {
-            $index->initApplication()->bootstrap();
+            $app = $index->initApplication();
+
+            \Editor_Bootstrap::initContainer();
+
+            $app->bootstrap();
         });
         $index->addModuleOptions('default');
 
