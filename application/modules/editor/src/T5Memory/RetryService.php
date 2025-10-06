@@ -53,10 +53,10 @@ class RetryService
      * @param callable(): array{WaitCallState, T} $callback
      * @return T|null
      */
-    public function callAwaiting(callable $callback)
+    public function callAwaiting(callable $callback, bool $canWaitLong = false)
     {
         $elapsedTime = 0;
-        $maxWaitingTime = $this->getMaxWaitingTimeSeconds();
+        $maxWaitingTime = $this->getMaxWaitingTimeSeconds($canWaitLong);
         $state = WaitCallState::Retry;
         $result = null;
 
@@ -80,9 +80,9 @@ class RetryService
         return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySeconds;
     }
 
-    public function getMaxWaitingTimeSeconds(): int
+    public function getMaxWaitingTimeSeconds(bool $canWaitLong): int
     {
-        if ($this->canWaitLongTaskFinish()) {
+        if ($canWaitLong || $this->canWaitLongTaskFinish()) {
             // 1 hour max waiting time
             return 3600;
         }
