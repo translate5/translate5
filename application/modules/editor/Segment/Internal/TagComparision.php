@@ -237,4 +237,15 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
     {
         return in_array(self::TAG_STRUCTURE_FAULTY, $this->stati);
     }
+
+    public function hasValidInternalTags(): bool
+    {
+        foreach ($this->stati as $stat) {
+            if (str_starts_with($stat, 'internal_tag')) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

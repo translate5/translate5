@@ -94,7 +94,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         Segment $segment,
         UpdateSegmentDto $updateDto,
         User $actor,
-        UpdateSegmentLogger $updateLogger,
+        ?UpdateSegmentLogger $updateLogger = null,
         ?ZfExtended_Models_Messages $restMessages = null
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::Update, $segment);

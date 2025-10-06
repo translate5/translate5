@@ -35,6 +35,8 @@ use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessingFailedEvent
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionReplacementRequestedEvent;
 use MittagQI\Translate5\Segment\SearchAndReplace\Event\SearchAndReplaceProcessingFailedEvent;
 use MittagQI\Translate5\Segment\SearchAndReplace\Event\SearchAndReplaceProcessingRequestedEvent;
+use MittagQI\Translate5\Segment\SyncStatus\Event\SyncStatusProcessingFailedEvent;
+use MittagQI\Translate5\Segment\SyncStatus\Event\SyncStatusProcessingRequestedEvent;
 use MittagQI\Translate5\Task\Events\TaskProgressUpdatedEvent;
 
 class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
@@ -127,6 +129,16 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
             EventDispatcher::class,
             SearchAndReplaceProcessingFailedEvent::class,
             [$this, 'unlockProcessingSearchAndReplaceSegments']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            SyncStatusProcessingRequestedEvent::class,
+            [$this, 'sendSegmentSyncStatusProcessingStarted']
+        );
+        $this->eventManager->attach(
+            EventDispatcher::class,
+            SyncStatusProcessingFailedEvent::class,
+            [$this, 'unlockProcessingSyncStatusSegments']
         );
 
         $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', [$this, 'handleStartSession']);
@@ -357,6 +369,17 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
         ]);
     }
 
+    public function sendSegmentSyncStatusProcessingStarted(Zend_EventManager_Event $zendEvent)
+    {
+        /** @var SyncStatusProcessingRequestedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $this->bus->notify(self::CHANNEL_TASK, 'segmentProcessingStarted', [
+            'taskGuid' => $event->taskGuid,
+            'segmentIds' => $event->segmentIds,
+        ]);
+    }
+
     public function sendSegmentProcessed(Zend_EventManager_Event $zendEvent)
     {
         /** @var SegmentProcessedEvent $event */
@@ -397,6 +420,17 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract
     public function unlockProcessingSearchAndReplaceSegments(Zend_EventManager_Event $zendEvent): void
     {
         /** @var SearchAndReplaceProcessingFailedEvent $event */
+        $event = $zendEvent->getParam('event');
+
+        $this->bus->notify(self::CHANNEL_TASK, self::SEGMENTS_PROCESSED_MESSAGE, [
+            'taskGuid' => $event->taskGuid,
+            'segmentIds' => $event->segmentIds,
+        ]);
+    }
+
+    public function unlockProcessingSyncStatusSegments(Zend_EventManager_Event $zendEvent): void
+    {
+        /** @var SyncStatusProcessingFailedEvent $event */
         $event = $zendEvent->getParam('event');
 
         $this->bus->notify(self::CHANNEL_TASK, self::SEGMENTS_PROCESSED_MESSAGE, [

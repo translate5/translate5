@@ -33,6 +33,9 @@ Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
         scrollToTooltip: function(get) {
             return get('isEditingSegment') ? get('l10n.segmentGrid.toolbar.btnScrollToSegment') : get('l10n.segmentGrid.toolbar.btnJumpToSegment');
         },
+        syncStatusDisabled: function(get) {
+            return !Editor.data.plugins.FrontEndMessageBus || get('editorIsReadonly') || !get('selectedSegment') || get('isEditingSegment');
+        },
         segmentIsWatched: {
             bind: {
                 bindTo: '{selectedSegment}',

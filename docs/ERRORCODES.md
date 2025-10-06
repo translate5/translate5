@@ -534,17 +534,18 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1081"></a>E1081 | Segment Pixellength | Textlength by pixel failed; most probably data about the pixelWidth is missing: fontFamily: &quot;{fontFamily} fontSize: &quot;{fontSize}&quot;. | Same as E1082 below, but no default width is available for that font and font size.                                                                                                                                                                         |
 | <a id="E1082"></a>E1082 | Segment Pixellength | Segment length calculation: missing pixel width for several characters.                                                                          | On of the characters in the segment has no pixel length defined, the default pixel width is used.<br />This error happens in most cases on the export of a task, where the length of the segments is finally checked. Also it happens on saving a segment.  |
 
-### Segment: Search and replace
+### Segment: Search and replace, finalize status
 
-| EventCode               | Context            | EventMessage                                                                 | Description/Solution                                                                 |
-|:------------------------|:-------------------|:-----------------------------------------------------------------------------|:-------------------------------------------------------------------------------------|
-| <a id="E1192"></a>E1192 | Search and replace | Replace all can not be used for task with usageMode &quot;simultaneous&quot; | The replace all is disabled for the tasks where the task usage mode is simultaneous. |
+| EventCode               | Context                        | EventMessage                                                                                    | Description/Solution                                                                                |
+|:------------------------|:-------------------------------|:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------|
+| <a id="E1192"></a>E1192 | Search and replace             | Replace all can not be used for task with usageMode &quot;simultaneous&quot;                    | The replace all is disabled for the tasks where the task usage mode is simultaneous.                |
+| <a id="E1192"></a>E1192 | Set to final processing status | Set to final processing status can not be used for task with usageMode &quot;simultaneous&quot; | Set to final processing status is disabled for the tasks where the task usage mode is simultaneous. |
 
 ### Statistics
 
-| EventCode               | Context         | EventMessage                            | Description/Solution                                      |
-|:------------------------|:----------------|:----------------------------------------|:----------------------------------------------------------|
-| <a id="E1722"></a>E1722 | Task Statistics | Multi purpose code for duration logging | Logging of the levensthein / aggregation command duration |
+| EventCode               | Context         | EventMessage                            | Description/Solution                                       |
+|:------------------------|:----------------|:----------------------------------------|:-----------------------------------------------------------|
+| <a id="E1722"></a>E1722 | Task Statistics | Multi purpose code for duration logging | Logging of the levenshtein / aggregation command duration |
 
 ### QA / AutoQA
 

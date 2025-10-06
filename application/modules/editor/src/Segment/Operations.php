@@ -127,9 +127,9 @@ class Operations
         $this->iterateOverFilteredList(callback: function (editor_Models_Segment $segment) use ($assoc, $bookmark) {
             $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
             if ($bookmark) {
-                $assoc->createAndSave($segment->getTaskGuid(), $segment->getId(), $userGuid);
+                $assoc->createAndSave($segment->getTaskGuid(), (int) $segment->getId(), $userGuid);
             } else {
-                $assoc->directDelete($segment->getId(), $userGuid);
+                $assoc->directDelete((int) $segment->getId(), $userGuid);
             }
         });
     }

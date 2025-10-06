@@ -601,6 +601,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             bind: {
                                 text: '{l10n.segmentGrid.batchOperations.menuUnbookmark}'
                             }
+                        },{
+                            icon: Editor.data.moduleFolder+'images/book_link.png',
+                            operation: 'finalizestatus',
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuFinalizeStatus}',
+                                disabled: '{syncStatusDisabled}'
+                            }
                         }]
                     }
                 },{

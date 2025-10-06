@@ -10835,6 +10835,22 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Alle selektierten exportieren</source>
                 <target>Export all selected</target>
             </trans-unit>
+            <trans-unit id='QXVmIGZpbmFsZW4gQmVhcmJlaXR1bmdzc3RhdHVzIHNldHplbg=='>
+                <source>Auf finalen Bearbeitungsstatus setzen</source>
+                <target>Set to final processing status</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudGUgd2VyZGVuIGF1ZiBmaW5hbGVuIEJlYXJiZWl0dW5nc3N0YXR1cyBnZXNldHp0'>
+                <source>Segmente werden auf finalen Bearbeitungsstatus gesetzt</source>
+                <target>Set segments to final processing status</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSB3ZXJkZW4gaW4gZGVyIEF1ZmdhYmUgdW5kIGltIEF1ZmdhYmVuLVRNIGdlc3BlaWNoZXJ0LCB3aWUgd2VubiBzaWUgZWluemVsbiBnZcO2ZmZuZXQgd8O8cmRlbi4='>
+                <source>Alle Segmente werden in der Aufgabe und im Aufgaben-TM gespeichert, wie wenn sie einzeln geöffnet würden.</source>
+                <target>All segments will be saved to the task and the task TM as they would when opened individually.</target>
+            </trans-unit>
+            <trans-unit id='RWluIG9kZXIgbWVocmVyZSBTZWdtZW50ZSBrb25udGVuIG5pY2h0IGF1ZiBmaW5hbGVuIFByb3plc3NzdGF0dXMgZ2VzZXR6dCB3ZXJkZW4sIHdlaWwgc2llIFRhZy1GZWhsZXIgZW50aGFsdGVuLiBGaWx0ZXJuIFNpZSBpbiBkZXIgQXV0b1FBIG5hY2ggZGllc2VyIEthdGVnb3JpZSB1bSBkaWUgU2VnbWVudGUgZXJuZXV0IHp1IHByw7xmZW4u'>
+                <source>Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.</source>
+                <target>One or more segments could not be set to final processing state because they contain tag errors. Filter by this category in the AutoQA to check the segment(s) again.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

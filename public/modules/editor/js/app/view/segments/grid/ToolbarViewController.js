@@ -56,6 +56,43 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
 
         params = params || {filter: "[]"};
         params.qualities = grid.store.getQualityFilter();
+
+        if(menuitem.operation === 'finalizestatus') {
+
+            const errTitle = Editor.MessageBox.prototype.titles.error;
+            if(!Editor.data.plugins.FrontEndMessageBus){
+                Ext.Msg.alert(errTitle, 'Frontend Message Bus plugin must be enabled');
+                return;
+            }
+
+            const segment = vm.get('selectedSegment'),
+                ed = grid && grid.editingPlugin;
+            //if there is no segment selected or a segment is opened for editing, then we can not proceed
+            if (!segment || (ed && ed.editing)) {
+                Ext.Msg.alert(errTitle, segment ? 'The segment should not be opened for editing' : 'No segment selected');
+                return;
+            }
+
+            params.segmentId = segment.get('id');
+
+            Ext.Msg.show({
+                title: vm.get('l10n.segmentGrid.batchOperations.menuFinalizeStatus'),
+                message: vm.get('l10n.segmentGrid.batchOperations.warnFinalizeText'),
+                buttons: Ext.MessageBox.OKCANCEL,
+                prompt : false,
+                fn: function(btn){
+                    if (btn === 'ok'){
+                        me.runBatchOperation(menuitem.operation, params);
+                    }
+                },
+                buttonText: {
+                    ok: vm.get('l10n.segmentGrid.batchOperations.continue'),
+                    cancel: vm.get('l10n.segmentGrid.batchOperations.cancel')
+                }
+            });
+            return;
+        }
+
         if(params.filter === '[]' && params.qualities === '') {
                 Ext.Msg.confirm(
                     vm.get('l10n.segmentGrid.batchOperations.warnAllTitle'),
@@ -79,6 +116,10 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             loading: '{l10n.segmentGrid.batchOperations.loading.'+opName+'}'
         });
 
+        if(opName === 'finalizestatus') {
+            opName = 'syncstatus';
+        }
+
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/'+opName+'/batch',
             method: 'post',
@@ -86,7 +127,46 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             timeout: 240000,
             scope: me,
             success: function(xhr){
-                if (opName.match('lock')) {
+                if(opName === 'syncstatus') {
+                    if(xhr.responseText) {
+                        const json = Ext.JSON.decode(xhr.responseText);
+                        if (json.errors) {
+                            let msg = '';
+                            Ext.Array.each(json.errors, function (error) {
+                                msg += error.msg + "\n";
+                            });
+                            Ext.MessageBox.show({
+                                title: Editor.MessageBox.prototype.titles.error,
+                                msg: msg,
+                                buttons: Ext.MessageBox.OK,
+                                icon: Ext.MessageBox.ERROR
+                            });
+                        }
+                    } else if(!params.draft && !Editor.app.getTaskConfig('segments.userCanIgnoreTagValidation')) {
+                        Ext.TaskManager.start({
+                            run: function () {
+                                Ext.Ajax.request({
+                                    url: Editor.data.restpath+'segment/'+opName+'/batch?checkprogress=1',
+                                    success: function (xhr) {
+                                        let json = Ext.JSON.decode(xhr.responseText);
+                                        if (json.status !== 'WAIT') {
+                                            if(json.status === 'WARN') {
+                                                Ext.MessageBox.show({
+                                                    title: Editor.MessageBox.prototype.titles.warning,
+                                                    msg: Ext.String.htmlEncode(json.warning),
+                                                    buttons: Ext.MessageBox.OK,
+                                                    icon: Ext.MessageBox.WARNING
+                                                });
+                                            }
+                                            Ext.TaskManager.stopAll(); // stop polling
+                                        }
+                                    }
+                                });
+                            },
+                            interval: 2000 // every 2s
+                        });
+                    }
+                } else if (opName.match('lock')) {
                     var json = xhr.responseJson, segmentsCtrl = Editor.app.getController('Segments');
                     segmentsCtrl.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
                     segmentsCtrl.fireEvent('segmentLockToggled', true);

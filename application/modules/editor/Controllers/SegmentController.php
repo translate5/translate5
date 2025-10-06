@@ -40,6 +40,10 @@ use MittagQI\Translate5\Segment\SearchAndReplace\SearchAndReplaceException;
 use MittagQI\Translate5\Segment\SearchAndReplace\SearchAndReplaceService;
 use MittagQI\Translate5\Segment\SearchAndReplace\SearchQueryDtoFactory;
 use MittagQI\Translate5\Segment\SearchAndReplace\SearchService;
+use MittagQI\Translate5\Segment\SyncStatus\DTO\SyncDto;
+use MittagQI\Translate5\Segment\SyncStatus\SyncStatusException;
+use MittagQI\Translate5\Segment\SyncStatus\SyncStatusService;
+use MittagQI\Translate5\Segment\SyncStatus\TagValidationTracking;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Terminology\TermportletData;
@@ -398,7 +402,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      */
-    public function isOpenedByMoreThanOneUser(string $taskGuid): bool
+    private function isOpenedByMoreThanOneUser(string $taskGuid): bool
     {
         $usedBy = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->loadUsed($taskGuid);
 
@@ -411,7 +415,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws NoAccessException
      * @throws Zend_Exception
      * @throws ZfExtended_ValidateException
-     * @throws editor_Models_SearchAndReplace_Exception
+     * @throws SearchAndReplaceException
      */
     public function replaceallAction()
     {
@@ -445,7 +449,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         $results = $searchService->search($searchQuery);
 
-        if (! $results || empty($results)) {
+        if (empty($results)) {
             $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
 
             return;
@@ -466,7 +470,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         $searchAndReplaceService->replaceAll($replaceDto);
 
-        //return the modefied segments
+        //return the modified segments
         $this->view->rows = $searchService->search($searchQuery);
         $this->view->total = count($this->view->rows);
     }
@@ -686,6 +690,65 @@ class Editor_SegmentController extends ZfExtended_RestController
             $this->entity,
         ]);
         $operations->toggleBookmarkBatch($bookmark);
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception|ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function syncstatusBatch()
+    {
+        $task = $this->getCurrentTask();
+        $this->validateTaskAccess($task->getTaskGuid());
+        $auth = ZfExtended_Authentication::getInstance();
+        $tagValidationTracking = new TagValidationTracking($task, $auth->getUserId());
+
+        $request = $this->getRequest();
+        if ($request->getParam('checkprogress')) {
+            $result = new stdClass();
+            $result->status = $tagValidationTracking->getStatus();
+            if ($result->status === TagValidationTracking::WARN) {
+                $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+                /* @var $t ZfExtended_Zendoverwrites_Translate */
+                $result->warning = $t->_('Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.');
+            }
+            echo Zend_Json::encode($result);
+            if ($result->status !== TagValidationTracking::WAIT) {
+                $tagValidationTracking->remove();
+            }
+            exit;
+        }
+
+        if ($task->getUsageMode() === $task::USAGE_MODE_SIMULTANEOUS
+            && $this->isOpenedByMoreThanOneUser($task->getTaskGuid())
+        ) {
+            $ex = new SyncStatusException('E1737', [
+                'task' => $task,
+            ]);
+            $this->log->exception($ex);
+            $this->restMessages->addWarning($ex->getMessage());
+
+            return;
+        }
+
+        $autoStateId = editor_Models_Segment_AutoStates::PENDING; // different for drafts
+        $dto = new SyncDto(
+            $auth->getUserGuid(),
+            $task->getTaskGuid(),
+            $request->getParam('segmentId'),
+            $request->getRawParam('filter'),
+            $autoStateId
+        );
+
+        // TODO: add $autoStateId !== editor_Models_Segment_AutoStates::PENDING || (always true for drafts)
+        $userCanIgnoreTagValidation = $task->getConfig()->runtimeOptions->segments?->userCanIgnoreTagValidation;
+        if (! $userCanIgnoreTagValidation) {
+            $tagValidationTracking->update(TagValidationTracking::WAIT);
+        }
+
+        $syncStatusService = SyncStatusService::create();
+        $syncStatusService->queueSyncAll($dto);
     }
 
     #endregion
