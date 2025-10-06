@@ -1798,6 +1798,9 @@ Ext.define('Editor.controller.Editor', {
      * Event handler for text selection change in editor
      */
     onEditorSelectionChange: function (event) {
+        if (!event.detail.selection) {
+            return;
+        }
         const selectedText = event.detail.selection.toString(),
             synonymGridExist = this.getSynonymSearch() !== undefined,
             editorPanelExist = this.getLanguageResourceEditorPanel() !== undefined;
