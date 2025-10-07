@@ -40,6 +40,8 @@ class ImportOptions
         public readonly bool $resegmentTmx = false,
         public readonly bool $saveDifferentTargetsForSameSource = false,
         public readonly ?int $customerId = null,
+        public readonly bool $protectContent = true,
+        public readonly bool $forceLongWait = false,
     ) {
     }
 

@@ -36,7 +36,7 @@ use Zend_Config;
 class PersistenceService
 {
     public function __construct(
-        private readonly Zend_Config $config
+        private readonly Zend_Config $config,
     ) {
     }
 
@@ -121,16 +121,24 @@ class PersistenceService
         return $tmName;
     }
 
+    private function removeTmPrefix(string $tmName): string
+    {
+        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+
+        if (! empty($prefix) && str_contains($tmName, $prefix)) {
+            //remove the prefix from being stored into the TM
+            return str_replace('^' . $prefix . '-', '', '^' . $tmName);
+        }
+
+        return $tmName;
+    }
+
     public function addMemoryToLanguageResource(
         LanguageResource $languageResource,
         string $tmName,
         bool $isInternalFuzzy = false,
     ): void {
-        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if (! empty($prefix)) {
-            //remove the prefix from being stored into the TM
-            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
-        }
+        $tmName = $this->removeTmPrefix($tmName);
 
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
 
@@ -161,12 +169,7 @@ class PersistenceService
         string $tmName,
         bool $isInternalFuzzy = false,
     ): void {
-        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
-
-        if (! empty($prefix)) {
-            //remove the prefix from being stored into the TM
-            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
-        }
+        $tmName = $this->removeTmPrefix($tmName);
 
         $oldMemories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
 

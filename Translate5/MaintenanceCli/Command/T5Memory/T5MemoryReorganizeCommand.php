@@ -31,6 +31,7 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_OpenTM2_Service;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -48,29 +49,31 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
     use T5MemoryLocalTmsTrait;
     use FilteringByNameTrait;
 
-    protected static $defaultName = 't5memory:reorganize|memory:reorganize';
+    protected static $defaultName = 't5memory:reorganize';
 
     private const OPTION_TM_NAME = 'tmName';
 
-    private const ARGUMENT_UUID = 'uuid';
+    private const ARGUMENT_ID = 'id';
 
     private const OPTION_BATCH_SIZE = 'batchSize';
 
     private const OPTION_START_FROM_ID = 'startFromId';
 
+    private LanguageResourceRepository $languageResourceRepository;
+
     protected function configure(): void
     {
         $this->setDescription('Reorganizes particular TM');
         $this->addArgument(
-            self::ARGUMENT_UUID,
+            self::ARGUMENT_ID,
             InputArgument::OPTIONAL,
-            'UUID of the memory to reorganize, if not given, you can select from a list'
+            'ID of the language resource to reorganize, if not given, you can select from a list'
         );
         $this->addOption(
             self::OPTION_TM_NAME,
             'f',
             InputOption::VALUE_REQUIRED,
-            'If no UUID was given this will filter the list of all TMs if provided'
+            'If no ID was given this will filter the list of all TMs if provided'
         );
         $this->addOption(
             self::OPTION_BATCH_SIZE,
@@ -82,7 +85,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
             self::OPTION_START_FROM_ID,
             null,
             InputOption::VALUE_REQUIRED,
-            'The DB ID of the language resource to start reorganize from. Works only if no UUID and tmName was given',
+            'The DB ID of the language resource to start reorganize from. Works only if no ID and tmName was given',
         );
     }
 
@@ -90,6 +93,8 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+
+        $this->languageResourceRepository = LanguageResourceRepository::create();
 
         $this->assertInputValid($input);
 
@@ -154,6 +159,10 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
             return $this->getLanguageResourcesBatch((int) $batchSize, (int) $startFromId);
         }
 
+        if ($input->getArgument(self::ARGUMENT_ID)) {
+            return [$this->languageResourceRepository->get((int) $input->getArgument(self::ARGUMENT_ID))];
+        }
+
         $uuid = $this->getTmUuid($input);
 
         if (null !== $uuid) {
@@ -167,9 +176,11 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
     {
         $db = ZfExtended_Factory::get(LanguageResource::class)->db;
         $s = $db->select()
-            ->from([
-                'lr' => 'LEK_languageresources',
-            ], ['lr.langResUuid AS uuid'])
+            ->from(
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
+            )
             ->where('lr.id > ?', $startFromId)
             ->where('lr.serviceName = ?', editor_Services_OpenTM2_Service::NAME)
             ->limit($batchSize);
@@ -177,7 +188,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $data = $db->fetchAll($s);
 
         foreach ($data as $row) {
-            yield $this->getLanguageResource($row['uuid']);
+            yield $this->languageResourceRepository->get((int) $row['id']);
         }
     }
 
@@ -208,14 +219,14 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
     private function assertInputValid(InputInterface $input): void
     {
-        $uuid = $input->getArgument(self::ARGUMENT_UUID);
+        $uuid = $input->getArgument(self::ARGUMENT_ID);
         $tmName = $input->getOption(self::OPTION_TM_NAME);
         $batchSize = $input->getOption(self::OPTION_BATCH_SIZE);
         $startFromId = $input->getOption(self::OPTION_START_FROM_ID);
 
         if (($uuid || $tmName) && ($batchSize || $startFromId)) {
             throw new \InvalidArgumentException(
-                'Please either provide `UUID/tmName` or `batchSize/startFromId`'
+                'Please either provide `ID/tmName` or `batchSize/startFromId`'
             );
         }
     }

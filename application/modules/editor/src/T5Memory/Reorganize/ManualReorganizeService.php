@@ -37,20 +37,16 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use Http\Client\Exception\HttpException;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\CloneMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\Exception\CloneException;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInErrorException;
 use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
-use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
 use MittagQI\Translate5\T5Memory\WipeMemoryService;
-use Psr\Http\Client\ClientExceptionInterface;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -62,8 +58,6 @@ class ManualReorganizeService
         private readonly ZfExtended_Logger $logger,
         private readonly ExportService $exportService,
         private readonly ImportService $importService,
-        private readonly CloneMemoryService $cloneService,
-        private readonly FlushMemoryService $flushService,
         private readonly WipeMemoryService $wipeMemoryService,
         private readonly SameTuvFilter $sameTuvFilter,
     ) {
@@ -75,8 +69,6 @@ class ManualReorganizeService
             Zend_Registry::get('logger')->cloneMe('editor.t5memory.reorganize'),
             ExportService::create(),
             ImportService::create(),
-            CloneMemoryService::create(),
-            FlushMemoryService::create(),
             WipeMemoryService::create(),
             SameTuvFilter::create(),
         );
@@ -95,26 +87,6 @@ class ManualReorganizeService
         $exportFilePath = $exportDir . '/' . $languageResource->getId() . '_' . $tmName . '.tmx';
 
         @mkdir($exportDir, 0777, true);
-
-        $timestamp = date_format(new DateTime(), 'Y-m-d\THis');
-
-        try {
-            $this->cloneService->clone(
-                $languageResource,
-                $tmName,
-                $tmName . ".reorganise.before-flush.$timestamp",
-            );
-        } catch (ClientExceptionInterface|HttpException|CloneException $e) {
-            $this->logger->warn(
-                'E1314',
-                'Could not create backup or flush TM before reorganize. Continuing anyway.',
-                [
-                    'languageResource' => $languageResource,
-                    'error' => $e->getMessage(),
-                ]
-            );
-            $this->logger->exception($e);
-        }
 
         $file = $this->exportService->export(
             $languageResource,
@@ -136,26 +108,6 @@ class ManualReorganizeService
             );
 
             throw new ReorganizeException('Reorganize failed: Nothing was exported');
-        }
-
-        try {
-            $this->flushService->flush($languageResource, $tmName);
-
-            $this->cloneService->clone(
-                $languageResource,
-                $tmName,
-                $tmName . ".reorganise.after-flush.$timestamp",
-            );
-        } catch (ClientExceptionInterface|HttpException|CloneException $e) {
-            $this->logger->warn(
-                'E1314',
-                'Could not create backup or flush TM after reorganize. Continuing anyway.',
-                [
-                    'languageResource' => $languageResource,
-                    'error' => $e->getMessage(),
-                ]
-            );
-            $this->logger->exception($e);
         }
 
         rename($file, $exportFilePath);

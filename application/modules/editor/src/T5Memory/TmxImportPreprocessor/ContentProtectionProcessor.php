@@ -63,6 +63,10 @@ class ContentProtectionProcessor extends Processor
 
     public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool
     {
+        if (! $importOptions->protectContent) {
+            return false;
+        }
+
         return $this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang);
     }
 

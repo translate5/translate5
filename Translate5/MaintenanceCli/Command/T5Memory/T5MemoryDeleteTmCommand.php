@@ -45,7 +45,7 @@ class T5MemoryDeleteTmCommand extends Translate5AbstractCommand
     use T5MemoryLocalTmsTrait;
     use FilteringByNameTrait;
 
-    protected static $defaultName = 't5memory:delete|memory:delete';
+    protected static $defaultName = 't5memory:delete';
 
     private const OPTION_TM_NAME = 'tmName';
 

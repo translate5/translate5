@@ -222,7 +222,7 @@ class ImportService
         };
 
         /** @var ImportStatusResponse|null $status */
-        $status = $this->waitingService->callAwaiting($waitNonImportStatus);
+        $status = $this->waitingService->callAwaiting($waitNonImportStatus, $importOptions->forceLongWait);
 
         if (null === $status) {
             $this->logger->error('E1302', 't5memory: Waiting timed out in process of import status retrieving', [
@@ -283,6 +283,7 @@ class ImportService
 
     private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
     {
+        gc_enable();
         // suppress: namespace error : Namespace prefix t5 on n is not defined
         $errorLevel = error_reporting();
         error_reporting($errorLevel & ~E_WARNING);
@@ -315,6 +316,7 @@ class ImportService
         $doc->save($importFilename);
 
         error_reporting($errorLevel);
+        gc_collect_cycles();
     }
 
     private function getOverflowSegmentNumberFromStatus(

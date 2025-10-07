@@ -29,6 +29,23 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.30.1] - 2025-10-07
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5029](https://jira.translate5.net/browse/TRANSLATE-5029): t5memory, Translate5 CLI - Improve translate5 cli commands for downgrading t5memory version** <br>
+Improved command for t5memory language resources migration 
+
+
+### Bugfixes
+**[TRANSLATE-5032](https://jira.translate5.net/browse/TRANSLATE-5032): t5memory - Reorganise issues** <br>
+Fix reorganise calls
+
+
 ## [7.30.0] - 2025-10-03
 
 ### Important Notes:

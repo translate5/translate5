@@ -39,6 +39,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateExceptio
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
+use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
@@ -77,6 +78,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     private readonly PersistenceService $persistenceService;
 
+    private readonly T5MemoryApi $t5MemoryApi;
+
     public function __construct()
     {
         \editor_Services_Connector_Exception::addCodes([
@@ -98,6 +101,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         $this->waitingService = RetryService::create();
         $this->updateRetryService = UpdateRetryService::create();
         $this->persistenceService = PersistenceService::create();
+        $this->t5MemoryApi = T5MemoryApi::create();
 
         parent::__construct();
     }
@@ -106,7 +110,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         LanguageResource $languageResource,
         $sourceLang,
         $targetLang,
-        $config = null
+        $config = null,
     ): void {
         $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
@@ -320,7 +324,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         string $field,
         ?string $offset,
         SearchDTO $searchDTO,
-        int $amountOfResults = self::CONCORDANCE_SEARCH_NUM_RESULTS
+        int $amountOfResults = self::CONCORDANCE_SEARCH_NUM_RESULTS,
     ): \editor_Services_ServiceResult {
         $offsetTmId = null;
         $recordKey = null;
@@ -375,7 +379,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
             );
 
             if (
-                ! $segmentIdsGenerated
+                (! $segmentIdsGenerated && ! $this->isMemoryEmpty($this->languageResource, $tmName))
                 || $this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)
             ) {
                 $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
@@ -465,6 +469,25 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         }
 
         return $resultList;
+    }
+
+    private function isMemoryEmpty(LanguageResource $languageResource, string $tmName): bool
+    {
+        $response = $this->t5MemoryApi->downloadTmx(
+            $languageResource->getResource()->getUrl(),
+            $this->persistenceService->addTmPrefix($tmName),
+            1
+        );
+
+        foreach ($response as $stream) {
+            $content = $stream->getContents();
+
+            if (str_contains($content, '<tu ')) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function countSegments(SearchDTO $searchDTO): int

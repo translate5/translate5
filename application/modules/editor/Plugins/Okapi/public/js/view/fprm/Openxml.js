@@ -82,7 +82,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bExtractExternalHyperlinks.b': {}
         }},
         /* Font Mappings */
-        'tabFontMappings': { type: 'tab', icon: 'fa-font', children: {
+        'tabFontMappings': { type: 'tab', icon: 'fa-font', helpUrl: 'https://okapiframework.org/wiki/index.php/Filters#Font_Mapping', children: {
             'fontMappings': { type: 'grid', config: {
                 cols: [{
                     itemId: 'sourceLocalePattern'

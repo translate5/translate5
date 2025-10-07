@@ -45,7 +45,7 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
     use T5MemoryLocalTmsTrait;
     use FilteringByNameTrait;
 
-    protected static $defaultName = 't5memory:list|memory:list';
+    protected static $defaultName = 't5memory:list';
 
     private const OPTION_TM_NAME = 'tmName';
 
