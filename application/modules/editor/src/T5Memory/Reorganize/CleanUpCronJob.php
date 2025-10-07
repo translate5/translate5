@@ -31,8 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Reorganize;
 
 use MittagQI\Translate5\Maintenance\CleanUpFolders;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
-use MittagQI\Translate5\T5Memory\PersistenceService;
 
 class CleanUpCronJob
 {
@@ -40,9 +38,6 @@ class CleanUpCronJob
 
     public function __construct(
         private readonly CleanUpFolders $cleanUpFolders,
-        private readonly T5MemoryApi $api,
-        private readonly \Zend_Config $config,
-        private readonly PersistenceService $persistenceService,
     ) {
     }
 
@@ -50,51 +45,14 @@ class CleanUpCronJob
     {
         return new self(
             new CleanUpFolders(),
-            T5MemoryApi::create(),
-            \Zend_Registry::get('config'),
-            PersistenceService::create(),
         );
     }
 
     public function cleanUp(): void
     {
-        $this->removeOldTmxBackUps();
-        $this->removeOldTmBuckUps();
-    }
-
-    public function removeOldTmxBackUps(): void
-    {
         $this->cleanUpFolders->deleteOldDateFolders(
             ManualReorganizeService::REORGANIZE_DIR,
             new \DateTime(self::THRESHOLD_DAYS)
         );
-    }
-
-    public function removeOldTmBuckUps(): void
-    {
-        $tmPrefix = $this->persistenceService->addTmPrefix('');
-        $threshold = new \DateTime(self::THRESHOLD_DAYS);
-
-        foreach ($this->config->runtimeOptions->LanguageResources->opentm2->server as $baseUrl) {
-            if (! $this->api->ping($baseUrl)) {
-                continue;
-            }
-
-            $memoryListResponse = $this->api->getMemories($baseUrl);
-
-            foreach ($memoryListResponse->memories as $memory) {
-                if ('' !== $tmPrefix && ! str_starts_with($memory->name, $tmPrefix)) {
-                    continue;
-                }
-
-                if (preg_match('/reorganise\.(before|after)-flush\.(\d{4}-\d{2}-\d{2})/', $memory->name, $matches)) {
-                    $memoryDate = new \DateTime($matches[2]);
-
-                    if ($memoryDate < $threshold) {
-                        $this->api->deleteTm($baseUrl, $memory->name);
-                    }
-                }
-            }
-        }
     }
 }
