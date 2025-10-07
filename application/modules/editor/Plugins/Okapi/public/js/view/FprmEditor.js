@@ -261,7 +261,14 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         return null;
     },
     openHelpLink: function(){
-        window.open(this.getHelpLink(), '_blank');
+        let url, tabPanel = this.formPanel.down('tabpanel');
+        if (tabPanel) {
+            url = tabPanel.getActiveTab().helpUrl;
+        }
+        if (!url) {
+            url = this.getHelpLink();
+        }
+        window.open(url, '_blank');
     },
     /**
      * Save button handler

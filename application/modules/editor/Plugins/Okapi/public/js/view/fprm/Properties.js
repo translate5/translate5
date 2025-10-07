@@ -92,7 +92,8 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
                     tabs = this.createHolder('tabs', this.formPanel, null);
                 }
                 iconClass = data.icon ? 'x-fa ' + data.icon : null;
-                tab = tabs.add({ xtype: 'panel', title: this.translations[id], iconCls: iconClass });
+                tab = tabs.add({ xtype: 'panel', title: this.translations[id], iconCls: iconClass, helpUrl: data.helpUrl });
+
                 this.addHolderChildren(data.children, tab, false);
                 tabs.setActiveTab(0);
             } else {
