@@ -87,8 +87,8 @@ class CleanUpCronJob
                     continue;
                 }
 
-                if (preg_match('/reorganise\.(\d{4}-\d{2}-\d{2})\.(before|after)/', $memory->name, $matches)) {
-                    $memoryDate = new \DateTime($matches[1]);
+                if (preg_match('/reorganise\.(before|after)-flush\.(\d{4}-\d{2}-\d{2})/', $memory->name, $matches)) {
+                    $memoryDate = new \DateTime($matches[2]);
 
                     if ($memoryDate < $threshold) {
                         $this->api->deleteTm($baseUrl, $memory->name);

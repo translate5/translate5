@@ -80,7 +80,7 @@ class RetryService
         return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySeconds;
     }
 
-    public function getMaxWaitingTimeSeconds(bool $canWaitLong): int
+    public function getMaxWaitingTimeSeconds(bool $canWaitLong = false): int
     {
         if ($canWaitLong || $this->canWaitLongTaskFinish()) {
             // 1 hour max waiting time

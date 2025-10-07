@@ -238,6 +238,12 @@ class ManualReorganizeServiceTest extends TestCase
         $countAfterReorganize = preg_match_all('#<tu #', $afterReorganizeTmx);
 
         self::assertSame($countInBackup, $countAfterReorganize, 'Some segments are missing after reorganize');
+
+        self::assertSame(
+            $persistenceService->addTmPrefix($currentTm),
+            $persistenceService->addTmPrefix($lrMemories[0]['filename']),
+            'New memory name is not as expected'
+        );
     }
 
     private function deleteTm(string $tmName): void
