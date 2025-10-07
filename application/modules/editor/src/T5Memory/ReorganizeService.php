@@ -132,7 +132,7 @@ class ReorganizeService
         }
 
         $this->logger->info(
-            'I1314',
+            'E1314',
             'Starting TM reorganization',
             [
                 'languageResource' => $languageResource,
