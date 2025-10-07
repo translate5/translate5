@@ -58,7 +58,7 @@ class ManualReorganizeServiceTest extends TestCase
     private static ?string $afterFlushTmx = null;
 
     private static ?string $afterReorganizeTmx = null;
-    
+
     private \editor_Models_LanguageResources_LanguageResource $languageResource;
 
     private PersistenceService $persistenceService;
