@@ -131,6 +131,16 @@ class ReorganizeService
             $languageResource->save();
         }
 
+        $this->logger->info(
+            'E1314',
+            'Starting TM reorganization',
+            [
+                'languageResource' => $languageResource,
+                'tmName' => $tmName,
+                'attempt' => $this->getCurrentAttemptsCount($languageResource, $tmName),
+            ]
+        );
+
         if ($this->config->runtimeOptions->LanguageResources->t5memory->reorganizeManually) {
             $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
 
