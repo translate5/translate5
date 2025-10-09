@@ -41,6 +41,7 @@ use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\Reorganize\ManualReorganizeService;
+use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
 use MittagQI\Translate5\T5Memory\UpdateRetryService;
 use MittagQI\Translate5\Test\Fixtures\LanguageResourceFixtures;
 use PHPUnit\Framework\TestCase;
@@ -49,15 +50,9 @@ class ManualReorganizeServiceTest extends TestCase
 {
     private const TM_NAME = 'ManualReorganizeServiceTest';
 
-    private static ?string $backupBeforeTm = null;
-
-    private static ?string $backupAfterTm = null;
-
-    private static ?string $beforeFlushTmx = null;
-
-    private static ?string $afterFlushTmx = null;
-
     private static ?string $afterReorganizeTmx = null;
+
+    private static ?string $beforeReorganizeTmx = null;
 
     private \editor_Models_LanguageResources_LanguageResource $languageResource;
 
@@ -73,24 +68,15 @@ class ManualReorganizeServiceTest extends TestCase
 
     public function tearDown(): void
     {
-        if (null !== self::$beforeFlushTmx) {
-            unlink(self::$beforeFlushTmx);
-        }
-        if (null !== self::$afterFlushTmx) {
-            unlink(self::$afterFlushTmx);
-        }
         if (null !== self::$afterReorganizeTmx) {
             unlink(self::$afterReorganizeTmx);
         }
 
-        $this->deleteTm(self::TM_NAME);
+        if (null !== self::$beforeReorganizeTmx) {
+            unlink(self::$beforeReorganizeTmx);
+        }
 
-        if (null !== self::$backupBeforeTm) {
-            $this->deleteTm(self::$backupBeforeTm);
-        }
-        if (null !== self::$backupAfterTm) {
-            $this->deleteTm(self::$backupAfterTm);
-        }
+        $this->deleteTm(self::TM_NAME);
 
         foreach ($this->languageResource->getSpecificData('memories', true) as $memory) {
             $this->deleteTm($memory['filename']);
@@ -111,6 +97,7 @@ class ManualReorganizeServiceTest extends TestCase
         $updateService = UpdateRetryService::create();
         $reorganize = ManualReorganizeService::create();
         $importService = ImportService::create();
+        $sameTuFilter = SameTuvFilter::create();
 
         $persistenceService->addMemoryToLanguageResource($this->languageResource, $tmName);
 
@@ -145,6 +132,27 @@ class ManualReorganizeServiceTest extends TestCase
             \Zend_Registry::get('config'),
         );
 
+        $tempDir = sys_get_temp_dir() . '/test_cleanup_' . uniqid();
+        mkdir($tempDir);
+
+        $url = $this->languageResource->getResource()->getUrl();
+
+        self::$beforeReorganizeTmx = $tempDir . '/beforeReorganizeTmx.tmx';
+        $tmxStream = $this->api->downloadTmx(
+            $url,
+            $this->persistenceService->addTmPrefix($tmName),
+            100
+        );
+        foreach ($tmxStream as $stream) {
+            file_put_contents(self::$beforeReorganizeTmx, $stream->getContents());
+        }
+
+        $sameTuFilter->filter(self::$beforeReorganizeTmx);
+
+        $beforeReorganizeTmx = file_get_contents(self::$beforeReorganizeTmx);
+
+        $countBefore = preg_match_all('#<tu #', $beforeReorganizeTmx);
+
         try {
             $reorganize->reorganizeTm(
                 $this->languageResource,
@@ -154,8 +162,6 @@ class ManualReorganizeServiceTest extends TestCase
         } catch (ReorganizeException $e) {
             self::fail($e->getMessage());
         }
-
-        $url = $this->languageResource->getResource()->getUrl();
 
         $memories = $this->api->getMemories($url)->memories;
 
@@ -167,53 +173,7 @@ class ManualReorganizeServiceTest extends TestCase
             if ($memory->name === $tmFullName) {
                 self::fail('Memory was not deleted');
             }
-
-            if (str_contains($memory->name, "$tmFullName.reorganise.before-flush")) {
-                self::$backupBeforeTm = $memory->name;
-
-                continue;
-            }
-
-            if (str_contains($memory->name, "$tmFullName.reorganise.after-flush")) {
-                self::$backupAfterTm = $memory->name;
-            }
         }
-
-        self::assertNotNull(self::$backupBeforeTm, 'TM before flush was not saved');
-        self::assertNotNull(self::$backupAfterTm, 'TM after flush was not saved');
-
-        $tempDir = sys_get_temp_dir() . '/test_cleanup_' . uniqid();
-        mkdir($tempDir);
-
-        self::$beforeFlushTmx = $tempDir . '/beforeFlushTmx.tmx';
-        $tmxStream = $this->api->downloadTmx($url, self::$backupBeforeTm, 100);
-        foreach ($tmxStream as $stream) {
-            file_put_contents(self::$beforeFlushTmx, $stream->getContents());
-        }
-
-        self::assertNotNull(self::$beforeFlushTmx, 'Before flush backup TM has problems');
-        self::assertFileExists(self::$beforeFlushTmx);
-
-        self::assertStringNotContainsString(
-            '<seg>Eine Segment</seg>',
-            file_get_contents(self::$beforeFlushTmx)
-        );
-
-        self::$afterFlushTmx = $tempDir . '/afterFlushTmx.tmx';
-        $tmxStream = $this->api->downloadTmx($url, self::$backupAfterTm, 100);
-        foreach ($tmxStream as $stream) {
-            file_put_contents(self::$afterFlushTmx, $stream->getContents());
-        }
-
-        self::assertNotNull(self::$afterFlushTmx, 'After flush backup TM has problems');
-        self::assertFileExists(self::$afterFlushTmx);
-
-        $afterFlushTmx = file_get_contents(self::$afterFlushTmx);
-        self::assertStringContainsString(
-            '<seg>Eine Segment</seg>',
-            $afterFlushTmx,
-            'New segment is missing in backup'
-        );
 
         $lrMemories = $this->languageResource->getSpecificData('memories', true);
 
@@ -222,10 +182,16 @@ class ManualReorganizeServiceTest extends TestCase
         $currentTm = $lrMemories[0]['filename'];
 
         self::$afterReorganizeTmx = $tempDir . '/afterReorganizeTmx.tmx';
-        $tmxStream = $this->api->downloadTmx($url, $currentTm, 100);
+        $tmxStream = $this->api->downloadTmx(
+            $url,
+            $this->persistenceService->addTmPrefix($currentTm),
+            100
+        );
         foreach ($tmxStream as $stream) {
             file_put_contents(self::$afterReorganizeTmx, $stream->getContents());
         }
+
+        $sameTuFilter->filter(self::$afterReorganizeTmx);
 
         $afterReorganizeTmx = file_get_contents(self::$afterReorganizeTmx);
         self::assertStringContainsString(
@@ -234,10 +200,9 @@ class ManualReorganizeServiceTest extends TestCase
             'New segment is missing after reorganize'
         );
 
-        $countInBackup = preg_match_all('#<tu #', $afterFlushTmx);
         $countAfterReorganize = preg_match_all('#<tu #', $afterReorganizeTmx);
 
-        self::assertSame($countInBackup, $countAfterReorganize, 'Some segments are missing after reorganize');
+        self::assertSame($countBefore, $countAfterReorganize, 'Some segments are missing after reorganize');
 
         self::assertSame(
             $persistenceService->addTmPrefix($currentTm),
