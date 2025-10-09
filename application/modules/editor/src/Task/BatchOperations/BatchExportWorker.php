@@ -30,26 +30,26 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\BatchOperations;
 
-use editor_Models_Export_Exported_Worker;
+use editor_Models_Export_Exported_ZipDefaultWorker;
+use editor_Models_Export_Worker;
 use Exception;
 use MittagQI\Translate5\Repository\QueuedExportRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\Task\TaskLockService;
-use SplFileInfo;
+use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
 use Zend_Filter_Compress_Zip;
 use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Utils;
+use ZfExtended_Models_Worker;
 use ZfExtended_Worker_Abstract;
 use ZipArchive;
 
 class BatchExportWorker extends ZfExtended_Worker_Abstract
 {
-    private int $userId;
-
     private array $taskIds;
 
     private string $exportFolder;
+
+    private const CHECK_DELAY = 5;
 
     public function __construct()
     {
@@ -57,19 +57,48 @@ class BatchExportWorker extends ZfExtended_Worker_Abstract
         $this->log = \Zend_Registry::get('logger')->cloneMe('task.batch.export');
     }
 
-    public static function queueExportWorker(int $userId, array $taskIds, string $exportFolder): int
+    public static function queueExportWorker(int $userId, array $taskIds, string $taskExportFolder): int
     {
-        $worker = ZfExtended_Factory::get(self::class);
+        $parentWorker = ZfExtended_Factory::get(self::class);
 
-        if ($worker->init(parameters: [
-            'userId' => $userId,
+        if (! $parentWorker->init(parameters: [
             'taskIds' => $taskIds,
-            'exportFolder' => $exportFolder,
+            'exportFolder' => $taskExportFolder,
         ])) {
-            return $worker->queue();
+            throw new \MittagQI\Translate5\Export\Exception('E1608');
         }
 
-        throw new \MittagQI\Translate5\Export\Exception('E1608');
+        $parentWorkerId = $parentWorker->queue(state: ZfExtended_Models_Worker::STATE_PREPARE);
+
+        $taskRepository = TaskRepository::create();
+        $config = Zend_Registry::get('config');
+        $taskguiddirectory = $config->runtimeOptions->editor->export->taskguiddirectory;
+
+        foreach ($taskIds as $taskId) {
+            $task = $taskRepository->get((int) $taskId);
+
+            $taskExportFolder = tempnam($task->getAbsoluteTaskDataPath(), 'batch-export-');
+            unlink($taskExportFolder);
+            @mkdir($taskExportFolder);
+
+            $worker = ZfExtended_Factory::get(editor_Models_Export_Worker::class);
+            $worker->initFolderExport($task, false, $taskExportFolder);
+            $workerId = $worker->queue($parentWorkerId, ZfExtended_Models_Worker::STATE_PREPARE);
+
+            $finalExportWorker = ZfExtended_Factory::get(editor_Models_Export_Exported_ZipDefaultWorker::class);
+            $finalExportWorker->setup($task->getTaskGuid(), [
+                'exportFolder' => $taskExportFolder,
+                'userId' => $userId,
+                'targetZipFilePath' => $task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . 'export.zip',
+                'cleanZipPaths' => $taskguiddirectory ? '' : basename($taskExportFolder),
+            ]);
+
+            $finalExportWorker->queue($workerId);
+        }
+
+        $parentWorker->getModel()->schedulePrepared();
+
+        return $parentWorkerId;
     }
 
     protected function validateParameters(array $parameters): bool
@@ -79,12 +108,6 @@ class BatchExportWorker extends ZfExtended_Worker_Abstract
         }
 
         $this->exportFolder = $parameters['exportFolder'];
-
-        if (! array_key_exists('userId', $parameters)) {
-            return false;
-        }
-
-        $this->userId = $parameters['userId'];
 
         if (! array_key_exists('taskIds', $parameters) || ! is_array(
             $parameters['taskIds']
@@ -111,7 +134,16 @@ class BatchExportWorker extends ZfExtended_Worker_Abstract
             return true;
         }
 
-        $queueModel = QueuedExportRepository::create()->findByWorkerId((int) $this->workerModel->getId());
+        $workerId = (int) $this->workerModel->getId();
+        if ($this->workerModel->hasWaitingChildWorker($workerId)) {
+            throw new SetDelayedException(
+                'BatchExportWorker',
+                __CLASS__,
+                self::CHECK_DELAY
+            );
+        }
+
+        $queueModel = QueuedExportRepository::create()->findByWorkerId($workerId);
 
         if (null === $queueModel) {
             throw new Exception('Export failed: No queue model found');
@@ -123,7 +155,6 @@ class BatchExportWorker extends ZfExtended_Worker_Abstract
         $filename = "{$this->getModel()->getHash()}.$extension";
         $filePath = "{$this->exportFolder}/{$filename}";
 
-        // export to $filePath
         $this->addExportsToZip($filePath);
 
         if (! file_exists($filePath)) {
@@ -140,60 +171,15 @@ class BatchExportWorker extends ZfExtended_Worker_Abstract
 
     private function addExportsToZip(string $batchZipFilePath): void
     {
-        // Info: only 1 task export per task is allowed. In case user trys to export task which has already running
-        // exports, the user will get error message. This is checked by checkExportAllowed and this function must be
-        // used if other export types are implemented in future
-
         $taskRepository = TaskRepository::create();
-        $events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
-        $taskLockService = TaskLockService::create();
-        $config = Zend_Registry::get('config');
-        $taskguiddirectory = $config->runtimeOptions->editor->export->taskguiddirectory;
 
         touch($batchZipFilePath);
 
         foreach ($this->taskIds as $taskId) {
             $task = $taskRepository->get((int) $taskId);
 
-            // an export may be handled by plugins
-            $events->trigger(
-                'beforeTaskExport',
-                $this,
-                [
-                    'task' => $task,
-                    'context' => '',
-                    'diff' => false,
-                    'lock' => $taskLockService,
-                ]
-            );
-
-            /** @var editor_Models_Export_Exported_Worker $finalExportWorker */
-            $finalExportWorker = editor_Models_Export_Exported_Worker::factory('');
-
-            $task->checkExportAllowed($finalExportWorker::class);
-
-            $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
-            $exportFolder = $worker->initExport($task, false);
-            $workerId = $worker->queue();
-
-            // Setup worker, assume return value is zipFile name
-            $zipFile = (string) $finalExportWorker->setup($task->getTaskGuid(), [
-                'exportFolder' => $exportFolder,
-                'userId' => $this->userId,
-            ]);
-
-            $finalExportWorker->setBlocking(); //we have to wait for the underlying worker to provide the download
-            $finalExportWorker->queue($workerId);
-
-            // remove the taskGuid from root folder name in the exported package
-            if (! $taskguiddirectory) {
-                ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
-            }
-
+            $zipFile = $task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . 'export.zip';
             $errMsg = $this->addToZipArchive($batchZipFilePath, $zipFile, $this->getFileName($taskId . '-' . $task->getTaskName()) . '.zip');
-
-            //rename file after usage to export.zip to keep backwards compatibility
-            rename($zipFile, dirname($zipFile) . DIRECTORY_SEPARATOR . 'export.zip');
 
             if ($errMsg) {
                 $this->log->error(

@@ -78,10 +78,12 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         $this->init($taskGuid, [
             'folderToBeZipped' => $parameters['exportFolder'],
             'zipFile' => $zipFile,
+            'targetZipFilePath' => $parameters['targetZipFilePath'] ?: null,
+            'cleanZipPaths' => $parameters['cleanZipPaths'] ?: null,
         ]);
 
         // Return zipFile
-        return $zipFile;
+        return $parameters['targetZipFilePath'] ?: $zipFile;
     }
 
     /**
@@ -122,6 +124,15 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
                 'task' => $task,
                 'exportFolder' => $params['folderToBeZipped'],
             ]);
+        }
+
+        if (! empty($params['cleanZipPaths'])) {
+            // remove the taskGuid from root folder name in the exported package
+            ZfExtended_Utils::cleanZipPaths(new SplFileInfo($params['zipFile']), $params['cleanZipPaths']);
+        }
+
+        if (! empty($params['targetZipFilePath'])) {
+            rename($params['zipFile'], $params['targetZipFilePath']);
         }
 
         // Drop folderToBeZipped

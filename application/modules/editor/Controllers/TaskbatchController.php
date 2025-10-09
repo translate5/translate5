@@ -37,12 +37,14 @@ use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidValueProvidedExcep
 use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowProvidedException;
 use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\Task\BatchOperations\Exception\MaintenanceScheduledException;
-use MittagQI\Translate5\Task\BatchOperations\TaskBatchHandler;
+use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchExport;
+use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchSetDeadlineDate;
+use MittagQI\Translate5\Task\BatchOperations\TaskBatchExportInterface;
 
 /**
- * Controller for Batch Updates
+ * Controller for Batch Operations
  */
-class Editor_BatchsetController extends ZfExtended_RestController
+class Editor_TaskbatchController extends ZfExtended_RestController
 {
     protected $entityClass = editor_Models_Task::class;
 
@@ -107,9 +109,24 @@ class Editor_BatchsetController extends ZfExtended_RestController
         }
 
         try {
-            $nextUrl = TaskBatchHandler::create()->process($this->getRequest());
-            if (! empty($nextUrl)) {
-                $this->view->nextUrl = $nextUrl;
+            $batchType = $this->getParam('batchType');
+            switch ($batchType) {
+                case 'export':
+                    $batchHandler = TaskBatchExport::create();
+
+                    break;
+                case 'deadlineDate':
+                    $batchHandler = TaskBatchSetDeadlineDate::create();
+
+                    break;
+                default:
+                    return;
+            }
+
+            $batchHandler->process($this->getRequest());
+
+            if ($batchHandler instanceof TaskBatchExportInterface) {
+                $this->view->nextUrl = $batchHandler->getUrl();
             }
             $this->view->success = true;
         } catch (MaintenanceScheduledException $e) {

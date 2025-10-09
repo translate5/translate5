@@ -32,13 +32,10 @@ namespace MittagQI\Translate5\Task\BatchOperations;
 
 use REST_Controller_Request_Http;
 
-interface TaskBatchHandlerInterface
+interface TaskBatchSetterInterface
 {
-    public function supports(string $batchType): bool;
-
     /**
      * executes desired handler action
-     * returns nextUrl (if needed to be navigated to)
      */
-    public function process(REST_Controller_Request_Http $request): ?string;
+    public function process(REST_Controller_Request_Http $request): void;
 }

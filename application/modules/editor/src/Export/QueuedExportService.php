@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Export;
 use MittagQI\Translate5\Export\Model\QueuedExport;
 use MittagQI\Translate5\Repository\QueuedExportRepository;
 use MittagQI\Translate5\Repository\WorkerRepository;
+use MittagQI\ZfExtended\Worker\Queue;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ZfExtended_Factory;
@@ -103,6 +104,18 @@ class QueuedExportService
 
         if ($worker->isDefunct()) {
             throw new Exception('E1607');
+        }
+
+        if ($worker->isDelayed()) {
+            // in case the worker is delayed, we try to start it
+            // otherwise it may has to wait until being triggered by our periodical cronjob,
+            // which happens, when no other workers are running and takes up to 15 min
+            if ($worker->rescheduleDelayed() > 0) {
+                // if we could reschedule a worker, we trigger the queue to start it
+                ZfExtended_Factory::get(Queue::class)->trigger();
+            }
+
+            return false;
         }
 
         return $worker->isDone();

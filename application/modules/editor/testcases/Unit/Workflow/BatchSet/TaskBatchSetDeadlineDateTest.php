@@ -56,11 +56,6 @@ class TaskBatchSetDeadlineDateTest extends TestCase
         $this->taskBatchSetDeadlineDate = new TaskBatchSetDeadlineDate($logger, $userJobRepository, $userJobDeadlineBatchUpdater, $taskGuidsProvider);
     }
 
-    public function testSupportsDeadline(): void
-    {
-        self::assertTrue($this->taskBatchSetDeadlineDate->supports(self::batchType));
-    }
-
     public function testEmptyWorkflow(): void
     {
         $request = self::getRequest();
