@@ -582,7 +582,8 @@ Ext.define('Editor.controller.SearchReplace', {
         //if it is not from menu, check if the window is opened from edited segment, if yes select to search to field the current edited segment column
         //if only ctrl+f or ctrl+h is pressed and there
 
-        const searchReplaceWindow = Ext.widget('searchreplacewindow'),
+        const searchReplaceWindow = Ext.ComponentQuery.query('searchreplacewindow').pop()
+            || Ext.widget('searchreplacewindow'),
             plug = Editor.app.getController('Editor').getEditPlugin();
         let focusTab = null;
 
