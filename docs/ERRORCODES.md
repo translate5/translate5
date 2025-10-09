@@ -539,7 +539,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | EventCode               | Context                        | EventMessage                                                                                    | Description/Solution                                                                                |
 |:------------------------|:-------------------------------|:------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------|
 | <a id="E1192"></a>E1192 | Search and replace             | Replace all can not be used for task with usageMode &quot;simultaneous&quot;                    | The replace all is disabled for the tasks where the task usage mode is simultaneous.                |
-| <a id="E1192"></a>E1192 | Set to final processing status | Set to final processing status can not be used for task with usageMode &quot;simultaneous&quot; | Set to final processing status is disabled for the tasks where the task usage mode is simultaneous. |
+| <a id="E1737"></a>E1737 | Set to final processing status | Set to final processing status can not be used for task with usageMode &quot;simultaneous&quot; | Set to final processing status is disabled for the tasks where the task usage mode is simultaneous. |
 
 ### Statistics
 
