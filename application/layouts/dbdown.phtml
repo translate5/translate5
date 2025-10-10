@@ -5,11 +5,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="/css/translate5.css?v=2" media="screen" rel="stylesheet" type="text/css" />
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon"/>
-    <?php
-    if (getenv('T5_REDIRECT_ON_ERROR')) {
-        echo '<meta http-equiv="refresh" content="5;' . getenv('T5_REDIRECT_ON_ERROR') . '">';
+<?php
+    $refresh = '5;';
+    $isBackup = defined('BACKUP_RUNNING') && BACKUP_RUNNING;
+
+    if($isBackup) {
+        $refresh = '15;';
     }
-    ?>
+
+    if (getenv('T5_REDIRECT_ON_ERROR')) {
+        $refresh .= getenv('T5_REDIRECT_ON_ERROR');
+    }
+
+    echo '<meta http-equiv="refresh" content="'.$refresh.'">';
+?>
 
    <style>
         body { text-align: center; padding: 150px; }
@@ -29,11 +38,21 @@
     </div>
     <h1>We&rsquo;ll be back <br>soon!</h1>
     <div style="clear:both;">
-        <p>Fatal: Could not connect to the database! <br>
-            <b>If you get this message in the Browser: try to reload the application.</b>
-            <br>See <b>plain php error log</b> for details.
+        <?php
+        if ($isBackup) {
+            ?>
+            <p><b>Backup is running - could not connect to the database!</b><br><br>
+                If application is not loaded automatically after backup - please reload the page.
+            </p>
+        <?php } else  { ?>
+        <p>Fatal: Could not connect to the database! <br><br>
+            <b>If this error persists please contact support.</b>
+            <?php if(ZfExtended_Utils::isDevelopment()) { ?>
+            <br><br>See <b>plain php error log</b> for details.
+            <?php } ?>
         </p>
         <?php
+        }
         if (getenv('T5_REDIRECT_ON_ERROR')) {
             echo '<p><b>You will be redirected automatically to our status page.</b></p>';
         }

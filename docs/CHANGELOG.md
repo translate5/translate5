@@ -30,6 +30,29 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.30.2] - 2025-10-09
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4797](https://jira.translate5.net/browse/TRANSLATE-4797): Export - Add batch operation for task export "original format, translated/reviewed"** <br>
+7.30.0: Added batch operation for task export "original format, translated/reviewed"
+7.30.2: Improved queueing of batch export workers
+
+
+### Changed
+**[TRANSLATE-5025](https://jira.translate5.net/browse/TRANSLATE-5025): file format settings - Link relevant Help-Page for Font-mappings** <br>
+File Format Settings: Link relevant help-page for Font-Mappings 
+
+
+### Bugfixes
+**[TRANSLATE-5030](https://jira.translate5.net/browse/TRANSLATE-5030): Editor general - Problem with searching in opened task via CTRL+F** <br>
+Fixed issue with 'Search and Replace' dialog
+
+
 ## [7.30.1] - 2025-10-07
 
 ### Important Notes:

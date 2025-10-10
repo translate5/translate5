@@ -30,43 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\BatchOperations;
 
-use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchExport;
-use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchSetDeadlineDate;
-use REST_Controller_Request_Http;
-
-class TaskBatchHandler
+interface TaskBatchExportInterface extends TaskBatchSetterInterface
 {
     /**
-     * @param TaskBatchHandlerInterface[] $handlers
+     * returns nextUrl to be navigated to
      */
-    public function __construct(
-        private readonly array $handlers,
-    ) {
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            [
-                TaskBatchSetDeadlineDate::create(),
-                TaskBatchExport::create(),
-            ],
-        );
-    }
-
-    public function process(REST_Controller_Request_Http $request): ?string
-    {
-        return $this->getHandler($request->getParam('batchType'))?->process($request);
-    }
-
-    private function getHandler(string $batchType): ?TaskBatchHandlerInterface
-    {
-        foreach ($this->handlers as $handler) {
-            if ($handler->supports($batchType)) {
-                return $handler;
-            }
-        }
-
-        return null;
-    }
+    public function getUrl(): string;
 }

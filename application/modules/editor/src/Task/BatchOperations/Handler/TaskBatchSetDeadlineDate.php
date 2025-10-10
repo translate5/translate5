@@ -39,12 +39,12 @@ use MittagQI\Translate5\Task\BatchOperations\DTO\TaskGuidsQueryDto;
 use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidDeadlineDateStringProvidedException;
 use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowProvidedException;
 use MittagQI\Translate5\Task\BatchOperations\Exception\InvalidWorkflowStepProvidedException;
-use MittagQI\Translate5\Task\BatchOperations\TaskBatchHandlerInterface;
+use MittagQI\Translate5\Task\BatchOperations\TaskBatchSetterInterface;
 use REST_Controller_Request_Http as Request;
 use Zend_Registry;
 use ZfExtended_Logger;
 
-class TaskBatchSetDeadlineDate implements TaskBatchHandlerInterface
+class TaskBatchSetDeadlineDate implements TaskBatchSetterInterface
 {
     public function __construct(
         private readonly ZfExtended_Logger $logger,
@@ -64,17 +64,12 @@ class TaskBatchSetDeadlineDate implements TaskBatchHandlerInterface
         );
     }
 
-    public function supports(string $batchType): bool
-    {
-        return 'deadlineDate' === $batchType;
-    }
-
     /**
      * @throws InvalidDeadlineDateStringProvidedException
      * @throws InvalidWorkflowProvidedException
      * @throws InvalidWorkflowStepProvidedException
      */
-    public function process(Request $request): ?string
+    public function process(Request $request): void
     {
         $deadlineDate = $request->getParam('deadlineDate');
         $workflow = $request->getParam('batchWorkflow');
@@ -113,7 +108,5 @@ class TaskBatchSetDeadlineDate implements TaskBatchHandlerInterface
                 ]
             );
         }
-
-        return null;
     }
 }

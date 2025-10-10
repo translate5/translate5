@@ -35,7 +35,7 @@ use MittagQI\Translate5\Task\BatchOperations\BatchExportWorker;
 use MittagQI\Translate5\Task\BatchOperations\BatchSetTaskGuidsProvider;
 use MittagQI\Translate5\Task\BatchOperations\DTO\TaskGuidsQueryDto;
 use MittagQI\Translate5\Task\BatchOperations\Exception\MaintenanceScheduledException;
-use MittagQI\Translate5\Task\BatchOperations\TaskBatchHandlerInterface;
+use MittagQI\Translate5\Task\BatchOperations\TaskBatchExportInterface;
 use REST_Controller_Request_Http as Request;
 use Zend_Registry;
 use ZfExtended_Authentication;
@@ -44,8 +44,10 @@ use ZfExtended_Models_Installer_Maintenance;
 use ZfExtended_Utils;
 use ZfExtended_Zendoverwrites_Translate;
 
-class TaskBatchExport implements TaskBatchHandlerInterface
+class TaskBatchExport implements TaskBatchExportInterface
 {
+    private string $token;
+
     public function __construct(
         private readonly ZfExtended_Logger $logger,
         private readonly BatchSetTaskGuidsProvider $taskGuidsProvider,
@@ -60,12 +62,7 @@ class TaskBatchExport implements TaskBatchHandlerInterface
         );
     }
 
-    public function supports(string $batchType): bool
-    {
-        return 'export' === $batchType;
-    }
-
-    public function process(Request $request): ?string
+    public function process(Request $request): void
     {
         $this->logger->info(
             'E1012',
@@ -77,7 +74,7 @@ class TaskBatchExport implements TaskBatchHandlerInterface
         // selected checkboxes only
         $taskIds = $request->getParam('taskIds');
         if (empty($taskIds)) {
-            return null;
+            return;
         }
         if (ZfExtended_Models_Installer_Maintenance::isLoginLock(30)) {
             throw new MaintenanceScheduledException();
@@ -88,16 +85,20 @@ class TaskBatchExport implements TaskBatchHandlerInterface
 
         $exportService = QueuedExportService::create();
 
-        $token = ZfExtended_Utils::uuid();
+        $this->token = ZfExtended_Utils::uuid();
         $workerId = BatchExportWorker::queueExportWorker(
             ZfExtended_Authentication::getInstance()->getUserId(),
             $taskIds,
-            $exportService->composeExportDir($token)
+            $exportService->composeExportDir($this->token)
         );
 
-        $exportService->makeQueueRecord($token, $workerId, 'export'); //w/o extension
+        $exportService->makeQueueRecord($this->token, $workerId, 'export'); //w/o extension
+    }
+
+    public function getUrl(): string
+    {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        return "/editor/queuedexport/$token?title=" . $translate->_('Exportieren');
+        return "/editor/queuedexport/{$this->token}?title=" . $translate->_('Exportieren');
     }
 }

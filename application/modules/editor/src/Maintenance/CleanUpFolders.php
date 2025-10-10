@@ -34,14 +34,13 @@ use DateTime;
 use DirectoryIterator;
 use Exception;
 use FilesystemIterator;
-use InvalidArgumentException;
 
 class CleanUpFolders
 {
     public function deleteOldDateFolders(string $parentDir, DateTime $threshold): void
     {
         if (! is_dir($parentDir)) {
-            throw new InvalidArgumentException("Invalid directory: $parentDir");
+            return;
         }
 
         foreach (new DirectoryIterator($parentDir) as $fileInfo) {

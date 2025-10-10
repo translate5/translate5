@@ -551,7 +551,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor/taskuserassoc/batchset',
             [
                 'module' => 'editor',
-                'controller' => 'batchset',
+                'controller' => 'taskbatch',
                 'action' => 'index',
             ]
         ));
