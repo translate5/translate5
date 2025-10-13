@@ -361,8 +361,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      *
      * {@inheritDoc}
      */
-    public function query(editor_Models_Segment $segment, int $pretranslateMatchrate = 0): editor_Services_ServiceResult
-    {
+    public function query(
+        editor_Models_Segment $segment,
+        int $pretranslateMatchrate = 0,
+        bool $pretranslation = false
+    ): editor_Services_ServiceResult {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
         $context = $this->getSegmentContext($segment);
@@ -386,7 +389,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $fileName,
                 $segment,
                 $this->config,
-                $pretranslateMatchrate
+                $pretranslateMatchrate,
+                $pretranslation,
             );
 
             $this->queryCache->set($key, $resultList);
@@ -407,6 +411,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         editor_Models_Segment $segment,
         Zend_Config $config,
         int $pretranslateMatchrate = 0,
+        bool $pretranslation = false,
     ): editor_Services_ServiceResult {
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($languageResource);
@@ -422,6 +427,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->calculateMatchRate($segment),
             $config,
             $this->isInternalFuzzy(),
+            $pretranslation,
         );
 
         $skipWorseMatches = false;
