@@ -55,7 +55,23 @@ class RetryClient implements ClientInterface, PoolAsyncClientInterface
         $timeElapsed = 0;
         while (true) {
             try {
-                return $this->client->sendRequest($request);
+                $response = $this->client->sendRequest($request);
+
+                $content = (string) $response->getBody();
+
+                if ($response->getBody()->isSeekable()) {
+                    $response->getBody()->rewind();
+                }
+
+                if (str_contains($content, 'Failed to acquire the lock')) {
+                    if ($timeElapsed >= self::MAX_ELAPSED_TIME) {
+                        return $response;
+                    }
+
+                    $timeElapsed += self::RETRY_DELAY_SECONDS;
+
+                    continue;
+                }
             } catch (ClientExceptionInterface $e) {
                 if ($timeElapsed >= self::MAX_ELAPSED_TIME) {
                     throw $e;
