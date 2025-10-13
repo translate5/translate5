@@ -958,11 +958,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Keyword WHERE clauses using LIKE
         foreach ($cols as $col) {
-            if (defined('FEATURE_TRANSLATE_4673_ENABLE') && FEATURE_TRANSLATE_4673_ENABLE) {
-                $keywordWHERE[] = sprintf('%s LIKE :keyword', $col);
-            } else {
-                $keywordWHERE[] = sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
-            }
+            $keywordWHERE[] = sprintf('%s LIKE :keyword', $col);
         }
 
         // Render keyword WHERE string
@@ -1920,7 +1916,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $this->db->getAdapter()->query(
             'SELECT `termTbxId` 
             FROM `terms_term` 
-            WHERE `termEntryTbxId` IN ("' . join('","', $termEntryTbxIds) . '") 
+            WHERE `termEntryTbxId` IN ("' . join('","', $termEntryTbxIds) . '")
               AND `term` = ?
               AND `languageId` IN (' . join(',', $languageIds) . ')',
             $term
