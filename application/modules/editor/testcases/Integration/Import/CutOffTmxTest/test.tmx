@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmx version="1.4">
+    <header creationtoolversion="0.6.108" gitCommit="498ba722 * updated to 0.6.108 * added support to open tms from 0.7" segtype="sentence" adminlang="en-us" srclang="de-DE" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
+    <body>
+        <tu tuid="1" creationdate="20160323T152428Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de">
+                <seg>Unser schönes 4 Segment</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Our nice 4 segment</seg>
+            </tuv>
+        </tu>
+        <tu tuid="2" creationdate="20170323T152428Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de">
+                <seg>Unser schönes 4 Segment <x id="1"/></seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Our nice 4 segment <x id="1"/></seg>
+            </tuv>
+        </tu>
+        <tu tuid="3" creationdate="20250323T152428Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de">
+                <seg>Segment mit Duplikaten</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Segment with duplicates</seg>
+            </tuv>
+        </tu>
+        <tu tuid="4" creationdate="20250323T152430Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de">
+                <seg>Segment mit Duplikaten</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>This segment should replace one above</seg>
+            </tuv>
+        </tu>
+        <tu tuid="5" creationdate="20250323T152440Z" creationid="other manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <tuv xml:lang="de">
+                <seg>Segment mit Duplikaten</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Other author - should be in TM</seg>
+            </tuv>
+        </tu>
+        <tu tuid="6" creationdate="20250323T152430Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">some-file.txt</prop>
+            <tuv xml:lang="de">
+                <seg>Segment mit Duplikaten</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Other document - should be in TM</seg>
+            </tuv>
+        </tu>
+        <tu tuid="7" creationdate="20250323T152430Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">none</prop>
+            <prop type="tmgr:context">SOME_CONTEXT</prop>
+            <tuv xml:lang="de">
+                <seg>Segment mit Duplikaten</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Has context - should be in TM</seg>
+            </tuv>
+        </tu>
+    </body>
+</tmx>

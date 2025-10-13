@@ -30,8 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory;
 
-use DOMDocument;
-use DOMXPath;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
@@ -43,6 +41,7 @@ use MittagQI\Translate5\T5Memory\Enum\ImportStatusEnum;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInErrorException;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInReorganizeException;
+use MittagQI\Translate5\T5Memory\Import\CutOffTmx;
 use Psr\Http\Client\ClientExceptionInterface;
 use RuntimeException;
 use Zend_Config;
@@ -61,6 +60,7 @@ class ImportService
         private readonly CreateMemoryService $createMemoryService,
         private readonly RetryService $waitingService,
         private readonly WipeMemoryService $wipeMemoryService,
+        private readonly CutOffTmx $cutOffTmx,
     ) {
     }
 
@@ -76,6 +76,7 @@ class ImportService
             CreateMemoryService::create(),
             RetryService::create(),
             WipeMemoryService::create(),
+            CutOffTmx::create(),
         );
     }
 
@@ -271,7 +272,7 @@ class ImportService
             $this->persistenceService->addMemoryToLanguageResource($languageResource, $newName);
 
             // Filter TMX data from already imported segments
-            $this->cutOffTmx(
+            $this->cutOffTmx->cutOff(
                 $importFilename,
                 $this->getOverflowSegmentNumberFromStatus($languageResource, $status)
             );
@@ -279,44 +280,6 @@ class ImportService
             // Import further
             $this->importTmxIntoMemory($languageResource, $importFilename, $newName, $importOptions);
         }
-    }
-
-    private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
-    {
-        gc_enable();
-        // suppress: namespace error : Namespace prefix t5 on n is not defined
-        $errorLevel = error_reporting();
-        error_reporting($errorLevel & ~E_WARNING);
-
-        $doc = new DOMDocument();
-        $doc->load($importFilename);
-
-        if (! $doc->hasChildNodes()) {
-            $error = libxml_get_last_error();
-
-            if (false !== $error) {
-                throw new RuntimeException(
-                    'Error while loading TMX file: ' . $error->message,
-                    $error->code
-                );
-            }
-        }
-
-        // Create an XPath to query the document
-        $xpath = new DOMXPath($doc);
-
-        // Find all 'tu' elements
-        $tuNodes = $xpath->query('/tmx/body/tu');
-
-        // Remove 'tu' elements before the segment index
-        for ($i = 0; $i < $segmentToStartFrom; $i++) {
-            $tuNodes->item($i)->parentNode->removeChild($tuNodes->item($i));
-        }
-
-        $doc->save($importFilename);
-
-        error_reporting($errorLevel);
-        gc_collect_cycles();
     }
 
     private function getOverflowSegmentNumberFromStatus(
