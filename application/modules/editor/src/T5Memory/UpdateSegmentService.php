@@ -105,6 +105,10 @@ class UpdateSegmentService implements UpdateSegmentInterface
         Zend_Config $config,
         UpdateOptions $updateOptions,
     ): void {
+        if ('' === trim($dto->target)) {
+            return;
+        }
+
         try {
             $this->updateRetryService->updateWithRetry(
                 $languageResource,
