@@ -61,11 +61,8 @@ class WipeMemoryService
         string $tmName,
         bool $isInternalFuzzy = false,
     ): string {
-        $newName = $this->memoryNameGenerator->generateNextMemoryName(
-            $languageResource,
-            $tmName,
-        );
-        $newName = $this->createMemoryService->createEmptyMemory($languageResource, $newName);
+        $newName = $this->memoryNameGenerator->generateNextMemoryName($languageResource);
+        $newName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource, $newName);
 
         $this->persistenceService->removeMemoryFromLanguageResource($languageResource, $tmName, $isInternalFuzzy);
         $this->persistenceService->addMemoryToLanguageResource($languageResource, $newName, $isInternalFuzzy);
