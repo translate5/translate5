@@ -67,11 +67,14 @@ class RetryClient implements ClientInterface, PoolAsyncClientInterface
                     if ($timeElapsed >= self::MAX_ELAPSED_TIME) {
                         return $response;
                     }
+                    sleep(self::RETRY_DELAY_SECONDS);
 
                     $timeElapsed += self::RETRY_DELAY_SECONDS;
 
                     continue;
                 }
+
+                return $response;
             } catch (ClientExceptionInterface $e) {
                 if ($timeElapsed >= self::MAX_ELAPSED_TIME) {
                     throw $e;
