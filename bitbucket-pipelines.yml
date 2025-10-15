@@ -73,6 +73,8 @@ pipelines:
 
       # Clone docker-repo and run all things from there
       - step:
+          caches:
+            - docker
           size: 2x
           script:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
