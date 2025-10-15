@@ -32,14 +32,15 @@ use MittagQI\Translate5\Plugins\IndiEngine\EventWriter as EventWriter;
 
 /**
  * Initial Class of Plugin "IndiEngine"
+ * @deprecated
  */
 class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
 {
     protected static string $description = 'Send logs to external Indi Engine logger in batch manner';
 
-    protected static bool $enabledByDefault = true;
+    protected static bool $enabledByDefault = false;
 
-    protected static bool $activateForTests = true;
+    protected static bool $activateForTests = false;
 
     /**
      * The configs that needed to be set/copied for tests
