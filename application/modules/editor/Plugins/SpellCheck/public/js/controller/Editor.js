@@ -1124,6 +1124,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         event.preventDefault();
         event.stopPropagation();
 
+        if (! this.editor) {
+            return;
+        }
+
         let node = this.editor.editor.getDomNodeUnderCursor();
 
         if (!node) {

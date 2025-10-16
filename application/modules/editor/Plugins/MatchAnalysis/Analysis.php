@@ -579,7 +579,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             // provide the matchrate threshold for pretranslation
             // it will be used by t5memory only for now
             // as so - contract of connectors remains unchanged
-            return $connector->query($segment, $this->pretranslateMatchrate); // @phpstan-ignore-line
+            return $connector->query($segment, $this->pretranslateMatchrate, true); // @phpstan-ignore-line
         }
 
         //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate

@@ -47,7 +47,7 @@ class SameTuvFilter
             throw new TmxFilterException('Could not open TMX file ' . $tmxFile);
         }
 
-        $resultingFile = basename($tmxFile, '.tmx').'.filtered.tmx';
+        $resultingFile = basename($tmxFile, '.tmx') . '.filtered.tmx';
         $filterFolder = APPLICATION_DATA . '/tmx-filter/' . bin2hex(random_bytes(8));
 
         if (! @mkdir($filterFolder, 0777, true) && ! is_dir($filterFolder)) {
@@ -64,6 +64,7 @@ class SameTuvFilter
         $errorLevel = error_reporting();
         error_reporting($errorLevel & ~E_WARNING);
 
+        /** @var array<string, array{timestamp: int, tu: string}> $segments */
         $segments = [];
         $sourceLang = null;
 
@@ -74,12 +75,13 @@ class SameTuvFilter
                     '<tmx version="1.4">' . PHP_EOL . $reader->readOuterXML() . PHP_EOL . '<body>' . PHP_EOL,
                     FILE_APPEND
                 );
+
                 continue;
             }
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                 $author = '';
-                $date = '';
+                $date = 0;
                 $docname = '';
                 $context = '';
                 $sourceSegment = '';
@@ -130,10 +132,12 @@ class SameTuvFilter
 
                 if ($reader->hasAttributes) {
                     while ($reader->moveToNextAttribute()) {
+                        // @phpstan-ignore-next-line
                         if ($reader->name === 'creationdate') {
                             $date = strtotime($reader->value);
                         }
 
+                        // @phpstan-ignore-next-line
                         if ($reader->name === 'creationid') {
                             $author = $reader->value;
                         }

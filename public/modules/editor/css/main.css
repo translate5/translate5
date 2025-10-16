@@ -2297,3 +2297,12 @@ ins.tmMatchGridResultTooltip {
 [id^=customerPanel-] [id^=activeFiltersToolbar-] {
     top: -1px !important;
 }
+.x-grid-row-editor div.internal-tag.number span.full::after {
+    display: none;
+}
+.x-grid-row-editor div.internal-tag.number span.full {
+    color: black;
+}
+.x-grid-row-editor div.internal-tag.number {
+    user-select: text;
+}

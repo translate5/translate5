@@ -73,12 +73,15 @@ pipelines:
 
       # Clone docker-repo and run all things from there
       - step:
+          caches:
+            - docker
           size: 2x
           script:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
             - cd docker && ./bitbucket/test-script.sh
           artifacts:
             - translate5/data/**
-          after-script:
-            - cd docker && ./bitbucket/test-after-script.sh
+# indi engine post - disabled
+#          after-script:
+#            - cd docker && ./bitbucket/test-after-script.sh
 

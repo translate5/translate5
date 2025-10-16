@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Test\Unit\T5Memory\TmxImportPreprocessor;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\ContentProtectionProcessor;
@@ -47,7 +47,7 @@ class ContentProtectionProcessorTest extends TestCase
 {
     private MockObject|ContentProtectionRepository $contentProtectionRepository;
 
-    private MockObject|TmConversionService $tmConversionService;
+    private MockObject|ConvertT5MemoryTagServiceInterface $tmConversionService;
 
     private MockObject|TransUnitParser $transUnitParser;
 
@@ -58,7 +58,7 @@ class ContentProtectionProcessorTest extends TestCase
     public function setUp(): void
     {
         $this->contentProtectionRepository = $this->createMock(ContentProtectionRepository::class);
-        $this->tmConversionService = $this->createMock(TmConversionService::class);
+        $this->tmConversionService = $this->createMock(ConvertT5MemoryTagServiceInterface::class);
         $this->transUnitParser = $this->createMock(TransUnitParser::class);
         $this->config = $this->createMock(Zend_Config::class);
 

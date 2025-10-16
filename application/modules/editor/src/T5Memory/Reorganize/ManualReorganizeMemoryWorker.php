@@ -35,6 +35,7 @@ use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\Exception\ScheduleWorkerException;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
@@ -59,7 +60,7 @@ class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
             return $worker->queue();
         }
 
-        throw new \MittagQI\Translate5\Export\Exception('E1608');
+        throw new ScheduleWorkerException('E1314');
     }
 
     protected function validateParameters(array $parameters): bool

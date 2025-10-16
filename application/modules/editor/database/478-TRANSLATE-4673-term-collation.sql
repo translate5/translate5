@@ -3,7 +3,7 @@
 --
 --  This file is part of translate5
 --
---  Copyright (c) 2013 - '.(date('Y')).' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+--  Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 --
 --  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 --
@@ -20,8 +20,19 @@
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
 --  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
--- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+--              http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 --
 -- END LICENSE AND COPYRIGHT
 -- */
-DELETE FROM `Zf_configuration` WHERE `name` LIKE 'runtimeOptions.plugins.IndiEngine.%';
+
+ALTER TABLE `terms_term`
+    DROP INDEX `fulltext_term`,
+    DROP INDEX `fulltext`;
+
+ALTER TABLE `terms_term`
+    MODIFY `term` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL,
+    MODIFY `proposal` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci DEFAULT NULL;
+
+ALTER TABLE `terms_term`
+    ADD FULLTEXT KEY `fulltext_term` (`term`),
+    ADD FULLTEXT KEY `fulltext` (`term`, `proposal`);

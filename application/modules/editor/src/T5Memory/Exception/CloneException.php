@@ -36,6 +36,6 @@ class CloneException extends Exception
         public readonly string $tmName,
         public readonly string $newTmName,
     ) {
-        parent::__construct(sprintf('Could not clone TM "%s" to "%s": %s', $tmName, $newTmName, $this->getMessage()));
+        parent::__construct(sprintf('Could not clone TM "%s" to "%s"', $tmName, $newTmName));
     }
 }

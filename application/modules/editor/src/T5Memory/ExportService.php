@@ -34,7 +34,8 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector_Exception as ConnectorException;
 use Generator;
 use LogicException;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
@@ -52,7 +53,7 @@ class ExportService
 
     public function __construct(
         private readonly ZfExtended_Logger $logger,
-        private readonly TmConversionService $conversionService,
+        private readonly ConvertT5MemoryTagServiceInterface $conversionService,
         private readonly T5MemoryApi $t5MemoryApi,
         private readonly PersistenceService $persistenceService,
     ) {
@@ -65,7 +66,7 @@ class ExportService
     {
         return new self(
             Zend_Registry::get('logger')->cloneMe('editor.t5memory.export'),
-            TmConversionService::create(),
+            ConvertT5MemoryTagService::create(),
             T5MemoryApi::create(),
             PersistenceService::create(),
         );

@@ -47,6 +47,7 @@ use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
 use MittagQI\Translate5\T5Memory\TagHandlerProvider;
+use MittagQI\Translate5\T5Memory\WipeMemoryService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
@@ -148,8 +149,13 @@ class FuzzySearchServiceTest extends TestCase
     /**
      * @dataProvider cases
      */
-    public function test(string $query, string $tmx, array $expectedMaxRateResult, array $otherMatches): void
-    {
+    public function test(
+        string $query,
+        string $tmx,
+        bool $pretranslation,
+        array $expectedMaxRateResult,
+        array $otherMatches
+    ): void {
         $this->testFile = __DIR__ . '/FuzzySearchServiceTest/' . bin2hex(random_bytes(3)) . '.tmx';
         copy($tmx, $this->testFile);
 
@@ -170,7 +176,8 @@ class FuzzySearchServiceTest extends TestCase
             '',
             fn ($matchRate, $metaData, $filename) => $matchRate,
             \Zend_Registry::get('config'),
-            false
+            false,
+            $pretranslation,
         );
 
         $maxMatchRate = 0;
@@ -210,6 +217,12 @@ class FuzzySearchServiceTest extends TestCase
             self::fail("Meta data key '$key' not found in max match rate result");
         }
 
+        if ($pretranslation) {
+            self::assertCount(1, $allMatches, 'With pretranslation only one match should be returned');
+
+            return;
+        }
+
         foreach ($otherMatches as $index => $match) {
             $matchId = $index + 1;
 
@@ -235,6 +248,7 @@ class FuzzySearchServiceTest extends TestCase
         yield 'Very similar sentences' => [
             'query' => 'Unser schönes <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span title="&lt;0/&gt; CP: any number (not part of hyphanted compound)" class="short">&lt;0/&gt;</span><span data-originalid="number" data-length="1" data-source="4" data-target="4" class="full"></span></div> Segment',
             'tmx' => __DIR__ . '/FuzzySearchServiceTest/fuzzy-search.tmx',
+            'pretranslation' => false,
             'maxRateResult' => [
                 'matchRate' => 100,
                 'source' => 'Unser schönes 4 Segment',
@@ -261,6 +275,22 @@ class FuzzySearchServiceTest extends TestCase
                 ],
             ],
         ];
+
+        yield 'Very similar sentences (pretranslation)' => [
+            'query' => 'Unser schönes <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span title="&lt;0/&gt; CP: any number (not part of hyphanted compound)" class="short">&lt;0/&gt;</span><span data-originalid="number" data-length="1" data-source="4" data-target="4" class="full"></span></div> Segment',
+            'tmx' => __DIR__ . '/FuzzySearchServiceTest/fuzzy-search.tmx',
+            'pretranslation' => true,
+            'maxRateResult' => [
+                'matchRate' => 100,
+                'source' => 'Unser schönes 4 Segment',
+                'rawTarget' => 'Our nice 4 segment',
+                'metaData' => [
+                    'timestamp' => '2016-03-23 16:24:28 CET',
+                    'Guessed' => 'Some content was unprotected to get a better match',
+                ],
+            ],
+            'otherMatches' => [],
+        ];
     }
 
     private function getImportService(
@@ -284,10 +314,10 @@ class FuzzySearchServiceTest extends TestCase
             $t5MemoryApi,
             $tmxImportPreprocessor,
             PersistenceService::create(),
-            ReorganizeService::create(),
             FlushMemoryService::create(),
             CreateMemoryService::create(),
             RetryService::create(),
+            WipeMemoryService::create(),
         );
     }
 }

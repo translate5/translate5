@@ -3,6 +3,9 @@
         <!-- <extension class="MittagQI\Translate5\Test\Api\BeforeFirstTest"/> -->
         <extension class="MittagQI\Translate5\Test\Api\AfterLastTest"/>
     </extensions>
+    <listeners>
+        <listener class="MittagQI\Translate5\Test\TestomatBitbucketListener"/>
+    </listeners>
     <testsuites>
         <testsuite name="segment-tags">
             <file>Unit/Segment/SegmentTagsTest.php</file>

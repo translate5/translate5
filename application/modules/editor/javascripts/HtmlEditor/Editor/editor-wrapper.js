@@ -454,7 +454,17 @@ export default class EditorWrapper {
                 const length = calculateNodeLength(stringToDom(content));
                 preservedSelection.start.path[1] += length;
                 preservedSelection.end.path[1] += length;
+            } else {
+                const maxOffset = root.getChild(0).maxOffset;
+                if (preservedSelection.end.path[1] > maxOffset) {
+                    preservedSelection.end.path[1] = maxOffset;
+                }
+
+                if (preservedSelection.start.path[1] > maxOffset) {
+                    preservedSelection.start.path[1] = maxOffset;
+                }
             }
+
 
             writer.setSelection(preservedSelection);
 

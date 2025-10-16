@@ -42,15 +42,4 @@ interface TmConversionServiceInterface
     public function getConversionState(int $languageResourceId): ConversionState;
 
     public function scheduleConversion(int $languageResourceId): void;
-
-    public function convertT5MemoryTagToContent(string $string): string;
-
-    /**
-     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
-     */
-    public function convertContentTagToT5MemoryTag(
-        string $queryString,
-        bool $isSource,
-        array &$numberTagMap = []
-    ): string;
 }

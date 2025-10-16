@@ -4,7 +4,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
     mixins: ['TMMaintenance.mixin.ErrorMessage'],
     readTotalAt: 20,
-    batchThreshold: 5000,
+    batchThreshold: 1000,
     listen: {
         global: {
             onApplicationLoad: 'onApplicationLoad',

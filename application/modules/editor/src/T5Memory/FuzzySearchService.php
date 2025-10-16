@@ -90,6 +90,7 @@ class FuzzySearchService
         callable $calculateMatchRate,
         Zend_Config $config,
         bool $isInternalFuzzy,
+        bool $pretranslation,
     ): iterable {
         // if source is empty, t5memory will return an error, therefore we just return an empty list
         if (empty($queryString) && $queryString !== '0') {
@@ -156,6 +157,8 @@ class FuzzySearchService
             $hasSkippedTms,
         );
 
+        $currentBestMatch = null;
+
         foreach ($iterator as $found) {
             $target = $tagHandler->restoreInResult($found->target, false);
             $hasTargetErrors = $tagHandler->hasRestoreErrors();
@@ -182,7 +185,7 @@ class FuzzySearchService
                 $timestamp = (int) strtotime($metaDataAssoc['timestamp']);
             }
 
-            yield new FuzzyMatchDTO(
+            $match = new FuzzyMatchDTO(
                 source: $source,
                 target: $target,
                 matchrate: $matchRate,
@@ -190,6 +193,23 @@ class FuzzySearchService
                 rawTarget: $found->target,
                 timestamp: $timestamp,
             );
+
+            if (null === $currentBestMatch || $currentBestMatch->matchrate < $matchRate) {
+                $currentBestMatch = $match;
+            }
+
+            // found match with same rate but newer than current best match -> take this one
+            if ($currentBestMatch->matchrate === $matchRate && $currentBestMatch->timestamp < $timestamp) {
+                $currentBestMatch = $match;
+            }
+
+            if (! $pretranslation) {
+                yield $match;
+            }
+        }
+
+        if ($pretranslation && null !== $currentBestMatch) {
+            yield $currentBestMatch;
         }
     }
 

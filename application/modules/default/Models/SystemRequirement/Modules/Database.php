@@ -98,8 +98,8 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
 
             // Check if the version is less than the min defined
             if (version_compare($major . '.' . $minor . '.' . $patch, self::DB_MIN_VERSION, '<')) {
-                $this->result->info[] = 'Your DB version is '
-                    . $version . '. Minimum required version is MariaDB ' . self::DB_MIN_VERSION;
+                $this->result->error[] = 'Your DB version is '
+                     . $version . '. Minimum required version is MariaDB ' . self::DB_MIN_VERSION;
             }
         } else {
             $this->result->error[] = 'Unable to determine the DB version.';

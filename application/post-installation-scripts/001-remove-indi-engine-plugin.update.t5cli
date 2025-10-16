@@ -1,0 +1,2 @@
+plugin:disable IndiEngine -n
+plugin:remove IndiEngine --force

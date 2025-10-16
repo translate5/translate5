@@ -32,7 +32,8 @@ namespace MittagQI\Translate5\LanguageResource\ReimportSegments\Action;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
@@ -55,7 +56,7 @@ class ReimportSnapshot
         private readonly LanguageResourceRepository $languageResourceRepository,
         private readonly ReimportSegmentsLoggerProvider $loggerProvider,
         private readonly SegmentRepository $segmentRepository,
-        private readonly TmConversionService $tmConversionService,
+        private readonly ConvertT5MemoryTagServiceInterface $tmConversionService,
         private readonly FlushMemoryService $flushMemoryService,
         private readonly UpdateSegmentService $updateSegmentService,
     ) {
@@ -68,7 +69,7 @@ class ReimportSnapshot
             new LanguageResourceRepository(),
             new ReimportSegmentsLoggerProvider(),
             SegmentRepository::create(),
-            TmConversionService::create(),
+            ConvertT5MemoryTagService::create(),
             FlushMemoryService::create(),
             \Zend_Registry::get('integration.segment.update'),
         );
