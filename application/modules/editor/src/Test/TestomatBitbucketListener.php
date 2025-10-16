@@ -350,6 +350,19 @@ class TestomatBitbucketListener implements TestListener
         $passRate = $total > 0 ? round(($passed / $total) * 100, 2) : 0.0;
         $runId = self::$runId;
 
+        $token = getenv('BITBUCKET_TOKEN');
+
+        if (! $token) {
+            return;
+        }
+
+        if (! $prId) {
+            $prId = $this->getPullRequestId($repo, $branch, $token, $prId);
+            if (! $prId) {
+                return;
+            }
+        }
+
         $summary = <<<TXT
 🧪 PHPUnit Test Summary
 =========================
@@ -366,11 +379,6 @@ class TestomatBitbucketListener implements TestListener
 https://app.testomat.io/projects/translate5/runs/{$runId}\n
 https://bitbucket.org/mittagqi/translate5/pipelines/results/{$buildNumber}
 TXT;
-
-        $token = getenv('BITBUCKET_TOKEN');
-        if (! $token || ! $prId) {
-            return;
-        }
 
         $body = [
             'content' => [
@@ -395,5 +403,32 @@ TXT;
         } catch (Exception $e) {
             error_log("[BitbucketReporter] exception on sending git data: " . $e->getMessage());
         }
+    }
+
+    private function getPullRequestId(bool|array|string $repo, bool|array|string $branch, string $token, $prId): mixed
+    {
+        try {
+            $url = "https://api.bitbucket.org/2.0/repositories/{$repo}/pullrequests?q=source.branch.name=\"{$branch}\"+AND+state=\"OPEN\"";
+
+            $response = Request::get($url)
+                ->addHeader('Authorization', 'Bearer ' . $token)
+                ->sendsJson()
+                ->expectsJson()
+                ->send();
+
+            foreach ($response->body->values ?? [] as $value) {
+                $prId = $value->id;
+
+                break;
+            }
+
+            if ($response->code >= 400) {
+                error_log("[BitbucketReporter] Error sending data to bitbucket: " . $response->raw_body);
+            }
+        } catch (Exception $e) {
+            error_log("[BitbucketReporter] exception on sending git data: " . $e->getMessage());
+        }
+
+        return $prId;
     }
 }
