@@ -32,7 +32,8 @@ namespace MittagQI\Translate5\T5Memory\TmxImportPreprocessor;
 
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\BrokenTranslationUnitException;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
@@ -45,7 +46,7 @@ class ContentProtectionProcessor extends Processor
 {
     public function __construct(
         private readonly ContentProtectionRepository $contentProtectionRepository,
-        private readonly TmConversionService $tmConversionService,
+        private readonly ConvertT5MemoryTagServiceInterface $tmConversionService,
         private readonly TransUnitParser $transUnitParser,
         private readonly Zend_Config $config,
     ) {
@@ -55,7 +56,7 @@ class ContentProtectionProcessor extends Processor
     {
         return new self(
             ContentProtectionRepository::create(),
-            TmConversionService::create(),
+            ConvertT5MemoryTagService::create(),
             new TransUnitParser(),
             Zend_Registry::get('config'),
         );

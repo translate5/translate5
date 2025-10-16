@@ -1,6 +1,6 @@
 <?php
 
-namespace ContentProtection;
+namespace MittagQI\Translate5\Test\Integration\ContentProtection;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
@@ -8,11 +8,11 @@ use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use PHPUnit\Framework\TestCase;
 
-class TmConversionServiceTest extends TestCase
+class ConvertT5MemoryTagServiceTest extends TestCase
 {
     private editor_Models_Languages $sourceLang;
 
@@ -137,7 +137,7 @@ class TmConversionServiceTest extends TestCase
      */
     public function testConvertPair(array $pair, array $expected): void
     {
-        $service = TmConversionService::create();
+        $service = ConvertT5MemoryTagService::create();
 
         [$sourceResult, $targetResult] = $service->convertPair(
             $pair['source'],

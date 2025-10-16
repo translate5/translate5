@@ -31,8 +31,9 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberProtectorProvider;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\ContentProtection\DiffProtector;
 
@@ -42,7 +43,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     private NumberProtector $numberProtector;
 
-    private readonly TmConversionService $conversionService;
+    private readonly ConvertT5MemoryTagServiceInterface $conversionService;
 
     /**
      * @var array<string, array<string, \SplQueue<int>>>
@@ -60,7 +61,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->conversionService = TmConversionService::create();
+        $this->conversionService = ConvertT5MemoryTagService::create();
         $this->numberProtector = NumberProtector::create();
         $this->contentProtectionRepository = ContentProtectionRepository::create();
         $this->numberProtectorProvider = NumberProtectorProvider::create();

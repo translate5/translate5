@@ -30,16 +30,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\ConversionState;
-
-interface TmConversionServiceInterface
+interface ConvertT5MemoryTagServiceInterface
 {
-    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void;
+    public function convertT5MemoryTagToContent(string $string): string;
 
-    public function isTmConverted(int $languageResourceId): bool;
+    /**
+     * @param array<string, array<string, \SplQueue<int>>> $numberTagMap
+     */
+    public function convertContentTagToT5MemoryTag(
+        string $queryString,
+        bool $isSource,
+        array &$numberTagMap = []
+    ): string;
 
-    public function getConversionState(int $languageResourceId): ConversionState;
-
-    public function scheduleConversion(int $languageResourceId): void;
+    public function convertPair(string $source, string $target, int $sourceLang, int $targetLang): array;
 }

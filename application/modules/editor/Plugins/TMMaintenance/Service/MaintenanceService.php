@@ -33,7 +33,8 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as SegmentModel;
 use editor_Services_OpenTM2_Connector as T5MemoryConnector;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
@@ -68,7 +69,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     private T5MemoryConnector $t5MemoryConnector;
 
-    private readonly TmConversionService $tmConversionService;
+    private readonly ConvertT5MemoryTagServiceInterface $tmConversionService;
 
     private readonly ReorganizeService $reorganizeService;
 
@@ -96,7 +97,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
         \ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
         $this->t5MemoryConnector = new T5MemoryConnector();
-        $this->tmConversionService = TmConversionService::create();
+        $this->tmConversionService = ConvertT5MemoryTagService::create();
         $this->reorganizeService = ReorganizeService::create();
         $this->waitingService = RetryService::create();
         $this->updateRetryService = UpdateRetryService::create();

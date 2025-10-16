@@ -3,33 +3,21 @@
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\T5memory;
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use PHPUnit\Framework\TestCase;
 
-class TmConversionServiceTest extends TestCase
+class ConvertT5MemoryTagServiceTest extends TestCase
 {
     /**
      * @dataProvider t5memorySegmentsProvider
      */
     public function testConvertT5MemoryTagToContent(string $t5memorySegment, string $expected): void
     {
-        $contentProtectionRepository = $this->createMock(ContentProtectionRepository::class);
         $contentProtector = $this->createMock(ContentProtector::class);
-        $languageRepository = $this->createMock(LanguageRepository::class);
-        $languageRulesHashService = $this->createMock(LanguageRulesHashService::class);
-        $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
         $logger = $this->createMock(\ZfExtended_Logger::class);
 
-        $service = new TmConversionService(
-            $contentProtectionRepository,
+        $service = new ConvertT5MemoryTagService(
             $contentProtector,
-            $languageRepository,
-            $languageRulesHashService,
-            $languageResourceRepository,
             $logger,
         );
 
@@ -139,7 +127,7 @@ TU,
      */
     public function testConvertContentTagToT5MemoryTag(string $segment, string $expected, bool $isSource): void
     {
-        $tmConversionService = TmConversionService::create();
+        $tmConversionService = ConvertT5MemoryTagService::create();
 
         $actual = $tmConversionService->convertContentTagToT5MemoryTag($segment, $isSource);
 

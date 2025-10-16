@@ -33,38 +33,29 @@ namespace MittagQI\Translate5\ContentProtection\T5memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages;
 use editor_Models_Segment_Whitespace as Whitespace;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\DTO\RulesHashDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\Segment\EntityHandlingMode;
-use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Logger;
 
 class TmConversionService implements TmConversionServiceInterface
 {
-    private array $languageRulesHashMap;
+    private ?array $languageRulesHashMap = null;
 
     /**
-     * @var array<int, RulesHashDto>
+     * @var array<int, RulesHashDto>|null
      */
-    private array $languageResourceRulesHashMap;
+    private ?array $languageResourceRulesHashMap = null;
 
     public function __construct(
         private readonly ContentProtectionRepository $contentProtectionRepository,
-        private readonly ContentProtector $contentProtector,
         private readonly LanguageRepository $languageRepository,
         private readonly LanguageRulesHashService $languageRulesHashService,
         private readonly LanguageResourceRepository $languageResourceRepository,
-        private readonly ZfExtended_Logger $logger,
     ) {
-        $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
-        $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
     }
 
     public static function create(?Whitespace $whitespace = null)
@@ -74,11 +65,9 @@ class TmConversionService implements TmConversionServiceInterface
 
         return new self(
             $contentProtectionRepository,
-            ContentProtector::create($whitespace ?: ZfExtended_Factory::get(Whitespace::class)),
             $languageRepository,
             new LanguageRulesHashService($contentProtectionRepository, $languageRepository),
             new LanguageResourceRepository(),
-            Zend_Registry::get('logger')->cloneMe('editor.content_protection'),
         );
     }
 
@@ -95,15 +84,15 @@ class TmConversionService implements TmConversionServiceInterface
 
     public function isTmConverted(int $languageResourceId): bool
     {
-        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
+        if (! isset($this->getLanguageResourceRulesHashMap()[$languageResourceId])) {
             return false;
         }
 
-        $hashDto = $this->languageResourceRulesHashMap[$languageResourceId];
+        $hashDto = $this->getLanguageResourceRulesHashMap()[$languageResourceId];
         $languages = $hashDto->languages;
         $hash = $hashDto->hash;
 
-        if (! isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
+        if (! isset($this->getLanguageRulesHashMap()[$languages['source']][$languages['target']])) {
             $lrLanguage = new editor_Models_LanguageResources_Languages();
 
             foreach ($lrLanguage->loadByLanguageResourceId($languageResourceId) as $languagePair) {
@@ -122,7 +111,7 @@ class TmConversionService implements TmConversionServiceInterface
             $hash = md5('');
         }
 
-        return $this->languageRulesHashMap[$languages['source']][$languages['target']] === $hash;
+        return $this->getLanguageRulesHashMap()[$languages['source']][$languages['target']] === $hash;
     }
 
     public function getConversionState(int $languageResourceId): ConversionState
@@ -135,22 +124,40 @@ class TmConversionService implements TmConversionServiceInterface
         };
     }
 
+    private function getLanguageResourceRulesHashMap(): array
+    {
+        if (null === $this->languageResourceRulesHashMap) {
+            $this->languageResourceRulesHashMap = $this->contentProtectionRepository->getLanguageResourceRulesHashMap();
+        }
+
+        return $this->languageResourceRulesHashMap;
+    }
+
+    private function getLanguageRulesHashMap(): array
+    {
+        if (null === $this->languageRulesHashMap) {
+            $this->languageRulesHashMap = $this->contentProtectionRepository->getLanguageRulesHashMap();
+        }
+
+        return $this->languageRulesHashMap;
+    }
+
     private function isConversionStarted(int $languageResourceId): bool
     {
-        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
+        if (! isset($this->getLanguageResourceRulesHashMap()[$languageResourceId])) {
             return false;
         }
 
-        return $this->languageResourceRulesHashMap[$languageResourceId]->conversionStarted;
+        return $this->getLanguageResourceRulesHashMap()[$languageResourceId]->conversionStarted;
     }
 
     private function isConversionScheduled(int $languageResourceId): bool
     {
-        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
+        if (! isset($this->getLanguageResourceRulesHashMap()[$languageResourceId])) {
             return false;
         }
 
-        return $this->languageResourceRulesHashMap[$languageResourceId]->conversionScheduled;
+        return $this->getLanguageResourceRulesHashMap()[$languageResourceId]->conversionScheduled;
     }
 
     public function scheduleConversion(int $languageResourceId): void
@@ -167,132 +174,5 @@ class TmConversionService implements TmConversionServiceInterface
         ])) {
             $worker->queue();
         }
-    }
-
-    public function convertT5MemoryTagToContent(string $string): string
-    {
-        preg_match_all(T5NTag::fullTagRegex(), $string, $tags, PREG_SET_ORDER);
-
-        if (empty($tags)) {
-            return $string;
-        }
-
-        foreach ($tags as $tagWithProps) {
-            $tag = $tagWithProps[0];
-            // make sure not escape already escaped HTML entities
-            $protectedContent = $this->protectHtmlEntities(T5NTag::fromMatch($tagWithProps)->content);
-
-            $string = str_replace($tag, htmlentities($protectedContent, ENT_XML1), $string);
-        }
-
-        return $this->unprotectHtmlEntities($string);
-    }
-
-    private function protectHtmlEntities(string $text): string
-    {
-        return preg_replace('/&(\w{2,8});/', '¿¿¿\1¿¿¿', $text);
-    }
-
-    private function unprotectHtmlEntities(string $text): string
-    {
-        return preg_replace('/¿¿¿(\w{2,8})¿¿¿/', '&\1;', $text);
-    }
-
-    public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
-    {
-        $queryString = $this->contentProtector->unprotect($queryString, $isSource, NumberProtector::alias());
-        $regex = NumberProtector::fullTagRegex();
-
-        if (! preg_match($regex, $queryString)) {
-            return $queryString;
-        }
-
-        $currentId = 1;
-        $queryString = preg_replace_callback(
-            $regex,
-            function (array $tagProps) use (&$currentId, &$numberTagMap, $isSource) {
-                $tag = array_shift($tagProps);
-
-                if (count($tagProps) < 7) {
-                    $this->logger->warn(
-                        'E1625',
-                        "Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate"
-                    );
-                    $tagProps = array_pad($tagProps, 7, '');
-                }
-
-                unset($tagProps[5]);
-
-                $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target', 'regex'], $tagProps);
-
-                if (empty($tagProps['regex'])) {
-                    // for BC reasons, we use the name as regex
-                    $tagProps['regex'] = base64_encode($tagProps['name']);
-                }
-
-                $protectedContent = $isSource ? $tagProps['source'] : $tagProps['target'];
-
-                $protectedContent = html_entity_decode($protectedContent);
-
-                if ($isSource) {
-                    if (! isset($numberTagMap[$tagProps['regex']][$tag])) {
-                        $numberTagMap[$tagProps['regex']][$tag] = new \SplQueue();
-                    }
-                    $numberTagMap[$tagProps['regex']][$tag]->enqueue($currentId);
-                } else {
-                    $ids = $numberTagMap[$tagProps['regex']][$tag] ?? null;
-
-                    $currentId = null !== $ids && ! $ids->isEmpty() ? $ids->dequeue() : $currentId;
-                }
-
-                $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
-
-                $currentId++;
-
-                return $t5nTag->toString();
-            },
-            $queryString
-        );
-
-        return $queryString;
-    }
-
-    public function convertPair(string $source, string $target, int $sourceLang, int $targetLang): array
-    {
-        $source = $this->convertT5MemoryTagToContent($source);
-        $target = $this->convertT5MemoryTagToContent($target);
-
-        $source = $this->collapseTmxTags($source);
-        $target = $this->collapseTmxTags($target);
-
-        $protectedSource = $this->contentProtector->protect(
-            $source,
-            true,
-            $sourceLang,
-            $targetLang,
-            EntityHandlingMode::Off
-        );
-
-        $protectedTarget = $this->contentProtector->protect(
-            $target,
-            false,
-            $sourceLang,
-            $targetLang,
-            EntityHandlingMode::Off
-        );
-
-        [$source, $target] = $this->contentProtector->filterTags($protectedSource, $protectedTarget);
-
-        $tagMap = [];
-
-        return [
-            $this->convertContentTagToT5MemoryTag($source, true, $tagMap),
-            $this->convertContentTagToT5MemoryTag($target, false, $tagMap),
-        ];
-    }
-
-    private function collapseTmxTags(string $segment): string
-    {
-        return preg_replace('#<(ph|bpt|ept) ([^>]*)>(.*)</\1>#U', '<$1 $2/>', $segment);
     }
 }

@@ -7,7 +7,7 @@ namespace MittagQI\Translate5\Test\Integration\T5Memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Resource;
 use GuzzleHttp\Psr7\Stream;
-use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ExportService;
@@ -35,7 +35,7 @@ class ExportServiceTest extends TestCase
 
         $this->service = new ExportService(
             $this->loggerMock,
-            TmConversionService::create(),
+            ConvertT5MemoryTagService::create(),
             $this->t5MemoryApi,
             $this->persistenceService,
         );
