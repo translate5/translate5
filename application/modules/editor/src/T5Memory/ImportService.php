@@ -79,6 +79,11 @@ class ImportService
         );
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws Exception\UnableToCreateMemoryException
+     * @throws ImportResultedInErrorException
+     */
     public function importTmx(
         LanguageResource $languageResource,
         iterable $files,

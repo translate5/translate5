@@ -30,7 +30,9 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\Plugins\TMMaintenance\AclResource;
+use MittagQI\Translate5\Plugins\TMMaintenance\Service\TuBatchDeleteCleanUpCronJob;
 use MittagQI\ZfExtended\Acl\ResourceManager as ACLResourceManager;
 
 class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
@@ -52,6 +54,14 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
         $this->addController('ApiController');
         $this->initApplet();
         $this->initRoutes();
+
+        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+
+        $eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            fn () => TuBatchDeleteCleanUpCronJob::create()->cleanUp()
+        );
     }
 
     private function initApplet(): void

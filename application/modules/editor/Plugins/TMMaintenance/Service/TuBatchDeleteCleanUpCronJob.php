@@ -26,16 +26,38 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\T5Memory\Exception;
+declare(strict_types=1);
 
-use Exception;
+namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
-class CloneException extends Exception
+use MittagQI\Translate5\Maintenance\CleanUpFolders;
+
+class TuBatchDeleteCleanUpCronJob
 {
+    private const THRESHOLD_DAYS = '-10 days';
+
     public function __construct(
-        public readonly string $tmName,
-        public readonly string $newTmName,
+        private readonly CleanUpFolders $cleanUpFolders,
     ) {
-        parent::__construct(sprintf('Could not clone TM "%s" to "%s"', $tmName, $newTmName));
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            new CleanUpFolders(),
+        );
+    }
+
+    public function cleanUp(): void
+    {
+        $this->removeOldTmxBackUps();
+    }
+
+    public function removeOldTmxBackUps(): void
+    {
+        $this->cleanUpFolders->deleteOldDateFolders(
+            TuBatchDeleteService::PROCESSING_DIR,
+            new \DateTime(self::THRESHOLD_DAYS)
+        );
     }
 }

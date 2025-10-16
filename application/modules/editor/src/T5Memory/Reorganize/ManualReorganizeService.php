@@ -83,8 +83,10 @@ class ManualReorganizeService
         ReorganizeOptions $reorganizeOptions,
         bool $isInternalFuzzy = false,
     ): void {
-        $exportDir = self::REORGANIZE_DIR . '/' . date_format(new DateTime(), 'Y-m-d');
-        $exportFilePath = $exportDir . '/' . $languageResource->getId() . '_' . $tmName . '.tmx';
+        $dateTime = new DateTime();
+        $exportDir = self::REORGANIZE_DIR . '/' . date_format($dateTime, 'Y-m-d');
+        $exportFilePath = $exportDir . '/'
+            . $languageResource->getId() . '_' . $tmName . '_' . date_format($dateTime, 'His') . '.tmx';
 
         @mkdir($exportDir, 0777, true);
 

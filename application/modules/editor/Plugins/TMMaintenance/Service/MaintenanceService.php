@@ -38,16 +38,15 @@ use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInte
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\Plugins\TMMaintenance\Exception\BatchDeleteException;
 use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
-use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
-use MittagQI\Translate5\T5Memory\RetryService;
 use MittagQI\Translate5\T5Memory\UpdateRetryService;
 
 /**
@@ -73,8 +72,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     private readonly ReorganizeService $reorganizeService;
 
-    private readonly RetryService $waitingService;
-
     private readonly UpdateRetryService $updateRetryService;
 
     private readonly PersistenceService $persistenceService;
@@ -99,7 +96,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         $this->t5MemoryConnector = new T5MemoryConnector();
         $this->tmConversionService = ConvertT5MemoryTagService::create();
         $this->reorganizeService = ReorganizeService::create();
-        $this->waitingService = RetryService::create();
         $this->updateRetryService = UpdateRetryService::create();
         $this->persistenceService = PersistenceService::create();
         $this->t5MemoryApi = T5MemoryApi::create();
@@ -261,44 +257,22 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     public function deleteBatch(SearchDTO $dto): bool
     {
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        try {
+            TuBatchDeleteWorker::queueWorker($this->languageResource, $dto);
 
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        $saveDifferentTargetsForSameSource = (bool) $this->config
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
-        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
-
-        foreach ($memories as ['filename' => $tmName]) {
-            $this->assertMemoryAvailable($tmName);
-
-            $successful = $this->api->deleteBatch($tmName, $dto, $saveDifferentTargetsForSameSource);
-
-            $response = ApiResponse::fromContentAndStatus(
-                $this->api->getResponse()->getBody(),
-                $this->api->getResponse()->getStatus(),
+            $this->languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
+            $this->languageResource->save();
+        } catch (BatchDeleteException $e) {
+            $this->logger->error(
+                'E1688',
+                'Could not schedule batch delete worker',
+                [
+                    'languageResource' => $this->languageResource,
+                    'error' => $e->getMessage(),
+                ]
             );
 
-            if ($this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
-
-                $successful = $this->api->deleteBatch($tmName, $dto, $saveDifferentTargetsForSameSource);
-            }
-
-            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $deleteBatch = fn () => $this->api->deleteBatch($tmName, $dto, $saveDifferentTargetsForSameSource)
-                    ? [WaitCallState::Done, true]
-                    : [WaitCallState::Retry, false];
-
-                $successful = (bool) $this->waitingService->callAwaiting($deleteBatch);
-            }
-
-            if (! $successful) {
-                $this->logger->exception($this->getBadGatewayException($tmName));
-            }
+            throw new \editor_Services_Connector_Exception('E1688');
         }
 
         return true;
@@ -545,6 +519,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
     ): string {
         if ($this->languageResource->isConversionStarted()) {
             return LanguageResourceStatus::CONVERTING;
+        }
+
+        if ($this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS) {
+            return LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
         }
 
         if ($tmName) {

@@ -26,16 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\T5Memory\Exception;
+namespace MittagQI\Translate5\Plugins\TMMaintenance\Exception;
 
 use Exception;
 
-class CloneException extends Exception
+class BatchDeleteException extends Exception
 {
-    public function __construct(
-        public readonly string $tmName,
-        public readonly string $newTmName,
-    ) {
-        parent::__construct(sprintf('Could not clone TM "%s" to "%s"', $tmName, $newTmName));
-    }
 }

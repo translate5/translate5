@@ -30,12 +30,12 @@ namespace MittagQI\Translate5\T5Memory\Exception;
 
 use Exception;
 
-class CloneException extends Exception
+class MemoryBackupException extends Exception
 {
     public function __construct(
         public readonly string $tmName,
-        public readonly string $newTmName,
+        public string $reason = 'unknown reason',
     ) {
-        parent::__construct(sprintf('Could not clone TM "%s" to "%s"', $tmName, $newTmName));
+        parent::__construct(sprintf('Could not backup TM "%s": %s', $tmName, $reason));
     }
 }

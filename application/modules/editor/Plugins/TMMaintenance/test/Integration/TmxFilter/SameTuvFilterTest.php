@@ -26,16 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\T5Memory\Exception;
+declare(strict_types=1);
 
-use Exception;
+namespace MittagQI\Translate5\Plugins\TMMaintenance\test\Integration\TmxFilter;
 
-class CloneException extends Exception
+use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
+use PHPUnit\Framework\TestCase;
+
+class SameTuvFilterTest extends TestCase
 {
-    public function __construct(
-        public readonly string $tmName,
-        public readonly string $newTmName,
-    ) {
-        parent::__construct(sprintf('Could not clone TM "%s" to "%s"', $tmName, $newTmName));
+    private const TMX_FILE = __DIR__ . '/SameTuvFilterTest/test.tmx';
+
+    private const EXPECTED_FILTERED_TMX_FILE = __DIR__ . '/SameTuvFilterTest/expected.tmx';
+
+    private static string $testFile = '';
+
+    public function setUp(): void
+    {
+        copy(self::TMX_FILE, self::$testFile = sys_get_temp_dir() . '/test_' . bin2hex(random_bytes(8)) . '.tmx');
+    }
+
+    public function tearDown(): void
+    {
+        if (file_exists(self::$testFile)) {
+            unlink(self::$testFile);
+        }
+    }
+
+    public function test(): void
+    {
+        $filter = SameTuvFilter::create();
+        $filter->filter(self::$testFile);
+
+        self::assertFileExists(self::$testFile);
+        self::assertFileEquals(self::EXPECTED_FILTERED_TMX_FILE, self::$testFile);
     }
 }

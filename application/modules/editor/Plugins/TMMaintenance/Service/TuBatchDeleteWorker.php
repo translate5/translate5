@@ -28,39 +28,38 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Reorganize;
+namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Status;
+use MittagQI\Translate5\Plugins\TMMaintenance\Exception\BatchDeleteException;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
-use MittagQI\Translate5\T5Memory\Exception\ScheduleWorkerException;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
-class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
+class TuBatchDeleteWorker extends ZfExtended_Worker_Abstract
 {
     public function __construct()
     {
         parent::__construct();
-        $this->log = Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.reorganize');
+        $this->log = Zend_Registry::get('logger')->cloneMe('editor.languageResource.tu-batch-delete');
     }
 
-    public static function queueWorker(LanguageResource $languageResource, string $tmName, bool $isInternalFuzzy): int
+    public static function queueWorker(LanguageResource $languageResource, SearchDTO $searchDto): int
     {
         $worker = ZfExtended_Factory::get(self::class);
 
         if ($worker->init(parameters: [
             'languageResourceId' => $languageResource->getId(),
-            'tmName' => $tmName,
-            'isInternalFuzzy' => $isInternalFuzzy,
+            'searchDto' => $searchDto,
         ])) {
             return $worker->queue();
         }
 
-        throw new ScheduleWorkerException('E1314');
+        throw new BatchDeleteException('E1688');
     }
 
     protected function validateParameters(array $parameters): bool
@@ -69,11 +68,11 @@ class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        if (! array_key_exists('tmName', $parameters)) {
+        if (! array_key_exists('searchDto', $parameters)) {
             return false;
         }
 
-        if (! array_key_exists('isInternalFuzzy', $parameters)) {
+        if (! $parameters['searchDto'] instanceof SearchDTO) {
             return false;
         }
 
@@ -83,31 +82,16 @@ class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
-        $languageResource = LanguageResourceRepository::create()->get($params['languageResourceId']);
+        $languageResource = LanguageResourceRepository::create()->get((int) $params['languageResourceId']);
 
         if (editor_Services_Manager::SERVICE_OPENTM2 !== $languageResource->getServiceType()) {
             $languageResource->setStatus(Status::AVAILABLE);
-            if (! $params['isInternalFuzzy']) {
-                $languageResource->save();
-            }
+            $languageResource->save();
 
             return false;
         }
 
-        $reorganizeService = ManualReorganizeService::create();
-
-        $saveDifferentTargetsForSameSource = (bool) Zend_Registry::get('config')
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
-
-        $reorganizeService->reorganizeTm(
-            $languageResource,
-            $params['tmName'],
-            new ReorganizeOptions($saveDifferentTargetsForSameSource),
-            (bool) $params['isInternalFuzzy'],
-        );
+        TuBatchDeleteService::create()->deleteBatch($languageResource, $params['searchDto']);
 
         return true;
     }
