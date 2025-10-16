@@ -340,6 +340,10 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
         this.focusContextCell();
 
         this.fireEvent('afterStartEdit', this);
+
+        this.el.dom
+            .querySelectorAll('.number.internal-tag [data-originalid="number"]')
+            .forEach(tag => tag.textContent = tag.getAttribute('data-source'));
     },
 
     /**
