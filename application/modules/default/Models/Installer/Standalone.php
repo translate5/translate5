@@ -319,6 +319,7 @@ class Models_Installer_Standalone
         //add only here the new CLI installer call
         $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
         $this->cli->add(new Translate5\MaintenanceCli\Command\DatabaseUpdateCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\InstallerPostInstallCommand());
 
         //FIXME can be moved into the installer CLI command:
         $this->cli->add(new Translate5\MaintenanceCli\Command\InstallerTimezoneCommand());
@@ -405,6 +406,7 @@ class Models_Installer_Standalone
      * Our ZIP based installation and update process can't deal with file deletions,
      * so this has currently to be done manually in this method.
      * See this as a workaround and not as a final solution.
+     * @deprecated must be replaced with proper "out of zip" clean up
      */
     protected function cleanUpDeletedFiles(): void
     {
@@ -844,10 +846,21 @@ class Models_Installer_Standalone
     {
         $version = ZfExtended_Utils::getAppVersion();
 
+        $this->initTranslate5CliBridge();
+
         if ($this->isInstallation) {
+            $this->cli->run(new Symfony\Component\Console\Input\ArrayInput([
+                'command' => 'installer:post-install',
+            ]));
+
             //since passwords are encrypted, we have to do that for the demo users too
             editor_Utils::initDemoAndTestUserPasswords();
         } else {
+            $this->cli->run(new Symfony\Component\Console\Input\ArrayInput([
+                'command' => 'installer:post-install',
+                '--update' => null,
+            ]));
+
             Zend_Registry::get('logger')
                 ->cloneMe('system.update')
                 ->info(
