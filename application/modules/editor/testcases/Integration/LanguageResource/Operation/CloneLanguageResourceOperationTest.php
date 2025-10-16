@@ -41,6 +41,10 @@ use PHPUnit\Framework\TestCase;
 
 class CloneLanguageResourceOperationTest extends TestCase
 {
+    private static LanguageResource $oldLanguageResource;
+
+    private static LanguageResource $newLanguageResource;
+
     private function prepareData(): LanguageResource
     {
         $languageResource = new LanguageResource();
@@ -73,7 +77,7 @@ class CloneLanguageResourceOperationTest extends TestCase
 
     public function testClone(): void
     {
-        $oldLanguageResource = $this->prepareData();
+        self::$oldLanguageResource = $this->prepareData();
 
         $connectorMock = $this->createMock(\editor_Services_OpenTM2_Connector::class);
         $connectorMock->expects(self::once())->method('addTm');
@@ -91,20 +95,28 @@ class CloneLanguageResourceOperationTest extends TestCase
             $serviceManager
         );
 
-        $newLanguageResource = $cloneLanguageResourceOperation->clone($oldLanguageResource, $newName);
+        self::$newLanguageResource = $cloneLanguageResourceOperation->clone(self::$oldLanguageResource, $newName);
 
-        self::assertNotEquals($oldLanguageResource->getId(), $newLanguageResource->getId());
-        self::assertEquals($newName, $newLanguageResource->getName());
-        self::assertEquals([1, 2], $newLanguageResource->getCustomers());
-        self::assertEquals(4, $newLanguageResource->getSourceLang());
-        self::assertEquals(5, $newLanguageResource->getTargetLang());
+        self::assertNotEquals(self::$oldLanguageResource->getId(), self::$newLanguageResource->getId());
+        self::assertEquals($newName, self::$newLanguageResource->getName());
+        self::assertEquals([1, 2], self::$newLanguageResource->getCustomers());
+        self::assertEquals(4, self::$newLanguageResource->getSourceLang());
+        self::assertEquals(5, self::$newLanguageResource->getTargetLang());
     }
 
     protected function tearDown(): void
     {
+        $ids = implode(
+            ',',
+            [
+                (int) self::$oldLanguageResource->getId(),
+                (int) self::$newLanguageResource->getId(),
+            ]
+        );
+
         $db = \Zend_Registry::get('db');
-        $db->query('TRUNCATE TABLE LEK_languageresources_customerassoc');
-        $db->query('TRUNCATE TABLE LEK_languageresources_languages');
-        $db->query('DELETE FROM LEK_languageresources');
+        $db->query("DELETE FROM LEK_languageresources_customerassoc WHERE languageResourceId IN ($ids)");
+        $db->query("DELETE FROM LEK_languageresources_languages WHERE languageResourceId IN ($ids)");
+        $db->query("DELETE FROM LEK_languageresources WHERE id IN ($ids)");
     }
 }
