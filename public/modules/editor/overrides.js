@@ -537,6 +537,109 @@ Ext.override(Ext.view.Table, {
         return dom;
         // </added block>
     },
+
+    /** Handle case when rowBody/rowExpander is clicked: exit from current function as otherwise
+     *  text selection is not working for rowBody/rowExpander because further 'eventPosition.cellElement = cell'
+     *  prevents text selection for some reason
+     *
+     * @param record
+     * @param item
+     * @param rowIndex
+     * @param e
+     * @returns {boolean}
+     */
+    processItemEvent: function(record, item, rowIndex, e) {
+        var me = this,
+            self = me.self,
+            map = self.EventMap,
+            type = e.type,
+            features = me.features,
+            len = features.length,
+            i, cellIndex, result, feature, column,
+            eventPosition = e.position = me.eventPosition || (me.eventPosition = new Ext.grid.CellContext()),
+            row, cell;
+
+        // IE has a bug whereby if you mousedown in a cell editor in one side of a locking grid and then
+        // drag out of that, and mouseup in *the other side*, the mousedowned side still receives the event!
+        // Even though the mouseup target is *not* within it! Ignore the mouseup in this case.
+        if (Ext.isIE && type === 'mouseup' && !e.within(me.el)) {
+            return false;
+        }
+        // Only process the event if it occurred within an item which maps to a record in the store
+        if (me.indexInStore(item) !== -1) {
+
+            row = eventPosition.rowElement = Ext.fly(item).down(me.rowSelector, true);
+            // Access the cell from the event target.
+            cell = e.getTarget(me.getCellSelector(), row);
+            type = self.TouchEventMap[type] || type;
+            if (cell) {
+                if (!cell.parentNode) {
+                    // If we have no parentNode, the td has been removed from the DOM, probably via an update,
+                    // so just jump out since the target for the event isn't valid
+                    return false;
+                }
+                column = me.getHeaderByCell(cell);
+                // Find the index of the header in the *full* (including hidden columns) leaf column set.
+                // Because In 4.0.0 we rendered hidden cells, and the cellIndex included the hidden ones.
+                if (column) {
+                    cellIndex = me.ownerCt.getColumnManager().getHeaderIndex(column);
+                } else {
+                    column = cell = null;
+                    cellIndex = -1;
+                }
+            } else {
+                cellIndex = -1;
+            }
+
+            eventPosition.setAll(me, rowIndex, column ? me.getVisibleColumnManager().getHeaderIndex(column) : -1, record, column);
+
+            if (e.type === 'mousedown' && !column) {        // +
+                return;                                     // +
+            }                                               // +
+            eventPosition.cellElement = cell;
+            result = me.fireEvent('uievent', type, me, cell, rowIndex, cellIndex, e, record, row);
+            // If the event has been stopped by a handler, tell the selModel (if it is interested) and return early.
+            // For example, action columns by default will stop event propagation by returning `false` from its
+            // 'uievent' event handler.
+            if ((result === false || me.callSuper(arguments) === false)) { // +- callParent() replaced with callSuper()
+                return false;
+            }
+            for (i = 0; i < len; ++i) {
+                feature = features[i];
+                // In some features, the first/last row might be wrapped to contain extra info,
+                // such as grouping or summary, so we may need to stop the event
+                if (feature.wrapsItem) {
+                    if (feature.vetoEvent(record, row, rowIndex, e) === false) {
+                        // If the feature is vetoing the event, there's a good chance that
+                        // it's for some feature action in the wrapped row.
+                        me.processSpecialEvent(e);
+                        return false;
+                    }
+                }
+            }
+            // if the element whose event is being processed is not an actual cell (for example if using a rowbody
+            // feature and the rowbody element's event is being processed) then do not fire any "cell" events
+            // Don't handle cellmouseenter and cellmouseleave events for now
+            if (cell && type !== 'mouseover' && type !== 'mouseout') {
+                result = !(// We are adding cell and feature events
+                    (me['onBeforeCell' + map[type]](cell, cellIndex, record, row, rowIndex, e) === false) || (me.fireEvent('beforecell' + type, me, cell, cellIndex, record, row, rowIndex, e) === false) || (me['onCell' + map[type]](cell, cellIndex, record, row, rowIndex, e) === false) || (me.fireEvent('cell' + type, me, cell, cellIndex, record, row, rowIndex, e) === false));
+            }
+            if (result !== false) {
+                result = me.fireEvent('row' + type, me, record, row, rowIndex, e);
+            }
+
+            return result;
+        } else {
+            // If it's not in the store, it could be a feature event, so check here
+            me.processSpecialEvent(e);
+            // Prevent focus/selection here until proper focus handling is added for non-data rows
+            // This should probably be removed once this is implemented.
+            if (e.pointerType === 'mouse') {
+                e.preventDefault();
+            }
+            return false;
+        }
+    },
 });
 
 /**
