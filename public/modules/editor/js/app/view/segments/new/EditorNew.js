@@ -218,7 +218,11 @@ Ext.define('Editor.view.segments.new.EditorNew', {
             recordHeight = me.getRecordHeightUsage(),
             inputMinHeight = recordHeight - me.statusStrip.getHeight() - 2;
 
-        if (!me.currentlyEditingRecord) {
+        if (! me.currentlyEditingRecord) {
+            return;
+        }
+
+        if (! me.inputCmp) {
             return;
         }
 
@@ -227,7 +231,7 @@ Ext.define('Editor.view.segments.new.EditorNew', {
 
         // Setup min height for input extjs component and input of the editor component
         me.inputCmp.setMinHeight(inputMinHeight);
-        me.inputCmp.el.down('.ck-editor__main').dom.setAttribute('style', '--height:' + inputMinHeight + 'px');
+        me.inputCmp.el.down('.ck-editor__main')?.dom.setAttribute('style', '--height:' + inputMinHeight + 'px');
 
         // Get target height usage
         let targetHeight = me.getTargetHeightUsage();

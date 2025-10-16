@@ -992,7 +992,17 @@ class EditorWrapper {
                 const length = (0,_Tools_calculate_node_length__WEBPACK_IMPORTED_MODULE_8__["default"])((0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(content));
                 preservedSelection.start.path[1] += length;
                 preservedSelection.end.path[1] += length;
+            } else {
+                const maxOffset = root.getChild(0).maxOffset;
+                if (preservedSelection.end.path[1] > maxOffset) {
+                    preservedSelection.end.path[1] = maxOffset;
+                }
+
+                if (preservedSelection.start.path[1] > maxOffset) {
+                    preservedSelection.start.path[1] = maxOffset;
+                }
             }
+
 
             writer.setSelection(preservedSelection);
 
