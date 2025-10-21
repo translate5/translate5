@@ -37,6 +37,7 @@ use MittagQI\Translate5\Integration\Contract\SegmentUpdateDtoFactoryInterface;
 use MittagQI\Translate5\Integration\Contract\UpdateSegmentInterface;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Exception\SegmentUpdateCheckException;
 use Zend_Config;
@@ -119,11 +120,19 @@ class UpdateSegmentService implements UpdateSegmentInterface
         } catch (SegmentUpdateException $e) {
             editor_Services_Manager::reportTMUpdateError(errorMsg: $e->getMessage());
 
-            $this->logger->error('E1306', 't5memory: could not save segment to TM', [
-                'languageResource' => $languageResource,
-                'segment' => $segment,
-                'apiError' => $e->getMessage(),
-            ]);
+            if ($e->getPrevious() instanceof SegmentTooLongException) {
+                $this->logger->info('E1306', 't5memory: could not save segment to TM', [
+                    'languageResource' => $languageResource,
+                    'segment' => $segment,
+                    'apiError' => $e->getMessage(),
+                ]);
+            } else {
+                $this->logger->error('E1306', 't5memory: could not save segment to TM', [
+                    'languageResource' => $languageResource,
+                    'segment' => $segment,
+                    'apiError' => $e->getMessage(),
+                ]);
+            }
 
             throw $e;
         } catch (SegmentUpdateCheckException $e) {
