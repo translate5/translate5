@@ -34,6 +34,7 @@ use BackedEnum;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserHasNoAccessToTaskOfForbiddenClientException;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 
@@ -42,9 +43,16 @@ use MittagQI\Translate5\Task\ActionAssert\TaskAction;
  */
 final class ClientRestrictedPermissionAssert implements PermissionAssertInterface
 {
+    public function __construct(
+        private readonly UserJobRepository $userJobRepository,
+    ) {
+    }
+
     public static function create(): self
     {
-        return new self();
+        return new self(
+            UserJobRepository::create(),
+        );
     }
 
     public function supports(BackedEnum $action): bool
@@ -69,6 +77,16 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
             return;
         }
 
+        $hasJobInTask = $this->userJobRepository->userHasJobsInTask(
+            $context->actor->getUserGuid(),
+            $object->getTaskGuid()
+        );
+
+        if ($hasJobInTask && in_array($action, [TaskAction::Read, TaskAction::View, TaskAction::Edit], true)) {
+            return;
+        }
+
+        // ClientPM is client restricted role. This user can only access tasks of his clients
         if ($context->actor->isClientPm()) {
             throw new UserHasNoAccessToTaskOfForbiddenClientException($object);
         }
