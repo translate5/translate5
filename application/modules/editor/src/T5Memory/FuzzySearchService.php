@@ -110,7 +110,7 @@ class FuzzySearchService
         $query = $tagHandler->prepareQuery($queryString);
 
         if (! $this->segmentLengthValidator->isValid($query)) {
-            $this->logger->warn(
+            $this->logger->info(
                 'E1742',
                 'Segment too long for queries in t5memory',
                 [

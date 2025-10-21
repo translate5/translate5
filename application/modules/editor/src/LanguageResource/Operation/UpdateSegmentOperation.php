@@ -40,6 +40,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateExceptio
 use MittagQI\Translate5\LanguageResource\TaskTm\Repository\TaskTmRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use Zend_Config;
 use Zend_Registry;
@@ -94,7 +95,13 @@ class UpdateSegmentOperation
                 continue;
             }
 
-            $this->updateSegmentInTaskTm($segment, $taskTm->getServiceType());
+            try {
+                $this->updateSegmentInTaskTm($segment, $taskTm->getServiceType());
+            } catch (SegmentUpdateException $e) {
+                if (! ($e->getPrevious() instanceof SegmentTooLongException)) {
+                    throw $e;
+                }
+            }
 
             unset($data[$taskTm->getServiceType()]);
         }
@@ -111,7 +118,13 @@ class UpdateSegmentOperation
         );
 
         foreach ($data as $languageResourcesData) {
-            $this->updateSegmentInIntegrations($segment, $languageResourcesData, $updateOptions);
+            try {
+                $this->updateSegmentInIntegrations($segment, $languageResourcesData, $updateOptions);
+            } catch (SegmentUpdateException $e) {
+                if (! ($e->getPrevious() instanceof SegmentTooLongException)) {
+                    throw $e;
+                }
+            }
         }
     }
 

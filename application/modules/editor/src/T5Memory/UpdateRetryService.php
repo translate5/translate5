@@ -148,7 +148,7 @@ class UpdateRetryService
                     $updateOptions->saveToDisk,
                 );
             } catch (SegmentTooLongException $e) {
-                throw new SegmentUpdateException($e->getMessage());
+                throw new SegmentUpdateException($e->getMessage(), previous: $e);
             }
 
             if ($response->successful()) {

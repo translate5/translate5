@@ -36,6 +36,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentDTO;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsResult;
@@ -43,6 +44,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimpo
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use Throwable;
@@ -183,6 +185,15 @@ class ReimportSnapshot
                     $task->getConfig(),
                     $options,
                 );
+            } catch (SegmentUpdateException $e) {
+                if ($e->getPrevious() instanceof SegmentTooLongException) {
+                    // Skip segments that are too long
+                    $emptySegmentsAmount++;
+
+                    continue;
+                }
+
+                $failedSegmentsIds[] = $reimportDTO->segmentId;
             } catch (Throwable) {
                 $failedSegmentsIds[] = $reimportDTO->segmentId;
 
