@@ -32,6 +32,26 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.30.4] - 2025-10-21
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5069](https://jira.translate5.net/browse/TRANSLATE-5069): t5memory - Change error handling for too long segments** <br>
+Change error handling for too long segments
+
+**[TRANSLATE-5067](https://jira.translate5.net/browse/TRANSLATE-5067): User Management - "No access granted" for user with assigned job** <br>
+Fix permissions of ClientPM
+
+
+### Bugfixes
+**[TRANSLATE-5070](https://jira.translate5.net/browse/TRANSLATE-5070): Export - Random errors on import/export of a large task with Okapi** <br>
+Fixed occasional random errors on import/export with Okapi with large tasks
+
+
 ## [7.30.3] - 2025-10-17
 
 ### Important Notes:
