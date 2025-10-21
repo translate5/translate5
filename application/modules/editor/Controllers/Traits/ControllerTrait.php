@@ -100,13 +100,11 @@ trait editor_Controllers_Traits_ControllerTrait
 
     /**
      * Alias for editor_Utils::jflush()
-     *
-     * @param string $msg
-     * @return mixed
+     * @param string|array $msgOrParams
      */
-    public function jflush(bool|array $success, $msg = '')
+    public function jflush(bool|array $success, $msgOrParams = ''): void
     {
-        return forward_static_call_array(['editor_Utils', 'jflush'], func_get_args());
+        editor_Utils::jflush($success, $msgOrParams);
     }
 
     /**

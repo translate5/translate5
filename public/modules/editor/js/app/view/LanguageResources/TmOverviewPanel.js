@@ -200,7 +200,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                 action: 'edit',
                                 iconCls: 'ico-tm-edit',
                                 isDisabled: function (view, rowIndex, colIndex, item, record) {
-                                    return record.get('status') === 'novalidlicense' ? true : false;
+                                    return record.get('status') === 'novalidlicense';
                                 },
                             },
                             {
@@ -209,7 +209,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                 hidden: canNotDeleteLangresource,
                                 isDisabled: function (view, rowIndex, colIndex, item, record) {
                                     item.hidden = canNotDeleteLangresource || !record.get('deletable');
-                                    return record.get('status') === 'novalidlicense' ? true : false;
+                                    return record.get('status') === 'novalidlicense';
                                 },
                                 getClass: (v, meta, rec) => service(rec).getEditIconClass(rec),
                             },
@@ -246,6 +246,18 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                 },
                                 isDisabled: function (view, rowIndex, colIndex, item, record) {
                                     return [record.STATUS_IMPORT, record.STATUS_LOADING, record.STATUS_CONVERTING].includes(record.get('status'));
+                                },
+                            },
+                            {
+                                action: 'extra',
+                                getClass: function (v, meta, r) {
+                                    return service(r).getEditExtraIconClass(r);
+                                },
+                                getTip: function (view, metadata, r) {
+                                    return service(r).getEditExtraTooltip(r);
+                                },
+                                isDisabled: function (view, rowIndex, colIndex, item, record) {
+                                    return service(record).isEditExtraDisabled(record);
                                 },
                             },
                             {

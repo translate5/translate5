@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
  * 'editor_Services_Google',
  * 'editor_Plugins_GroupShare',
  * 'editor_Plugins_DeepL',
+ * 'editor_Plugins_OpenAi',
  */
 Ext.define('Editor.view.LanguageResources.services.Default', {
     id: 'Default',
@@ -48,7 +49,7 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
     
     /**
      * returns the row css class for the associated service in the tm overview panel
-     * @param {Editor.model.LanguageResources.LanguageResource} rec
+     * @param {Editor.model.LanguageResources.LanguageResource} record
      * @return {Array}
      */
     getTmOverviewRowCls: function(record) {
@@ -137,6 +138,8 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
         return 'x-hidden-display';
     },
 
+
+
     /**
      * Get edit specific data action icon tooltip
      */
@@ -150,7 +153,7 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      * @returns {string}
      */
     getEditSpecificWindow: function(){
-        return '';
+        return false;
     },
 
     /**
@@ -159,7 +162,37 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
     isEditSpecificDisabled: function(){
         return true;
     },
-    
+
+    /**
+     * Get edit extra data action icon class
+     */
+    getEditExtraIconClass: function(){
+        return 'x-hidden-display';
+    },
+
+    /**
+     * Get edit extra data action icon tooltip
+     */
+    getEditExtraTooltip: function(){
+        return false;
+    },
+
+    /**
+     * Retrieves the window to edit the extra data of a language resource.
+     * Generally must be implemented in concrete implementations
+     * @returns {string}
+     */
+    getEditExtraWindow: function(){
+        return false;
+    },
+
+    /**
+     * If edit extra data action disabled
+     */
+    isEditExtraDisabled: function(){
+        return true;
+    },
+
     /**
      * Get valid file-types for download.
      * @return array

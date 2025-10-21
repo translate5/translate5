@@ -1356,117 +1356,115 @@ a.x-btn span.task-confirmation {
 
 /* TM Overview */
 .ico-tm-edit {
-    background-image: url(../images/book_edit.png);
+    background-image: url(../images/svg/resource-edit.svg);
     background-repeat: no-repeat;
     background-position: center;
-}
-
-.ico-tm-tasks {
-    background-image: url(../images/tasks_assoc.png);
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.ico-tm-delete {
-    background-image: url(../images/book_delete.png);
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.ico-tm-add {
-    background-image: url(../images/book_add.png);
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.ico-tm-export {
-    background-image: url(../images/database_go.png);
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.ico-tm-information {
-    background-image: url(../images/information.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-}
-
-.ico-tm-show-more {
-    background-image: url(../images/show_more.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-}
-
-.ico-tm-import.ico-mt-finetune {
-    background-image: url(../images/book_finetune.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-}
-
-.ico-tm-import.ico-mt-processing {
-    background-image: url(../images/book_processing.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-size: contain;
 }
 
 .language-ressource-import .ico-tm-import {
-    background-image: url(../images/book_add.png);
+    background-image: url(../images/svg/resource-add.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
 }
 
 .language-ressource-export .ico-tm-download {
-    background-image: url(../images/book_go.png);
+    background-image: url(../images/svg/resource-download.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
 }
 
-.ico-tm-magnifier {
-    background-image: url(../images/magnifier.png) !important;
+.ico-tm-tasks {
+    background-image: url(../images/svg/documents-related.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
+}
+
+.ico-tm-delete {
+    background-image: url(../images/svg/resource-remove.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.ico-tm-add {
+    background-image: url(../images/svg/resource-add.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.ico-tm-export {
+    background-image: url(../images/svg/database-download.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.ico-tm-information {
+    background-image: url(../images/svg/info.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
 }
 
 .ico-tm-log {
-    background-image: url(../images/information.png);
+    background-image: url(../images/svg/log.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
 }
 
 .ico-tm-converseTm {
-    background-image: url(../images/exclamation.png);
+    background-image: url(../images/svg/database-error.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
 }
 
 .ico-tm-specific {
-    background-image: url(../images/processing.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-}
-
-.ico-tm-converseTm {
-    background-image: url(../images/exclamation.png);
+    background-image: url(../images/svg/settings.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
+}
+
+.ico-tm-extra {
+    background-image: url(../images/svg/extra.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
 }
 
 .ico-tm-converseTm-inProgress {
-    background-image: url(../images/book_processing.png);
+    background-image: url(../images/svg/database-inprogress.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
 }
 
 .ico-tm-converseTm-scheduled {
-    background-image: url(../images/book_clock.ico);
+    background-image: url(../images/svg/database-scheduled.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
 }
 
 .ico-tm-sync {
-    background-image: url(../images/book_refresh.png);
+    background-image: url(../images/svg/resource-sync.svg);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
+}
+
+.ico-tm-magnifier {
+    background-image: url(../images/svg/magnifier.svg) !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
 }
 
 /*
@@ -1584,7 +1582,7 @@ a.x-btn span.task-confirmation {
 .tmOverviewPanel tr:hover td.infoIcon > div,
 .tmOverviewPanel tr:hover td.taskList > div,
 .tmOverviewPanel tr:hover td.serviceName > div {
-    background-image: url(../images/information.png);
+    background-image: url(../images/svg/info16.svg);
     background-repeat: no-repeat;
     background-position: right center;
 }
@@ -1696,13 +1694,13 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty {
 }
 
 .gridColumnInfoIconTooltipLeft {
-    background-image: url(../images/information.png);
+    background-image: url(../images/svg/info16.svg);
     background-repeat: no-repeat;
     background-position: left center;
 }
 
 .gridColumnInfoIconTooltipCenter {
-    background-image: url(../images/information.png);
+    background-image: url(../images/svg/info16.svg);
     background-repeat: no-repeat;
     background-position: center center;
 }
@@ -2144,6 +2142,10 @@ dl {
 .t5quality[data-t5qfp="true"] {
     border-bottom: 1px solid limegreen;
     padding-bottom: 2px;
+}
+
+.t5-white-checkox .x-form-checkbox-default {
+    color: #ffffff;
 }
 
 .x-grid-row-editor [id^=numberfield] {

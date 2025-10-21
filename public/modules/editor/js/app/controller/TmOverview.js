@@ -382,6 +382,7 @@ Ext.define('Editor.controller.TmOverview', {
     /**
      * Checks loaded LanguageResources and reloads LanguageResources with status import periodically
      * @param {Ext.data.Store} store
+     * @param {Editor.model.LanguageResources.LanguageResource} record
      */
     addRecordToImportCheck: function (store, record) {
         var me = this;
@@ -441,7 +442,16 @@ Ext.define('Editor.controller.TmOverview', {
     handleEditSpecific: function (view, cell, cellIdx, rec) {
         // find the edit specific data window from the service name, by default this is empty
         var configWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getEditSpecificWindow();
-
+        if(!configWindow || this.statusBlocksActionWithWindow(rec)){
+            return;
+        }
+        var win = Ext.widget(configWindow);
+        win.loadRecord(rec);
+        win.show();
+    },
+    handleEditExtra: function (view, cell, cellIdx, rec) {
+        // find the edit specific data window from the service name, by default this is empty
+        var configWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getEditExtraWindow();
         if(!configWindow || this.statusBlocksActionWithWindow(rec)){
             return;
         }
@@ -453,38 +463,49 @@ Ext.define('Editor.controller.TmOverview', {
         var me = this,
             grid = view.up('tmOverviewPanel'),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
-
-
         // call the selection row handler. This will also fetch fresh record version
         grid.onGridRowSelect(grid, [record], function (newRecord) {
             switch (f && f[1]) {
                 case 'edit':
                     me.handleEditTm(view, cell, col, newRecord);
                     break;
+
                 case 'tasks':
                     me.handleShowTasks(view, cell, col, newRecord);
                     break;
+
                 case 'import':
                     me.handleImportTm(view, cell, col, newRecord);
                     break;
+
                 case 'download':
                     me.handleDownloadTm(view, cell, col, newRecord, ev);
                     break;
+
                 case 'delete':
                     me.handleDeleteTm(view, cell, col, newRecord);
                     break;
+
                 case 'export':
                     me.showExportActionMenu(newRecord, ev);
                     break;
+
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
                     break;
+
                 case 'specific':
                     me.handleEditSpecific(view, cell, col, newRecord);
                     break;
+
+                case 'extra':
+                    me.handleEditExtra(view, cell, col, newRecord);
+                    break;
+
                 case 'converseTm':
                     me.handleTmConversion(view, cell, col, newRecord);
                     break;
+
                 case 'sync':
                     me.handleLanguageResourceSync(view, cell, col, newRecord);
                     break;

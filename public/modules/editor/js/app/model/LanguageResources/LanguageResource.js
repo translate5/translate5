@@ -138,6 +138,18 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         return (specificData.hasOwnProperty(key)) ? specificData[key] : null;
     },
 
+    /**
+     * Will set a specific dta prop but will not sync it
+     * Specific data generally cannot be synced
+     * @param {string} key
+     * @param {*} value
+     */
+    setSpecificDataProp: function (key, value) {
+        var specificData = this.getSpecificData();
+        specificData[key] = value;
+        this.set('specificData', JSON.stringify(specificData), { dirty: false, silent: true });
+    },
+
     getName: function() {
         return Ext.String.htmlEncode(this.get('name'));
     },
@@ -157,7 +169,7 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
             hasReadAccess : this.get('customerUseAsDefaultIds')  .some(inArray),
             hasWriteAccess: this.get('customerWriteAsDefaultIds').some(inArray),
             hasPivotAccess: this.get('customerPivotAsDefaultIds').some(inArray),
-        })
+        });
     },
 
     proxy: {
