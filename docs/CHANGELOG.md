@@ -31,6 +31,55 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.30.3] - 2025-10-17
+
+### Important Notes:
+#### [TRANSLATE-4673](https://jira.translate5.net/browse/TRANSLATE-4673)
+ON PREMISE: MariaDB version must be updated to be at least 11.4.5: docker compose pull; docker compose up -d
+ 
+
+
+### Changed
+**[TRANSLATE-5057](https://jira.translate5.net/browse/TRANSLATE-5057): Configuration - Increase deadlock retries** <br>
+Increase retries on DB queries after a deadlock occurred.
+
+**[TRANSLATE-5056](https://jira.translate5.net/browse/TRANSLATE-5056): MatchAnalysis & Pretranslation - Refactor t5memory communication in pre-translation scope** <br>
+Improve speed of pre-translation by t5emory
+
+**[TRANSLATE-5047](https://jira.translate5.net/browse/TRANSLATE-5047): t5memory - Error 500 on saving a segment with empty target (into T5Memory)** <br>
+Don't send segments with empty targets to t5memory on update in editor
+
+**[TRANSLATE-5045](https://jira.translate5.net/browse/TRANSLATE-5045): t5memory - Retry t5memory API calls on not acquired lock error** <br>
+Retry t5memory API calls on not acquired lock error
+
+**[TRANSLATE-5043](https://jira.translate5.net/browse/TRANSLATE-5043): t5memory - Look only for best match in t5memory fuzzy query in pre-translation** <br>
+Look only for best match in t5memory fuzzy query in pre-translation
+
+**[TRANSLATE-5027](https://jira.translate5.net/browse/TRANSLATE-5027): TM Maintenance - Improve batch delete in TM Maintenance** <br>
+Improve batch delete in TM Maintenance
+
+
+### Bugfixes
+**[TRANSLATE-5049](https://jira.translate5.net/browse/TRANSLATE-5049): Content Protection - Name of rule put into tag incorrectly** <br>
+Fix rule name escaping in tag compose process
+
+**[TRANSLATE-5044](https://jira.translate5.net/browse/TRANSLATE-5044): t5memory - WipeService generates next memory name incorrectly** <br>
+Fix how WipeService generates next memory name
+
+**[TRANSLATE-5041](https://jira.translate5.net/browse/TRANSLATE-5041): Main back-end mechanisms (Worker, Logging, etc.) - Text selection not working in system log** <br>
+FIXED: text selection is now working in row expander in system log
+
+**[TRANSLATE-5031](https://jira.translate5.net/browse/TRANSLATE-5031): Editor general - Number protection tags are not selectable in source text** <br>
+FIXED: number-protection tags are now also selectable
+
+**[TRANSLATE-4981](https://jira.translate5.net/browse/TRANSLATE-4981): Editor general - Error when trying to replace a text with search/replace** <br>
+[🐞 Fix] Fixed Search/Replace error when replacing a word at the end of the segment to a shorter word, fixed error when replacing a word inside the trackchanges
+
+**[TRANSLATE-4673](https://jira.translate5.net/browse/TRANSLATE-4673): TermPortal - No DB index used when searching for plain terms** <br>
+No proper DB index is used when using terminology for pre translations leading to slow performance there.
+
+
 ## [7.30.2] - 2025-10-09
 
 ### Important Notes:
