@@ -167,12 +167,12 @@ class editor_Models_Export_Terminology_Tbx
 
                 continue;
             }
-            if ($oldTermEntry != $row->termEntryTbxId) {
+            if ($isNewTermEntry = $oldTermEntry != $row->termEntryTbxId) {
                 $termEntry = $body->addChild('termEntry');
                 $termEntry->addAttribute('id', $row->termEntryTbxId);
                 $oldTermEntry = $row->termEntryTbxId;
             }
-            if ($oldLanguage != $row->languageId) {
+            if ($isNewTermEntry || $oldLanguage != $row->languageId) {
                 $langSet = $termEntry->addChild('langSet');
                 $langSet->addAttribute('lang', $this->getLanguage((int) $row->languageId));
                 $oldLanguage = $row->languageId;
