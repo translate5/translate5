@@ -33,6 +33,31 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.31.0] - 2025-10-22
+
+### Important Notes:
+#### [TRANSLATE-4374](https://jira.translate5.net/browse/TRANSLATE-4374)
+Important: The latest translate5 docker image (with PHP 8.3) is required for the updated OpenAI library
+ 
+
+
+### Added
+**[TRANSLATE-4374](https://jira.translate5.net/browse/TRANSLATE-4374): AI - RAG-based prompting for LLMs (GPT, OpenAI, Azure AI Foundry, Llama, ect.)** <br>
+OpenAI Plugin: 
+* add RAG-based prompting for LLM based language-resources
+* Improve Icons & prompt layouts
+* add option to use xliff-format for single text translations (InstantTranslate)
+
+**[TRANSLATE-3694](https://jira.translate5.net/browse/TRANSLATE-3694): usability editor - Finalize status of all segments in the current filtering** <br>
+Added ability to change status of all segments in the current filtering
+
+
+### Changed
+**[TRANSLATE-5042](https://jira.translate5.net/browse/TRANSLATE-5042): t5memory - Redo TMX cut off functionality** <br>
+Improve RAM usage on TMX import process
+
+
 ## [7.30.4] - 2025-10-21
 
 ### Important Notes:
