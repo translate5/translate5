@@ -167,7 +167,9 @@ class editor_Models_Export_Terminology_Tbx
 
                 continue;
             }
-            if ($isNewTermEntry = $oldTermEntry != $row->termEntryTbxId) {
+
+            $isNewTermEntry = $oldTermEntry != $row->termEntryTbxId;
+            if ($isNewTermEntry) {
                 $termEntry = $body->addChild('termEntry');
                 $termEntry->addAttribute('id', $row->termEntryTbxId);
                 $oldTermEntry = $row->termEntryTbxId;
