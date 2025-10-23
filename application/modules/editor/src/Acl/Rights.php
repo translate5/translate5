@@ -142,6 +142,12 @@ final class Rights extends AbstractResource
     public const EDIT_ALL_TASKS = 'editAllTasks';
 
     /**
+     * allows bypassing the auto QA check when finish a task / job
+     * @group Task usage
+     */
+    public const TASK_FINISH_SKIP_AUTOQA = 'taskFinishSkipAutoQa';
+
+    /**
      * allows opening all tasks for editing, even if not assigned to task as user or as direct task PM
      * @group Task usage
      */

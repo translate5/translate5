@@ -13,7 +13,7 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
  plugin-exception.txt in the root folder of translate5.
@@ -1003,10 +1003,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorFinishTask: function (task) {
-        var me = this;
-        Editor.app.mask(me.strings.taskFinishing, task.getTaskName());
+        Editor.app.mask(this.strings.taskFinishing, task.getTaskName());
         task.set('userState', Editor.model.admin.Task.userStates.FINISH);
-        task.save(me.getTaskMaskBindings());
+        task.save(this.getTaskMaskBindings());
     },
 
     /**
@@ -1025,10 +1024,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorEndTask: function (task) {
-        var me = this;
-        Editor.app.mask(me.strings.taskEnding, task.getTaskName());
+        Editor.app.mask(this.strings.taskEnding, task.getTaskName());
         task.set('state', 'end');
-        task.save(me.getTaskMaskBindings());
+        task.save(this.getTaskMaskBindings());
     },
 
     /**

@@ -468,13 +468,10 @@ Ext.define('Editor.controller.Localizer', {
         messages: {
             assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
             assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
-            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
+            finishAutoQaCheck: '<?php echo $this->translate->_('Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.');?>',
+            finishAutoQaCheckQuestion: '<?php echo $this->translate->_('Trotzdem Status auf "abgeschlossen" setzen?');?>'
         }
-    });
-
-    Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
-        override: "Editor.controller.admin.TaskUserAssoc",
-        title: '<?php echo $this->translate->_('Referenz-Dateien');?>'
     });
 
     Ext.define("Editor.locale.de.controller.admin.TaskOverview", {

@@ -46,6 +46,7 @@ class UpdateUserJobDto
         public readonly ?bool $canSeeTrackChangesOfPrevSteps,
         public readonly ?bool $canSeeAllTrackChanges,
         public readonly ?bool $canAcceptOrRejectTrackChanges,
+        public readonly ?bool $skipAutoQaCheck = false,
     ) {
         if (null !== $state && ! in_array($state, Workflow::getAllStates())) {
             throw new InvalidStateProvidedException();

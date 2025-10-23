@@ -116,6 +116,7 @@ class UpdateUserJobDtoFactory extends AbstractUserJobDtoFactory
             isset($data['trackchangesShow']) ? (bool) $data['trackchangesShow'] : null,
             isset($data['trackchangesShowAll']) ? (bool) $data['trackchangesShowAll'] : null,
             isset($data['trackchangesAcceptReject']) ? (bool) $data['trackchangesAcceptReject'] : null,
+            (bool) $request->getParam('skipAutoQaCheck', false)
         );
     }
 }

@@ -10835,6 +10835,14 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Alle selektierten exportieren</source>
                 <target>Export all selected</target>
             </trans-unit>
+            <trans-unit id="RWluaWdlIFBmbGljaHRrcml0ZXJpZW4gZGVyIEF1dG9RQSB3ZWlzZW4gbm9jaCBGZWhsZXIgYXVmLg==">
+                <source>Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.</source>
+                <target>Some mandatory criteria of the AutoQA still have errors.</target>
+            </trans-unit>
+            <trans-unit id="VHJvdHpkZW0gU3RhdHVzIGF1ZiAiYWJnZXNjaGxvc3NlbiIgc2V0emVuPw==">
+                <source>Trotzdem Status auf "abgeschlossen" setzen?</source>
+                <target>Nevertheless set status to "finished"?</target>
+            </trans-unit>
             <trans-unit id='QXVmIGZpbmFsZW4gQmVhcmJlaXR1bmdzc3RhdHVzIHNldHplbg=='>
                 <source>Auf finalen Bearbeitungsstatus setzen</source>
                 <target>Set to final processing status</target>

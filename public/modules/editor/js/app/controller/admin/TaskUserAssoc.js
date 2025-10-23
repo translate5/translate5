@@ -59,7 +59,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     messages: {
         assocSave: '#UT#Eintrag gespeichert!',
         assocDeleted: '#UT#Eintrag gelöscht!',
-        assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
+        assocSaveError: '#UT#Fehler beim Speichern der Änderungen!',
+        finishAutoQaCheck: '#UT#Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.',
+        finishAutoQaCheckQuestion: '#UT#Trotzdem Status auf "abgeschlossen" setzen?',
     },
     //***********************************************************************************
     //Begin Events
@@ -305,8 +307,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     /**
      * save the user task assoc info.
      */
-    handleSaveAssoc: function () {
-        var me = this,
+    handleSaveAssoc: function (skipAutoQaCheck) {
+        let me = this,
             form = me.getUserAssocForm(),
             task = me.getPrefWindow().getCurrentTask(),
             grid = me.getUserAssocGrid(),
@@ -319,6 +321,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         }
         win.setLoading(true);
         rec.saveVersioned(task, {
+            preventDefaultHandler: true,
+            params: {
+                skipAutoQaCheck: !!skipAutoQaCheck
+            },
             success: function (savedRec, op) {
                 //reload only the task, not the whole task prefs, should be OK
                 task.load({
@@ -339,9 +345,25 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                     }
                 });
             },
-            failure: function () {
+            failure: function (rec, operation) {
+                let error = operation.getError();
                 store.load();
                 win.setLoading(false);
+                if(error && error.status === 409 && error?.response?.responseJson?.errorCode === 'E1750') {
+                    Ext.Msg.confirm(
+                        Editor.MessageBox.prototype.titles.warning,
+                        me.messages.finishAutoQaCheck + ' <br>' + me.messages.finishAutoQaCheckQuestion,
+
+                        //convert errorsTranslated to ul li? when only one entry show just that?
+                        function (btnId) {
+                            if (btnId === 'yes') {
+                                me.handleSaveAssoc(true); // additionally with force parameter here
+                            }
+                        }
+                    );
+                    return;
+                }
+                Editor.app.getController('ServerException').handleException(operation.error.response);
             }
         });
     },
