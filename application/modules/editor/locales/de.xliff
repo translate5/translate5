@@ -10638,6 +10638,14 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Alle selektierten exportieren</source>
                 <target>Alle selektierten exportieren</target>
             </trans-unit>
+            <trans-unit id="RWluaWdlIFBmbGljaHRrcml0ZXJpZW4gZGVyIEF1dG9RQSB3ZWlzZW4gbm9jaCBGZWhsZXIgYXVmLg==">
+                <source>Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.</source>
+                <target>Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.</target>
+            </trans-unit>
+            <trans-unit id="VHJvdHpkZW0gU3RhdHVzIGF1ZiAiYWJnZXNjaGxvc3NlbiIgc2V0emVuPw==">
+                <source>Trotzdem Status auf "abgeschlossen" setzen?</source>
+                <target>Trotzdem Status auf "abgeschlossen" setzen?</target>
+            </trans-unit>
             <trans-unit id='QXVmIGZpbmFsZW4gQmVhcmJlaXR1bmdzc3RhdHVzIHNldHplbg=='>
                 <source>Auf finalen Bearbeitungsstatus setzen</source>
                 <target>Auf finalen Bearbeitungsstatus setzen</target>

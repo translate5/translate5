@@ -497,6 +497,31 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
+### composer/pcre (Version 3.1.4 | 04229f1)
+PCRE wrapping library that offers type-safe preg_* replacements.
+Homepage: Not configured.
+Licenses Used: MIT
+Copyright (C) 2021 Composer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
 ### deeplcom/deepl-php (Version v1.10.0 | a095708)
 Official DeepL API Client Library
 Homepage: Not configured.
@@ -630,7 +655,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### ezyang/htmlpurifier (Version v4.16.0 | 523407f)
+### ezyang/htmlpurifier (Version v4.18.0 | cb56001)
 Standards compliant HTML filter written in PHP
 Homepage: http://htmlpurifier.org/
 Licenses Used: LGPL-2.1-or-later
@@ -4449,34 +4474,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### lcobucci/clock (Version 3.0.0 | 039ef98)
-Yet another clock abstraction
-Homepage: Not configured.
-Licenses Used: MIT
-MIT License
-
-Copyright (c) 2017 Luís Cobucci
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
-### lcobucci/jwt (Version 4.3.0 | 4d7de2f)
+### lcobucci/jwt (Version 5.3.0 | 08071d8)
 A simple library to work with JSON Web Token and JSON Web Signature
 Homepage: Not configured.
 Licenses Used: BSD-3-Clause
@@ -4534,7 +4532,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### league/flysystem-ftp (Version 3.28.0 | 6c65e1d)
+### league/flysystem-ftp (Version 3.29.0 | 17e8e42)
 FTP filesystem adapter for Flysystem.
 Homepage: Not configured.
 Licenses Used: MIT
@@ -5241,7 +5239,7 @@ Homepage: Not configured.
 Licenses Used: Apache-2.0
 Full license text not found in dependency source.
 
-### openai-php/client (Version v0.10.3 | 4a565d1)
+### openai-php/client (Version v0.17.1 | f7d3150)
 OpenAI PHP is a supercharged PHP API client that allows you to interact with the Open AI API
 Homepage: Not configured.
 Licenses Used: MIT
@@ -5957,13 +5955,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### phpoffice/phpspreadsheet (Version 1.29.0 | fde2ccf)
+### phpoffice/phpspreadsheet (Version 1.29.12 | 7c06eed)
 PHPSpreadsheet - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine
 Homepage: https://github.com/PHPOffice/PhpSpreadsheet
 Licenses Used: MIT
 MIT License
 
-Copyright (c) 2019 PhpSpreadsheet Authors
+Copyright (c) 2019-2025 PhpSpreadsheet Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -7407,7 +7405,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 
-### setasign/tfpdf (Version v1.32 | a879b83)
+### setasign/tfpdf (Version v1.33 | 050de12)
 This class is a modified version of FPDF that adds UTF-8 support. As of version 1.31 it is based on FPDF 1.82. Before it was based on FPDF 1.7.
 Homepage: http://fpdf.org/en/script/script92.php
 Licenses Used: LGPL-2.1

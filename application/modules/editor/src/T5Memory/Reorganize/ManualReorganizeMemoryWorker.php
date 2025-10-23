@@ -83,7 +83,7 @@ class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
-        $languageResource = LanguageResourceRepository::create()->get($params['languageResourceId']);
+        $languageResource = LanguageResourceRepository::create()->get((int) $params['languageResourceId']);
 
         if (editor_Services_Manager::SERVICE_OPENTM2 !== $languageResource->getServiceType()) {
             $languageResource->setStatus(Status::AVAILABLE);

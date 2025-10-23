@@ -54,6 +54,8 @@ class TestomatBitbucketListener implements TestListener
 
     private bool $hasFailed = false;
 
+    private array $lastFailed = [];
+
     private array $testStatCounter = [
         'passed' => 0,
         'failed' => 0,
@@ -237,8 +239,18 @@ class TestomatBitbucketListener implements TestListener
 
         if ($test instanceof TestCase) {
             $testTitle = $this->humanize($test->getName(false));
+            $fullTitle = $test->toString();
         } else {
             $testTitle = 'Unknown';
+            $fullTitle = 'Unknown';
+        }
+
+        if ($status === 'failed') {
+            $this->lastFailed[] = [
+                'title' => $fullTitle,
+                'message' => $message,
+                'trace' => $trace,
+            ];
         }
 
         $body = [
@@ -335,13 +347,14 @@ class TestomatBitbucketListener implements TestListener
 
     private function commentBitBucketPR(): void
     {
-        $commit = getenv('BITBUCKET_COMMIT') ?: '';
-        $branch = getenv('BITBUCKET_BRANCH') ?: '';
-        $prId = getenv('BITBUCKET_PR_ID') ?: null;
-        $repo = getenv('BITBUCKET_REPO') ?: '';
-        $buildNumber = getenv('BITBUCKET_BUILD_NUMBER') ?: null;
+        $commit = (string) getenv('BITBUCKET_COMMIT') ?: '';
+        $branch = (string) getenv('BITBUCKET_BRANCH') ?: '';
+        $prId = (string) getenv('BITBUCKET_PR_ID') ?: '';
+        $repo = (string) getenv('BITBUCKET_REPO') ?: '';
+        $slackWebhook = (string) getenv('SLACK_TEST_WEBHOOK_URL') ?: '';
+        $buildNumber = (string) getenv('BITBUCKET_BUILD_NUMBER') ?: '';
 
-        if (! $commit && ! $branch && ! $repo) {
+        if (strlen($commit) === 0 && strlen($branch) === 0 && strlen($repo) === 0) {
             return;
         }
 
@@ -349,19 +362,6 @@ class TestomatBitbucketListener implements TestListener
         $passed = $this->testStatCounter['passed'] ?? 0;
         $passRate = $total > 0 ? round(($passed / $total) * 100, 2) : 0.0;
         $runId = self::$runId;
-
-        $token = getenv('BITBUCKET_TOKEN');
-
-        if (! $token) {
-            return;
-        }
-
-        if (! $prId) {
-            $prId = $this->getPullRequestId($repo, $branch, $token, $prId);
-            if (! $prId) {
-                return;
-            }
-        }
 
         $summary = <<<TXT
 🧪 PHPUnit Test Summary
@@ -379,6 +379,78 @@ class TestomatBitbucketListener implements TestListener
 https://app.testomat.io/projects/translate5/runs/{$runId}\n
 https://bitbucket.org/mittagqi/translate5/pipelines/results/{$buildNumber}
 TXT;
+        $summary = $this->addLastFailed($summary);
+
+        $this->postSlackMessage($slackWebhook, $summary);
+
+        $token = (string) getenv('BITBUCKET_TOKEN');
+
+        $this->postPullRequestComment($token, $prId, $repo, $branch, $summary);
+    }
+
+    private function getPullRequestId(string $repo, string $branch, string $token, string $prId): string
+    {
+        try {
+            $url = "https://api.bitbucket.org/2.0/repositories/{$repo}/pullrequests?q=source.branch.name=\"{$branch}\"+AND+state=\"OPEN\"";
+
+            $response = Request::get($url)
+                ->addHeader('Authorization', 'Bearer ' . $token)
+                ->sendsJson()
+                ->expectsJson()
+                ->send();
+
+            foreach ($response->body->values ?? [] as $value) {
+                $prId = (string) $value->id;
+
+                break;
+            }
+
+            if ($response->code >= 400) {
+                error_log("[BitbucketReporter] Error sending data to bitbucket: " . $response->raw_body);
+            }
+        } catch (Exception $e) {
+            error_log("[BitbucketReporter] exception on sending git data: " . $e->getMessage());
+        }
+
+        return $prId;
+    }
+
+    private function addLastFailed(string $summary): string
+    {
+        if (empty($this->lastFailed)) {
+            return $summary;
+        }
+        $i = 0;
+        $summary .= "\n\n";
+        $summary .= '=========================' . "\n\n";
+        $summary .= 'Last 5 failed/broken tests: ' . "\n\n";
+        foreach ($this->lastFailed as $failedTest) {
+            if ($i++ > 5) {
+                break;
+            }
+            $summary .= '  ' . $failedTest['title'] . ': ' . $failedTest['message'] . "\n\n";
+        }
+
+        return $summary;
+    }
+
+    private function postPullRequestComment(
+        string $token,
+        string $prId,
+        string $repo,
+        string $branch,
+        string $summary
+    ): void {
+        if (empty($token)) {
+            return;
+        }
+
+        if (empty($prId)) {
+            $prId = $this->getPullRequestId($repo, $branch, $token, $prId);
+            if (empty($prId)) {
+                return;
+            }
+        }
 
         $body = [
             'content' => [
@@ -405,30 +477,30 @@ TXT;
         }
     }
 
-    private function getPullRequestId(bool|array|string $repo, bool|array|string $branch, string $token, $prId): mixed
-    {
-        try {
-            $url = "https://api.bitbucket.org/2.0/repositories/{$repo}/pullrequests?q=source.branch.name=\"{$branch}\"+AND+state=\"OPEN\"";
+    private function postSlackMessage(
+        string $url,
+        string $summary
+    ): void {
+        if (empty($url)) {
+            return;
+        }
+        $body = [
+            'text' => $summary,
+        ];
 
-            $response = Request::get($url)
-                ->addHeader('Authorization', 'Bearer ' . $token)
+        try {
+            $response = Request::post($url)
+                ->body($body)
                 ->sendsJson()
                 ->expectsJson()
                 ->send();
 
-            foreach ($response->body->values ?? [] as $value) {
-                $prId = $value->id;
-
-                break;
-            }
-
             if ($response->code >= 400) {
-                error_log("[BitbucketReporter] Error sending data to bitbucket: " . $response->raw_body);
+                error_log("[Slack] Error sending data to slack: " . $response->raw_body);
+                print_r($response);
             }
         } catch (Exception $e) {
-            error_log("[BitbucketReporter] exception on sending git data: " . $e->getMessage());
+            error_log("[Slack] exception on sending data: " . $e->getMessage());
         }
-
-        return $prId;
     }
 }

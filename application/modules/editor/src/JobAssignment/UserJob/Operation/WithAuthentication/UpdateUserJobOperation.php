@@ -31,11 +31,16 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\JobAssignment\UserJob\Operation\WithAuthentication;
 
 use editor_Models_TaskUserAssoc as UserJob;
+use editor_Workflow_Default as DefaultWorkflow;
+use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\ActionAssert\Feasibility\Exception\FeasibilityExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinatorRepository;
 use MittagQI\Translate5\JobAssignment\CoordinatorGroupJob\Exception\NotFoundCoordinatorGroupJobException;
+use MittagQI\Translate5\JobAssignment\Exception\JobNotFinishableException;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\UserJobActionPermissionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\UpdateUserJobOperationInterface;
@@ -43,8 +48,13 @@ use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidWorkflowStepProvi
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\UpdateUserJobDto;
 use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
+use Zend_Exception;
 use ZfExtended_Authentication;
 use ZfExtended_AuthenticationInterface;
+use ZfExtended_ErrorCodeException;
 
 class UpdateUserJobOperation implements UpdateUserJobOperationInterface
 {
@@ -55,6 +65,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         private readonly UserRepository $userRepository,
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
+        private readonly QualityService $qualityService,
     ) {
     }
 
@@ -70,15 +81,30 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
             new UserRepository(),
             JobCoordinatorRepository::create(),
             CoordinatorGroupJobRepository::create(),
+            new QualityService(),
         );
     }
 
+    /**
+     * @throws ZfExtended_ErrorCodeException
+     * @throws PermissionExceptionInterface
+     * @throws Zend_Exception
+     * @throws InexistentUserException
+     * @throws TaskHasCriticalQualityErrorsException
+     * @throws FeasibilityExceptionInterface
+     */
     public function update(UserJob $job, UpdateUserJobDto $dto): void
     {
         $authUser = $this->userRepository->get($this->authentication->getUserId());
         $context = new PermissionAssertContext($authUser);
 
         $this->permissionAssert->assertGranted(UserJobAction::Update, $job, $context);
+
+        $maySkipAutoQa = $this->authentication->isUserAllowed(Rights::ID, Rights::TASK_FINISH_SKIP_AUTOQA);
+        $doAutoQaCheck = ($dto->state === DefaultWorkflow::STATE_FINISH) && ! ($dto->skipAutoQaCheck && $maySkipAutoQa);
+        if ($doAutoQaCheck && $this->qualityService->taskHasCriticalErrors($job->getTaskGuid(), $job)) {
+            throw new JobNotFinishableException('E1750');
+        }
 
         $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
 
@@ -89,6 +115,9 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         $this->operation->update($job, $dto);
     }
 
+    /**
+     * @throws PermissionExceptionInterface
+     */
     private function coordinatorAsserts(
         JobCoordinator $coordinator,
         UserJob $job,

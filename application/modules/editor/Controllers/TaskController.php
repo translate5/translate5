@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Export\QueuedExportService;
+use MittagQI\Translate5\JobAssignment\Exception\JobNotFinishableException;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -1154,6 +1155,8 @@ class editor_TaskController extends ZfExtended_RestController
 
         //throws exceptions if task not closable
         $this->checkTaskStateTransition();
+
+        $this->checkAutoQaHasCritical($userState);
 
         $this->handleCancelImport();
 
@@ -2516,5 +2519,19 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         return $filter;
+    }
+
+    /**
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     */
+    private function checkAutoQaHasCritical($userState): void
+    {
+        if ($userState === editor_Workflow_Default::STATE_FINISH
+            && $this->qualityService->taskHasCriticalErrors($this->entity->getTaskGuid())) {
+            throw JobNotFinishableException::createResponse('E1750', [
+                'userState' => 'Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.',
+            ]);
+        }
     }
 }
