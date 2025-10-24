@@ -84,7 +84,7 @@ class SegmentUpdateDtoFactory implements SegmentUpdateDtoFactoryInterface
             $source,
             $target,
             $fileName,
-            $useSegmentTimestamp ? (int) $segment->getTimestamp() : time(),
+            $useSegmentTimestamp ? strtotime($segment->getTimestamp()) : time(),
             $userName,
             $context,
         );
