@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Integration\DummyFileTm\UpdateSegmentService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
 /**
@@ -299,8 +300,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         /* @var $connector editor_Services_Connector */
         $connector->connectTo(
             $fuzzyLanguageResource,
-            $this->languageResource->getSourceLang(),
-            $this->languageResource->getTargetLang(),
+            LanguagePairDTO::fromLanguageResource($this->languageResource),
             $this->getConfig()
         );
         // copy the current config (for task specific config)

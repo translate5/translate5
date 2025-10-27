@@ -18,6 +18,7 @@ use editor_Services_Manager;
 use editor_Services_ServiceResult;
 use Exception;
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use stdClass;
 use Zend_Db_Statement_Exception;
@@ -123,13 +124,7 @@ class Pivot
             $connector = null;
 
             try {
-                $connector = $manager->getConnector(
-                    $languageresource,
-                    (int) $this->task->getSourceLang(),
-                    (int) $this->task->getRelaisLang(),
-                    $this->task->getConfig(),
-                    (int) $this->task->getCustomerId(),
-                );
+                $connector = ConnectorForTaskProvider::create()->provideForPivotPretrans($languageresource, $this->task);
 
                 // set the analysis running user to the connector
                 $connector->setWorkerUserGuid($this->userGuid);

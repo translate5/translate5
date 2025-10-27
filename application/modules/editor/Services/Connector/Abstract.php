@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Services_Connector_TagHandler_Abstract as AbstractTagHandler;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguageResolver;
 use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 
@@ -173,6 +175,8 @@ abstract class editor_Services_Connector_Abstract
 
     private TagHandlerFactory $tagHandlerFactory;
 
+    private LanguageResolver $languageResolver;
+
     /**
      * initialises the internal result list
      */
@@ -184,6 +188,7 @@ abstract class editor_Services_Connector_Abstract
         $this->tagHandlerFactory = TagHandlerFactory::create();
         $this->tagHandler = $this->createTagHandler();
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
+        $this->languageResolver = LanguageResolver::create();
     }
 
     /**
@@ -207,19 +212,16 @@ abstract class editor_Services_Connector_Abstract
 
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
-     * @param int $sourceLang language id
-     * @param int $targetLang language id
      */
     public function connectTo(
         editor_Models_LanguageResources_LanguageResource $languageResource,
-        $sourceLang,
-        $targetLang,
+        LanguagePairDTO $languagePair,
         $config = null
     ) {
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
-        $this->setServiceLanguages($sourceLang, $targetLang);
+        $this->setServiceLanguages($languagePair);
 
         if ($languageResource->getId() !== null) {
             $this->languageResource->sourceLangCode = $this->languageResource->getSourceLangCode();
@@ -233,8 +235,8 @@ abstract class editor_Services_Connector_Abstract
         // Maybe it would be enough to set the remove-handler for instantiation ... better none at all.
         $this->tagHandler = $this->createTagHandler();
         $this->tagHandler->setLanguages(
-            (int) ($sourceLang ?: $languageResource->getSourceLang()),
-            (int) ($targetLang ?: $languageResource->getSourceLang())
+            (int) ($languagePair->sourceLanguageId ?: $languageResource->getSourceLang()),
+            (int) ($languagePair->targetLanguageId ?: $languageResource->getSourceLang())
         );
         $this->logger = $this->logger->cloneMe(
             'editor.languageresource.' . strtolower($this->resource->getService()) . '.connector'
@@ -242,55 +244,34 @@ abstract class editor_Services_Connector_Abstract
     }
 
     /**
-     * @throws Zend_Cache_Exception|ReflectionException
+     * @throws Zend_Cache_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ReflectionException
      */
-    protected function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
+    protected function setServiceLanguages(LanguagePairDTO $languagePair): void
     {
-        if ($this->languageResource === null || $sourceLang === null || $targetLang === null) {
-            $this->sourceLang = $sourceLang;
-            $this->targetLang = $targetLang;
+        if ($this->languageResource === null
+            || $languagePair->sourceLanguageId === null
+            || $languagePair->targetLanguageId === null) {
+            $this->sourceLang = $languagePair->sourceLanguageId;
+            $this->targetLang = $languagePair->targetLanguageId;
 
             return;
         }
 
-        $fuzzy = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $sourceFuzzy = $fuzzy->getFuzzyLanguages($sourceLang, includeMajor: true);
-        $targetFuzzy = $fuzzy->getFuzzyLanguages($targetLang, includeMajor: true);
-
-        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
-
-        // load only the required languages
-        $langaugepair = $languages->loadFilteredPairs((int) $this->languageResource->getId(), $sourceFuzzy, $targetFuzzy);
-
-        // if only 1 language combination is available for the langauge resource, use it.
-        if (count($langaugepair) === 1) {
-            $langaugepair = $langaugepair[0];
-            $this->sourceLang = (int) $langaugepair['sourceLang'];
-            $this->targetLang = (int) $langaugepair['targetLang'];
-
-            return;
+        $languagePairDTO = $this->languageResolver->resolve($this->languageResource, $languagePair);
+        if ($languagePairDTO === null) {
+            $this->logger->error(
+                'E1749',
+                'No language pair could be resolved according fuzzy / major rules.',
+                [
+                    'sourceLangId' => $languagePair->sourceLanguageId,
+                    'targetLangId' => $languagePair->targetLanguageId,
+                ]
+            );
         }
-
-        // check for direct match
-        foreach ($langaugepair as $item) {
-            if (($item['sourceLang'] === $sourceLang) && ($item['targetLang'] === $targetLang)) {
-                $this->sourceLang = $item['sourceLang'];
-                $this->targetLang = $item['targetLang'];
-
-                return;
-            }
-        }
-
-        // check for fuzzy match
-        foreach ($langaugepair as $item) {
-            // find the langauges using fuzzy matching
-            if (in_array($item['sourceLang'], $sourceFuzzy, true) && in_array($item['targetLang'], $targetFuzzy, true)) {
-                $this->sourceLang = $item['sourceLang'];
-                $this->targetLang = $item['targetLang'];
-
-                return;
-            }
-        }
+        $this->sourceLang = $languagePairDTO->sourceLanguageId;
+        $this->targetLang = $languagePairDTO->targetLanguageId;
     }
 
     /**

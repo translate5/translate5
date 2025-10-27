@@ -34,6 +34,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service as Service;
 use Generator;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use ZfExtended_Factory as Factory;
 
 trait T5MemoryLocalTmsTrait
@@ -58,8 +59,7 @@ trait T5MemoryLocalTmsTrait
                 try {
                     $connector->connectTo(
                         $languageResource,
-                        $languageResource->getSourceLang(),
-                        $languageResource->getTargetLang()
+                        LanguagePairDTO::fromLanguageResource($languageResource),
                     );
 
                     $status = $connector->getStatus($languageResource->getResource(), $languageResource, $tmName);

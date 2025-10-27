@@ -36,6 +36,7 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceAction;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceActionPermissionAssert;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
@@ -747,9 +748,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * receives a list of task and task assoc data, returns a list of taskNames grouped by languageResource
-     * @return string[]
+     * @return array<array<int, string>>
      */
-    protected function convertTasknames(array $taskInfoList)
+    protected function convertTasknames(array $taskInfoList): array
     {
         $result = [];
         foreach ($taskInfoList as $taskInfo) {
@@ -1717,21 +1718,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * returns the connector to be used
-     *
-     * @throws editor_Models_ConfigException
-     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     private function getConnectorForTask(editor_Models_Task $task): editor_Services_Connector
     {
-        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
-
-        return $manager->getConnector(
-            $this->entity,
-            $task->getSourceLang(),
-            $task->getTargetLang(),
-            $task->getConfig(),
-            (int) $task->getCustomerId()
-        );
+        return ConnectorForTaskProvider::create()->provideForTargetPretrans($this->entity, $task);
     }
 
     /**

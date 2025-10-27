@@ -30,8 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use editor_Models_Db_Languages;
 use editor_Models_Languages;
 use PDO;
+use ReflectionException;
+use Zend_Cache_Exception;
+use Zend_Db_Statement_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -46,6 +50,7 @@ class LanguageRepository
     }
 
     /**
+     * @throws ReflectionException
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function get(int $langId): editor_Models_Languages
@@ -56,6 +61,9 @@ class LanguageRepository
         return $lang;
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function find(int $langId): ?editor_Models_Languages
     {
         try {
@@ -65,10 +73,13 @@ class LanguageRepository
         }
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function findByRfc5646(string $rfc): ?editor_Models_Languages
     {
         try {
-            $language = \ZfExtended_Factory::get(editor_Models_Languages::class);
+            $language = ZfExtended_Factory::get(editor_Models_Languages::class);
             $language->loadByRfc5646($rfc);
 
             return $language;
@@ -79,13 +90,37 @@ class LanguageRepository
 
     /**
      * @return array<string, string>
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      */
     public function getRfc5646ToIdMap(): array
     {
-        $languages = \ZfExtended_Factory::get(editor_Models_Languages::class);
+        $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $db = $languages->db->getAdapter();
-        $select = $db->select()->from(\editor_Models_Db_Languages::TABLE_NAME, ['rfc5646', 'id']);
+        $select = $db->select()->from(editor_Models_Db_Languages::TABLE_NAME, ['rfc5646', 'id']);
 
         return $db->query($select)->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Cache_Exception
+     */
+    public function findFuzzyLanguages(int $id, string $field = 'id', bool $includeMajor = false): array
+    {
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+
+        return $language->getFuzzyLanguages($id, $field, $includeMajor);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function findMajorLanguageById(int $languageId): int
+    {
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+
+        return $language->findMajorLanguageById($languageId);
     }
 }

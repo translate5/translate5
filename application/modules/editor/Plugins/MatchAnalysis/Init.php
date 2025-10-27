@@ -28,6 +28,7 @@
 
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
@@ -462,6 +463,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
+     * @throws Zend_Exception
      */
     protected function getAvailableBatchResourceForPivotPreTranslation(string $taskGuid, array $assocs): array
     {
@@ -474,16 +476,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
             $languageResource->load($assoc['languageResourceId']);
 
-            $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
-
-            $connector = $manager->getConnector(
-                $languageResource,
-                $task->getSourceLang(),
-                (int) $task->getRelaisLang(),
-                $task->getConfig(),
-                (int) $task->getCustomerId(),
-            );
-            /* @var $connector editor_Services_Connector */
+            $connector = ConnectorForTaskProvider::create()->provideForPivotPretrans($languageResource, $task);
             //collect all connectors which are supporting batch query
             if ($connector->isBatchQuery()) {
                 $batchAssocs[] = clone $languageResource;
@@ -778,15 +771,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
+     * @throws Zend_Exception
      */
     protected function checkLanguageResources(string $taskGuid): array
     {
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($taskGuid);
 
-        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $taskMajorSourceLangId = $language->findMajorLanguageById($task->getSourceLang());
-        $taskMajorTargetLangId = $language->findMajorLanguageById($task->getTargetLang());
         $this->resetBatchAssocs();
 
         $valid = [];
@@ -797,14 +788,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
             $resource = $manager->getResource($languageresource);
-
-            $connector = $manager->getConnector(
-                $languageresource,
-                $taskMajorSourceLangId,
-                $taskMajorTargetLangId,
-                $task->getConfig(),
-                (int) $task->getCustomerId(),
-            );
+            $connector = ConnectorForTaskProvider::create()->provideForTargetPretrans($languageresource, $task);
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
             if ($connector->isBatchQuery()) {

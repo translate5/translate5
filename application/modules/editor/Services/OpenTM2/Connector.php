@@ -31,6 +31,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\QueryCache;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
@@ -135,18 +136,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function connectTo(
         LanguageResource $languageResource,
-        $sourceLang,
-        $targetLang,
+        LanguagePairDTO $languagePair,
         $config = null,
     ): void {
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
-        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
+        parent::connectTo($languageResource, $languagePair, $config);
 
         $this->tagHandler = $this->tagHandlerProvider->getTagHandler(
-            (int) ($sourceLang ?: $languageResource->getSourceLang()),
-            (int) ($targetLang ?: $languageResource->getSourceLang()),
+            (int) ($languagePair->sourceLanguageId ?: $languageResource->getSourceLang()),
+            (int) ($languagePair->targetLanguageId ?: $languageResource->getSourceLang()),
             $config ?: $this->config
         );
     }
@@ -866,8 +866,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $connector = ZfExtended_Factory::get(static::class);
         $connector->connectTo(
             $fuzzyLanguageResource,
-            $this->languageResource->getSourceLang(),
-            $this->languageResource->getTargetLang(),
+            LanguagePairDTO::fromLanguageResource($this->languageResource),
             $this->getConfig()
         );
         // copy the current config (for task specific config)

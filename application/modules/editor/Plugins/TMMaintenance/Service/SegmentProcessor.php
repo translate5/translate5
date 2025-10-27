@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource;
 use editor_Services_Connector_Exception;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
@@ -194,8 +195,7 @@ final class SegmentProcessor
         $connector = new MaintenanceService();
         $connector->connectTo(
             $languageResource,
-            $languageResource->getSourceLang(),
-            $languageResource->getTargetLang()
+            LanguagePairDTO::fromLanguageResource($languageResource),
         );
 
         return $connector;

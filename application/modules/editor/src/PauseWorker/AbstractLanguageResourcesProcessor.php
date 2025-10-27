@@ -34,7 +34,9 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_Manager as Manager;
 use Exception;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use ReflectionException;
 use Throwable;
 use ZfExtended_Factory;
 
@@ -42,11 +44,20 @@ abstract class AbstractLanguageResourcesProcessor
 {
     private Manager $manager;
 
+    private ConnectorForTaskProvider $connectorProvider;
+
+    /**
+     * @throws ReflectionException
+     */
     public function __construct()
     {
         $this->manager = ZfExtended_Factory::get(Manager::class);
+        $this->connectorProvider = ConnectorForTaskProvider::create();
     }
 
+    /**
+     * @throws ReflectionException
+     */
     protected function getWaitingStrategyByStatus(Task $task, int ...$languageResourceIds): WaitingStrategy
     {
         foreach ($languageResourceIds as $languageResourceId) {
@@ -54,7 +65,7 @@ abstract class AbstractLanguageResourcesProcessor
 
             try {
                 $languageResource->load($languageResourceId);
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // We don't care here in case language resource can not be loaded, it will be processed further
                 continue;
             }
@@ -62,13 +73,7 @@ abstract class AbstractLanguageResourcesProcessor
             $resource = $this->manager->getResource($languageResource);
 
             try {
-                $connector = $this->manager->getConnector(
-                    $languageResource,
-                    $task->getSourceLang(),
-                    $task->getTargetLang(),
-                    $task->getConfig(),
-                    (int) $task->getCustomerId(),
-                );
+                $connector = $this->connectorProvider->provideForTargetPretrans($languageResource, $task);
                 $status = $connector->getStatus($resource, $languageResource);
 
                 if (in_array($status, $this->getStatusesRequireWaiting(), true)) {
