@@ -25,16 +25,20 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
-class editor_Models_LanguageResources_UsageExporterException extends ZfExtended_ErrorCodeException
+namespace MittagQI\Translate5\Task\Excel;
+
+use ZfExtended_ErrorCodeException;
+
+class MetadataException extends ZfExtended_ErrorCodeException
 {
     /**
      * @var string
      */
-    protected $domain = 'core.languageresources.usageexporter';
+    protected $domain = 'editor.task.excel.metadata';
 
-    protected static $localErrorCodes = [
-        'E1335' => 'Unable to create export zip archive {path}.',
-        'E1336' => 'Unable to close the export zip archive {path}.',
+    protected static array $localErrorCodes = [
+        'E1170' => 'The Metadata of the currently filtered tasks can not be exported as Excel-file.',
     ];
 }

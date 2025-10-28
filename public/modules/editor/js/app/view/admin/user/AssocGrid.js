@@ -133,6 +133,9 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'deadlineDate',
+                    renderer: function(value,metaData){
+                        return value > 0.001 ? value : '';
+                    },
                     flex:1,
                     text: me.strings.deadlineDateLable
                 }],

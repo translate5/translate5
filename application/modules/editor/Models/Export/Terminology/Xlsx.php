@@ -25,11 +25,14 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
+use WilsonGlasser\Spout\Common\Entity\Cell;
 use WilsonGlasser\Spout\Common\Entity\ColumnDimension;
 use WilsonGlasser\Spout\Common\Entity\Style\Style;
 use WilsonGlasser\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use WilsonGlasser\Spout\Writer\Common\Creator\WriterEntityFactory;
 use WilsonGlasser\Spout\Writer\Common\Helper\CellHelper;
+use WilsonGlasser\Spout\Writer\XLSX\Writer;
 
 /**
  * exports term data stored in translate5 to valid XLSX files
@@ -182,6 +185,8 @@ class editor_Models_Export_Terminology_Xlsx
      * @var ZfExtended_Zendoverwrites_Translate
      */
     private $l10n;
+
+    private Writer $writer;
 
     /**
      * Get exported file path
@@ -370,7 +375,7 @@ class editor_Models_Export_Terminology_Xlsx
             // Foreach column in group
             foreach (array_keys($info['cols']) as $idx => $key) {
                 // Create cell
-                $cell = WriterEntityFactory::createCell($data[$key] ?? '', $info['style']);
+                $cell = $this->createCell($data[$key] ?? '', $info['style']);
 
                 // Add cell to a row
                 $row->setCellAtIndex($cell, $shift + $idx);
@@ -382,6 +387,16 @@ class editor_Models_Export_Terminology_Xlsx
 
         // Write row
         $this->writer->addRow($row);
+    }
+
+    private function createCell(string $cellValue, Style $cellStyle = null): Cell
+    {
+        if (str_starts_with($cellValue, '=')) {
+            //disable formulas for security reasons TRANSLATE-5059
+            $cellValue = ' ' . $cellValue;
+        }
+
+        return WriterEntityFactory::createCell($cellValue, $cellStyle);
     }
 
     /**
@@ -499,7 +514,7 @@ class editor_Models_Export_Terminology_Xlsx
             // Foreach column in current group
             foreach (array_values($info['cols']) as $idx => $text) {
                 // Create cell
-                $cell = WriterEntityFactory::createCell($info['text'] ?? '', $style);
+                $cell = $this->createCell($info['text'] ?? '', $style);
 
                 // Put it in a row at certain index
                 $row->setCellAtIndex($cell, $shift + $idx);
@@ -555,7 +570,7 @@ class editor_Models_Export_Terminology_Xlsx
             // Foreach column in current group
             foreach (array_values($info['cols']) as $idx => $text) {
                 // Create cell
-                $cell = WriterEntityFactory::createCell($text, $style);
+                $cell = $this->createCell($text, $style);
 
                 // Add cell at certain index
                 $row->setCellAtIndex($cell, $shift + $idx);
@@ -617,6 +632,7 @@ class editor_Models_Export_Terminology_Xlsx
      * Instantiate xlsx-writer and open the destination xlsx-file
      *
      * @return $this
+     * @throws Zend_Exception
      * @throws \WilsonGlasser\Spout\Common\Exception\IOException
      * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      */
@@ -626,7 +642,12 @@ class editor_Models_Export_Terminology_Xlsx
         $file = $this->file($this->collectionId);
 
         // Create writer and open file for writing
-        $this->writer = WriterEntityFactory::createWriter('xlsx');
+        $writer = WriterEntityFactory::createWriter('xlsx');
+        if ($writer instanceof Writer) {
+            $this->writer = $writer;
+        } else {
+            throw new Zend_Exception('Invalid Writer object');
+        }
         $this->writer->openToFile($file);
 
         // Return $this

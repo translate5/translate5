@@ -1449,7 +1449,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
         $row = $this->db->fetchRow($s);
 
-        return $row->cnt;
+        return (int) $row->cnt;
     }
 
     /**
@@ -1522,7 +1522,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return;
         }
 
-        // If first repetition occurrences should be kept - return
+        // If both types of repetitions are searched - return
+        if (isset($isRepeated[1]) && isset($isRepeated[2])) {
+            return;
+        }
+
+        // If first repetition occurrences should NOT be excluded - return
         if (isset($isRepeated[4])) {
             return;
         }
@@ -1533,16 +1538,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         // Shortcut to table name
         $t = "`$this->tableName`";
 
+        // Setup column to be used for grouping
+        $groupBy = isset($isRepeated[1]) ? 'sourceMd5' : 'targetMd5';
+
         // Get array of ids of first repetition occurrences, if we haven't fetched it previously
-        $this->firstSegmentsOfEachRepetitionsGroup = $this->firstSegmentsOfEachRepetitionsGroup
-            ?? $this->db->getAdapter()->query("
-                SELECT SUBSTRING_INDEX(GROUP_CONCAT($t.`id`), ',', 1) AS `first`
-                FROM $from
-                WHERE $where
-                GROUP BY IF($t.`isRepeated` = 1, $t.`sourceMd5`, IF($t.`isRepeated` = 2, $t.`targetMd5`, CONCAT($t.`sourceMd5`, '-', $t.`targetMd5`)))
-                HAVING COUNT($t.`id`) > 1
-                ORDER BY $t.`fileOrder`, $t.`id`
-            ")->fetchAll(PDO::FETCH_COLUMN);
+        $this->firstSegmentsOfEachRepetitionsGroup ??= $this->db->getAdapter()->query("
+            SELECT SUBSTRING_INDEX(GROUP_CONCAT($t.`id`), ',', 1) AS `first`
+            FROM $from
+            WHERE $where
+            GROUP BY $t.`$groupBy`
+            HAVING COUNT($t.`id`) > 1
+            ORDER BY $t.`fileOrder`, $t.`id`
+        ")->fetchAll(PDO::FETCH_COLUMN);
 
         // Exclude
         if ($this->firstSegmentsOfEachRepetitionsGroup) {

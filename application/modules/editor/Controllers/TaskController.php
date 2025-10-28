@@ -48,7 +48,9 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\DataProvider\TaskViewDataProvider;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\Task\Export\Html\Worker;
+use MittagQI\Translate5\Task\Export\Metadata;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
+use MittagQI\Translate5\Task\Export\TaskHistoryExcel;
 use MittagQI\Translate5\Task\Filtering\TaskQueryFilterAndSort;
 use MittagQI\Translate5\Task\Import\ImportService;
 use MittagQI\Translate5\Task\Import\ProjectWorkersService;
@@ -308,8 +310,7 @@ class editor_TaskController extends ZfExtended_RestController
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         if ($context == 'xlsx') {
-            $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
-            /* @var $exportMetaData editor_Models_Task_Export_Metadata */
+            $exportMetaData = ZfExtended_Factory::get(Metadata::class);
             $exportMetaData->setTasks($rows['rows']);
             $exportMetaData->setFilters(json_decode($this->getParam('filter')));
             $exportMetaData->setColumns(json_decode($this->getParam('visibleColumns')));
@@ -1837,8 +1838,7 @@ class editor_TaskController extends ZfExtended_RestController
                     throw new ZfExtended_NoAccessException();
                 }
                 // run history excel export
-                /** @var editor_Models_Export_TaskHistoryExcel $exportExcel */
-                $exportExcel = ZfExtended_Factory::get('editor_Models_Export_TaskHistoryExcel', [$this->entity]);
+                $exportExcel = ZfExtended_Factory::get(TaskHistoryExcel::class, [$this->entity]);
                 $exportExcel->exportAsDownload();
 
                 return;

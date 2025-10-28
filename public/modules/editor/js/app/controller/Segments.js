@@ -403,12 +403,15 @@ Ext.define('Editor.controller.Segments', {
             if (btn.pressed) {
                 tbar.down('#filterBtnRepeatedExcludeFirst').toggle(false, false);
                 //1,2,3,4 contain in filter source only (1), target only (2), segments repeated in both (3), including first ones
-                column.filter.filter.setValue([1, 2, 3, 4]);
+                column.filter.filter.setValue([1, 4]);
                 column.filter.active = false;
                 column.filter.setActive(true);
             } else {
+                column.filter.filter.setValue([]);
                 column.filter.setActive(false);
             }
+            column.filter.syncCheckedState();
+            column.filter.syncIncludeFirstState(true);
         }
     },
 
@@ -422,14 +425,18 @@ Ext.define('Editor.controller.Segments', {
             if (btn.pressed) {
                 tbar.down('#filterBtnRepeatedIncludeFirst').toggle(false, false);
                 //1,2,3 contain in filter source only (1), target only (2), segments repeated in both (3), except first ones
-                column.filter.filter.setValue([1, 2, 3]);
+                column.filter.filter.setValue([1]);
                 column.filter.active = false;
                 column.filter.setActive(true);
             } else {
+                column.filter.filter.setValue([]);
                 column.filter.setActive(false);
             }
+            column.filter.syncCheckedState();
+            column.filter.syncIncludeFirstState();
         }
     },
+
     /**
      * handles the click on a file in the filetree
      * resets the sorting and jumps to the first segment of the file.

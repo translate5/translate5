@@ -31,6 +31,7 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerAction;
 use MittagQI\Translate5\Customer\ActionAssert\CustomerActionPermissionAssert;
 use MittagQI\Translate5\Customer\CustomerService;
+use MittagQI\Translate5\LanguageResource\UsageExporter;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Test\Enums\TestUser;
 
@@ -137,8 +138,11 @@ class Editor_CustomerController extends ZfExtended_RestController
         }
     }
 
-    /***
+    /**
      * Export language resources usage as excel document
+     * @throws ReflectionException
+     * @throws UsageExporter\Exception
+     * @throws ZfExtended_Models_Entity_NoAccessException
      */
     public function exportresourceAction()
     {
@@ -152,17 +156,14 @@ class Editor_CustomerController extends ZfExtended_RestController
 
             return;
         }
-        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
-        /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $export = UsageExporter::create();
         $taskType = $this->getRequest()->getParam('taskType', null);
         if (! empty($taskType)) {
             $taskType = explode(',', $taskType);
             $export->setDocumentTaskType($taskType);
         }
-        if ($export->excel($customerId)) {
-            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-            $this->view->result = $t->_("Es wurden keine Ergebnisse gefunden");
-        }
+        $export->excel($customerId);
+        exit; //excel method flushes content to the browser
     }
 
     public function copyOperation()
@@ -278,19 +279,22 @@ class Editor_CustomerController extends ZfExtended_RestController
         ]);
     }
 
-    /***
+    /**
      * Set the resources log data for the current export request. If the request is from non test user, this will throw
      * an exception.
-     * @param int $customerId
+     * @throws ReflectionException
+     * @throws UsageExporter\Exception
+     * @throws ZfExtended_Models_Entity_NoAccessException
      */
-    protected function setupTextExportResourcesLogData(int $customerId = null)
+    protected function setupTextExportResourcesLogData(int $customerId = null): void
     {
         $allowed = [TestUser::TestManager->value, TestUser::TestApiUser->value];
         if (! in_array(ZfExtended_Authentication::getInstance()->getLogin(), $allowed)) {
-            throw new ZfExtended_Models_Entity_NoAccessException('The current user is not alowed to use the resources log export data.');
+            throw new ZfExtended_Models_Entity_NoAccessException(
+                'The current user is not allowed to use the resources log export data.'
+            );
         }
-        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
-        /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $export = UsageExporter::create();
         $taskType = $this->getRequest()->getParam('taskType', null);
         if (! empty($taskType)) {
             $taskType = explode(',', $taskType);

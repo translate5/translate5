@@ -25,16 +25,36 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
+namespace MittagQI\Translate5\Task\Export;
+
+use editor_Models_LanguageResources_LanguageResource;
+use editor_Models_Segment;
+use editor_Models_Segment_AutoStates;
+use editor_Models_Segment_InternalTag;
+use editor_Models_Segment_Iterator;
+use editor_Models_SegmentField;
+use editor_Models_Task;
+use editor_Workflow_Default;
+use MittagQI\Translate5\Repository\SegmentHistoryDataRepository;
+use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
+use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use ReflectionException;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_NoAccessException;
 
 /**
  * Export the whole task as an Excel-file
  */
-class editor_Models_Export_TaskHistoryExcel
+class TaskHistoryExcel
 {
     protected Spreadsheet $excel;
 
@@ -53,7 +73,7 @@ class editor_Models_Export_TaskHistoryExcel
     private array $toBeUsedSteps;
 
     /**
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws Exception
      */
     public function __construct(editor_Models_Task $task)
     {
@@ -62,16 +82,19 @@ class editor_Models_Export_TaskHistoryExcel
         $this->toBeUsedSteps = $this->workflow->getStepChain();
         //we remove the workflowEnded since this is not needed for history export
         array_pop($this->toBeUsedSteps);
-        //$this->log = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
         $this->initExcel();
     }
 
     /**
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws Exception
      */
-    private function initExcel()
+    private function initExcel(): void
     {
         $this->excel = new Spreadsheet();
+
+        $stringBinder = new StringValueBinder();
+        $stringBinder->setFormulaConversion(true);
+        $this->excel->setValueBinder($stringBinder);
 
         //default format
         $this->excel->getDefaultStyle()->getAlignment()
@@ -122,7 +145,7 @@ class editor_Models_Export_TaskHistoryExcel
     /**
      * does the export
      * @param string $fileName where the XLS should go to
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws ReflectionException
      */
     protected function export(string $fileName): void
     {
@@ -130,27 +153,26 @@ class editor_Models_Export_TaskHistoryExcel
         $this->task->createMaterializedView();
 
         // load segment tagger to extract pure text from segments
-        /** @var editor_Models_Segment_InternalTag $internalTag */
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $internalTag = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
 
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
-        /* @var $segments editor_Models_Segment_Iterator */
+        $segments = ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$this->task->getTaskGuid()]);
 
         $sheet = $this->excel->getActiveSheet();
 
-        $setString = function (int $col, int $row, string $content) use ($sheet) {
-            $sheet->setCellValueExplicitByColumnAndRow($col, $row, $content, DataType::TYPE_STRING);
+        $setString = function (string $col, int $row, string $content) use ($sheet) {
+            $sheet->setCellValueExplicit($col . $row, $content, DataType::TYPE_STRING);
         };
 
         // write the segments into the excel
         $row = 2; //row 1 = headlines
         foreach ($segments as $segment) {
-            $col = 1;
+            $col = 'A';
             // First column: Segment number → as implemented
-            $sheet->setCellValueByColumnAndRow($col++, $row, $segment->getSegmentNrInTask());
+            $sheet->setCellValue(($col++) . $row, $segment->getSegmentNrInTask());
 
-            // Second column: Language Resource resource_id  used for pre-translation (editor_Services_Deepl_1, editor_Services_t5memory_1, etc.)
+            // Second column: Language Resource resource_id
+            //   used for pre-translation (editor_Services_Deepl_1, editor_Services_t5memory_1, etc.)
             // Third column: Language Resource name (name given by the PM, when creating the language resource)
             $uuid = $segment->meta()->getPreTransLangResUuid();
             if (is_null($uuid)) {
@@ -177,16 +199,19 @@ class editor_Models_Export_TaskHistoryExcel
             $row++;
         }
         // .. then send the excel
-        $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excel);
+        $writer = new Xlsx($this->excel);
         $writer->save($fileName);
     }
 
     protected function getTargetsByStep(editor_Models_Segment $segment): array
     {
-        $history = MittagQI\Translate5\Repository\SegmentHistoryRepository::create();
+        $history = SegmentHistoryRepository::create();
         $historyEntries = array_reverse($history->loadBySegmentId((int) $segment->getId()));
-        $historyData = new MittagQI\Translate5\Repository\SegmentHistoryDataRepository();
-        $historyDataEntries = $historyData->loadBySegmentId((int) $segment->getId(), editor_Models_SegmentField::TYPE_TARGET);
+        $historyData = new SegmentHistoryDataRepository();
+        $historyDataEntries = $historyData->loadBySegmentId(
+            (int) $segment->getId(),
+            editor_Models_SegmentField::TYPE_TARGET
+        );
 
         $ids = array_column($historyDataEntries, 'segmentHistoryId');
         $historyDataEntries = array_combine($ids, $historyDataEntries);
@@ -262,8 +287,7 @@ class editor_Models_Export_TaskHistoryExcel
         if (! empty($this->languageResourceCache[$uuid])) {
             return $this->languageResourceCache[$uuid];
         }
-        /** @var editor_Models_LanguageResources_LanguageResource $langRes */
-        $langRes = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $langRes = new editor_Models_LanguageResources_LanguageResource();
 
         try {
             $langRes->loadByUuid($uuid);
@@ -277,8 +301,7 @@ class editor_Models_Export_TaskHistoryExcel
 
     /**
      * export xls from stored task, returns true if file was created
-     * @param string $fileName where the XLS should go to
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws ReflectionException
      */
     public function exportAsFile(string $fileName): bool
     {
@@ -289,7 +312,8 @@ class editor_Models_Export_TaskHistoryExcel
 
     /**
      * provides the excel as download to the browser
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception|ZfExtended_NoAccessException
+     * @throws ReflectionException
+     * @throws ZfExtended_NoAccessException
      */
     public function exportAsDownload(): void
     {

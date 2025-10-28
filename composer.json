@@ -137,7 +137,7 @@
     "comcast/php-legal-licenses": "~1.1",
     "gportela85/datetimefield": "^1.9",
     "fortawesome/font-awesome": "^6.2",
-    "phpoffice/phpspreadsheet": "~1.12",
+    "phpoffice/phpspreadsheet": "^5.1",
     "querypath/querypath": "dev-master",
     "google/cloud-translate": "~1.7",
     "dream-group/horde-text-diff": "dev-main",
@@ -214,6 +214,7 @@
     "phpstan/phpstan": "^1.10",
     "symplify/easy-coding-standard": "^12.1",
     "doctrine/sql-formatter": "^1.4",
-    "testomatio/reporter": "^1.0"
+    "testomatio/reporter": "^1.0",
+    "testomatio/list-tests": "^0.2.5"
   }
 }

@@ -63,7 +63,7 @@ END LICENSE AND COPYRIGHT
  * @method void setSourceWordCount(int $count)
  * @method string getSourceCharacterCount()
  * @method void setSourceCharacterCount(int $count)
- * @method string getPreTransLangResUuid()
+ * @method null|string getPreTransLangResUuid()
  * @method void setPreTransLangResUuid(string $uuid)
  * @method string getMrkMid()
  * @method void setMrkMid(string $mrkMid)
