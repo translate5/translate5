@@ -19214,47 +19214,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method ZfExtended_Models_Entity_ExcelExport\\:\\:getFieldType\\(\\) should return string but return statement is missing\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @var for variable \\$cell contains unknown class PHPExcel_Cell\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property ZfExtended_Models_Entity_ExcelExport\\:\\:\\$callbacks \\(stdClass\\) does not accept default value of type array\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property ZfExtended_Models_Entity_ExcelExport\\:\\:\\$fieldTypes \\(stdClass\\) does not accept default value of type false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property ZfExtended_Models_Entity_ExcelExport\\:\\:\\$hiddenFields \\(stdClass\\) does not accept default value of type false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property ZfExtended_Models_Entity_ExcelExport\\:\\:\\$labels \\(stdClass\\) does not accept default value of type false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property ZfExtended_Models_Entity_ExcelExport\\:\\:\\$properties \\(stdClass\\) does not accept default value of type false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property ZfExtended_Models_Entity_ExcelExport\\:\\:\\$spreadsheet \\(PhpOffice\\\\PhpSpreadsheet\\\\Spreadsheet\\) does not accept default value of type false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Static method PhpOffice\\\\PhpSpreadsheet\\\\Shared\\\\Date\\:\\:PHPToExcel\\(\\) invoked with 2 parameters, 1 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/Entity/ExcelExport.php',
 ];

@@ -229,11 +229,13 @@ class editor_Workflow_Manager
         return self::$workflowTaskCache[$taskGuid];
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     public function getActive(string $taskGuid)
     {
         if (empty(self::$workflowTaskCache[$taskGuid])) {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
+            $task = new editor_Models_Task();
             $task->loadByTaskGuid($taskGuid);
 
             return $this->getActiveByTask($task);

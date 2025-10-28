@@ -26,60 +26,69 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Task\Export;
+
+use DateTime;
+use editor_Models_KPI;
+use editor_Models_Workflow_Step;
+use editor_Workflow_Exception;
+use Exception;
+use MittagQI\Translate5\Task\Excel\Metadata as ExcelMetadata;
+use MittagQI\Translate5\Task\Excel\MetadataException;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use ReflectionException;
+use Zend_Exception;
+use Zend_Registry;
+use ZfExtended_Factory;
+use ZfExtended_Logger;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Filter_ExtJs6;
+use ZfExtended_Models_User;
+use ZfExtended_Zendoverwrites_Translate;
 
 /**
  * Export given tasks, their filtering and their key performance indicators (KPI) as an Excel-file.
  * This class should not directly interact with the PHPSpreadsheet, this is done via editor_Models_Task_Excel_Metadata.
  * TODO: Achieve this completely by refactoring export(), exportAsDownload() and exportAsFile().
  */
-class editor_Models_Task_Export_Metadata
+class Metadata
 {
-    /**
-     * @var editor_Models_Task_Excel_Metadata
-     */
-    protected $excelMetadata;
+    protected ExcelMetadata $excelMetadata;
 
     /**
      * Tasks as currently filtered by the user.
-     * @var array
      */
-    protected $tasks;
+    protected array $tasks;
 
     /**
      * Filters currently applied by the user.
-     * @var array
      */
-    protected $filters;
+    protected array $filters;
 
     /**
      * Visible columns of the task-grid (order and names).
-     * @var array
      */
-    protected $columns;
+    protected array $columns;
 
     /**
      * Key Performance Indicators (KPI) for the current tasks.
-     * @var array
      */
-    protected $kpiStatistics;
+    protected array $kpiStatistics;
 
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    protected $translate;
+    protected ZfExtended_Zendoverwrites_Translate $translate;
 
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $log;
+    protected ZfExtended_Logger $log;
 
     /***
      * Kpi locale string
      * @var array
      */
-    protected $kpiTypeLocales = [];
+    protected array $kpiTypeLocales = [];
 
+    /**
+     * @throws Zend_Exception
+     */
     public function __construct()
     {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -96,20 +105,24 @@ class editor_Models_Task_Export_Metadata
             $this->kpiTypeLocales[$key] = $type . ' ' . $this->translate->_($workflowStepTypeName);
         }
 
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_START] = $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_START] = $this->translate->_('Ø Nachbearbeitungszeit vor Beginn des Workflows');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION] = $this->translate->_('Ø Nachbearbeitungszeit innerhalb eines Workflowschritts');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS] = $this->translate->_('Ø Levenshtein-Abstand innerhalb eines Workflowschritts');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_TOTAL] = $this->translate->_('Ø Nachbearbeitungszeit ab Beginn des Workflows');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL] = $this->translate->_('Ø Levenshtein-Abstand ab Beginn des Workflows');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_END] = $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');
-        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_END] = $this->translate->_('Ø Nachbearbeitungszeit nach Ende des Workflows');
+        foreach ([
+            editor_Models_KPI::KPI_LEVENSHTEIN_START => 'Ø Levenshtein-Distanz vor Beginn des Workflows',
+            editor_Models_KPI::KPI_DURATION_START => 'Ø Nachbearbeitungszeit vor Beginn des Workflows',
+            editor_Models_KPI::KPI_DURATION => 'Ø Nachbearbeitungszeit innerhalb eines Workflowschritts',
+            editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS => 'Ø Levenshtein-Abstand innerhalb eines Workflowschritts',
+            editor_Models_KPI::KPI_DURATION_TOTAL => 'Ø Nachbearbeitungszeit ab Beginn des Workflows',
+            editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL => 'Ø Levenshtein-Abstand ab Beginn des Workflows',
+            editor_Models_KPI::KPI_LEVENSHTEIN_END => 'Ø Levenshtein-Distanz nach Ende des Workflows',
+            editor_Models_KPI::KPI_DURATION_END => 'Ø Nachbearbeitungszeit nach Ende des Workflows',
+        ] as $key => $text) {
+            $this->kpiTypeLocales[$key] = $this->translate->_($text);
+        }
     }
 
     /**
      * Set tasks.
      */
-    public function setTasks(array $rows)
+    public function setTasks(array $rows): void
     {
         $this->tasks = $rows;
     }
@@ -117,7 +130,7 @@ class editor_Models_Task_Export_Metadata
     /**
      * Set the filters that the user applied in the task overview.
      */
-    public function setFilters(array $filters)
+    public function setFilters(array $filters): void
     {
         $this->filters = $filters;
     }
@@ -125,7 +138,7 @@ class editor_Models_Task_Export_Metadata
     /**
      * Set the columns that are currently visible in the task overview.
      */
-    public function setColumns(array $columns)
+    public function setColumns(array $columns): void
     {
         $this->columns = $columns;
     }
@@ -133,29 +146,29 @@ class editor_Models_Task_Export_Metadata
     /**
      * Set KPI-statistics.
      */
-    public function setKpiStatistics(array $kpiStatistics)
+    public function setKpiStatistics(array $kpiStatistics): void
     {
         $this->kpiStatistics = $kpiStatistics;
     }
 
     /**
      * Get a KPI-value by the indicator's name.
-     * @return string
      */
-    protected function getKpiValueByName(string $name)
+    protected function getKpiValueByName(string $name): string
     {
         return $this->kpiStatistics[$name];
     }
 
     /**
      * provides the excel as download to the browser
+     * @throws MetadataException
      */
     public function exportAsDownload(): void
     {
         try {
             $this->export('php://output');
         } catch (Exception $e) {
-            throw new editor_Models_Task_Excel_MetadataException('E1170', [], $e);
+            throw new MetadataException('E1170', previous: $e);
         }
         Header::sendDownload(
             $this->getFilenameForDownload(),
@@ -168,21 +181,19 @@ class editor_Models_Task_Export_Metadata
     /**
      * does the export
      * @param string $fileName where the XLS should go to
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Workflow_Exception
+     * @throws Exception
      */
     protected function export(string $fileName): void
     {
-        $this->excelMetadata = ZfExtended_Factory::get('editor_Models_Task_Excel_Metadata');
+        $this->excelMetadata = ZfExtended_Factory::get(ExcelMetadata::class);
         $this->excelMetadata->initExcel($this->columns);
 
         // add data: filters
         $this->excelMetadata->addMetadataHeadline($this->translate->_('Filter'));
-        if (count($this->filters) == 0) {
-            $this->filters[] = (object) [
-                'property' => ' ',
-                'operator' => ' ',
-                'value' => '-',
-            ];
-        }
 
         //validate if filter value is date
         $isDate = function ($value) {
@@ -191,18 +202,18 @@ class editor_Models_Task_Export_Metadata
             }
 
             try {
-                new DateTime($value);
+                (new DateTime($value));
 
                 return true;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 return false;
             }
         };
 
         //convert the userName filter value(the initial value is guid)
         $convertUserName = function ($filter) {
-            if (! isset($filter->value) || empty($filter->value)) {
-                return false;
+            if (empty($filter->value)) {
+                return;
             }
 
             $model = ZfExtended_Factory::get('ZfExtended_Models_User');
@@ -212,13 +223,12 @@ class editor_Models_Task_Export_Metadata
                 try {
                     $model->loadByGuid($single);
                     $single = $model->getUserName();
-                } catch (Exception $e) {
+                } catch (Exception) {
                     //catch notfound, this should not happen
                 }
             }
         };
-        $filter = ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
-        /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
+        $filter = ZfExtended_Factory::get(ZfExtended_Models_Filter_ExtJs6::class);
         $operatorTranslated = $filter->getTranslatedOperators();
         $workflowStepTypes = null;
         foreach ($this->filters as $filter) {
@@ -236,7 +246,20 @@ class editor_Models_Task_Export_Metadata
                 $filter->value = $date->format('Y-m-d');
             }
 
-            $this->excelMetadata->addFilter($filter);
+            $this->excelMetadata->addFilter(
+                $filter->property,
+                $filter->operator,
+                is_array($filter->value) ? implode(', ', $filter->value) : $filter->value,
+            );
+        }
+
+        //add empty filter entry
+        if (count($this->filters) === 0) {
+            $this->excelMetadata->addFilter(
+                '',
+                '',
+                '-',
+            );
         }
 
         // add data: KPI
@@ -267,7 +290,8 @@ class editor_Models_Task_Export_Metadata
             $this->excelMetadata->addKPI($this->kpiTypeLocales[$key] . ': ' . $this->kpiStatistics[$key]);
         }
 
-        $this->excelMetadata->addKPI($this->kpiStatistics['excelExportUsage'] . ' ' . $this->translate->_('Excel-Export Nutzung'));
+        $this->excelMetadata->addKPI($this->kpiStatistics['excelExportUsage']
+            . ' ' . $this->translate->_('Excel-Export Nutzung'));
 
         // add data: tasks
         foreach ($this->tasks as $task) {
@@ -279,14 +303,11 @@ class editor_Models_Task_Export_Metadata
         $this->excelMetadata->setColWidth();
 
         // .. then send the excel
-        $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excelMetadata->getSpreadsheet());
+        $writer = new Xlsx($this->excelMetadata->getSpreadsheet());
         $writer->save($fileName);
     }
 
-    /**
-     * @return string
-     */
-    protected function getFilenameForDownload()
+    protected function getFilenameForDownload(): string
     {
         return 'metadataExport_' . date("Y-m-d h:i:sa") . '.xlsx';
     }

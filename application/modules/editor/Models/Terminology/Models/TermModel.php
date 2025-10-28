@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Models\Entity\ExcelExport;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
 /**
  * Term Instance
  *
@@ -1172,11 +1175,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      */
     public function exportProposals(array $rows, string $path = null)
     {
-        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        $excel = ZfExtended_Factory::get(ExcelExport::class);
 
         // set property for export-filename
-        $excel->setProperty('filename', 'Term and term attributes proposals');
+        $excel->setFilename('Term and term attributes proposals');
 
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
@@ -1216,7 +1218,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                     // get highest row index for each column
                     // $highestRow = $worksheet->getHighestRow();
                     for ($row = 1; $row <= $highestRow; $row++) {
-                        $cell = $worksheet->getCellByColumnAndRow($col, $row);
+                        $cell = $worksheet->getCell(Coordinate::stringFromColumnIndex($col) . $row);
                         if (strpos($cell->getValue(), '<changemycolortag>') !== false) {
                             $cell->setValue(str_replace('<changemycolortag>', '', $cell->getValue()));
                             $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor(

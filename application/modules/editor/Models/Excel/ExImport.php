@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -35,7 +38,7 @@ END LICENSE AND COPYRIGHT
  /**
  * General model for Excel ex- and im-ports.
  * Will be used by the models under ../Export/Excel.php respectively ../Import/Excel.php
- * TODO: refactor (= implement with ZfExtended_Models_Entity_ExcelExport)
+ * TODO: refactor (= implement with \MittagQI\ZfExtended\Models\Entity\ExcelExport)
  */
 class editor_Models_Excel_ExImport
 {
@@ -59,7 +62,7 @@ class editor_Models_Excel_ExImport
 
     /**
      * Container to hold the excel-object aka PhpOffice\PhpSpreadsheet\Spreadsheet
-     * @var \PhpOffice\PhpSpreadsheet\Spreadsheet
+     * @var Spreadsheet
      */
     protected $excel = null;
 
@@ -118,7 +121,12 @@ class editor_Models_Excel_ExImport
         $tempExImExcel->taskMailPm = $user->getEmail();
 
         // create a new spreadsheet object
-        $tempExImExcel->excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $tempExImExcel->excel = new Spreadsheet();
+        $stringBinder = new StringValueBinder();
+        //prevent formulas from being used
+        $stringBinder->setFormulaConversion(true);
+
+        $tempExImExcel->excel->setValueBinder($stringBinder);
         $tempExImExcel->initDefaultFormat();
 
         // add two sheets 'review job' and 'meta data'
@@ -156,7 +164,7 @@ class editor_Models_Excel_ExImport
     /**
      * Get the excel as Spreadsheet object
      */
-    public function getExcel(): \PhpOffice\PhpSpreadsheet\Spreadsheet
+    public function getExcel(): Spreadsheet
     {
         // set sheet 'review job' as active sheet
         $this->getSheetJob();

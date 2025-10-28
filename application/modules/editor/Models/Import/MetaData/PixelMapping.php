@@ -122,9 +122,9 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
             $values['taskGuid'] = $taskGuid;
             $values['fileId'] = null;
             $oneColWasEmpty = false;
-            $col = 1;
+            $col = 'A';
             foreach ($this->colsNamesAndOrder as $colName) {
-                $values[$colName] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $values[$colName] = $worksheet->getCell($col . $row)->getValue();
                 $oneColWasEmpty = $oneColWasEmpty || (strlen($values[$colName]) == 0);
                 $col++;
             }

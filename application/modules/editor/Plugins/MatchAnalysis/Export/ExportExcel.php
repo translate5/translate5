@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\Models\Entity\ExcelExport;
+
 /**
  * Export the match analyse result into Excel
  */
@@ -58,13 +60,12 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
 
         $data = $this->prepareDataArray($rows);
 
-        $spreadsheet = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        /* @var $spreadsheet ZfExtended_Models_Entity_ExcelExport */
+        $spreadsheet = ZfExtended_Factory::get(ExcelExport::class);
 
         $spreadsheet->setPreCalculateFormulas(true);
 
         // set property for export-filename
-        $spreadsheet->setProperty('filename', $filename);
+        $spreadsheet->setFilename($filename);
 
         $this->setLabels($spreadsheet);
 
@@ -103,9 +104,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
         });
     }
 
-    /**
-     * @throws Zend_Exception
-     */
     protected function prepareDataArray(array $rows): array
     {
         //add to all groups 'Group' suffix, php excel does not handle integer keys
@@ -139,7 +137,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
     /**
      * @throws Zend_Exception
      */
-    protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet): void
+    protected function setLabels(ExcelExport $spreadsheet): void
     {
         $spreadsheet->setLabel('resourceName', $this->translate->_("Name"));
 
@@ -169,9 +167,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
         $spreadsheet->setLabel('internalFuzzy', $this->translate->_("Interner Fuzzy aktiv"));
     }
 
-    /**
-     * @throws Zend_Exception
-     */
     private function getSingleElementRangeLabel(int $match): string
     {
         return match ($match) {

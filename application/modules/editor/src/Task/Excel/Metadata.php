@@ -25,15 +25,33 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
+namespace MittagQI\Translate5\Task\Excel;
+
+use editor_Models_Task;
+use editor_Workflow_Default;
+use editor_Workflow_Exception;
+use editor_Workflow_Manager;
+use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Task\CustomFields\Field;
+use MittagQI\ZfExtended\Models\Entity\ExcelExport;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use ReflectionException;
+use ZfExtended_Authentication;
 use ZfExtended_Factory as Factory;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Zendoverwrites_Translate;
 
 /**
  * General model for Excel Metadata (= task overview and statistics).
- * Handles all interactions with the PHPSpreadsheet (via ZfExtended_Models_Entity_ExcelExport).
+ * Handles all interactions with the PHPSpreadsheet (via \MittagQI\ZfExtended\Models\Entity\ExcelExport).
  */
 
-class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelExport
+class Metadata
 {
     /**
      * general max width for all cols in the Excel.
@@ -41,74 +59,70 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      */
     public const COL_MAX_WIDTH = 40; // just test what looks best
 
-    /**
-     * @var ZfExtended_Models_Entity_ExcelExport
-     */
-    protected $excelExport;
+    protected ExcelExport $excelExport;
 
     /**
      * The name of the sheet that contains the 'task overview' data (aka the tasks)
-     * @var string
      */
-    protected $sheetNameTaskOverview;
+    protected string $sheetNameTaskOverview;
 
     /**
      * The name of the sheet that contains the 'meta data' (aka filtering and KPI-statistics)
-     * @var string
      */
-    protected $sheetNameMetadata;
+    protected string $sheetNameMetadata;
 
     /**
      * the number of the row of the next task
-     * @var integer
      */
-    protected $taskRow = 2;
+    protected int $taskRow = 2;
 
     /**
      * columns to show for the tasks
-     * @var array
      */
-    protected $taskColumns = [];
+    protected array $taskColumns = [];
 
     /**
      * Info about task custom columns
-     *
-     * @var array
      */
-    protected $taskCustomColumns = [];
+    protected array $taskCustomColumns = [];
 
     /**
      * the number of the row in the metadata-sheet
-     * @var integer
      */
-    protected $metadataRow = 1;
+    protected int $metadataRow = 1;
 
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    protected $translate;
+    protected ZfExtended_Zendoverwrites_Translate $translate;
 
-    private string $locale = 'en';
+    private string $locale;
+
+    private editor_Workflow_Manager $workflowManager;
+
+    private LanguageRepository $languageRepository;
+
+    private CustomerRepository $customerRepository;
 
     /**
      * Create a new, empty excel
-     * @return editor_Models_Task_Excel_Metadata
      */
     public function __construct()
     {
-        $this->excelExport = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        $this->excelExport = new ExcelExport();
         $this->excelExport->initDefaultFormat();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->sheetNameTaskOverview = $this->translate->_('Aufgaben');
         $this->sheetNameMetadata = $this->translate->_('Meta-Daten');
         $this->locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
+        $this->workflowManager = new editor_Workflow_Manager();
+        $this->languageRepository = LanguageRepository::create();
+        $this->customerRepository = CustomerRepository::create();
     }
 
     /**
      * Init the Excel-file for our purpose.
-     * @param array $columns
+     * @throws Exception
+     * @throws ReflectionException
      */
-    public function initExcel($columns)
+    public function initExcel(array $columns): void
     {
         $this->taskColumns = $columns;
 
@@ -126,8 +140,10 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
     /**
      * Init the sheet 'task overview'.
+     * @throws ReflectionException
+     * @throws Exception
      */
-    protected function initSheetTaskOverview()
+    protected function initSheetTaskOverview(): void
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameTaskOverview);
 
@@ -162,10 +178,9 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
         // write fieldnames in header, set their font to bold, set their width to auto
         $sheetCol = 'A';
-        $taskModel = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $taskModel editor_Models_Task */
+        $taskModel = new editor_Models_Task();
         $taskGridTextCols = $taskModel::getTaskGridTextCols();
-        foreach ($this->taskColumns as $key => $colName) {
+        foreach ($this->taskColumns as $colName) {
             // Not all column-names in the taskGrid have a translation.
             if (array_key_exists($colName, $taskGridTextCols)) {
                 $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
@@ -183,8 +198,9 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
     /**
      * init the sheet 'meta data'
+     * @throws Exception
      */
-    protected function initSheetMeta()
+    protected function initSheetMeta(): void
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
 
@@ -201,13 +217,14 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
     /**
      * Add a task to the Excel. The result should look exactly as in the taskGrid.
-     * @param array $task
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Workflow_Exception
      */
-    public function addTask($task)
+    public function addTask(array $task): void
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameTaskOverview);
         $sheetCol = 'A';
-        foreach ($this->taskColumns as $key => $colName) {
+        foreach ($this->taskColumns as $colName) {
             if (! array_key_exists($colName, $task)) {
                 // eg taskassoc is not always set for every task
                 $sheetCol++;
@@ -216,53 +233,31 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
             }
             switch ($colName) {
                 case 'customerId':
-                    $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
-                    /* @var $customer editor_Models_Customer_Customer */
-                    $customer->load($task['customerId']);
-                    $value = $customer->getName();
+                    $value = $this->customerRepository->get($task['customerId'] ?? 0)->getName();
 
                     break;
                 case 'orderdate':
                 case 'enddate':
-                    $value = \PhpOffice\PhpSpreadsheet\Shared\Date::stringToExcel($task[$colName]);
-
-                    $sheet->getStyle($sheetCol . $this->taskRow)
-                        ->getNumberFormat()
-                        ->setFormatCode(
-                            \PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDD
-                        );
+                    $value = Date::stringToExcel($task[$colName] ?? '');
+                    if ($value === false) {
+                        $value = null;
+                    } else {
+                        $sheet->getStyle($sheetCol . $this->taskRow)
+                            ->getNumberFormat()
+                            ->setFormatCode(
+                                NumberFormat::FORMAT_DATE_YYYYMMDD
+                            );
+                    }
 
                     break;
                 case 'relaisLang':
                 case 'sourceLang':
                 case 'targetLang':
-                    if ($task[$colName] == 0) {
-                        // relaisLang might not be set = ok
-                        $value = '';
-                    } else {
-                        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-
-                        /* @var $languages editor_Models_Languages */
-                        try {
-                            $languages->load($task[$colName]);
-                            $value = $languages->getLangName() . ' (' . $languages->getRfc5646() . ')';
-                        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                            $value = '- notfound -';
-                        }
-                    }
+                    $value = $this->getLanguage((int) ($task[$colName] ?? 0));
 
                     break;
                 case 'state':
-                    try {
-                        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
-                    } catch (editor_Workflow_Exception $e) {
-                        //normally that means that the workflow was not found, so we just use the default one
-                        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->get('default');
-                    }
-                    /* @var $workflow editor_Workflow_Default */
-                    $states = $workflow->getStates();
-                    $labels = $workflow->getLabels(true);
-                    $value = (array_search($task['state'], $states) !== false) ? $labels[array_search($task['state'], $states)] : $task['state'];
+                    $value = $this->getTaskState($task);
 
                     break;
                 case 'workflow':
@@ -270,19 +265,15 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
                     break;
                 case 'taskassocs':
-                    $allTaskassocs = $task['taskassocs'];
-                    $values = [];
-                    foreach ($allTaskassocs as $assoc) {
-                        $values[] = $assoc['name'] . ' (' . $assoc['serviceName'] . ')';
-                    }
-                    $value = count($allTaskassocs) . ': ' . implode(', ', $values);
+                    $value = $this->getTaskAssocs($task['taskassocs']);
 
                     break;
                 default:
                     /* customField1 value example:
                     Array ( [en] => first value dropdown
                             [de] => erster Wert Dropdown ) */
-                    $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]][$this->locale] ?? $task[$colName];
+                    $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]][$this->locale]
+                        ?? $task[$colName];
 
                     break;
             }
@@ -296,7 +287,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     /**
      * Add a headline to the metadata-sheet.
      */
-    public function addMetadataHeadline($headline)
+    public function addMetadataHeadline($headline): void
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         $sheet->setCellValue('A' . $this->metadataRow, $headline);
@@ -306,21 +297,18 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
 
     /**
      * Add filter-setting to the Excel.
-     * @param string $filter
      */
-    public function addFilter($filter)
+    public function addFilter(string $property, string $operator, string $value): void
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
-        $value = is_array($filter->value) ? implode(', ', $filter->value) : $filter->value;
-        $sheet->setCellValue('A' . $this->metadataRow, $filter->property . ' ' . $filter->operator . ' ' . $value);
+        $sheet->setCellValue('A' . $this->metadataRow, $property . ' ' . $operator . ' ' . $value);
         $this->metadataRow++;
     }
 
     /**
      * Add a KPI-item to the Excel.
-     * @param string $kpiValue
      */
-    public function addKPI($kpiValue)
+    public function addKPI(string $kpiValue): void
     {
         $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         $sheet->setCellValue('A' . $this->metadataRow, $kpiValue);
@@ -330,7 +318,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     /**
      * Get the excel as Spreadsheet object
      */
-    public function getSpreadsheet(): \PhpOffice\PhpSpreadsheet\Spreadsheet
+    public function getSpreadsheet(): Spreadsheet
     {
         return $this->excelExport->getSpreadsheet();
     }
@@ -338,7 +326,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     /**
      * Set autowidth with maximum for all columns in the Excel.
      */
-    public function setColWidth()
+    public function setColWidth(): void
     {
         // https://github.com/PHPOffice/PhpSpreadsheet/issues/275
         foreach ($this->excelExport->getAllWorksheets() as $sheet) {
@@ -354,5 +342,53 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                 }
             }
         }
+    }
+
+    private function getTaskAssocs($taskassocs): string
+    {
+        $allTaskassocs = $taskassocs;
+        $values = [];
+        foreach ($allTaskassocs as $assoc) {
+            $values[] = $assoc['name'] . ' (' . $assoc['serviceName'] . ')';
+        }
+
+        return count($allTaskassocs) . ': ' . implode(', ', $values);
+    }
+
+    /**
+     * @throws editor_Workflow_Exception
+     */
+    private function getTaskState(array $task): string
+    {
+        try {
+            $workflow = $this->workflowManager->getActive($task['taskGuid']);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            $workflow = $this->workflowManager->get('default');
+        }
+        /* @var $workflow editor_Workflow_Default */
+        $states = $workflow->getStates();
+        $labels = $workflow->getLabels();
+
+        return (in_array($task['state'], $states)) ? $labels[array_search(
+            $task['state'],
+            $states
+        )] : $task['state'];
+    }
+
+    private function getLanguage(int $languageId): string
+    {
+        if ($languageId === 0) {
+            // relaisLang might not be set = ok
+            $value = '';
+        } else {
+            try {
+                $language = $this->languageRepository->get($languageId);
+                $value = $language->getLangName() . ' (' . $language->getRfc5646() . ')';
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                $value = '- notfound -';
+            }
+        }
+
+        return $value;
     }
 }
