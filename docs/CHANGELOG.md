@@ -34,6 +34,54 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.31.1] - 2025-10-28
+
+### Important Notes:
+#### [TRANSLATE-5086](https://jira.translate5.net/browse/TRANSLATE-5086)
+Default value for runtimeOptions.plugins.DeepL.api.parametars.tagHandling changes from none to XML.
+
+#### [TRANSLATE-4993](https://jira.translate5.net/browse/TRANSLATE-4993)
+Visual: officeconverter container needs to be pulled
+ 
+
+
+### Changed
+**[TRANSLATE-5016](https://jira.translate5.net/browse/TRANSLATE-5016): t5memory - Redo reorganise call** <br>
+7.31.1: Fix reorganize worker
+7.30.0: T5Memory: replaced reorganize with export/import to avoid potential data losses
+
+**[TRANSLATE-4877](https://jira.translate5.net/browse/TRANSLATE-4877): t5memory - Make re-try calls on update of segments in t5memory** <br>
+7.31.1: Fix reimport segments timestamp
+7.30.0: Updates of segments in t5memory will re-try calls now in case of service down time
+
+
+### Bugfixes
+**[TRANSLATE-5086](https://jira.translate5.net/browse/TRANSLATE-5086): LanguageResources - Change default config value for deepl taghandling to xml** <br>
+Default value for runtimeOptions.plugins.DeepL.api.parametars.tagHandling changes from none to XML since this gives better results.
+
+**[TRANSLATE-5071](https://jira.translate5.net/browse/TRANSLATE-5071): Client management - Cannot save the default user assignment without a deadline** <br>
+User association can be saved now when deadline is empty in Clients/User assignment defaults
+
+**[TRANSLATE-5059](https://jira.translate5.net/browse/TRANSLATE-5059): Export - Prevent formulas to be used in different excel exports** <br>
+Updated used spreadsheet generation libraries, ensured that now malicious formulas could be generated
+
+**[TRANSLATE-5051](https://jira.translate5.net/browse/TRANSLATE-5051): Editor general - Repetition filtering and exclude first repetition not working as expected** <br>
+The segment repetition filters were misleading the user about what is in the current filter what not.
+
+**[TRANSLATE-5039](https://jira.translate5.net/browse/TRANSLATE-5039): TermTagger integration - TermTagging TBX export problem** <br>
+FIXED: problem with exporting terms under wrong term entries
+
+**[TRANSLATE-5017](https://jira.translate5.net/browse/TRANSLATE-5017): Auto-QA - must be zero quality and allow tag errors faulty** <br>
+Auto-QA: user is allowed to finish the task if tag errors are absent if they are configured to be
+
+**[TRANSLATE-4993](https://jira.translate5.net/browse/TRANSLATE-4993): VisualReview / VisualTranslation - Libreoffice conversion process timeouts on complex documents in officeconverter container** <br>
+Increased Libreoffice conversion process' timeout to handle complex documents by officeconverter
+
+**[TRANSLATE-4290](https://jira.translate5.net/browse/TRANSLATE-4290): Editor general - Make concordance search in editor and TM Maintenance NOT scroll down** <br>
+FIXED: concordance and TMMaintenance search results are not auto-scrolled down anymore to prevent user distraction
+
+
 ## [7.31.0] - 2025-10-22
 
 ### Important Notes:
