@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -43,6 +42,9 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
     dataIndex: 'isRepeated',
     text: '#UT#Mit Wiederholungen',
     hidden: true,
+    requires: [
+        'Editor.view.segments.filters.IsRepeated'
+    ],
     bind: {
         disabled: '{!taskHasDefaultLayout}',
         stateful: '{taskHasDefaultLayout}'
@@ -53,7 +55,7 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
             none: '#UT#Segmente ohne Wiederholungen',
             source: '#UT#Segmente mit Wiederholungen nur in der Quellsprache',
             target: '#UT#Segmente mit Wiederholungen nur in der Zielsprache',
-            both: '#UT#Segmente mit Wiederholungen in der Quell- und Zielsprache',
+            includeFirst: '#UT#Einschließlich erster Vorkommnisse'
         },
         col: {
             none: '#UT#-',
@@ -76,7 +78,7 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
                     cls: 'isRepeated'
                 },
                 filter: {
-                    type: 'list',
+                    type: 'isrepeatedlist',
                     labelField: 'label',
                     phpMode: false,
                     options: [{
@@ -89,10 +91,8 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
                         id: 2,
                         label: me.strings.filter.target
                     },{
-                        id: 3,
-                        label: me.strings.filter.both
-                    },{
                         id: 4,
+                        userCls: 'isRepeated-include-first',
                         label: me.strings.filter.includeFirst
                     }]
                 }

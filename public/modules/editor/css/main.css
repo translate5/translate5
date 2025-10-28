@@ -2308,3 +2308,6 @@ ins.tmMatchGridResultTooltip {
 .x-grid-row-editor div.internal-tag.number {
     user-select: text;
 }
+.x-menu-item.isRepeated-include-first {
+    border-top: 1px solid gray;
+}

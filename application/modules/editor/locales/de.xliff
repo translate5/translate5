@@ -8442,13 +8442,13 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Bosnisch (Latein Bosnien und Herzegowina)</source>
                 <target>Bosnisch (Latein Bosnien und Herzegowina)</target>
             </trans-unit>
-            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgZWluc2NobGllw59saWNoIGRlciBlcnN0ZW4gU2VnbWVudGU='>
-                <source>Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente</source>
-                <target>Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente</target>
+            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBRdWVsbC1XaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgZWluc2NobGllw59saWNoIGVyc3RlciBWb3Jrb21tbmlzc2U='>
+                <source>Nur Segmente mit Quell-Wiederholungen anzeigen, einschließlich erster Vorkommnisse</source>
+                <target>Nur Segmente mit Quell-Wiederholungen anzeigen, einschließlich erster Vorkommnisse</target>
             </trans-unit>
-            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgYXVzZ2Vub21tZW4gZGllIGVyc3RlbiBTZWdtZW50ZQ=='>
-                <source>Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente</source>
-                <target>Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente</target>
+            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBRdWVsbC1XaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgYXVzZ2Vub21tZW4gZXJzdGUgVm9ya29tbW5pc3Nl'>
+                <source>Nur Segmente mit Quell-Wiederholungen anzeigen, ausgenommen erste Vorkommnisse</source>
+                <target>Nur Segmente mit Quell-Wiederholungen anzeigen, ausgenommen erste Vorkommnisse</target>
             </trans-unit>
             <trans-unit id='RsO8Z2VuIFNpZSB6dWVyc3QgZGVuIEFic2Nobml0dCBlaW4sIGRlciBpbSBGb2xnZW5kZW4gd2llZGVyaG9sdCB3aXJk'>
                 <source>Fügen Sie zuerst den Abschnitt ein, der im Folgenden wiederholt wird</source>
@@ -8542,9 +8542,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Segmente mit Wiederholungen nur in der Zielsprache</source>
                 <target>Segmente mit Wiederholungen nur in der Zielsprache</target>
             </trans-unit>
-            <trans-unit id='U2VnbWVudGUgbWl0IFdpZWRlcmhvbHVuZ2VuIGluIGRlciBRdWVsbC0gdW5kIFppZWxzcHJhY2hl'>
-                <source>Segmente mit Wiederholungen in der Quell- und Zielsprache</source>
-                <target>Segmente mit Wiederholungen in der Quell- und Zielsprache</target>
+            <trans-unit id='RWluc2NobGllw59saWNoIGVyc3RlciBWb3Jrb21tbmlzc2U='>
+                <source>Einschließlich erster Vorkommnisse</source>
+                <target>Einschließlich erster Vorkommnisse</target>
             </trans-unit>
             <trans-unit id='LQ=='>
                 <source>-</source>

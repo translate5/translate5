@@ -52,6 +52,27 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
     }
 
     /**
+     * converts the new ExtJS 5 filter format to the old ExtJS 4 format
+     *
+     * @param string $todecode
+     * @return array
+     */
+    protected function decode($todecode)
+    {
+        $filters = parent::decode($todecode);
+
+        foreach ($filters as &$filter) {
+            if ($filter->field === 'isRepeated') {
+                if (array_intersect([1, 2], $filter->value)) {
+                    $filter->value[] = 3;
+                }
+            }
+        }
+
+        return $filters;
+    }
+
+    /**
      * sets the quality filter. This is a "OR" filter that is handled seperately from the main filtering
      */
     public function setQualityFilter(editor_Models_Quality_RequestState $requestState)
