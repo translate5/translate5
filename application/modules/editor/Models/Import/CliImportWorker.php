@@ -85,7 +85,6 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         $data = [
             'pmGuid' => $project->getPmGuid(),
             'pmName' => $project->getPmName(),
-            'targetLang' => $parameters['targets'],
         ];
         // bconf-id is optional
         if (array_key_exists('bconfId', $parameters)) {
@@ -99,7 +98,13 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         );
 
         $dataprovider = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
-        $importService->importProject($project, $dataprovider->createFromPath($parameters['path']), $data, $pm);
+        $importService->addTaskMetaData($data);
+        $importService->importProject(
+            $project,
+            $dataprovider->createFromPath($parameters['path']),
+            $parameters['targets'],
+            $pm
+        );
         $importService->startWorkers($project);
 
         return true;

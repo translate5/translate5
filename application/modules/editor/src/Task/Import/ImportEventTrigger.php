@@ -56,6 +56,7 @@ use editor_Models_Import_Configuration;
 use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
+use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
 
@@ -128,12 +129,12 @@ class ImportEventTrigger
     public function triggerAfterProjectUploadPreparation(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        array $data
+        TaskMetaImmutableDTO $projectMeta,
     ): void {
         $this->triggerEvent(self::AFTER_PROJECT_UPLOAD_PREPARATION, [
             'task' => $task,
+            'metaDTO' => $projectMeta,
             'dataProvider' => $dataProvider,
-            'requestData' => $data,
         ]);
     }
 
@@ -163,12 +164,12 @@ class ImportEventTrigger
     public function triggerAfterUploadPreparation(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        array $data
+        TaskMetaImmutableDTO $taskMeta,
     ): void {
         $this->triggerEvent(self::AFTER_UPLOAD_PREPARATION, [
             'task' => $task,
             'dataProvider' => $dataProvider,
-            'requestData' => $data,
+            'metaDTO' => $taskMeta,
         ]);
     }
 

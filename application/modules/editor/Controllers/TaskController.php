@@ -1016,17 +1016,13 @@ class editor_TaskController extends ZfExtended_RestController
         $this->entity = $cloner->clone($this->entity);
 
         if ($this->validate()) {
-            foreach ($metaData as $field => $value) {
-                $this->data[$field] = $value;
-            }
-            // handle the cloned meta
-            $this->importService->prepareMeta($this->entity, $this->data);
+            //clone the task meta data from old task for the new one
+            $this->importService->addTaskMetaData($metaData);
 
             try {
                 $this->importService->prepareConfigsDefaultsCheckUploadsQueueWorkers(
                     $this->entity,
                     $dataProvider,
-                    $this->data,
                     ZfExtended_Authentication::getInstance()->getUser()
                 );
             } catch (ZfExtended_ErrorCodeException $e) {

@@ -47,6 +47,7 @@ $this->headLink()->prependStylesheet(APPLICATION_RUNDIR . '/modules/editor/css/p
 
 $jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui';
 $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
+$this->headLink()->prependStylesheet('/js/select2/dist/css/select2.min.css'.$version);
 ?>
 <!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -59,6 +60,7 @@ $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);
 <?php echo $this->headScript() ?>
         <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js<?php echo $version; ?>"></script>
         <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js<?php echo $version; ?>"></script>
+        <script src="/js/select2/dist/js/select2.min.js<?php echo $version; ?>"></script>
     </head>
     <body class="instantTranslate">
         <?php

@@ -31,30 +31,18 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Meta;
 
 /**
- * A container to ex-change or change fields for a meta-entity
+ * A readonly container for task meta-data - to be used in the import process after meta-initialization
+ * structure must be manually synchronized with TaskMetaDTO
  */
-class TaskMetaDTO
+class TaskMetaImmutableDTO
 {
     public function __construct(
         public readonly string $taskGuid,
-        public ?string $mappingType = null,
-        public ?int $bconfId = null,
-        public ?string $bconfInZip = null,
-        public ?int $pricingPresetId = null,
-        public bool $perTaskExport = false,
-        //synchronize fields manually to TaskMetaImmutableDTO!
+        public readonly ?string $mappingType = null,
+        public readonly ?int $bconfId = null,
+        public readonly ?string $bconfInZip = null,
+        public readonly ?int $pricingPresetId = null,
+        public readonly bool $perTaskExport = false,
     ) {
-    }
-
-    public function getImmutable(): TaskMetaImmutableDTO
-    {
-        return new TaskMetaImmutableDTO(
-            $this->taskGuid,
-            $this->mappingType,
-            $this->bconfId,
-            $this->bconfInZip,
-            $this->pricingPresetId,
-            $this->perTaskExport,
-        );
     }
 }

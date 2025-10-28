@@ -333,7 +333,7 @@ a.warning:hover {
     padding: 10px;
     margin: 0 10px -2px 10px;
     cursor: pointer;
-    border-bottom: 2px solid transparent;;
+    border-bottom: 2px solid transparent;
 }
 
 .sourceSelectorItem .icon {
@@ -348,7 +348,6 @@ a.warning:hover {
 }
 .sourceIsText .sourceSelector .icon-t5_translate_text {background-image: url('../images/icons/t5_translate_text_cyan.svg');}
 .sourceIsFile .sourceSelector .icon-t5_translate_file {background-image: url('../images/icons/t5_translate_file_cyan.svg');}
-
 
 /* --------------- language selectors --------------- */
 
@@ -584,4 +583,24 @@ a.warning:hover {
     color: white;
 }
 
+.message-box {
+    padding: 12px 20px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border-left: 4px solid;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
+.message-box::before {
+    font-size: 20px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.message-warning {
+    background-color: #f5f5f5;
+    border-left-color: #6c757d;
+    color: #4a4a4a;
+}

@@ -282,17 +282,10 @@ class FilesystemProcessor
         $project = $this->projectFactory->createProject($instructions, $customer, $foreignId);
         //$bconfId = $this->fetchBconfId($project, $instructions->project->bconf);
 
-        $data = [
-            'pmGuid' => $project->getPmGuid(),
-            'pmName' => $project->getPmName(),
-            'targetLang' => array_values($instructions->targetLang),
-            'customerId' => $project->getCustomerId(),
-            //'bconfId' => $bconfId,
-        ];
-
+        $targetLanguages = array_values($instructions->targetLang);
         $this->importService->prepareTaskType(
             $project,
-            count($data['targetLang']) > 1,
+            count($targetLanguages) > 1,
             editor_Task_Type_ProjectTask::ID
         );
 
@@ -308,7 +301,7 @@ class FilesystemProcessor
 
             $directoryProvider = new editor_Models_Import_DataProvider_Directory($tempDirPath);
 
-            $this->importService->importProject($project, $directoryProvider, $data, User::loadSystemUser());
+            $this->importService->importProject($project, $directoryProvider, $targetLanguages, User::loadSystemUser());
             if (null !== $instructions->project->deadline) {
                 $this->setDeadlineByProject($project, $instructions->project->deadline);
             }

@@ -53,27 +53,46 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\FileTranslation;
 
+use DateTime;
+use editor_Models_Import_DataProvider_Factory;
 use editor_Models_LanguageResources_CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource;
 use editor_Models_Languages;
 use editor_Models_Task;
 use editor_Models_TaskUsageLog;
+use editor_Plugins_MatchAnalysis_Init;
 use editor_Task_Type;
+use Exception;
+use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeEvent;
 use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationChangeType;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
-use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
-use MittagQI\ZfExtended\ApiRequest;
-use MittagQI\ZfExtended\ApiRequestDTO;
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+use MittagQI\Translate5\Task\Import\ImportService;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use ReflectionException;
+use SplFileInfo;
 use Zend_Acl_Exception;
-use ZfExtended_Acl;
+use Zend_Cache_Exception;
+use Zend_Db_Statement_Exception;
+use Zend_EventManager_Event;
+use Zend_EventManager_StaticEventManager;
+use Zend_Exception;
+use Zend_Http_Client_Exception;
+use Zend_Registry;
 use ZfExtended_Authentication;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
+use ZfExtended_FileUploadException;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Utils;
 
 /**
  * Helper for a translation of the given file with the given language-combination  (= ids as in LEK_languages).
@@ -83,26 +102,33 @@ use ZfExtended_Factory;
  */
 class FileTranslation
 {
-    public static function create(string $loggerDomain = 'editor.filetranslation'): self
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     */
+    public static function create(): self
     {
         return new self(
             new UserRepository(),
-            TaskRepository::create(),
-            $loggerDomain,
             AssociateTaskOperation::create(),
-            LanguageResourceRepository::create()
+            LanguageResourceRepository::create(),
+            CustomerRepository::create(),
+            new ImportService(),
+            ZfExtended_Authentication::getInstance(),
+            Zend_Registry::get('PluginManager')->get('MatchAnalysis'),
+            Zend_EventManager_StaticEventManager::getInstance(),
         );
     }
 
-    /**
-     * @throws ReflectionException
-     */
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly TaskRepository $taskRepository,
-        private readonly string $loggerDomain,
         private readonly AssociateTaskOperation $associateTaskOperation,
         private readonly LanguageResourceRepository $languageResourceRepository,
+        private readonly CustomerRepository $customerRepository,
+        private readonly ImportService $importService,
+        private readonly ZfExtended_Authentication $authentication,
+        private readonly editor_Plugins_MatchAnalysis_Init $matchanalysisPlugin,
+        private readonly Zend_EventManager_StaticEventManager $eventManager,
     ) {
     }
 
@@ -112,96 +138,151 @@ class FileTranslation
      * 1) automatically create a hidden task for the document
      * 2) pre-translate it against the available language resources for the language combination for the customer
      *    in the same way pre-translations work for tasks through the GUI (first termCollections, second TMs, third MTs)
-     *    OR in case $withMtResources is given, use this resource for mt failback. Reason is:
-     *     - saving costs and not query each of one assigned.
-     *     - feature in instant-translate where a user can pick the mt to pre-translate file
-     * 3) When the document is pre-translated, we will offer it for download#
+     *    or, when targetLanguageResourceAssignments is provided, use the explicitly selected resources for each task
+     * 3) When the document is pre-translated, we will offer it for download
      *
      * @throws FileTranslationException
-     * @throws Zend_Acl_Exception
-     * @throws \Zend_Exception
-     * @throws \Zend_Http_Client_Exception
-     * @throws \ZfExtended_Exception
-     * @throws \ZfExtended_FileUploadException
      * @throws ReflectionException
+     * @throws Zend_Acl_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_FileUploadException
      */
     public function importAndTranslate(
-        array $importFile,
+        SplFileInfo $importFile,
         int $sourceLang,
-        int $targetLang,
+        array $targetLang,
+        string $taskName,
         int $customerId,
-        array $withMtResources = [],
+        array $targetLanguageResourceAssignments = [],
     ): editor_Models_Task {
-        $acl = ZfExtended_Acl::getInstance();
-        if (! $acl->isInAllowedRoles(
-            ZfExtended_Authentication::getInstance()->getUserRoles(),
-            editor_Task_Type::ID,
-            FileTranslationType::ID
-        )) {
-            throw new FileTranslationException('E1213', [
-                'msg' => "Initial tasktype for pretranslations does not match acl-rules.",
-            ]);
+        $this->checkRights();
+        // Explicit language resource assignments keyed by target language id. The queue ensures that each task receives the
+        // next configured set of resource ids for its target language (if any).
+        $targetLanguageResourceQueue = empty($targetLanguageResourceAssignments)
+            ? null
+            : new TargetLanguageResourceQueue($targetLanguageResourceAssignments);
+
+        $task = $this->prepareTaskImport($taskName, $sourceLang, $customerId);
+
+        $isSingle = $this->importService->prepareTaskType(
+            $task,
+            count($targetLang) > 1,
+            $task->getTaskType()->id()
+        );
+
+        $dataprovider = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
+
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::IMPORT_WORKER_QUEUED,
+            function (Zend_EventManager_Event $event) use ($targetLanguageResourceQueue) {
+                /** @var editor_Models_Task $task */
+                $task = $event->getParam('task');
+                $assignedLanguageResourceIds = $this->manageAssociation($task, $targetLanguageResourceQueue);
+                // pretranslate the task
+                /*
+                 * (Marc:)
+                 * "Bei der Analyse von Tasks kann man die Mindest-Matchrate für Vorübersetzungen einstellen.
+                 * Default ist 100%. Wenn man dann anhakt, dass MT-Vorübersetzung aktiv ist, wird alles weitere
+                 * was dann noch leer ist von der Maschine vorübersetzt. Das passt für Tasks so und
+                 * genauso sollten wir es auch im InstantTranslate machen: Alles mit 100% oder mehr aus dem TM
+                 * und alles andere durch die Maschine."
+                 */
+                $this->matchanalysisPlugin->queueInternalPretranslation($task, [
+                    'internalFuzzy' => 0,
+                    'pretranslateMatchrate' => 100,
+                    'pretranslateTmAndTerm' => 1,
+                    'pretranslateMt' => 1,
+                    'isTaskImport' => 0,
+                ]);
+
+                // add usage log
+                $this->insertTaskUsageLog($task, $assignedLanguageResourceIds);
+            }
+        );
+        if ($isSingle) {
+            $this->importService->importSingleTask(
+                $task,
+                $dataprovider->createFromPath($importFile->getPathname()),
+                (int) reset($targetLang),
+                $this->authentication->getUser()
+            );
+        } else {
+            $this->importService->importProject(
+                $task,
+                $dataprovider->createFromPath($importFile->getPathname()),
+                $targetLang,
+                $this->authentication->getUser()
+            );
         }
 
-        $task = $this->prepareTaskImport($importFile, $sourceLang, $targetLang, $customerId);
-
-        $assignedLanguageResourceIds = $this->manageAssociation($task, $withMtResources);
-
-        // pretranslate the task
-        /*
-         * (Marc:)
-         * "Bei der Analyse von Tasks kann man die Mindest-Matchrate für Vorübersetzungen einstellen.
-         * Default ist 100%. Wenn man dann anhakt, dass MT-Vorübersetzung aktiv ist, wird alles weitere
-         * was dann noch leer ist von der Maschine vorübersetzt. Das passt für Tasks so und
-         * genauso sollten wir es auch im InstantTranslate machen: Alles mit 100% oder mehr aus dem TM
-         * und alles andere durch die Maschine."
-         */
-        $data = [
-            'internalFuzzy' => 0,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 1,
-            'pretranslateMt' => 1,
-            'isTaskImport' => 0,
-        ];
-
-        $requestData = new ApiRequestDTO(
-            'PUT',
-            'editor/task/' . $task->getId() . '/pretranslation/operation',
-            $data
-        );
-        $requestData->loggerDomain = $this->loggerDomain;
-        ApiRequest::requestApi($requestData);
-
-        // import the task
-        $requestData = new ApiRequestDTO('GET', 'editor/task/' . $task->getId() . '/import');
-        $requestData->loggerDomain = $this->loggerDomain;
-        ApiRequest::requestApi($requestData);
-
-        // add usage log
-        $this->insertTaskUsageLog($task, $assignedLanguageResourceIds);
+        $this->importService->startWorkers($task);
 
         return $task;
     }
 
     /**
-     * Validate and assign the provided language resources to the task. In case no resources are given, the automatic
-     * resources assignment will take place.
      * @throws FileTranslationException
-     * @throws ReflectionException
-     * @throws \Zend_Cache_Exception
-     * @throws \Zend_Exception
      */
-    private function manageAssociation(editor_Models_Task $task, array $withMtResources = []): array
+    private function checkRights(): void
     {
-        if (empty($withMtResources)) {
-            return $this->assignLanguageResources($task);
+        //only instanttranslate file translatations are allowed
+        foreach (FileTranslationTypeChecker::getTranslationTypeTaskIds() as $id) {
+            if ($this->authentication->isUserAllowed(editor_Task_Type::ID, $id)) {
+                return;
+            }
         }
 
-        $assignable = $this->getTaskAssignableResources($task);
+        throw new FileTranslationException('E1213', [
+            'msg' => "Initial tasktype for pretranslations does not match acl-rules.",
+        ]);
+    }
 
-        // Validate that all requested resources are assignable for this task
-        $requested = array_map('intval', $withMtResources);
-        $invalid = array_values(array_diff($requested, $assignable));
+    /**
+     * Validate and assign the provided language resources to the task. In case no resources are given, the automatic
+     * resources assignment will take place.
+     *
+     * @throws FileTranslationException
+     * @throws ReflectionException
+     * @throws Zend_Cache_Exception
+     * @throws Zend_Exception
+     */
+    private function manageAssociation(editor_Models_Task $task, ?TargetLanguageResourceQueue $targetLanguageResourceQueue): array
+    {
+        $explicitResources = $targetLanguageResourceQueue?->consume($task->getTargetLang());
+        if ($explicitResources !== null) {
+            if ($explicitResources === []) {
+                return $this->assignLanguageResources($task);
+            }
+
+            return $this->assignAvailableLanguageResources($task, $explicitResources);
+        }
+
+        return $this->assignLanguageResources($task);
+    }
+
+    private function assignAvailableLanguageResources(editor_Models_Task $task, array $resourceIds): array
+    {
+        $resourceIds = array_values(array_unique(array_filter(
+            array_map('intval', $resourceIds),
+            static fn (int $id): bool => $id > 0
+        )));
+
+        if (empty($resourceIds)) {
+            return [];
+        }
+
+        $assignable = $this->getTaskAssignableResources($task, $resourceIds);
+        $assignable = array_values(array_unique(array_map('intval', $assignable)));
+
+        $invalid = array_values(array_diff($resourceIds, $assignable));
         if (! empty($invalid)) {
             throw new FileTranslationException('E1740', [
                 'msg' => 'File-Translation: Some provided language resources are not assignable for this task.',
@@ -210,13 +291,9 @@ class FileTranslation
         }
 
         $assignedLanguageResourceIds = [];
-
-        foreach ($withMtResources as $withResource) {
-            $this->addLanguageResource(
-                (int) $withResource,
-                $task->getTaskGuid()
-            );
-            $assignedLanguageResourceIds[] = (int) $withResource;
+        foreach ($assignable as $resourceId) {
+            $this->addLanguageResource((int) $resourceId, $task->getTaskGuid());
+            $assignedLanguageResourceIds[] = (int) $resourceId;
         }
 
         return $assignedLanguageResourceIds;
@@ -225,46 +302,51 @@ class FileTranslation
     /**
      * Prepare import for task with the given file.
      * Creates a task-entity for further handling, but does not run the import yet.
-     *
      * @throws FileTranslationException
-     * @throws \MittagQI\Translate5\Task\Exception\InexistentTaskException
-     * @throws \Zend_Exception
-     * @throws \Zend_Http_Client_Exception
-     * @throws \ZfExtended_Exception
-     * @throws \ZfExtended_FileUploadException
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function prepareTaskImport(array $importFile, int $sourceLang, int $targetLang, int $customerId): editor_Models_Task
+    private function prepareTaskImport(string $taskName, int $sourceLang, int $customerId): editor_Models_Task
     {
-        $requestData = new ApiRequestDTO('POST', 'editor/task/');
-        $requestData->loggerDomain = $this->loggerDomain;
-        $requestData->params = [
-            'taskName' => $importFile['name'],
-            'sourceLang' => $sourceLang,
-            'targetLang' => $targetLang,
-            'customerId' => $customerId,
-            'lockLocked' => '1',
-            'orderdate' => date('Y-m-d H:i:s'),
-            'autoStartImport' => '0',
-            //pmGuid is set implicitly since the same session is used
-            'taskType' => FileTranslationType::ID,
-        ];
-        $requestData->files = [
-            'importUpload' => $importFile,
-        ];
-
-        $result = ApiRequest::requestApi($requestData);
-
-        if (empty($result) || empty($result->rows)) {
+        try {
+            $customer = $this->customerRepository->get($customerId);
+        } catch (InexistentCustomerException $e) {
             throw new FileTranslationException('E1211', [
                 'msg' => 'Task for importing file could not be created.',
-            ]);
+            ], $e);
         }
 
-        $task = $this->taskRepository->get((int) $result->rows->id);
+        $config = $customer->getConfig();
+
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
+        $task->createTaskGuidIfNeeded();
+        $task->setImportAppVersion(ZfExtended_Utils::getAppVersion());
+
+        $task->setLockLocked(1);
+        $task->setSourceLang($sourceLang);
+        $task->setTaskName($taskName);
+        $currentUser = $this->authentication->getUser();
+        $task->setPmGuid($currentUser->getUserGuid());
+        $task->setPmName($currentUser->getUsernameLong());
+        $task->setOrderdate((new DateTime())->format('Y-m-d H:i:s'));
+        $task->setUsageMode($config->runtimeOptions->import->initialTaskUsageMode);
+        $task->setWorkflow($config->runtimeOptions->workflow->initialWorkflow);
+        $task->setEdit100PercentMatch((int) ($config->runtimeOptions->import->edit100PercentMatch));
+        $task->setTaskType(FileTranslationType::ID);
+        $task->setCustomerId($customer->getId());
+        $task->setCreatedByUserGuid($currentUser->getUserGuid());
+
+        $task->save();
+        $task->setProjectId($task->getId());
+        $task->save();
+
         if ($task->isErroneous()) {
             // If e.g. the file-type cannot be handled for import, we don't need the rest.
             throw new FileTranslationException('E1211', [
-                'msg' => 'Task for importing file could not be created; check file-format and if Okapi is running if needed.',
+                'msg' => 'Task for importing file could not be created; '
+                    . 'check file-format and if Okapi is running if needed.',
                 'task' => $task,
             ]);
         }
@@ -274,6 +356,9 @@ class FileTranslation
 
     /**
      * Assign LanguageResources to the task that match the language-combination.
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws Zend_Cache_Exception
      */
     public function assignLanguageResources(editor_Models_Task $task): array
     {
@@ -307,10 +392,10 @@ class FileTranslation
     /**
      * Find all assignable resources for a task customer and language combination. Task tms will be ignored
      * @throws ReflectionException
-     * @throws \Zend_Cache_Exception
-     * @throws \Zend_Exception
+     * @throws Zend_Cache_Exception
+     * @throws Zend_Exception
      */
-    private function getTaskAssignableResources(editor_Models_Task $task, array $withMtResources = []): array
+    private function getTaskAssignableResources(editor_Models_Task $task, array $restrictTo = []): array
     {
         $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
         //get source and target language fuzzy
@@ -322,17 +407,17 @@ class FileTranslation
         // we can set the task customer. That is why we use the resource only of this customer.
         $toBeUsed = $langRes->loadByUserCustomerAssocs([], $sourceLangs, $targetLangs, [], [$task->getCustomerId()]);
 
-        return $this->filterAssignableResources($toBeUsed, $withMtResources);
+        return $this->filterAssignableResources($toBeUsed, $restrictTo);
     }
 
     /**
      * Collect(filter) all resources which can be assigned to the file-translation tasks.
-     * If $withMtResources is defined, only this mt resource will be used for file-translation.
+     * If $restrictTo is defined, only those resources will be used for file-translation.
      */
-    private function filterAssignableResources(array $resources, array $withMtResources): array
+    private function filterAssignableResources(array $resources, array $restrictTo): array
     {
-        $hasRestrictions = ! empty($withMtResources);
-        $mtResourcesSet = $hasRestrictions ? array_flip($withMtResources) : [];
+        $hasRestrictions = ! empty($restrictTo);
+        $restrictToSet = $hasRestrictions ? array_flip($restrictTo) : [];
         $assignable = [];
 
         foreach ($resources as $resource) {
@@ -342,7 +427,7 @@ class FileTranslation
 
             $resourceId = (int) $resource['id'];
 
-            if (! $hasRestrictions || isset($mtResourcesSet[$resourceId])) {
+            if (! $hasRestrictions || isset($restrictToSet[$resourceId])) {
                 $assignable[] = $resourceId;
             }
         }
@@ -352,6 +437,7 @@ class FileTranslation
 
     /**
      * Add a languageresource-task-assoc.
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     private function addLanguageResource(int $languageResourceId, string $taskGuid): void
     {
@@ -369,6 +455,8 @@ class FileTranslation
     /**
      * Return intersection between user customers and language resources customers.
      * Those customers will be used for logging the usage
+     * @throws InexistentUserException
+     * @throws ReflectionException
      */
     private function getCustomersForLogging(editor_Models_Task $task, array $assignedLanguageResourceIds): array
     {
@@ -387,6 +475,8 @@ class FileTranslation
     /**
      * Insert task usage log for the current pretranslation request.
      * For each customer of the associated language resource, one log entry is inserted.
+     * @throws ReflectionException
+     * @throws Zend_Exception
      */
     private function insertTaskUsageLog(editor_Models_Task $task, array $assignedLanguageResourceIds): void
     {
@@ -402,8 +492,8 @@ class FileTranslation
         $log = ZfExtended_Factory::get(editor_Models_TaskUsageLog::class);
         #id, taskType, sourceLang, targetLang, customerId, yearAndMonth, taskCount
         $log->setTaskType($task->getTaskType()->id());
-        $log->setSourceLang((int) $task->getSourceLang());
-        $log->setTargetLang((int) $task->getTargetLang());
+        $log->setSourceLang($task->getSourceLang());
+        $log->setTargetLang($task->getTargetLang());
         $log->setYearAndMonth(date('Y-m'));
 
         //foreach associated customer, add taskCount entry in the log table

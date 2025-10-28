@@ -53,26 +53,46 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\FileTranslation;
 
+use editor_Task_Type_Abstract;
+use ZfExtended_Authentication;
+
 /**
  * An internal task to represent file translations for instant translate
- * Legacy task type for single target file translations.
  */
-class FileTranslationType extends FileTranslationTypeAbstract
+abstract class FileTranslationTypeAbstract extends editor_Task_Type_Abstract
 {
-    // must match the acl_rule of the role 'instantTranslate' for the resource 'initial_tasktype'!
-    public const ID = 'instanttranslate-pre-translate';
+    protected bool $isInternalTask = true;
 
-    protected bool $isProject = false;
+    protected bool $terminologyDisabled = false;
 
-    protected bool $isTask = true;
+    protected bool $autoStartAutoQA = false;
 
-    protected bool $exportUsage = true;
+    protected bool $exportUsage = false;
+
+    protected bool $supportsTaskTm = false;
+
+    protected bool $isAllowedSeeTasks = false;
+
+    protected bool $instantFileTranslation = true;
 
     public function __construct()
     {
-        parent::__construct();
+        $this->isAllowedSeeTasks = ZfExtended_Authentication::getInstance()
+            ->isUserAllowed(FileTranslationRights::ID, FileTranslationRights::ACCESS_INSTANTTRANSLATE_TASK);
+
         if ($this->isAllowedSeeTasks) {
-            $this->isProject = true;
+            $this->isInternalTask = false;
+        }
+    }
+
+    public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType): void
+    {
+        if ($multiTarget) {
+            $taskType = FileTranslationTaskType::ID;
+            $projectType = FileTranslationProjectType::ID;
+        } else {
+            $taskType = FileTranslationType::ID;
+            $projectType = FileTranslationType::ID;
         }
     }
 }

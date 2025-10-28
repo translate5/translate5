@@ -28,7 +28,7 @@ use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\CoordinatorGroupUserRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationTypeChecker;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_EventManager;
@@ -74,7 +74,7 @@ class JobAssignmentDefaults implements ITaskDefaults
 
     public function canApplyDefaults(Task $task): bool
     {
-        return $task->getTaskType()->id() !== FileTranslationType::ID;
+        return ! FileTranslationTypeChecker::isTranslationTypeTask($task->getTaskType());
     }
 
     public function applyDefaults(Task $task, bool $importWizardUsed = false): void

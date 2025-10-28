@@ -42,6 +42,7 @@ use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
+use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
 use MittagQI\ZfExtended\ApiRequestDTO;
 
 /**
@@ -204,8 +205,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     private static function getImportBconfById(
         editor_Models_Task $task,
         int $bconfId = null,
-        bool $addWarning = false,
-        string $orderer = null,
     ): BconfEntity {
         // this may be called multiple times when processing the import upload, so we better cache it
         if (! empty($bconfId) && isset(static::$cachedBconf) && (int) static::$cachedBconf->getId() === $bconfId) {
@@ -215,18 +214,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         // empty covers "not set" and also invalid id '0'
         // somehow dirty: unit tests pass a virtual" bconf-id of "0" to signal to use the system default bconf
         if (empty($bconfId)) {
-            // a bconfId may not be given when the API is used via an unittest or the termportal
-            // otherwise this is very unlikely if not impossible: no bconf-id set for the task.
-            // In that case we use the default one and add a warning
-            if ($addWarning && $orderer != 'unittest' && $orderer != 'termportal') {
-                $task->logger('editor.task.okapi')->info(
-                    'E1055',
-                    'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
-                    [
-                        'bconfFile' => 'No bconf-id was set for task meta',
-                    ]
-                );
-            }
             $bconf = $bconf->getDefaultBconf((int) $task->getCustomerId());
         } else {
             $bconf->load($bconfId);
@@ -787,14 +774,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      * @throws editor_Models_ConfigException
      * @throws OkapiException
      */
-    public function handleAfterUploadPreparation(Zend_EventManager_Event $event)
+    public function handleAfterUploadPreparation(Zend_EventManager_Event $event): void
     {
         /* @var editor_Models_Import_DataProvider_Abstract $dataProvider */
         $dataProvider = $event->getParam('dataProvider');
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        /* @var $requestData array */
-        $requestData = $event->getParam('requestData');
+        /* @var TaskMetaImmutableDTO $taskMetaDTO */
+        $taskMetaDTO = $event->getParam('metaDTO');
 
         $bconfInZip = self::findImportBconfFileinDir($dataProvider->getAbsImportPath());
 
@@ -802,14 +789,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             error_log(
                 'OKAPI::handleAfterUploadPreparation: task ' . $task->getTaskGuid()
                 . ', bconfInZip: ' . ($bconfInZip === null ? 'null' : basename($bconfInZip))
-                . ', bconfId: ' . (array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : 'null')
+                . ', bconfId: ' . ($taskMetaDTO->bconfId ?? 'null')
             );
         }
 
         if ($bconfInZip === null) {
-            $bconfId = array_key_exists('bconfId', $requestData) ? intval($requestData['bconfId']) : null;
-            $orderer = array_key_exists('orderer', $requestData) ? $requestData['orderer'] : null;
-            $bconf = self::getImportBconfById($task, $bconfId, true, $orderer);
+            $bconf = self::getImportBconfById($task, $taskMetaDTO->bconfId);
             // we add the bconf with it's visual name as filename to the archive for easier maintainability
             $dataProvider->addAdditonalFileToArchive($bconf->getPath(), $bconf->getDownloadFilename());
         } else {

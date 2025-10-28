@@ -41,38 +41,68 @@ START LICENSE AND COPYRIGHT
  root folder of translate5. This plug-in exception allows using GPLv3 for translate5 plug-ins,
  although translate5 core is licensed under AGPLv3.
 
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/gpl.html
-             http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
-
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\FileTranslation;
 
-/**
- * An internal task to represent file translations for instant translate
- * Legacy task type for single target file translations.
- */
-class FileTranslationType extends FileTranslationTypeAbstract
+final class TargetLanguageResourceQueue
 {
-    // must match the acl_rule of the role 'instantTranslate' for the resource 'initial_tasktype'!
-    public const ID = 'instanttranslate-pre-translate';
+    /**
+     * @var array<int, array<int, int[]>>
+     */
+    private array $queue = [];
 
-    protected bool $isProject = false;
-
-    protected bool $isTask = true;
-
-    protected bool $exportUsage = true;
-
-    public function __construct()
+    public function __construct(array $assignments)
     {
-        parent::__construct();
-        if ($this->isAllowedSeeTasks) {
-            $this->isProject = true;
+        foreach ($assignments as $assignment) {
+            if (! is_array($assignment)) {
+                continue;
+            }
+
+            $languageId = (int) ($assignment['languageId'] ?? 0);
+            if ($languageId <= 0) {
+                continue;
+            }
+
+            $resourceIdsRaw = $assignment['resourceIds'] ?? [];
+            if (! is_array($resourceIdsRaw)) {
+                $resourceIdsRaw = [];
+            }
+
+            $resourceIds = [];
+
+            foreach ($resourceIdsRaw as $resourceId) {
+                $resourceId = (int) $resourceId;
+                if ($resourceId > 0) {
+                    $resourceIds[$resourceId] = $resourceId;
+                }
+            }
+
+            $resourceIds = array_values($resourceIds);
+
+            if (! array_key_exists($languageId, $this->queue)) {
+                $this->queue[$languageId] = [];
+            }
+
+            $this->queue[$languageId][] = $resourceIds;
         }
+    }
+
+    public function consume(int $languageId): ?array
+    {
+        if (! isset($this->queue[$languageId])) {
+            return null;
+        }
+
+        $assignment = array_shift($this->queue[$languageId]);
+        $assignment ??= [];
+
+        if (empty($this->queue[$languageId])) {
+            unset($this->queue[$languageId]);
+        }
+
+        return $assignment;
     }
 }

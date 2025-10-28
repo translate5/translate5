@@ -72,6 +72,8 @@ abstract class editor_Task_Type_Abstract
 
     protected bool $supportsTaskTm = true;
 
+    protected bool $instantFileTranslation = false;
+
     /**
      * Returns true if usage of term tagging is disabled for that type
      */

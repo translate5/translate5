@@ -53,26 +53,22 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\FileTranslation;
 
-/**
- * An internal task to represent file translations for instant translate
- * Legacy task type for single target file translations.
- */
-class FileTranslationType extends FileTranslationTypeAbstract
+final class FileTranslationTypeChecker
 {
-    // must match the acl_rule of the role 'instantTranslate' for the resource 'initial_tasktype'!
-    public const ID = 'instanttranslate-pre-translate';
+    private const TRANSLATION_TASK_TYPE_IDS = [FileTranslationTaskType::ID, FileTranslationType::ID];
 
-    protected bool $isProject = false;
-
-    protected bool $isTask = true;
-
-    protected bool $exportUsage = true;
-
-    public function __construct()
+    private function __construct()
     {
-        parent::__construct();
-        if ($this->isAllowedSeeTasks) {
-            $this->isProject = true;
-        }
+        //not intended to be instanced, just containing trivial helper functions to identify FileTranslationTask Types!
+    }
+
+    public static function isTranslationTypeTask(\editor_Task_Type_Abstract $taskType): bool
+    {
+        return in_array($taskType->id(), self::TRANSLATION_TASK_TYPE_IDS);
+    }
+
+    public static function getTranslationTypeTaskIds(): array
+    {
+        return self::TRANSLATION_TASK_TYPE_IDS;
     }
 }

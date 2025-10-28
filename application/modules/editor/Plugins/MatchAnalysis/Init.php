@@ -36,7 +36,7 @@ use MittagQI\Translate5\PauseWorker\AbstractPauseWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
-use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationTypeChecker;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use MittagQI\ZfExtended\Worker\Queue;
@@ -160,12 +160,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     {
         /** @var TaskMetaDTO $metaDTO */
         $metaDTO = $event->getParam('metaDTO');
+        /** @var editor_Models_Task $task */
+        $task = $event->getParam('task');
         /** @var array $requestData */
         $requestData = $event->getParam('data');
         // Get pricingPresetId: either given within request, or default for the customer, or system default
         $pricingPresetId = $requestData['pricingPresetId']
             ?? ZfExtended_Factory::get(Preset::class)
-                ->getDefaultPresetId($requestData['customerId'] ?? null);
+                ->getDefaultPresetId($task->getCustomerId() ?? null);
         // Add to meta
         $metaDTO->pricingPresetId = $pricingPresetId;
     }
@@ -277,6 +279,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $this->handleOperation($task, $params);
     }
 
+    public function queueInternalPretranslation(editor_Models_Task $task, array $config): void
+    {
+        $config['pretranslate'] = true;
+        $this->handleOperation($task, $config);
+    }
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws Zend_Exception
@@ -298,7 +306,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
         if (
             $config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport
-            && (string) $task->getTaskType() !== FileTranslationType::ID
+            && ! FileTranslationTypeChecker::isTranslationTypeTask($task->getTaskType())
         ) {
             $this->handleOperation($task, [
                 'pretranslate' => true,

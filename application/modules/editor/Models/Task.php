@@ -362,10 +362,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * their lifetime is over).
      * @return array
      */
-    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset)
+    public function loadListForCleanupByTasktype(array $tasktypes, int $orderDaysOffset)
     {
+        if (empty($tasktypes)) {
+            return [];
+        }
         $s = $this->db->select();
-        $s->where('tasktype = ?', $tasktype);
+        $s->where('taskType in (?)', $tasktypes);
         $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
 
         return parent::loadFilterdCustom($s);

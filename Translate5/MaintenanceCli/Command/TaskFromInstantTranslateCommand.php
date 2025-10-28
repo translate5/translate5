@@ -30,7 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Task;
 use editor_Task_Type_Default;
-use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationTypeChecker;
 use MittagQI\Translate5\Task\TaskLockService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -71,8 +71,8 @@ class TaskFromInstantTranslateCommand extends TaskInfoCommand
             $this->io,
             $input->getArgument('taskIdentifier'),
             false,
+            FileTranslationTypeChecker::getTranslationTypeTaskIds(),
             [editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_ERROR],
-            [FileTranslationType::ID]
         );
 
         if ($task === null) {

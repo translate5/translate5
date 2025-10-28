@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TransUnitHash;
-use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationTypeChecker;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
 
 /**
@@ -348,7 +348,8 @@ abstract class editor_Models_Export_FileParser
         // TODO FIXME: when auto-QA is not active for segment errors, faulty tags will only be detected, not repaired. This behaviour must be discussed and the variable-naming curently says something else
         $findFaultyTags = array_key_exists('checkFaultySegments', $this->options) && $this->options['checkFaultySegments'] === true;
         // as stated above, not to fix if we search for faults seems to be pretty schizophrenic
-        $fixFaultyTags = ! $findFaultyTags || ($this->_task->getTaskType()->__toString() === FileTranslationType::ID);
+        $fixFaultyTags = ! $findFaultyTags
+            || FileTranslationTypeChecker::isTranslationTypeTask($this->_task->getTaskType());
 
         $segmentExport = $segment->getFieldExport($field, $this->_task, $useEdited, $fixFaultyTags, $findFaultyTags);
 
