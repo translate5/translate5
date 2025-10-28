@@ -14,27 +14,6 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## [7.31.1] - 2025-10-28
 
 ### Important Notes:
@@ -49,7 +28,7 @@ Visual: officeconverter container needs to be pulled
 ### Changed
 **[TRANSLATE-5016](https://jira.translate5.net/browse/TRANSLATE-5016): t5memory - Redo reorganise call** <br>
 7.31.1: Fix reorganize worker
-7.30.0: T5Memory: replaced reorganize with export/import to avoid potential data losses
+7.30.0: T5Memory: replaced reorganize with export/import for better processes
 
 **[TRANSLATE-4877](https://jira.translate5.net/browse/TRANSLATE-4877): t5memory - Make re-try calls on update of segments in t5memory** <br>
 7.31.1: Fix reimport segments timestamp
@@ -227,7 +206,7 @@ InstantTranslate: When creating a task for human revision, users can set task fi
 
 ### Changed
 **[TRANSLATE-5016](https://jira.translate5.net/browse/TRANSLATE-5016): t5memory - Redo reorganise call** <br>
-T5Memory: replaced reorganize with export/import to avoid potential data losses
+T5Memory: replaced reorganize with export/import for better processes
 
 **[TRANSLATE-5014](https://jira.translate5.net/browse/TRANSLATE-5014): t5memory - Improve commands for working with t5memory** <br>
 Improved t5memory CLI commands to provide more functionality
@@ -285,7 +264,7 @@ InstantTranslate: When creating a task for human revision, users can set task fi
 
 ### Changed
 **[TRANSLATE-5016](https://jira.translate5.net/browse/TRANSLATE-5016): t5memory - Redo reorganise call** <br>
-T5Memory: replaced reorganize with export/import to avoid potential data losses
+T5Memory: replaced reorganize with export/import for better processes
 
 **[TRANSLATE-5014](https://jira.translate5.net/browse/TRANSLATE-5014): t5memory - Improve commands for working with t5memory** <br>
 Improved t5memory CLI commands to provide more functionality
