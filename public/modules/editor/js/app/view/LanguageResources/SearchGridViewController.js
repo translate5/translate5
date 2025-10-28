@@ -198,7 +198,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             target: me.strings.loading,
             languageResourceid: languageResourceid,
             state: me.SERVER_STATUS.SERVER_STATUS_LOADING
-        }]}, true);
+        }]});
 
         me.executedRequests.add(languageResourceid,Ext.Ajax.request({
             url:Editor.data.restpath+'languageresourceinstance/'+languageResourceid+'/search',

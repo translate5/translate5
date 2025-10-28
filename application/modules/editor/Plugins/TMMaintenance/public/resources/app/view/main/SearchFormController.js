@@ -290,7 +290,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         vm.set('loadingRecordNumber', store.getCount());
 
         scrollable.suspendScrollend ++;
-        view.ensureVisible(store.last());
 
         store.load({
             params: {data: JSON.stringify({...values, offset: offset})},
@@ -375,11 +374,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         }
 
         me.loadPageByChunks(2000, 1, true, true);
-    },
-
-    onContainerScrollUpEnd: function () {
-        this.getViewModel().set('loadedQty', 0);
-        this.stopLoading();
     },
 
     isDeleteBatchAllowed: function () {

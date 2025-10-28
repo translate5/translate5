@@ -276,13 +276,12 @@ Ext.define('TMMaintenance.view.main.List', {
                 let threshold = Math.ceil(this.getClientSize().y * 0.1);
                 let nowY = Math.round(this.getPosition().y);
                 let ctrl = this.component.down('^ app-main searchform').getController();
-                if (nowY < this.wasY) {
-                    if (nowY + threshold / 2 < this.wasY) {
-                        ctrl.onContainerScrollUpEnd();
-                    }
-                } else if (nowY > this.wasY) {
-                    if (nowY + threshold >= maxPosition && this.suspendScrollend <= 0) {
-                        ctrl.onContainerScrollDownEnd();
+                if (nowY > this.wasY) {
+                    if (nowY + threshold >= maxPosition) {
+                        Ext.getCmp('mainlist').getScrollable().scrollBy(0, -10);
+                        if (this.suspendScrollend <= 0) {
+                            ctrl.onContainerScrollDownEnd();
+                        }
                     }
                 }
             },
