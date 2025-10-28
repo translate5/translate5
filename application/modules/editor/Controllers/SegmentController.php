@@ -31,7 +31,10 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
+use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\Factory\UpdateSegmentDtoFactory;
+use MittagQI\Translate5\Segment\Operation\UpdateFlow;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\Segment\Operation\WithAuthentication\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\Operations;
@@ -64,13 +67,6 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @var editor_Models_Segment
      */
     protected $entity;
-
-    /**
-     * Number to divide the segment duration
-     *
-     * @var integer
-     */
-    protected $durationsDivisor = 1;
 
     /**
      * @var string[]
@@ -336,9 +332,10 @@ class Editor_SegmentController extends ZfExtended_RestController
         $updateSegmentOperation->update(
             $this->entity,
             $updateSegmentDtoFactory->fromRequest($this->entity, $this->getRequest()),
+            new ContextDto(UpdateFlow::General),
             $userRepository->get($auth->getUserId()),
             UpdateSegmentLogger::fromPutRequest('SegmentPut', $this->entity, $this->getRequest()),
-            $this->restMessages,
+            $this->getNewResultHandler(),
         );
 
         $this->entity->refresh();
@@ -732,17 +729,19 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
 
-        $autoStateId = editor_Models_Segment_AutoStates::PENDING; // different for drafts
+        $toDraft = $request->getParam('draft');
         $dto = new SyncDto(
             $auth->getUserGuid(),
             $task->getTaskGuid(),
             $request->getParam('segmentId'),
             $request->getRawParam('filter'),
-            $autoStateId
+            $toDraft ? editor_Models_Segment_AutoStates::DRAFT : editor_Models_Segment_AutoStates::PENDING
         );
 
-        // TODO: add $autoStateId !== editor_Models_Segment_AutoStates::PENDING || (always true for drafts)
-        $userCanIgnoreTagValidation = $task->getConfig()->runtimeOptions->segments?->userCanIgnoreTagValidation;
+        // always true for drafts
+        $userCanIgnoreTagValidation = $toDraft
+            || $task->getConfig()->runtimeOptions->segments?->userCanIgnoreTagValidation;
+
         if (! $userCanIgnoreTagValidation) {
             $tagValidationTracking->update(TagValidationTracking::WAIT);
         }
@@ -828,7 +827,8 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
-     * Sets the stateId asynchronously. This enables the segment meta panel to be independent from saving or canceling the segment text
+     * Sets the stateId asynchronously. This enables the segment meta panel to be independent from saving or canceling
+     * the segment text
      */
     public function stateidAction()
     {
@@ -890,8 +890,8 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /***
-     * Check if the segments range feature is active for the given task. If the feature is not active boolean false will be returned.
-     * If the feature is active, the assigned segments as array will be returned.
+     * Check if the segments range feature is active for the given task. If the feature is not active boolean false
+     * will be returned. If the feature is active, the assigned segments as array will be returned.
      * @param editor_Models_Task $task
      * @return boolean|array
      */
@@ -995,5 +995,24 @@ class Editor_SegmentController extends ZfExtended_RestController
             $filter = $this->entity->getFilter();
             $filter->setQualityFilter($qualityState);
         }
+    }
+
+    private function getNewResultHandler(): UpdateSegmentHandlerInterface
+    {
+        return new class($this->restMessages) implements UpdateSegmentHandlerInterface {
+            public function __construct(
+                private readonly ZfExtended_Models_Messages $restMessages
+            ) {
+            }
+
+            public function handleResults(bool $contentWasSanitized): void
+            {
+                if ($contentWasSanitized) {
+                    $this->restMessages->addWarning(
+                        'Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!'
+                    );
+                }
+            }
+        };
     }
 }

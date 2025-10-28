@@ -57,7 +57,7 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
         params = params || {filter: "[]"};
         params.qualities = grid.store.getQualityFilter();
 
-        if(menuitem.operation === 'finalizestatus') {
+        if(menuitem.operation === 'finalizestatus' || menuitem.operation === 'draftstatus') {
 
             const errTitle = Editor.MessageBox.prototype.titles.error;
             if(!Editor.data.plugins.FrontEndMessageBus){
@@ -74,10 +74,13 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             }
 
             params.segmentId = segment.get('id');
+            if(menuitem.operation === 'draftstatus'){
+                params.draft = 1;
+            }
 
             Ext.Msg.show({
-                title: vm.get('l10n.segmentGrid.batchOperations.menuFinalizeStatus'),
-                message: vm.get('l10n.segmentGrid.batchOperations.warnFinalizeText'),
+                title: vm.get('l10n.segmentGrid.batchOperations.' + (params.draft ? 'menuDraftStatus' : 'menuFinalizeStatus')),
+                message: vm.get('l10n.segmentGrid.batchOperations.' + (params.draft ? 'menuDraftStatus' : 'warnFinalizeText')),
                 buttons: Ext.MessageBox.OKCANCEL,
                 prompt : false,
                 fn: function(btn){
@@ -116,7 +119,7 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             loading: '{l10n.segmentGrid.batchOperations.loading.'+opName+'}'
         });
 
-        if(opName === 'finalizestatus') {
+        if(opName === 'finalizestatus' || opName === 'draftstatus') {
             opName = 'syncstatus';
         }
 
@@ -148,7 +151,7 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
                                 Ext.Ajax.request({
                                     url: Editor.data.restpath+'segment/'+opName+'/batch?checkprogress=1',
                                     success: function (xhr) {
-                                        let json = Ext.JSON.decode(xhr.responseText);
+                                        const json = Ext.JSON.decode(xhr.responseText);
                                         if (json.status !== 'WAIT') {
                                             if(json.status === 'WARN') {
                                                 Ext.MessageBox.show({

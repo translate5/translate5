@@ -98,13 +98,11 @@ class editor_Workflow_Default_SegmentHandler
     {
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
         $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->userGuid, $task);
+        //sets the actual workflow step number to identify in which phase the changes were done
+        $segmentToSave->setWorkflowStepNr((int) $task->getWorkflowStep());
         if ($tua->getIsPmOverride() == 1) {
-            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep($this->workflow::STEP_PM_CHECK);
         } else {
-            //sets the actual workflow step
-            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
-
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
             $segmentToSave->setWorkflowStep($tua->getWorkflowStepName());
         }

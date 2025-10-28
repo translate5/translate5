@@ -27,6 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Segment\Exception\NotEditableException;
+use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
+use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
+use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\Operation\UpdateFlow;
+use MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation;
+use MittagQI\Translate5\User\Model\User;
+use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
 use MittagQI\ZfExtended\Tools\Markup;
 
 /**
@@ -44,10 +53,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
      */
     protected $task;
 
-    /**
-     * @var ZfExtended_Models_User
-     */
-    protected $user;
+    protected User $user;
 
     /**
      * @var editor_Models_Segment_InternalTag
@@ -67,17 +73,23 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
     /**
      * A list of segment-numbers and notices about the segment (e.g. invalid tag-structure in segment).
      * This list is shown after the reimport with the hint that the user has to check the here notet segments.
-     *
-     * @var array
      */
-    protected $segmentErrors = [];
+    protected array $segmentErrors = [];
+
+    private UpdateSegmentOperation $updateSegmentOperation;
+
+    private ContextDto $context;
+
+    private WriteableWorkflowAssert $writeableWorkflowAssert;
 
     /**
      * reimport $filename xls into $task.
      * the fiel $filename is located inside the /data/importedTasks/<taskGuid>/excelReimport/ folder
      * returns TRUE if everything is OK, FALSE on (fatal) error
      * @param string $filename
-     * @return bool
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_Excel_ExImportException
      */
     public function __construct(editor_Models_Task $task, $filename, $currentUserGuid)
     {
@@ -94,7 +106,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         // on error an editor_Models_Excel_ExImportException is thrown
         $this->formalCheck();
 
-        $this->user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $this->user = new User();
         $this->user->loadByGuid($currentUserGuid);
 
         // - load segment tagger to extract pure text from t5Segment
@@ -105,13 +117,23 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
 
         // - load tag structure checker
         $this->tagStructureChecker = ZfExtended_Factory::get('editor_Models_Excel_TagStructureChecker');
+
+        $this->updateSegmentOperation = UpdateSegmentOperation::create();
+
+        $this->context = new ContextDto(UpdateFlow::ExcelReImport);
+        $this->writeableWorkflowAssert = WriteableWorkflowAssert::create();
     }
 
-    public function reimport(ZfExtended_Zendoverwrites_Translate $translate, ZfExtended_Models_Messages $restMessages, ZfExtended_Models_User $user)
-    {
+    public function reimport(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        ZfExtended_Models_Messages $restMessages,
+        ZfExtended_Models_User $user
+    ): void {
         $this->segmentErrors = [];
         // contains the TUA which is used to alter the segments
         $tua = $this->prepareTaskUserAssociation();
+
+        $this->writeableWorkflowAssert->assert($this->task->getTaskGuid(), $user->getUserGuid(), $this->context);
 
         try {
             // now handle each segment from the excel
@@ -210,7 +232,11 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
             $this->segmentTagger->toExcel($t5Segment->getSource(), $tempMap);
             $newSegment = $this->segmentTagger->reapply2dMap($newSegment, $tempMap);
 
-            $this->saveSegment($t5Segment, $newSegment);
+            try {
+                $this->saveSegment($t5Segment, $newSegment);
+            } catch (NotEditableException) {
+                continue;
+            }
 
             // on every changed segment, add a comment that it was edited
             $comment = $this->addComment("Changed in external Excel editing.", $t5Segment, true);
@@ -241,23 +267,46 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
      */
     protected function saveSegment(editor_Models_Segment $t5Segment, string $newContent)
     {
-        //the history entry must be created before the original entity is modified
-        $history = $t5Segment->getNewHistoryEntity();
-        //update the segment
-        $updater = new editor_Models_Segment_Updater($this->task, $this->user->getUserGuid());
+        $resultHandler = new class() implements UpdateSegmentHandlerInterface {
+            protected bool $wasSanitized = false;
 
-        if ($updater->sanitizeEditedContent($newContent, 'targetEdit')) {
+            public function handleResults(bool $contentWasSanitized): void
+            {
+                $this->wasSanitized = $contentWasSanitized;
+            }
+
+            public function wasSanitized(): bool
+            {
+                return $this->wasSanitized;
+            }
+        };
+
+        $this->updateSegmentOperation->update(
+            $t5Segment,
+            new UpdateSegmentDto(
+                [
+                    'targetEdit' => $newContent,
+                ],
+                new DurationsDto(
+                    durations: (object) [
+                        'targetEdit' => 0, //nothing defined for excel re-import
+                    ],
+                    divisor: 1
+                ),
+                autoStateId: editor_Models_Segment_AutoStates::PENDING,
+            ),
+            $this->context,
+            $this->user,
+            resultHandler: $resultHandler,
+        );
+
+        if ($resultHandler->wasSanitized()) {
             $this->addSegmentError(
                 (int) $t5Segment->getSegmentNrInTask(),
                 'Some non representable characters were removed from the segment'
                 . ' (multiple white-spaces, tabs, line-breaks etc.)!'
             );
         }
-
-        $t5Segment->setTargetEdit($newContent);
-        $t5Segment->setUserGuid($this->user->getUserGuid());
-        $t5Segment->setUserName($this->user->getUserName());
-        $updater->update($t5Segment, $history);
     }
 
     /**

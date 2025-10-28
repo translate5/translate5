@@ -62,8 +62,10 @@ use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\Event\SegmentProcessedEvent;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\Operation\UpdateFlow;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
 use MittagQI\Translate5\Segment\SyncStatus\DTO\SyncDto;
@@ -84,6 +86,7 @@ class SyncStatusService
         private readonly ZfExtended_Logger $logger,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserRepository $userRepository,
+        private readonly editor_Models_Segment_AutoStates $autoStates,
     ) {
     }
 
@@ -100,6 +103,7 @@ class SyncStatusService
             Zend_Registry::get('logger')->cloneMe('editor.segment.syncStatus'),
             EventDispatcher::create(),
             new UserRepository(),
+            new editor_Models_Segment_AutoStates()
         );
     }
 
@@ -124,18 +128,20 @@ class SyncStatusService
             return;
         }
         $segmentIds = [];
-        $autoState = new editor_Models_Segment_AutoStates();
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
 
+        $toDraft = ($dto->autoStateId === editor_Models_Segment_AutoStates::DRAFT);
         // always true for drafts
-        $userCanIgnoreTagValidation = ($dto->autoStateId !== editor_Models_Segment_AutoStates::PENDING || $task->getConfig(
-        )->runtimeOptions->segments?->userCanIgnoreTagValidation);
+        $userCanIgnoreTagValidation = ($toDraft
+            || $task->getConfig()->runtimeOptions->segments?->userCanIgnoreTagValidation);
         $tagValidationFailed = false;
 
         /* @var $segment editor_Models_Segment */
         foreach ($segments as $segment) {
             $isLockLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
-            if (! $isLockLocked && ! $autoState->isBlocked((int) $segment->getAutoStateId()) && $segment->isTargetTranslated()) {
+            if (! $isLockLocked
+                && ! $this->autoStates->isBlocked((int) $segment->getAutoStateId())
+                && $segment->isTargetTranslated()) {
                 if (! $userCanIgnoreTagValidation) {
                     $comparison = new editor_Segment_Internal_TagComparision(
                         $segment->getFieldTags($task, 'target'),
@@ -163,6 +169,7 @@ class SyncStatusService
         if (! $userCanIgnoreTagValidation) {
             $tagValidationTracking = new TagValidationTracking($task, (int) $user->getId());
             $tagValidationTracking->update($tagValidationFailed ? 'WARN' : 'OK');
+            //FIXME testen mit invaliden Tags!
         }
 
         if (empty($segmentIds)) {
@@ -178,11 +185,15 @@ class SyncStatusService
 
         try {
             $this->executeSyncAll($dto, $segmentIds);
-            $task->logger('editor.workflow')->info('E1012', 'Segments were set to final processing status', [
-                'segmentIds' => $segmentIds,
-                'userGuid' => $user->getUserGuid(),
-                'user' => $user->getUsernameLong(),
-            ]);
+            $task->logger('editor.workflow')->info(
+                'E1012',
+                'Segments were set to ' . ($toDraft ? 'draft' : 'final processing') . ' status',
+                [
+                    'segmentIds' => $segmentIds,
+                    'userGuid' => $user->getUserGuid(),
+                    'user' => $user->getUsernameLong(),
+                ]
+            );
         } catch (Throwable) {
             $this->eventDispatcher->dispatch(
                 new SyncStatusProcessingFailedEvent(
@@ -212,7 +223,12 @@ class SyncStatusService
 
             try {
                 // update segment status
-                $this->updateSegmentOperation->update($segment, $updateSegmentDto, $actor);
+                $this->updateSegmentOperation->update(
+                    $segment,
+                    $updateSegmentDto,
+                    new ContextDto(UpdateFlow::SynchronizeStatus),
+                    $actor
+                );
             } catch (Exception $e) {
                 /**
                  * Any exception on saving a segment should not break the whole loop.
@@ -227,10 +243,12 @@ class SyncStatusService
                 ]);
             } finally {
                 // always dispatch the event, even if the segment was not saved
-                $this->eventDispatcher->dispatch(new SegmentProcessedEvent(
-                    $task->getTaskGuid(),
-                    (int) $segment->getId(),
-                ));
+                $this->eventDispatcher->dispatch(
+                    new SegmentProcessedEvent(
+                        $task->getTaskGuid(),
+                        (int) $segment->getId(),
+                    )
+                );
             }
         }
     }

@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\Segment\ActionAssert\Feasibility\Asserts;
 use editor_Models_Segment;
 use MittagQI\Translate5\ActionAssert\Action;
 use MittagQI\Translate5\ActionAssert\Feasibility\Asserts\FeasibilityAssertInterface;
-use ZfExtended_Models_Entity_NoAccessException;
+use MittagQI\Translate5\Segment\Exception\NotEditableException;
 
 /**
  * @implements FeasibilityAssertInterface<editor_Models_Segment>
@@ -57,7 +57,7 @@ class SegmentIsEditableAssert implements FeasibilityAssertInterface
     public function assertAllowed(object $object): void
     {
         if (! $object->isEditable()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
+            throw new NotEditableException();
         }
     }
 }

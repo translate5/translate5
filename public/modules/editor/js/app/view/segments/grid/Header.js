@@ -51,6 +51,7 @@ Ext.define('Editor.view.segments.grid.Header', {
         leaveBtn: '#UT#Zurück zur Aufgabenübersicht',
         leaveTaskWindowTitle:'#UT#Zurück zur Aufgabenübersicht',
         closeBtn: '#UT#Anwendung verlassen',
+        error: '#UT#Fehler',
         showDesc: '#UT#Projektbeschr. anzeigen',
         hideDesc: '#UT#Projektbeschr. ausblenden',
         leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',

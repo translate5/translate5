@@ -31,12 +31,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_LanguageResources_LanguageResource;
+use editor_Models_Db_SegmentQuality;
 use editor_Models_Db_Task;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Db\TaskAssociation as TaskAssociationDb;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation as TaskTmTaskAssociationDb;
 use Zend_Db_Adapter_Abstract;
+use Zend_Db_Expr;
 use Zend_Db_Table;
 use Zend_Db_Table_Row;
 
@@ -182,5 +184,50 @@ class LanguageResourceTaskAssocRepository
             ->group('assocs.id');
 
         return (int) $this->db->fetchOne($s) > 0;
+    }
+
+    public function getTaskInfoForLanguageResources($languageResourceids)
+    {
+        if (empty($languageResourceids)) {
+            return [];
+        }
+
+        $s = $this->db->select()
+            ->from([
+                'assocs' => TaskAssociationDb::TABLE_NAME,
+            ], [
+                'assocs.id',
+                'assocs.taskGuid',
+                'task.id as taskId',
+                'task.projectId',
+                'task.taskName',
+                'task.state',
+                'task.lockingUser',
+                'task.taskNr',
+                'assocs.languageResourceId',
+                new Zend_Db_Expr($this->db->quote(TaskAssociationDb::TABLE_NAME) . ' as tableName'),
+            ])
+            //->setIntegrityCheck(false)
+            ->join([
+                'task' => 'LEK_task',
+            ], 'assocs.taskGuid = task.taskGuid', '')
+            ->where('assocs.languageResourceId in (?)', $languageResourceids)
+            ->group('assocs.id');
+
+        $rows = $this->db->fetchAll($s);
+        if (empty($rows)) {
+            return [];
+        }
+
+        $segmentRepository = SegmentRepository::create();
+        foreach ($rows as &$row) {
+            $qualityProps = editor_Models_Db_SegmentQuality::getNumQualitiesAndFaultsForTask($row['taskGuid']);
+            // adding number of quality errors, evaluated in the export actions
+            $row['qualityErrorCount'] = $qualityProps->numQualities;
+            $row['qualityHasFaults'] = ($qualityProps->numFaults > 0);
+            $row['segmentsInDraft'] = $segmentRepository->hasDraftsInTask($row['taskGuid']);
+        }
+
+        return $rows;
     }
 }

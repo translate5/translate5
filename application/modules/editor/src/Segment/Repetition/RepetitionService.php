@@ -304,6 +304,9 @@ class RepetitionService
             }
             $repetition->setMatchRateType($master->getMatchRateType());
 
+            $repetition->setAutoStateId($master->getAutoStateId());
+            $repetition->meta()->setRepetitionUsed(true);
+            $repetition->meta()->save();
             $repetition->setAutoStateId($this->autoStates->calculateAlikeState($repetition, $userJob));
 
             $matchRateType = new MatchRateType();

@@ -41,5 +41,6 @@ class JobNotFinishableException extends ZfExtended_Models_Entity_Conflict
 
     protected static $localErrorCodes = [
         'E1750' => 'Some mandatory criteria of the AutoQA still have errors.',
+        'E1751' => 'The task still contains segments in draft status. Open the task and change the status.',
     ];
 }

@@ -140,6 +140,8 @@ class editor_Models_Segment_AutoStates
      */
     public const BLOCKED = 16;
 
+    public const DRAFT = 997;
+
     /**
      * Internal state used to show segment is pending
      * @var integer
@@ -170,6 +172,7 @@ class editor_Models_Segment_AutoStates
         self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
         self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
         self::PRETRANSLATED => 'Vorübersetzt',
+        self::DRAFT => 'Draft',
     ];
 
     /**
@@ -343,7 +346,7 @@ class editor_Models_Segment_AutoStates
      */
     public function calculateAlikeState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua)
     {
-        $calculatedState = $this->calculateSegmentState($segment, $tua);
+        $calculatedState = $this->calculateSingleSegmentSave($segment, $tua);
         switch ($calculatedState) {
             case self::REVIEWED:
                 return self::REVIEWED_AUTO;
@@ -451,6 +454,15 @@ class editor_Models_Segment_AutoStates
      */
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua): int
     {
+        if ($segment->meta()->getRepetitionUsed()) {
+            return $this->calculateAlikeState($segment, $tua);
+        }
+
+        return $this->calculateSingleSegmentSave($segment, $tua);
+    }
+
+    private function calculateSingleSegmentSave(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua): int
+    {
         $isModified = $segment->isDataModifiedAgainstOriginal();
 
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
@@ -462,6 +474,10 @@ class editor_Models_Segment_AutoStates
 
         if ($segment->getAutoStateId() == self::LOCKED) {
             return self::LOCKED;
+        }
+
+        if ($segment->getAutoStateId() == self::DRAFT) {
+            return self::DRAFT;
         }
 
         if (! $segment->isTargetTranslated()) {

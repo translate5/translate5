@@ -35,6 +35,7 @@ use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
+use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
@@ -153,6 +154,8 @@ class editor_TaskController extends ZfExtended_RestController
      */
     private array $extraFilters = [];
 
+    private SegmentRepository $segmentRepository;
+
     public function init(): void
     {
         $taskQueryFilterAndSort = new TaskQueryFilterAndSort();
@@ -190,6 +193,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->qualityService = new QualityService();
         $this->taskViewDataProvider = TaskViewDataProvider::create();
         $this->taskActionPermissionAssert = TaskActionPermissionAssert::create();
+        $this->segmentRepository = SegmentRepository::create();
 
         //create a new logger instance writing only to the configured taskLogger
         $this->taskLog = ZfExtended_Factory::get(ZfExtended_Logger::class, [[
@@ -1154,6 +1158,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->checkTaskStateTransition();
 
         $this->checkAutoQaHasCritical($userState);
+        $this->checkForDraftSegments($userState);
 
         $this->handleCancelImport();
 
@@ -2527,6 +2532,21 @@ class editor_TaskController extends ZfExtended_RestController
             && $this->qualityService->taskHasCriticalErrors($this->entity->getTaskGuid())) {
             throw JobNotFinishableException::createResponse('E1750', [
                 'userState' => 'Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.',
+            ]);
+        }
+    }
+
+    /**
+     * @throws ZfExtended_ErrorCodeException
+     * @throws Zend_Exception
+     */
+    private function checkForDraftSegments($userState): void
+    {
+        if ($userState === editor_Workflow_Default::STATE_FINISH
+            && $this->segmentRepository->hasDraftsInTask($this->entity->getTaskGuid())) {
+            throw JobNotFinishableException::createResponse('E1751', [
+                'userState' => 'Die Aufgabe enthält noch Segmente im Entwurfsstatus. '
+                    . 'Setzen Sie den Status auf final um und beenden Sie dann die Aufgabe.',
             ]);
         }
     }

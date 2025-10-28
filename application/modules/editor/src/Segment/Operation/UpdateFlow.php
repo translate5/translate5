@@ -50,23 +50,19 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\SearchAndReplace\DTO;
+namespace MittagQI\Translate5\Segment\Operation;
 
-use MittagQI\Translate5\Segment\TrackChange\DTO\TrackChangeUserDto;
-
-class ReplaceDto
+enum UpdateFlow
 {
-    /**
-     * @param int $actorId Id of the user who initiated the search and replace
-     */
-    public function __construct(
-        public readonly int $actorId,
-        public readonly SearchQueryDto $searchQuery,
-        public readonly string $replaceWith,
-        public readonly int $durations,
-        public readonly bool $isActiveTrackChanges,
-        public readonly ?TrackChangeUserDto $trackChangeUserDto,
-        public readonly int $autoStateId,
-    ) {
+    case General;
+    case Repetition;
+    case SearchAndReplace;
+    case ExcelReImport;
+    case PackageReImport;
+    case SynchronizeStatus;
+
+    public function isExternalEditing(): bool
+    {
+        return $this === self::ExcelReImport || $this === self::PackageReImport;
     }
 }

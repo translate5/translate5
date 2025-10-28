@@ -53,18 +53,19 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Segment\Operation\Contract;
 
 use editor_Models_Segment as Segment;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\User\Model\User;
-use ZfExtended_Models_Messages;
 
 interface UpdateSegmentOperationInterface
 {
     public function update(
         Segment $segment,
         UpdateSegmentDto $updateDto,
+        ContextDto $contextDto,
         User $actor,
         UpdateSegmentLogger $updateLogger,
-        ?ZfExtended_Models_Messages $restMessages = null
+        ?UpdateSegmentHandlerInterface $resultHandler = null
     ): void;
 }

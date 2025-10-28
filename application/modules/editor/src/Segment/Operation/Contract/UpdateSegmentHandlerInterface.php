@@ -50,23 +50,11 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\SearchAndReplace\DTO;
+namespace MittagQI\Translate5\Segment\Operation\Contract;
 
-use MittagQI\Translate5\Segment\TrackChange\DTO\TrackChangeUserDto;
-
-class ReplaceDto
+interface UpdateSegmentHandlerInterface
 {
-    /**
-     * @param int $actorId Id of the user who initiated the search and replace
-     */
-    public function __construct(
-        public readonly int $actorId,
-        public readonly SearchQueryDto $searchQuery,
-        public readonly string $replaceWith,
-        public readonly int $durations,
-        public readonly bool $isActiveTrackChanges,
-        public readonly ?TrackChangeUserDto $trackChangeUserDto,
-        public readonly int $autoStateId,
-    ) {
-    }
+    public function handleResults(
+        bool $contentWasSanitized
+    ): void;
 }

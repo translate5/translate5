@@ -350,7 +350,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController
      * @throws InexistentTaskException
      * @throws ZfExtended_NotFoundException
      */
-    public function assertJobBelongsToTask(editor_Models_TaskUserAssoc $job): void
+    private function assertJobBelongsToTask(editor_Models_TaskUserAssoc $job): void
     {
         if ($this->hasParam('taskId')) {
             $task = $this->taskRepository->getByGuid($job->getTaskGuid());

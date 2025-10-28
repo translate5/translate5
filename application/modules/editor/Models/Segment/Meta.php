@@ -59,6 +59,8 @@ END LICENSE AND COPYRIGHT
  * @method void setAutopropagated(bool $autopropagated)
  * @method string getLocked()
  * @method void setLocked(bool $locked)
+ * @method string getRepetitionUsed()
+ * @method void setRepetitionUsed(bool $repetitionUsed)
  * @method string getSourceWordCount()
  * @method void setSourceWordCount(int $count)
  * @method string getSourceCharacterCount()

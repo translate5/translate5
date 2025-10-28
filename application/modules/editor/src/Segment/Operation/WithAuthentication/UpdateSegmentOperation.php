@@ -57,11 +57,12 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
+use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
 use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentOperationInterface;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\User\Model\User;
-use ZfExtended_Models_Messages;
 
 class UpdateSegmentOperation implements UpdateSegmentOperationInterface
 {
@@ -85,9 +86,10 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
     public function update(
         Segment $segment,
         UpdateSegmentDto $updateDto,
+        ContextDto $contextDto,
         User $actor,
         UpdateSegmentLogger $updateLogger,
-        ?ZfExtended_Models_Messages $restMessages = null
+        ?UpdateSegmentHandlerInterface $resultHandler = null
     ): void {
         $this->permissionAssert->assertGranted(
             SegmentAction::Update,
@@ -95,6 +97,6 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
             new PermissionAssertContext($actor),
         );
 
-        $this->updateSegmentOperation->update($segment, $updateDto, $actor, $updateLogger, $restMessages);
+        $this->updateSegmentOperation->update($segment, $updateDto, $contextDto, $actor, $updateLogger, $resultHandler);
     }
 }

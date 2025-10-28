@@ -88,5 +88,16 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
         searchReplaceController.activeSegment.matchCount=0;
         
         searchReplaceController.searchRequired=true;
+    },
+
+    saveCurrentChange: function(checkbox, checked) {
+        if (!checked) {
+            return;
+        }
+        // Get reference to the other checkbox and uncheck it
+        let other = checkbox.up().down('#saveCurrent' + (checkbox.getItemId()==='saveCurrentOpen'?'Draft':'Open'));
+        if (other && other.getValue()) {
+            other.setValue(false);
+        }
     }
 });

@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Quality_Notifications as QualityNotifications;
 use editor_Models_Segment;
+use editor_Models_Segment_AutoStates;
 use editor_Models_Segment_MaterializedView;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\Segment\Dto\SegmentView;
@@ -139,5 +140,24 @@ class SegmentRepository
         ;
 
         return array_map('intval', $this->db->fetchCol($select));
+    }
+
+    public function hasDraftsInTask(string $taskGuid): bool
+    {
+        return count($this->getSegmentIdsByAutostate($taskGuid, editor_Models_Segment_AutoStates::DRAFT, 1)) > 0;
+    }
+
+    private function getSegmentIdsByAutostate(string $taskGuid, int $autoStateId, int $limit = 0): array
+    {
+        $s = $this->db->select()
+            ->from(\editor_Models_Db_Segments::TABLE_NAME, ['id'])
+            ->where('taskGuid = ?', $taskGuid);
+
+        $s->where('autoStateId = ?', $autoStateId);
+        if ($limit > 0) {
+            $s->limit($limit);
+        }
+
+        return $this->db->fetchCol($s);
     }
 }

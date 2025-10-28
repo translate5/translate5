@@ -1633,6 +1633,10 @@
                 </source>
                 <target>Save. Open next unconfirmed editable segment (CTRL + ENTER)</target>
             </trans-unit>
+            <trans-unit id='QWxzIEVudHd1cmYgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgdW5iZXN0w6R0aWd0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgU0hJRlQgKyBFTlRFUik='>
+                <source>Als Entwurf speichern und nächstes unbestätigtes Segment öffnen (STRG + SHIFT + ENTER)</source>
+                <target>Save as draft and open next unconfirmed segment (CTRL + SHIFT + ENTER)</target>
+            </trans-unit>
             <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgU0hJRlQgKyBFTlRFUik='>
                 <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
                 <target>Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)</target>
@@ -3436,9 +3440,13 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Wildcards (* und ?)</source>
                 <target>Wildcards (* and ?)</target>
             </trans-unit>
-            <trans-unit id="U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gc3BlaWNoZXJu">
+            <trans-unit id='U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gc3BlaWNoZXJu'>
                 <source>Segment beim Schließen speichern</source>
                 <target>Save segment on close</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gYWxzIEVudHd1cmYgc3BlaWNoZXJu'>
+                <source>Segment beim Schließen als Entwurf speichern</source>
+                <target>Save segment on close as draft</target>
             </trans-unit>
             <trans-unit id="VW5nw7xsdGlnZXIgUmVndWzDpHJlciBBdXNkcnVjaw==">
                 <source>Ungültiger Regulärer Ausdruck</source>
@@ -10835,6 +10843,26 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Alle selektierten exportieren</source>
                 <target>Export all selected</target>
             </trans-unit>
+            <trans-unit id='QWxzIEVudHd1cmYgc3BlaWNoZXJu'>
+                <source>Als Entwurf speichern</source>
+                <target>Save as draft</target>
+            </trans-unit>
+            <trans-unit id='U1RSRyArIFNISUZUICsgUw=='>
+                <source>STRG + SHIFT + S</source>
+                <target>CTRL + SHIFT + S</target>
+            </trans-unit>
+            <trans-unit id='SW0gZmluYWxlbiBCZWFyYmVpdHVuZ3NzdGF0dXMgc3BlaWNoZXJuIChTVFJHICsgUyk='>
+                <source>Im finalen Bearbeitungsstatus speichern (STRG + S)</source>
+                <target>Save in final processing state (CTRL + S)</target>
+            </trans-unit>
+            <trans-unit id='SW0gZmluYWxlbiBTdGF0dXMgc3BlaWNoZXJu'>
+                <source>Im finalen Status speichern</source>
+                <target>Save in final state</target>
+            </trans-unit>
+            <trans-unit id='QXVmIEVudHd1cmZzc3RhdHVzIHNldHplbg=='>
+                <source>Auf Entwurfsstatus setzen</source>
+                <target>Set to draft state</target>
+            </trans-unit>
             <trans-unit id="RWluaWdlIFBmbGljaHRrcml0ZXJpZW4gZGVyIEF1dG9RQSB3ZWlzZW4gbm9jaCBGZWhsZXIgYXVmLg==">
                 <source>Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.</source>
                 <target>Some mandatory criteria of the AutoQA still have errors.</target>
@@ -10858,6 +10886,22 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
             <trans-unit id='RWluIG9kZXIgbWVocmVyZSBTZWdtZW50ZSBrb25udGVuIG5pY2h0IGF1ZiBmaW5hbGVuIFByb3plc3NzdGF0dXMgZ2VzZXR6dCB3ZXJkZW4sIHdlaWwgc2llIFRhZy1GZWhsZXIgZW50aGFsdGVuLiBGaWx0ZXJuIFNpZSBpbiBkZXIgQXV0b1FBIG5hY2ggZGllc2VyIEthdGVnb3JpZSB1bSBkaWUgU2VnbWVudGUgZXJuZXV0IHp1IHByw7xmZW4u'>
                 <source>Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.</source>
                 <target>One or more segments could not be set to final processing state because they contain tag errors. Filter by this category in the AutoQA to check the segment(s) again.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gw5ZmZm5lbiBTaWUgZGllIEF1ZmdhYmUgdW5kIHNldHplbiBTaWUgZGVuIFN0YXR1cyB1bS4='>
+                <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.</source>
+                <target>The task still contains segments in draft status. Open the task and change the status.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gU2V0emVuIFNpZSBkZW4gU3RhdHVzIGF1ZiBmaW5hbCB1bSB1bmQgYmVlbmRlbiBTaWUgZGFubiBkaWUgQXVmZ2FiZS4='>
+                <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Setzen Sie den Status auf final um und beenden Sie dann die Aufgabe.</source>
+                <target>The task still contains segments in draft status. Change the status to final and finish the task then.</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudGUgaW0gRW50d3VyZnNzdGF0dXM='>
+                <source>Segmente im Entwurfsstatus</source>
+                <target>Segments in draft state</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJuIFNpZSBrZWluZSBBdWZnYWJlbiBpbnMgVE0sIGRpZSBRQS1GZWhsZXIgYXVmd2Vpc2VuIHVuZC9vZGVyIFNlZ21lbnRlIGltIEVudHd1cmZzc3RhdHVzIGJlaW5oYWx0ZW4uIERpZXMgZsO8aHJ0IHp1IGZlaGxlcmhhZnRlbiB1bmQvb2RlciB1bmZlcnRpZ2VuIFNlZ21lbnR2ZXJzaW9uZW4gaW4gZGVyIFZvcsO8YmVyc2V0enVuZyE='>
+                <source>Speichern Sie keine Aufgaben ins TM, die QA-Fehler aufweisen und/oder Segmente im Entwurfsstatus beinhalten. Dies führt zu fehlerhaften und/oder unfertigen Segmentversionen in der Vorübersetzung!</source>
+                <target>Do not save any tasks to the TM that have QA errors and/or contain segments in draft status. This leads to incorrect and/or unfinished segment versions in the pre-translation!</target>
             </trans-unit>
         </body>
     </file>

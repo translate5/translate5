@@ -56,5 +56,10 @@ Ext.define('Editor.view.searchandreplace.ReplaceTabViewController', {
     resetSearchParameters:function(){
         var searchTab=Ext.ComponentQuery.query('#searchTab')[0];
         searchTab.getController().resetSearchParameters();
+    },
+
+    saveCurrentChange:function(checkbox, newValue){
+        var searchTab=Ext.ComponentQuery.query('#searchTab')[0];
+        searchTab.getController().saveCurrentChange(checkbox, newValue);
     }
 });
