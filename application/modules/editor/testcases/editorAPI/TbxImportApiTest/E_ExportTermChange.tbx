@@ -83,6 +83,10 @@
             <term id="tid-0-de-4">Term verboten</term>
             <termNote type="normativeAuthorization">supersededTerm</termNote>
           </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="ide39f16f4-7f25-42f0-8f05-f470454089b2">
+        <langSet lang="de-DE">
           <tig id="tig_add5dad8-61cd-4830-9c6e-1ceaff00c8c1">
             <term id="id08753133-db38-432b-85a5-c303c1624555">Kugelschreiber Change</term>
             <termNote type="normativeAuthorization">admittedTerm</termNote>
@@ -93,7 +97,6 @@
           </tig>
         </langSet>
       </termEntry>
-      <termEntry id="ide39f16f4-7f25-42f0-8f05-f470454089b2"/>
     </body>
   </text>
 </martif>
