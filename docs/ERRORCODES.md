@@ -227,6 +227,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1680"></a>E1680 | Job         | Route /editor/taskuserassoc deprecated, use editor/project/:projectId/jobs instead                                           | Please use new route                                                                                                                                                 |
 | <a id="E1681"></a>E1681 | Job Default | Route /editor/userassocdefault deprecated, use editor/customer/:customerId/workflow/:workflow/default-job instead            | Please use new route                                                                                                                                                 |
 | <a id="E1682"></a>E1682 | Job Default | Multi Purpose Code logging in the context of Default jobs                                                                    | Multi Purpose Code logging in the context of Default jobs                                                                                                            |
+| <a id="E1750"></a>E1750 | Job Finish  | Some mandatory criteria of the AutoQA still have errors.                                                                     | Fix the mentioned Auto QA findings in order to finish the job                                                                                                        |
 
 ### Coordinator group
 
