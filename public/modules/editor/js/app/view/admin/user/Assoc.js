@@ -189,7 +189,7 @@ Ext.define('Editor.view.admin.user.Assoc', {
                                     name: 'deadlineDate',
                                     decimalPrecision: 2,
                                     useCustomPrecision: true,
-                                    minValue: 0.10,
+                                    minValue: 0,
                                     mouseWheelEnabled: true,
                                     fieldLabel: me.strings.fieldDeadline,
                                     labelCls: 'labelInfoIcon',
