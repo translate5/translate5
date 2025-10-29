@@ -36,12 +36,12 @@ use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Plugins\Okapi\OkapiService;
+use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfAssocRepository;
 use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiImportWorker;
 use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiWorkerHelper;
 use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
-use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
 use MittagQI\ZfExtended\ApiRequestDTO;
 
@@ -119,10 +119,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      */
     public static function getExportBconfPath(editor_Models_Task $task): string
     {
-        $meta = $task->meta(true); // copied with this note from getImportBconf(): TODO FIXME: why reinit ?
-        if (! empty($meta->getBconfId())) {
+        $tbAssoc = TaskBconfAssocRepository::create()->findForTask($task->getTaskGuid());
+        if (! empty($tbAssoc->getBconfId())) {
             $bconf = new BconfEntity();
-            $bconf->load((int) $meta->getBconfId());
+            $bconf->load($tbAssoc->getBconfId());
 
             return $bconf->getPath(true);
         }
@@ -141,9 +141,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         if ($task->getTaskType()->useSystemDefaultFileFormatSettings()) {
             return self::getSystemDefaultBconf();
         }
-        $meta = $task->meta(true); // TODO FIXME: why reinit ?
+        $tbAssoc = TaskBconfAssocRepository::create()->findForTask($task->getTaskGuid());
 
-        return self::getImportBconfById($task, (int) $meta->getBconfId());
+        return self::getImportBconfById($task, $tbAssoc->getBconfId());
     }
 
     /**
@@ -506,6 +506,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
             [$this, 'handleAfterUploadPreparation']
         );
 
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::ON_POST_IMPORT,
+            [$this, 'handleOnPostImport']
+        );
+
         // adds the bconfId to the task-meta
         $this->eventManager->attach(
             ImportEventTrigger::class,
@@ -597,9 +603,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $okapiDataDirExists = false;
 
         if (! empty($task)) {
-            $meta = $task->meta();
-            $bconf = empty($meta->getBconfInZip()) ? self::getImportBconfById($task, $meta->getBconfId()) : null;
-            $importFilter = new ImportFilter($bconf, $meta->getBconfInZip());
+            $tbAssoc = TaskBconfAssocRepository::create()->findForTask($task->getTaskGuid());
+            $bconf = empty($tbAssoc->getBconfInZip()) ? self::getImportBconfById($task, $tbAssoc->getBconfId()) : null;
+            $importFilter = new ImportFilter($bconf, $tbAssoc->getBconfInZip());
             $okapiDataDir = $task->getAbsoluteTaskDataPath() . '/' . OkapiWorkerHelper::OKAPI_REL_DATA_DIR;
             $okapiDataDirExists = is_dir($okapiDataDir);
 
@@ -607,8 +613,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
                 error_log(
                     'OKAPI::handleRegisterSupportedFileTypes: ' .
                     'task: ' . $task->getTaskGuid() .
-                    ', bconfInZip: ' . (empty($meta->getBconfInZip()) ? 'null' : $meta->getBconfInZip()) .
-                    ', bconfId: ' . (empty($meta->getBconfId()) ? 'null' : $meta->getBconfId())
+                    ', bconfInZip: ' . (empty($tbAssoc->getBconfInZip()) ? 'null' : $tbAssoc->getBconfInZip()) .
+                    ', bconfId: ' . (empty($tbAssoc->getBconfId()) ? 'null' : $tbAssoc->getBconfId())
                 );
             }
         } elseif ($customerId > 0) {
@@ -636,7 +642,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $skipCoreParserSet = (empty($task) || $okapiDataDirExists) ? [] : self::getSkipCoreParserSet(
             $importFilter,
             $bconf,
-            $task->meta()->getBconfInZip(),
+            TaskBconfAssocRepository::create()->findForTask($task->getTaskGuid())->getBconfInZip(),
         );
 
         // This sets the supported file-extension for the requested task (if given) or the used default bconf
@@ -703,9 +709,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     #endregion
 
     /**
-     * Hook that adds the bconfId sent by the Import wizard to the task-meta
+     * Hook that adds the bconfId when creating tasks from the request or other CLI data
      * Called in the same request as handleInitTaskMeta, handleAfterUploadPreparation
-     * Take care: the task is not yet saved here
+     * Usually represents the single task creation of a project or non-project tasks
      *
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
@@ -719,10 +725,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     {
         /** @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        /** @var TaskMetaDTO $metaDTO */
-        $metaDTO = $event->getParam('metaDTO');
         /** @var array $requestData */
         $requestData = $event->getParam('data');
+
         $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : null;
 
         if ($this->doDebug) {
@@ -730,17 +735,51 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
                 ', requestBconfId: ' . ($bconfId === null ? 'null' : $bconfId));
         }
 
-        // empty makes sense here since we only accept an bconf-id > 0
+        // empty makes sense here since we only accept a bconf-id > 0
         if (empty($bconfId)) {
             $bconf = new BconfEntity();
             $bconfId = $bconf->getDefaultBconfId((int) $task->getCustomerId());
         }
-        $metaDTO->bconfId = $bconfId;
+
+        TaskBconfAssocRepository::create()->createForTask(
+            $task->getTaskGuid(),
+            (int) $bconfId
+        );
+    }
+
+    /**
+     * captures the bconfId send with a task POST request
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function handleOnPostImport(Zend_EventManager_Event $event): void
+    {
+        /** @var editor_Models_Task $task */
+        $task = $event->getParam('task');
+        /** @var ZfExtended_Sanitized_HttpRequest $request */
+        $request = $event->getParam('request');
+        $bconfId = $request->getParam('bconfId');
+
+        if ($this->doDebug) {
+            error_log('OKAPI::handleOnPostImport: task ' . $task->getTaskGuid() .
+                ', requestBconfId: ' . ($bconfId === null ? 'null' : $bconfId));
+        }
+
+        if (! empty($bconfId)) {
+            TaskBconfAssocRepository::create()->createForTask(
+                $task->getTaskGuid(),
+                (int) $bconfId
+            );
+        }
     }
 
     /**
      * Hook before a file-translation is requested as an internal-api request
      * We add the bconf-id then as the bconf-id is neccessary to properly evaluate the file-types
+     *
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -795,7 +834,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
         if ($bconfInZip === null) {
             $bconf = self::getImportBconfById($task, $taskMetaDTO->bconfId);
-            // we add the bconf with it's visual name as filename to the archive for easier maintainability
+            // we add the bconf with it's "visual" name as filename to the archive for easier maintainability
             $dataProvider->addAdditonalFileToArchive($bconf->getPath(), $bconf->getDownloadFilename());
         } else {
             // if a bconf is provided in the import zip it will be part of the archive anyway
@@ -810,7 +849,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
                 rename($bconfInZip, $dir . DIRECTORY_SEPARATOR . $bconfFilename);
                 $bconfInZip = $dir . DIRECTORY_SEPARATOR . $bconfFilename;
             }
-            $task->meta()->setBconfInZip($bconfInZip);
+
+            TaskBconfAssocRepository::create()->createForTask($task->getTaskGuid(), null, $bconfInZip);
         }
     }
 

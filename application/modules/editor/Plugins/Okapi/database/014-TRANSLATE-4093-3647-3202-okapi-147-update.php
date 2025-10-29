@@ -72,7 +72,7 @@ if ($bconfUpgradeNeeded) {
     // find a proper 147 server in the config
     $serverName = $insideBitbucket ? null : $find147VersionPlus(
         $okapiConfig?->server?->toArray() ?? [],
-            $okapiConfig?->serverUsed ?? ''
+        $okapiConfig?->serverUsed ?? ''
     );
 
     // not found, the migration has to be aborted !!
@@ -125,7 +125,6 @@ if ($bconfUpgradeNeeded) {
         );
     }
 }
-
 
 $db->query(
     "DELETE FROM `Zf_configuration` WHERE `name` IN (" .

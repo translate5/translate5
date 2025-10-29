@@ -281,8 +281,16 @@ final class FileTypeSupport
      */
     public function getSupportedExtensions(): array
     {
-        //array_values needed for later JSON encode (with array_unique there may be gaps in the index, which results in objects instead arrays
-        return array_values(array_unique(array_merge(array_keys($this->extensionsWithParser), array_keys($this->extensionsSupported))));
+        //array_values needed for later JSON encode (with array_unique there may be gaps in the index,
+        // which results in objects instead arrays)
+        return array_values(
+            array_unique(
+                array_merge(
+                    array_keys($this->extensionsWithParser),
+                    array_keys($this->extensionsSupported)
+                )
+            )
+        );
     }
 
     /**

@@ -45,7 +45,7 @@ class OkapiExportBconfTest extends JsonTestAbstract
         self::$bconf2 = $config->addBconf('JsonBconf', 'json.bconf');
     }
 
-    public function test10_BConfsImport()
+    public function test10_BconfsImport()
     {
         static::assertStringStartsWith(
             'TestBconf',
@@ -61,6 +61,7 @@ class OkapiExportBconfTest extends JsonTestAbstract
 
     /**
      * Test imported with a custom JSON Bconf
+     * @depends test10_BconfsImport
      */
     public function test20_OkapiJsonImport()
     {
@@ -79,6 +80,7 @@ class OkapiExportBconfTest extends JsonTestAbstract
 
     /**
      * Test imported with a custom Typo3 Bconf
+     * @depends test10_BconfsImport
      */
     public function test30_OkapiTypo3Import()
     {

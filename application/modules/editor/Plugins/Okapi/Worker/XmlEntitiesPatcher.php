@@ -42,7 +42,7 @@ final class XmlEntitiesPatcher
 
     private const T5_CLOSE = 'T5';
 
-    public static function patchBeforeImport(int $bconfId, SplFileInfo $file): void
+    public static function patchBeforeImport(?int $bconfId, SplFileInfo $file): void
     {
         $patchedEntities = self::getPatchedEntities($bconfId, $file->getExtension());
         $entitiesMap = [];
@@ -112,9 +112,9 @@ final class XmlEntitiesPatcher
         }
     }
 
-    private static function getPatchedEntities(int $bconfId, string $fileExtension): array
+    private static function getPatchedEntities(?int $bconfId, string $fileExtension): array
     {
-        if (! $bconfId) {
+        if (empty($bconfId)) {
             return [];
         }
         $bconf = new BconfEntity();

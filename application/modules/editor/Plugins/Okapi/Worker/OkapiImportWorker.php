@@ -36,6 +36,7 @@ use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\File\Filter\Type;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfAssocRepository;
 use SplFileInfo;
 use Throwable;
 use Zend_Registry;
@@ -84,7 +85,9 @@ class OkapiImportWorker extends editor_Models_Task_AbstractWorker
         $serverUsed = $okapiConfig->serverUsed ?? 'not set';
         $api = new OkapiAdapter($taskConfig);
 
-        XmlEntitiesPatcher::patchBeforeImport((int) $this->task->meta()->getBconfId(), $file);
+        $tbAssoc = TaskBconfAssocRepository::create()->findForTask($this->task->getTaskGuid());
+
+        XmlEntitiesPatcher::patchBeforeImport($tbAssoc->getBconfId(), $file);
 
         try {
             $this->logger->info(

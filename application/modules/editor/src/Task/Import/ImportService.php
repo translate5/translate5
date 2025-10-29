@@ -133,9 +133,15 @@ class ImportService
 
         $user = ZfExtended_Authentication::getInstance()->getUser();
 
+        //must be saved in order that initAndValidate works correct
+        $project->save();
+
+        $this->eventTrigger->triggerOnImportFromPost($project, $request);
+
         //gets and validates the uploaded zip file
         $upload = editor_Models_Import_UploadProcessor::taskInstance($project);
         $upload->initAndValidate();
+
         $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
 
         $this->addTaskMetaData($data); //uggly: contains more parameters as only the ones for meta data!
