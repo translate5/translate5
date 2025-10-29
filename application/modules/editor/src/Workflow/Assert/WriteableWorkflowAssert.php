@@ -81,7 +81,7 @@ class WriteableWorkflowAssert
 
         //Excel Re-import happens outside of an opened task, so there is no job with a used state.
         // if the external editing is properly included we should consider to add && $workflow->isWriteable($tua)
-        if ($tua !== null && $contextDto->flow->isExternalEditing()) {
+        if ($tua !== null && $contextDto->flow?->isExternalEditing()) {
             return;
         }
 
