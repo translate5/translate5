@@ -1930,11 +1930,13 @@ class ModelNode {
             element = document.createElement(this.#getTag());
         }
 
-        for (const [key, value] of Object.entries(this.#attributes)) {
-            try {
-                element.setAttribute(key, value);
-            } catch (e) {
-                console.log('Error setting attribute', key, value, e);
+        if (this.#type !== ModelNode.TYPE.TEXT) {
+            for (const [key, value] of Object.entries(this.#attributes)) {
+                try {
+                    element.setAttribute(key, value);
+                } catch (e) {
+                    console.log('Error setting attribute', key, value, e);
+                }
             }
         }
 
