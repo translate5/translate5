@@ -38,8 +38,6 @@ class TaskMetaDTO
     public function __construct(
         public readonly string $taskGuid,
         public ?string $mappingType = null,
-        public ?int $bconfId = null,
-        public ?string $bconfInZip = null,
         public ?int $pricingPresetId = null,
         public bool $perTaskExport = false,
         //synchronize fields manually to TaskMetaImmutableDTO!
@@ -51,8 +49,6 @@ class TaskMetaDTO
         return new TaskMetaImmutableDTO(
             $this->taskGuid,
             $this->mappingType,
-            $this->bconfId,
-            $this->bconfInZip,
             $this->pricingPresetId,
             $this->perTaskExport,
         );

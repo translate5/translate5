@@ -39,8 +39,6 @@ class TaskMetaImmutableDTO
     public function __construct(
         public readonly string $taskGuid,
         public readonly ?string $mappingType = null,
-        public readonly ?int $bconfId = null,
-        public readonly ?string $bconfInZip = null,
         public readonly ?int $pricingPresetId = null,
         public readonly bool $perTaskExport = false,
     ) {
