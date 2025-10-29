@@ -14,6 +14,37 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+
+## [7.32.0] - 2025-10-29
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4444](https://jira.translate5.net/browse/TRANSLATE-4444): InstantTranslate - InstantTranslate: file translation into multiple languages at once** <br>
+New feature where files in instant-translate can be translated to multiple languages. To enable it, activate: runtimeOptions.plugins.InstantTranslate.enableMultiLanguageFileTranslation 
+
+
+### Changed
+**[TRANSLATE-3710](https://jira.translate5.net/browse/TRANSLATE-3710): usability editor - Introduce new processing status "draft" for segments** <br>
+Introduced new processing status "draft" for segments
+
+
+### Bugfixes
+**[TRANSLATE-5095](https://jira.translate5.net/browse/TRANSLATE-5095): Search & Replace (editor) - Replace button click produces Js error** <br>
+[🐞 Fix] Fixed error that might have popped up in the dev tools when replacing a text with search/replace tool
+
+**[TRANSLATE-5094](https://jira.translate5.net/browse/TRANSLATE-5094): Import/Export - Replace Task-Meta for Okapi to resolve Import Event interdependencies** <br>
+Refactor Task-Meta handling in OKAPI to plugin-specific data to resolve Import 
+
+**[TRANSLATE-5036](https://jira.translate5.net/browse/TRANSLATE-5036): LanguageResources - Pretranslation crashes on specific language combinations** <br>
+Resolved match analysis / pre-translation crashes for specific language combinations.
+
+**[TRANSLATE-5007](https://jira.translate5.net/browse/TRANSLATE-5007): InstantTranslate - Improve filetranslation speed for small tasks** <br>
+Instanttranslate file translation speed for small translations improved
+
+
 ## [7.31.1] - 2025-10-28
 
 ### Important Notes:
