@@ -819,21 +819,20 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         $dataProvider = $event->getParam('dataProvider');
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        /* @var TaskMetaImmutableDTO $taskMetaDTO */
-        $taskMetaDTO = $event->getParam('metaDTO');
 
+        $tbAssoc = TaskBconfAssocRepository::create()->findForTask($task->getTaskGuid());
         $bconfInZip = self::findImportBconfFileinDir($dataProvider->getAbsImportPath());
 
         if ($this->doDebug) {
             error_log(
                 'OKAPI::handleAfterUploadPreparation: task ' . $task->getTaskGuid()
                 . ', bconfInZip: ' . ($bconfInZip === null ? 'null' : basename($bconfInZip))
-                . ', bconfId: ' . ($taskMetaDTO->bconfId ?? 'null')
+                . ', bconfId: ' . ($tbAssoc->getBconfId() ?? 'null')
             );
         }
 
         if ($bconfInZip === null) {
-            $bconf = self::getImportBconfById($task, $taskMetaDTO->bconfId);
+            $bconf = self::getImportBconfById($task, $tbAssoc->getBconfId());
             // we add the bconf with it's "visual" name as filename to the archive for easier maintainability
             $dataProvider->addAdditonalFileToArchive($bconf->getPath(), $bconf->getDownloadFilename());
         } else {
