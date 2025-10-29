@@ -28,11 +28,11 @@
 
 -- userGroup calculation: basic: 1; editor: 2; pm: 4; admin: 8
 
-UPDATE translate5.LEK_change_log
+UPDATE LEK_change_log
 SET description = 'T5Memory: replaced reorganize with export/import for better processes'
 WHERE jiraNumber = 'TRANSLATE-5016';
 
-UPDATE translate5.LEK_change_log
+UPDATE LEK_change_log
 SET description = '7.31.1: Fix reorganize worker
 7.30.0: T5Memory: replaced reorganize with export/import for better processes'
 WHERE jiraNumber = 'TRANSLATE-5016' and dateOfChange = '2025-10-28';
