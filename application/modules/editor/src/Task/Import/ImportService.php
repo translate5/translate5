@@ -37,17 +37,26 @@ use editor_Models_Import_UploadProcessor;
 use editor_Models_Languages;
 use editor_Models_Task;
 use editor_Models_Task_Remover;
+use editor_Models_TaskConfig;
 use editor_Models_TaskUsageLog;
 use editor_Task_Type;
 use editor_Task_Type_Default;
 use Exception;
+use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
+use ReflectionException;
 use Throwable;
+use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_Debug;
 use ZfExtended_ErrorCodeException;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Languages;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 use ZfExtended_Sanitized_HttpRequest;
 
@@ -69,6 +78,13 @@ class ImportService
 
     private bool $doDebug;
 
+    private array $taskMetaData = [];
+
+    private bool $importWizardUsed = false;
+
+    /**
+     * @throws ReflectionException
+     */
     public function __construct()
     {
         $this->defaults = new TaskDefaults();
@@ -81,6 +97,11 @@ class ImportService
         $this->doDebug = ZfExtended_Debug::hasLevel('core', 'ImportService');
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     */
     public function startWorkers(editor_Models_Task $task): void
     {
         if ($this->doDebug) {
@@ -112,31 +133,52 @@ class ImportService
 
         $user = ZfExtended_Authentication::getInstance()->getUser();
 
-        if ($single) {
-            return $this->importSingleTask(
-                $project,
-                $user,
-                $data,
-                (bool) $request->getParam('importWizardUsed', false)
-            );
-        }
+        //must be saved in order that initAndValidate works correct
+        $project->save();
 
-        // this triggers the meta event for the project only.
-        // For the tasks this is done in the import|importSingleTask methods
-        $this->prepareMeta($project, $data);
+        $this->eventTrigger->triggerOnImportFromPost($project, $request);
 
+        //gets and validates the uploaded zip file
         $upload = editor_Models_Import_UploadProcessor::taskInstance($project);
         $upload->initAndValidate();
 
         $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
 
+        $this->addTaskMetaData($data); //uggly: contains more parameters as only the ones for meta data!
+        $this->importWizardUsed = (bool) $request->getParam('importWizardUsed', false);
+
+        if ($single) {
+            if ($this->doDebug) {
+                error_log(
+                    'ImportService::importSingleTask: ' . $project->getTaskType() .
+                    ($request->getParam('importWizardUsed', false) ? ' from Import-Wizard' : '') .
+                    ', data: ' . print_r($data, true) . "\n"
+                );
+            }
+
+            return $this->importSingleTask(
+                $project,
+                $dpFactory->createFromUpload($upload, $data),
+                (int) reset($data['targetLang']),
+                $user,
+            );
+        }
+
         return $this->importProject(
             $project,
             $dpFactory->createFromUpload($upload, $data),
-            $data,
+            $data['targetLang'],
             $user,
-            false
         );
+    }
+
+    /**
+     * Assoc array with possible additional task meta data,
+     * passed to plugins for further usage and setting finally then in task meta
+     */
+    public function addTaskMetaData(array $metaData): void
+    {
+        $this->taskMetaData = $metaData;
     }
 
     /**
@@ -144,36 +186,19 @@ class ImportService
      * This will evaluate what kind of data provider should be used, and it will process the uploaded files
      * @throws Exception
      */
-    private function importSingleTask(
+    public function importSingleTask(
         editor_Models_Task $task,
+        editor_Models_Import_DataProvider_Abstract $dataProvider,
+        int $targetLanguage,
         ZfExtended_Models_User $user,
-        array $data,
-        bool $importWizardUsed
     ): array {
-        if ($this->doDebug) {
-            error_log(
-                'ImportService::importSingleTask: ' . $task->getTaskType() .
-                ($importWizardUsed ? ' from Import-Wizard' : '') .
-                ', data: ' . print_r($data, true) . "\n"
-            );
-        }
-
-        // must be done before upload-validation
-        $this->prepareMeta($task, $data);
-
-        //gets and validates the uploaded zip file
-        $upload = editor_Models_Import_UploadProcessor::taskInstance($task);
-        $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
-        $upload->initAndValidate();
-        $dp = $dpFactory->createFromUpload($upload, $data);
-
         // was set as array in setDataInEntity
-        $task->setTargetLang(reset($data['targetLang']));
+        $task->setTargetLang($targetLanguage);
 
         $task->save();
 
         // handling project tasks is also done in prepareConfigsDefaultsCheckUploadsQueueWorkers
-        $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dp, $data, $user, $importWizardUsed);
+        $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $user);
 
         // for internal tasks the usage log requires different handling, so log only non-internal tasks
         if (! $task->getTaskType()->isInternalTask()) {
@@ -186,32 +211,26 @@ class ImportService
 
     /**
      * @return object[]
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function importProject(
         editor_Models_Task $project,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        array $data,
+        array $targetLanguages,
         ZfExtended_Models_User $user,
-        bool $prepareMeta = true
     ): array {
         $entityId = $project->save();
         $project->initTaskDataDirectory();
 
-        if ($this->doDebug) {
-            error_log(
-                'ImportService::importProject: ' . $project->getTaskType() .
-                ', data: ' . print_r($data, true) . "\n"
-            );
-        }
-
         // trigger an event that gives plugins a chance to hook into the import process
         // after unpacking/checking the files and before archiving them
-        $this->eventTrigger->triggerAfterProjectUploadPreparation($project, $dataProvider, $data);
-
-        // meta-preparation might be skipped when already done in a preceiding step
-        if ($prepareMeta) {
-            $this->prepareMeta($project, $data);
-        }
+        $immutableProjectMetaDTO = $this->prepareMeta($project); //set meta explicit for project
+        $this->eventTrigger->triggerAfterProjectUploadPreparation($project, $dataProvider, $immutableProjectMetaDTO);
 
         $dataProvider->checkAndPrepare($project);
 
@@ -230,7 +249,7 @@ class ImportService
 
         $projectTasks = [];
 
-        foreach ($data['targetLang'] as $target) {
+        foreach ($targetLanguages as $target) {
             $task = clone $project;
 
             $task->setProjectId($entityId);
@@ -247,8 +266,7 @@ class ImportService
 
             try {
                 $task->save();
-                $this->prepareMeta($task, $data);
-                $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $data, $user);
+                $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $user);
                 //update the task usage log for this project-task
                 $this->usageLogger->log($task);
             } catch (Throwable $e) {
@@ -274,20 +292,20 @@ class ImportService
 
     /**
      * Prepares the meta-data for a task-import
-     * This has to happen BEFORE the Uploaded files are validated
+     * @throws ZfExtended_Exception
+     * @throws Zend_Db_Statement_Exception
      */
-    public function prepareMeta(editor_Models_Task $task, array $data): void
+    private function prepareMeta(editor_Models_Task $task): TaskMetaImmutableDTO
     {
         // TODO FIXME: is the catch to prevent duplication still neccessary ?
-        if (! in_array($task->getTaskGuid(), self::$metaTasks)) {
-            self::$metaTasks[] = $task->getTaskGuid();
-
+        if (! array_key_exists($task->getTaskGuid(), self::$metaTasks)) {
             $taskMeta = $task->meta();
             $taskMetaDTO = $taskMeta->toDTO();
             // send the DTO so plugins can add their data
-            $this->eventTrigger->triggerTaskMetaEvent($task, $data, $taskMetaDTO);
+            $this->eventTrigger->triggerTaskMetaEvent($task, $this->taskMetaData, $taskMetaDTO);
             // and save it back
             $taskMeta->setFromDTO($taskMetaDTO);
+            self::$metaTasks[$task->getTaskGuid()] = $taskMetaDTO->getImmutable();
 
             if ($this->doDebug) {
                 error_log(
@@ -301,6 +319,8 @@ class ImportService
                 '" called multiple for Task ' . $task->getTaskGuid() . ' !'
             );
         }
+
+        return self::$metaTasks[$task->getTaskGuid()];
     }
 
     /**
@@ -309,19 +329,10 @@ class ImportService
     public function prepareConfigsDefaultsCheckUploadsQueueWorkers(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        array $data,
         ZfExtended_Models_User $user,
-        bool $importWizardUsed = false
     ): void {
-        if ($this->doDebug) {
-            error_log(
-                'ImportService::prepareConfigsDefaultsCheckUploadsQueueWorkers: ' .
-                ', data: ' . print_r($data, true) . "\n"
-            );
-        }
-
         try {
-            $importConfig = $this->prepareImportConfig($task, $dataProvider, $user, $data);
+            $importConfig = $this->prepareImportConfig($task, $dataProvider, $user);
         } catch (ZfExtended_ErrorCodeException $e) {
             try {
                 $remover = ZfExtended_Factory::get(editor_Models_Task_Remover::class, [$task]);
@@ -333,25 +344,31 @@ class ImportService
             throw $e;
         }
 
-        $taskConfig = new editor_Models_Import_TaskConfig(new \editor_Models_TaskConfig());
+        $taskConfig = new editor_Models_Import_TaskConfig(new editor_Models_TaskConfig());
         $taskConfig->loadAndProcessConfigTemplate($task, $importConfig);
 
         // add task defaults (user associations and language resources)
-        $this->defaults->setTaskDefaults($task, $importWizardUsed);
+        $this->defaults->setTaskDefaults($task, $this->importWizardUsed);
 
         $this->workersService->queueImportWorkers($task, $dataProvider, $importConfig);
     }
 
     /**
      * führt den Import aller Dateien eines Task durch
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     private function prepareImportConfig(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         ZfExtended_Models_User $user,
-        array $data
     ): editor_Models_Import_Configuration {
+        $immutableTaskMetaDto = $this->prepareMeta($task); //this fixates the task meta-data for the current task!
+
         if ($this->doDebug) {
             error_log('ImportService::prepareImportConfig' . "\n");
         }
@@ -376,12 +393,12 @@ class ImportService
                 $task->getSourceLang(),
                 $task->getTargetLang(),
                 $task->getRelaisLang(),
-                editor_Models_Languages::LANG_TYPE_ID
+                ZfExtended_Languages::LANG_TYPE_ID
             );
 
             // trigger an event that gives plugins a chance to hook into the import process
             // after unpacking/checking the files and before archiving them
-            $this->eventTrigger->triggerAfterUploadPreparation($task, $dataProvider, $data);
+            $this->eventTrigger->triggerAfterUploadPreparation($task, $dataProvider, $immutableTaskMetaDto);
 
             $dataProvider->archiveImportedData();
             $importConfig->importFolder = $dataProvider->getAbsImportPath();

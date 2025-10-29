@@ -59,6 +59,10 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
         task: '#UT#Aufgabe',
         state: '#UT#Status',
         inUse: '#UT#Status "{0}" durch einen anderen Benutzer',
+        qualityErrorCount: '#UT#QS Fehler',
+        segmentsInDraft: '#UT#Segmente im Entwurfsstatus',
+        yes: '#UT#Ja',
+        no: '#UT#Nein',
         close: '#UT#Schließen',
         reimportAll: '#UT#Alle Segmente im TM speichern',
         reimportUserSaved: '#UT#Benutzer-gespeicherte Segmente im TM speichern',
@@ -68,6 +72,8 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
         timeOption: '#UT#Zeitoption',
         currentTime: '#UT#Aktueller Zeitpunkt',
         segmentSaveTime: '#UT#Zeitpunkt der Segmentspeicherung',
+        warning: '#UT#Warnung',
+        saveWarning: '#UT#Speichern Sie keine Aufgaben ins TM, die QA-Fehler aufweisen und/oder Segmente im Entwurfsstatus beinhalten. Dies führt zu fehlerhaften und/oder unfertigen Segmentversionen in der Vorübersetzung!',
         timeOptionTooltip: '#UT#Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird.',
     },
     controller: 'languageResourceTaskGridWindow',
@@ -96,7 +102,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                         columns: [
                             {
                                 xtype: 'gridcolumn',
-                                flex: 5,
+                                flex: 4,
                                 //hideable: false,
                                 //sortable: false,
                                 //cellWrap: true,
@@ -104,10 +110,9 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                                 dataIndex: 'taskName',
                                 text: me.strings.task,
                                 renderer: v => Ext.String.htmlEncode(v)
-                            },
-                            {
+                            },{
                                 xtype: 'gridcolumn',
-                                flex: 5,
+                                flex: 3,
                                 dataIndex: 'state',
                                 renderer: function (val, meta, rec) {
                                     if (!rec.get('lockingUser')) {
@@ -116,8 +121,27 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                                     return Ext.String.format(me.strings.inUse, rec.get('state'));
                                 },
                                 text: me.strings.state
-                            },
-                            {
+                            },{
+                                xtype: 'gridcolumn',
+                                flex: 1,
+                                dataIndex: 'qualityErrorCount',
+                                renderer: function (val, meta, rec) {
+                                    if (rec.get('qualityHasFaults')) {
+                                        val += ' <span class="x-grid-symbol t5-quality-faulty">' + Ext.String.fromCodePoint(parseInt('0xf057', 16)) + '</span>';
+                                    }
+                                    // We use the loader-feature of the qtips
+                                    return '<span data-qtipurl="' + Editor.data.restpath + 'quality/tasktooltip?taskGuid=' + rec.get('taskGuid') + '">' + val + '</span>';
+                                },
+                                text: me.strings.qualityErrorCount
+                            },{
+                                xtype: 'gridcolumn',
+                                flex: 2,
+                                dataIndex: 'segmentsInDraft',
+                                text: me.strings.segmentsInDraft,
+                                renderer: function (value) {
+                                    return '<span style="color:' + (value ? '#FF1C00;font-weight:bold' : 'darkgreen') + '">' + me.strings[value?'yes':'no'] + '</span>';
+                                }
+                            },{
                                 xtype: 'taskActionColumn',
                                 items: [{
                                     tooltip: me.strings.gotoTask,
@@ -128,8 +152,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                         ]
                     }
                 ],
-                dockedItems: [
-                    {
+                dockedItems: [{
                         xtype: 'toolbar',
                         dock: 'bottom',
                         ui: 'footer',
@@ -189,6 +212,11 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                                 text: me.strings.close
                             }
                         ]
+                    },{
+                        xtype: 'container',
+                        html: '<p style="margin-left:10px;font-weight: bold"><span style="color:#FF1C00">' +
+                            me.strings.warning + '</span>: ' + me.strings.saveWarning + '</p>',
+                        dock: 'bottom'
                     }
                 ]
             };

@@ -59,8 +59,10 @@ use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\Event\SegmentProcessedEvent;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\Operation\UpdateFlow;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
@@ -195,8 +197,9 @@ class SearchAndReplaceService
                             ],
                             divisor: $durationsDivisor
                         ),
-                        autoStateId: 999,
+                        autoStateId: $dto->autoStateId,
                     ),
+                    new ContextDto(UpdateFlow::SearchAndReplace),
                     $actor,
                     $updateLogger
                 );

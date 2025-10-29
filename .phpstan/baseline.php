@@ -7594,7 +7594,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Zend_File_Transfer\\:\\:getFileInfo\\(\\)\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Controllers/InstanttranslateapiController.php',
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Service/FileTranslationRequestParser.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property ZfExtended_RestController\\:\\:\\$data \\(array\\) on left side of \\?\\? is not nullable\\.$#',

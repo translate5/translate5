@@ -113,7 +113,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
             (int) $master->getId(),
             $ids,
             (int) $userJob->getId(),
-            (int) $this->_getParam('duration'),
+            (int) $this->_getParam('duration')
         );
 
         if ($this->_getParam('async', false)) {

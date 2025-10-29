@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource;
 
-use Zend_Db_Expr;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use Zend_Db_Table_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
@@ -40,33 +40,9 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
      */
     public function getTaskInfoForLanguageResources($languageResourceids)
     {
-        if (empty($languageResourceids)) {
-            return [];
-        }
+        $taskAssocRepository = LanguageResourceTaskAssocRepository::create();
 
-        $s = $this->db->select()
-            ->from([
-                'assocs' => $this->tableName,
-            ], [
-                'assocs.id',
-                'assocs.taskGuid',
-                'task.id as taskId',
-                'task.projectId',
-                'task.taskName',
-                'task.state',
-                'task.lockingUser',
-                'task.taskNr',
-                'assocs.languageResourceId',
-                new Zend_Db_Expr($this->db->getAdapter()->quote($this->tableName) . ' as tableName'),
-            ])
-            ->setIntegrityCheck(false)
-            ->join([
-                'task' => 'LEK_task',
-            ], 'assocs.taskGuid = task.taskGuid', '')
-            ->where('assocs.languageResourceId in (?)', $languageResourceids)
-            ->group('assocs.id');
-
-        return $this->db->fetchAll($s)->toArray();
+        return $taskAssocRepository->getTaskInfoForLanguageResources($languageResourceids);
     }
 
     /***

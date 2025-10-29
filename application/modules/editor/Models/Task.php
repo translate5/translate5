@@ -51,7 +51,6 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setDescription(string $description)
  * @method void setSourceLang(string|int $id)
  * @method void setTargetLang(string|int $id)
- * @method string getRelaisLang()
  * @method void setRelaisLang(string|int $id)
  * @method null|string getLockedInternalSessionUniqId()
  * @method void setLockedInternalSessionUniqId(?string $id)
@@ -363,10 +362,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * their lifetime is over).
      * @return array
      */
-    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset)
+    public function loadListForCleanupByTasktype(array $tasktypes, int $orderDaysOffset)
     {
+        if (empty($tasktypes)) {
+            return [];
+        }
         $s = $this->db->select();
-        $s->where('tasktype = ?', $tasktype);
+        $s->where('taskType in (?)', $tasktypes);
         $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
 
         return parent::loadFilterdCustom($s);
@@ -434,16 +436,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @return int
      */
-    public function getTotalCountByUserAssoc(string $userGuid)
+    public function getTotalCountByUserAssoc(string $userGuid): int
     {
         $s = $this->getSelectByUserAssocSql($userGuid, [
             'numrows' => 'count(*)',
         ]);
         $this->applyFilterToSelect($s);
 
-        return $this->db->fetchRow($s)->numrows;
+        return (int) $this->db->fetchRow($s)->numrows;
     }
 
     /**
@@ -1514,19 +1515,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         }
     }
 
-    /**
-     * @throws Zend_Exception
-     */
     public function getSourceLang(): int
     {
         return (int) $this->get('sourceLang');
     }
 
-    /**
-     * @throws Zend_Exception
-     */
     public function getTargetLang(): int
     {
         return (int) $this->get('targetLang');
+    }
+
+    public function getRelaisLang(): int
+    {
+        return (int) $this->get('relaisLang');
     }
 }

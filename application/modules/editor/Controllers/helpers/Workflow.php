@@ -40,6 +40,6 @@ class Editor_Controller_Helper_Workflow extends Zend_Controller_Action_Helper_Ab
      */
     public function checkWorkflowWriteable(string $taskGuid, string $userGuid, editor_Workflow_Default $workflow = null)
     {
-        WriteableWorkflowAssert::create()->assert($taskGuid, $userGuid, $workflow);
+        WriteableWorkflowAssert::create()->assert($taskGuid, $userGuid, workflow: $workflow);
     }
 }

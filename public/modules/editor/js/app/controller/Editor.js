@@ -216,12 +216,14 @@ Ext.define('Editor.controller.Editor', {
         // -------------------------------------------------------------------------------------
         me.keyMapConfig = {
             'ctrl-d': ['D', {ctrl: true, alt: false}, me.watchSegment, true],
-            'ctrl-s': ['S', {ctrl: true, alt: false}, me.save, true],
+            'ctrl-s': ['S', {ctrl: true, alt: false, shift: false}, me.save, true],
+            'ctrl-shift-s': ['S', {ctrl: true, alt: false, shift: true}, me.saveDraft, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
             // 'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             // 'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-l':         ['L',{ctrl: true, alt: false}, me.toggleSegmentLock, true],
-            'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
+            'ctrl-enter':     [[10,13],{ctrl: true, alt: false, shift: false}, me.saveNextByWorkflow],
+            'ctrl-shift-enter':     [[10,13],{ctrl: true, alt: false, shift: true}, me.saveDraftNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
             'esc': [Ext.EventObjectImpl.ESC, null, me.cancel],
@@ -783,6 +785,17 @@ Ext.define('Editor.controller.Editor', {
         }
     },
 
+    saveDraft: function () {
+        var ed = this.getEditPlugin(),
+        rec = ed.editing && ed.context.record;
+        if (rec && rec.get('editable')) {
+            // rec.set('autoStateId', Editor.data.segments.autoStates.DRAFT);
+            // rec.commit(false);
+            ed.isDraft = true;
+            this.save();
+        }
+    },
+
     // /**
     //  * Handler for CTRL+X
     //  */
@@ -1051,6 +1064,13 @@ Ext.define('Editor.controller.Editor', {
         this.calcNext(true);
         this.saveOtherRow();
     },
+
+    saveDraftNextByWorkflow: function() {
+        this.calcNext(true);
+        this.getEditPlugin().isDraft = true;
+        this.saveOtherRow();
+    },
+
     // /**
     //  * Handler for savePrevious Button
     //  * @return {Boolean} true if there is a next segment, false otherwise
@@ -1181,8 +1201,12 @@ Ext.define('Editor.controller.Editor', {
             }
         });
 
+        // disable UI tag check for draft status
+        if(this.getEditPlugin().isDraft){
+            me.saveAndIgnoreContentErrors();
+        }
         // tag-errors: check if user is allowed to save anyway
-        if (isTagError && Editor.app.getTaskConfig('segments.userCanIgnoreTagValidation')) {
+        else if (isTagError && Editor.app.getTaskConfig('segments.userCanIgnoreTagValidation')) {
             msgBox.confirm(
                 me.messages.errorTitle, msg, function (btn) {
                     if (btn === 'no') {

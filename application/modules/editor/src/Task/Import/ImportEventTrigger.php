@@ -56,8 +56,10 @@ use editor_Models_Import_Configuration;
 use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
+use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
+use ZfExtended_Sanitized_HttpRequest;
 
 class ImportEventTrigger
 {
@@ -67,6 +69,8 @@ class ImportEventTrigger
     public const BEFORE_IMPORT = 'beforeImport';
 
     public const AFTER_UPLOAD_PREPARATION = 'afterUploadPreparation';
+
+    public const ON_POST_IMPORT = 'onPostImport';
 
     public const AFTER_PROJECT_UPLOAD_PREPARATION = 'afterProjectUploadPreparation';
 
@@ -128,12 +132,12 @@ class ImportEventTrigger
     public function triggerAfterProjectUploadPreparation(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        array $data
+        TaskMetaImmutableDTO $projectMeta,
     ): void {
         $this->triggerEvent(self::AFTER_PROJECT_UPLOAD_PREPARATION, [
             'task' => $task,
+            'metaDTO' => $projectMeta,
             'dataProvider' => $dataProvider,
-            'requestData' => $data,
         ]);
     }
 
@@ -163,12 +167,12 @@ class ImportEventTrigger
     public function triggerAfterUploadPreparation(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        array $data
+        TaskMetaImmutableDTO $taskMeta,
     ): void {
         $this->triggerEvent(self::AFTER_UPLOAD_PREPARATION, [
             'task' => $task,
             'dataProvider' => $dataProvider,
-            'requestData' => $data,
+            'metaDTO' => $taskMeta,
         ]);
     }
 
@@ -178,5 +182,15 @@ class ImportEventTrigger
             error_log('IMPORT EVENT: ' . $event . ', task: ' . (array_key_exists('task', $params) ? $params['task']->getTaskGuid() : 'null'));
         }
         $this->events->trigger($event, self::class, $params);
+    }
+
+    public function triggerOnImportFromPost(
+        editor_Models_Task $task,
+        ZfExtended_Sanitized_HttpRequest $request
+    ): void {
+        $this->triggerEvent(self::ON_POST_IMPORT, [
+            'task' => $task,
+            'request' => $request,
+        ]);
     }
 }

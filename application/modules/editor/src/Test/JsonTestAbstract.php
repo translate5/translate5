@@ -151,7 +151,7 @@ abstract class JsonTestAbstract extends ImportTestAbstract
         foreach ($tmResults as &$res) {
             $tmUnset($res);
         }
-        $this->assertEquals($tmResults, $expectations, $message);
+        $this->assertEquals($expectations, $tmResults, $message);
     }
 
     /* Comment model specific API */

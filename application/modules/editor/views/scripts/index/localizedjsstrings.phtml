@@ -146,6 +146,7 @@ Ext.define('Editor.controller.Localizer', {
             leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabenübersicht');?>',
             closeBtn: '<?php echo $this->translate->_('Anwendung verlassen');?>',
             showDesc: '<?php echo $this->translate->_('Projektbeschr. anzeigen');?>',
+            error: '<?php echo $this->translate->_('Fehler');?>',
             hideDesc: '<?php echo $this->translate->_('Projektbeschr. ausblenden');?>',
             isTaskApproved: '<?php echo $this->translate->_('Ist die Aufgabe genehmigt?');?>',
             addCommentToReject: '<?php echo $this->translate->_('Wenn Sie auf "Nein" klicken möchten, schließen Sie bitte dieses Popup und fügen Sie einen Kommentar hinzu, warum');?>',
@@ -469,7 +470,8 @@ Ext.define('Editor.controller.Localizer', {
             assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
             assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
             finishAutoQaCheck: '<?php echo $this->translate->_('Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.');?>',
-            finishAutoQaCheckQuestion: '<?php echo $this->translate->_('Trotzdem Status auf "abgeschlossen" setzen?');?>'
+            finishAutoQaCheckQuestion: '<?php echo $this->translate->_('Trotzdem Status auf "abgeschlossen" setzen?');?>',
+            noFinishDueDraftSegments: '<?php echo $this->translate->_('Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.');?>'
         }
     });
 
@@ -507,7 +509,8 @@ Ext.define('Editor.controller.Localizer', {
             levenshteinDistanceOriginalLabel:'<?php echo $this->translate->_('Ø Levenshtein-Abstand ab Beginn des Workflows');?>',
             levenshteinDistanceStartLabel:'<?php echo $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');?>',
             levenshteinDistanceEndLabel:'<?php echo $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');?>',
-            taskDeleted: '<?php echo $this->translate->_('Aufgabe "{0}" gelöscht');?>'
+            taskDeleted: '<?php echo $this->translate->_('Aufgabe "{0}" gelöscht');?>',
+            noFinishDueDraftSegments: '<?php echo $this->translate->_('Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.');?>'
         },
         confirmStrings: {
             "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -1333,6 +1336,7 @@ Ext.define('Editor.controller.Localizer', {
             wildcardsSearch: '<?php echo $this->translate->_('Wildcards (* und ?)');?>',
             regularExpressionSearch: '<?php echo $this->translate->_('Regulärer Ausdruck');?>',
             saveCurrentOpen: '<?php echo $this->translate->_('Segment beim Schließen speichern');?>',
+            saveCurrentDraft: '<?php echo $this->translate->_('Segment beim Schließen als Entwurf speichern');?>',
             invalidRegularExpression: '<?php echo $this->translate->_('Ungültiger Regulärer Ausdruck');?>',
             unsupportedRegularExpression: '<?php echo $this->translate->_('Dieser reguläre Ausdruck wird nicht unterstützt');?>',
             segmentMatchInfoMessage: '<?php echo $this->translate->_('Segmente mit Suchtreffer:');?>',
@@ -1972,6 +1976,10 @@ Ext.define('Editor.controller.Localizer', {
             task: '<?php echo $this->translate->_('Aufgabe');?>',
             state: '<?php echo $this->translate->_('Status');?>',
             inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
+            qualityErrorCount: '<?php echo $this->translate->_('QS Fehler');?>',
+            segmentsInDraft: '<?php echo $this->translate->_('Segmente im Entwurfsstatus');?>',
+            yes: '<?php echo $this->translate->_('Ja');?>',
+            no: '<?php echo $this->translate->_('Nein');?>',
             close: '<?php echo $this->translate->_('Schließen');?>',
             reimportAll: '<?php echo $this->translate->_('Alle Segmente im TM speichern');?>',
             reimportUserSaved: '<?php echo $this->translate->_('Benutzer-gespeicherte Segmente im TM speichern');?>',
@@ -1981,6 +1989,8 @@ Ext.define('Editor.controller.Localizer', {
             timeOption: '<?php echo $this->translate->_('Zeitoption');?>',
             currentTime: '<?php echo $this->translate->_('Aktueller Zeitpunkt');?>',
             segmentSaveTime: '<?php echo $this->translate->_('Zeitpunkt der Segmentspeicherung');?>',
+            warning: '<?php echo $this->translate->_('Warnung');?>',
+            saveWarning: '<?php echo $this->translate->_('Speichern Sie keine Aufgaben ins TM, die QA-Fehler aufweisen und/oder Segmente im Entwurfsstatus beinhalten. Dies führt zu fehlerhaften und/oder unfertigen Segmentversionen in der Vorübersetzung!');?>',
             timeOptionTooltip: '<?php echo $this->translate->_('Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird');?>',
         }
     });
@@ -2093,6 +2103,7 @@ Editor.data.l10n = {
                 lock: '<?php echo $this->translate->_('Segmente werden gesperrt');?>',
                 unlock: '<?php echo $this->translate->_('Segmente werden entsperrt');?>',
                 finalizestatus: '<?php echo $this->translate->_('Segmente werden auf finalen Bearbeitungsstatus gesetzt');?>',
+                draftstatus: '<?php echo $this->translate->_('Segmente werden auf Entwurfsstatus gesetzt');?>',
                 bookmark: '<?php echo $this->translate->_('Segmente werden als Favoriten markiert');?>',
                 unbookmark: '<?php echo $this->translate->_('Segmente werden von der Favoritenliste entfernt');?>'
             },
@@ -2103,6 +2114,7 @@ Editor.data.l10n = {
             menuUnlock: '<?php echo $this->translate->_('Entsperren');?>',
             menuBookmark: '<?php echo $this->translate->_('Lesezeichen setzen');?>',
             menuUnbookmark: '<?php echo $this->translate->_('Lesezeichen entfernen');?>',
+            menuDraftStatus: '<?php echo $this->translate->_('Auf Entwurfsstatus setzen');?>',
             menuFinalizeStatus: '<?php echo $this->translate->_('Auf finalen Bearbeitungsstatus setzen');?>',
             warnFinalizeText: '<?php echo $this->translate->_('Alle Segmente werden in der Aufgabe und im Aufgaben-TM gespeichert, wie wenn sie einzeln geöffnet würden.');?>',
             btnText: '<?php echo $this->translate->_('Alle Seg.');?>',
@@ -2164,7 +2176,7 @@ Editor.data.l10n = {
                 'U+201D': '<?php echo $this->translate->_('Doppeltes englisches schließendes Anführungszeichen einfügen');?>',
                 'U+2122': '<?php echo $this->translate->_('Marken-Zeichen einfügen');?>'
             },
-            save: '<?php echo $this->translate->_('Speichern (STRG + S)');?>',
+            save: '<?php echo $this->translate->_('Im finalen Bearbeitungsstatus speichern (STRG + S)');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen (ESC)');?>',
             reset: '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>',
             startWatchingSegment: '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>',
@@ -2172,6 +2184,7 @@ Editor.data.l10n = {
 
             saveAndNext: '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>',
             saveAndNextFiltered: '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>',
+            saveDraftAndNextFiltered: '<?php echo $this->translate->_('Als Entwurf speichern und nächstes unbestätigtes Segment öffnen (STRG + SHIFT + ENTER)');?>',
 
             saveAndPrevious: '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>',
             alternateLeft: '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>',
@@ -2181,6 +2194,7 @@ Editor.data.l10n = {
             nextFiltered: '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>',
             prev: '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>',
             prevFiltered: '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>',
+            saveDraft: '<?php echo $this->translate->_('Als Entwurf speichern').' ('.$this->translate->_('STRG + SHIFT + S').')';?>'
         },
         searchReplace: {
             replaceAll: {

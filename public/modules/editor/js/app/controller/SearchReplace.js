@@ -1550,6 +1550,7 @@ Ext.define('Editor.controller.SearchReplace', {
             tabPanel = me.getTabPanel(),
             activeTab = tabPanel.getActiveTab(),
             saveCurrentOpen = activeTab.down('#saveCurrentOpen').checked,
+            saveCurrentDraft = activeTab.down('#saveCurrentDraft').checked,
             editor = Editor.app.getController('Editor');
 
         if (me.activeSegment.matchCount !== 0 || me.activeSegment.matchIndex <= me.activeSegment.matchCount - 1) {
@@ -1557,8 +1558,12 @@ Ext.define('Editor.controller.SearchReplace', {
         }
 
         //if there is only one match, and the save current open is active -> save the segment
-        if (saveCurrentOpen && me.activeSegment.currentSegmentIndex === me.activeSegment.nextSegmentIndex) {
-            editor.save();
+        if ((saveCurrentOpen || saveCurrentDraft) && me.activeSegment.currentSegmentIndex === me.activeSegment.nextSegmentIndex) {
+            if(saveCurrentDraft) {
+                editor.saveDraft();
+            } else {
+                editor.save();
+            }
         } else {
             me.handleRowSelection();
         }

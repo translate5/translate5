@@ -29,7 +29,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Task;
-use MittagQI\Translate5\Task\FileTranslation\FileTranslationType;
+use MittagQI\Translate5\Task\FileTranslation\FileTranslationTypeChecker;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Zend_Registry;
@@ -55,12 +55,11 @@ class TaskCommand extends Translate5AbstractCommand
      */
     public static function taskTypesWithData(): array
     {
-        return [
+        return array_merge([
             \editor_Task_Type_Default::ID,
             \editor_Task_Type_ProjectTask::ID,
             \editor_Task_Type_TermTranslationTask::ID,
-            FileTranslationType::ID,
-        ];
+        ], FileTranslationTypeChecker::getTranslationTypeTaskIds());
     }
 
     /**

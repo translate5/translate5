@@ -3175,6 +3175,10 @@
                 </source>
                 <target>Speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (STRG + ENTER)</target>
             </trans-unit>
+            <trans-unit id='QWxzIEVudHd1cmYgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgdW5iZXN0w6R0aWd0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgU0hJRlQgKyBFTlRFUik='>
+                <source>Als Entwurf speichern und nächstes unbestätigtes Segment öffnen (STRG + SHIFT + ENTER)</source>
+                <target>Als Entwurf speichern und nächstes unbestätigtes Segment öffnen (STRG + SHIFT + ENTER)</target>
+            </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'>
                 <source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source>
                 <target>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</target>
@@ -5122,6 +5126,14 @@ Im Projektportal {portalLink} wurde die Aufgabe
             <trans-unit id='U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gc3BlaWNoZXJu'>
                 <source>Segment beim Schließen speichern</source>
                 <target>Segment beim Schließen speichern</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gYWxzIEVudHd1cmYgc3BlaWNoZXJu'>
+                <source>Segment beim Schließen als Entwurf speichern</source>
+                <target>Segment beim Schließen als Entwurf speichern</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gYWxzIEVudHd1cmYgc3BlaWNoZXJu'>
+                <source>Segment beim Schließen als Entwurf speichern</source>
+                <target>Segment beim Schließen als Entwurf speichern</target>
             </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZXIgUmVndWzDpHJlciBBdXNkcnVjaw=='>
                 <source>Ungültiger Regulärer Ausdruck</source>
@@ -10638,6 +10650,26 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Alle selektierten exportieren</source>
                 <target>Alle selektierten exportieren</target>
             </trans-unit>
+            <trans-unit id='QWxzIEVudHd1cmYgc3BlaWNoZXJu'>
+                <source>Als Entwurf speichern</source>
+                <target>Als Entwurf speichern</target>
+            </trans-unit>
+            <trans-unit id='U1RSRyArIFNISUZUICsgUw=='>
+                <source>STRG + SHIFT + S</source>
+                <target>STRG + SHIFT + S</target>
+            </trans-unit>
+            <trans-unit id='SW0gZmluYWxlbiBCZWFyYmVpdHVuZ3NzdGF0dXMgc3BlaWNoZXJuIChTVFJHICsgUyk='>
+                <source>Im finalen Bearbeitungsstatus speichern (STRG + S)</source>
+                <target>Im finalen Bearbeitungsstatus speichern (STRG + S)</target>
+            </trans-unit>
+            <trans-unit id='SW0gZmluYWxlbiBTdGF0dXMgc3BlaWNoZXJu'>
+                <source>Im finalen Status speichern</source>
+                <target>Im finalen Status speichern</target>
+            </trans-unit>
+            <trans-unit id='QXVmIEVudHd1cmZzc3RhdHVzIHNldHplbg=='>
+                <source>Auf Entwurfsstatus setzen</source>
+                <target>Auf Entwurfsstatus setzen</target>
+            </trans-unit>
             <trans-unit id="RWluaWdlIFBmbGljaHRrcml0ZXJpZW4gZGVyIEF1dG9RQSB3ZWlzZW4gbm9jaCBGZWhsZXIgYXVmLg==">
                 <source>Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.</source>
                 <target>Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.</target>
@@ -10661,6 +10693,22 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
             <trans-unit id='RWluIG9kZXIgbWVocmVyZSBTZWdtZW50ZSBrb25udGVuIG5pY2h0IGF1ZiBmaW5hbGVuIFByb3plc3NzdGF0dXMgZ2VzZXR6dCB3ZXJkZW4sIHdlaWwgc2llIFRhZy1GZWhsZXIgZW50aGFsdGVuLiBGaWx0ZXJuIFNpZSBpbiBkZXIgQXV0b1FBIG5hY2ggZGllc2VyIEthdGVnb3JpZSB1bSBkaWUgU2VnbWVudGUgZXJuZXV0IHp1IHByw7xmZW4u'>
                 <source>Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.</source>
                 <target>Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gw5ZmZm5lbiBTaWUgZGllIEF1ZmdhYmUgdW5kIHNldHplbiBTaWUgZGVuIFN0YXR1cyB1bS4='>
+                <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.</source>
+                <target>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.</target>
+            </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gU2V0emVuIFNpZSBkZW4gU3RhdHVzIGF1ZiBmaW5hbCB1bSB1bmQgYmVlbmRlbiBTaWUgZGFubiBkaWUgQXVmZ2FiZS4='>
+                <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Setzen Sie den Status auf final um und beenden Sie dann die Aufgabe.</source>
+                <target>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Setzen Sie den Status auf final um und beenden Sie dann die Aufgabe.</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudGUgaW0gRW50d3VyZnNzdGF0dXM='>
+                <source>Segmente im Entwurfsstatus</source>
+                <target>Segmente im Entwurfsstatus</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJuIFNpZSBrZWluZSBBdWZnYWJlbiBpbnMgVE0sIGRpZSBRQS1GZWhsZXIgYXVmd2Vpc2VuIHVuZC9vZGVyIFNlZ21lbnRlIGltIEVudHd1cmZzc3RhdHVzIGJlaW5oYWx0ZW4uIERpZXMgZsO8aHJ0IHp1IGZlaGxlcmhhZnRlbiB1bmQvb2RlciB1bmZlcnRpZ2VuIFNlZ21lbnR2ZXJzaW9uZW4gaW4gZGVyIFZvcsO8YmVyc2V0enVuZyE='>
+                <source>Speichern Sie keine Aufgaben ins TM, die QA-Fehler aufweisen und/oder Segmente im Entwurfsstatus beinhalten. Dies führt zu fehlerhaften und/oder unfertigen Segmentversionen in der Vorübersetzung!</source>
+                <target>Speichern Sie keine Aufgaben ins TM, die QA-Fehler aufweisen und/oder Segmente im Entwurfsstatus beinhalten. Dies führt zu fehlerhaften und/oder unfertigen Segmentversionen in der Vorübersetzung!</target>
             </trans-unit>
         </body>
     </file>

@@ -31,6 +31,7 @@ use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Plugins_MatchAnalysis_Models_MatchAnalysis as MatchAnalysis;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Segment\Repetition\RepetitionUpdater;
@@ -100,6 +101,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         'sublang' => [],
     ];
 
+    private ConnectorForTaskProvider $connectorProvider;
+
     /**
      * @param integer $analysisId
      */
@@ -110,6 +113,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         $this->manager = Factory::get(editor_Services_Manager::class);
         $this->repetitionUpdater = RepetitionUpdater::create();
+        $this->connectorProvider = ConnectorForTaskProvider::create();
 
         parent::__construct($analysisId);
     }
@@ -827,19 +831,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         ]);
     }
 
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws editor_Services_Exceptions_NoService
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
+     */
     private function getConnector(LanguageResource $languageResource): editor_Services_Connector
     {
-        $language = Factory::get(editor_Models_Languages::class);
-        $taskMajorSourceLangId = $language->findMajorLanguageById($this->task->getSourceLang());
-        $taskMajorTargetLangId = $language->findMajorLanguageById($this->task->getTargetLang());
-
-        $connector = $this->manager->getConnector(
-            $languageResource,
-            $taskMajorSourceLangId,
-            $taskMajorTargetLangId,
-            $this->task->getConfig(),
-            (int) $this->task->getCustomerId()
-        );
+        $connector = $this->connectorProvider->provideForTargetPretrans($languageResource, $this->task);
 
         // set the analysis running user to the connector
         $connector->setWorkerUserGuid($this->userGuid);

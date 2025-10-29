@@ -38,6 +38,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\TmConversionServiceInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\TaskTm\Operation\CreateTaskTmOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\SupportsTaskTmInterface;
 use MittagQI\Translate5\Service\DetectLanguageInterface;
@@ -353,22 +354,23 @@ class editor_Services_Manager
      *
      * @param Zend_Config|null $config : this will overwrite the default connector config value
      *
-     * @return editor_Services_Connector
-     *
+     * @throws ReflectionException
      * @throws ZfExtended_Exception
      * @throws editor_Services_Exceptions_NoService
      */
     public function getConnector(
         editor_Models_LanguageResources_LanguageResource $languageResource,
-        int $sourceLang = null,
-        int $targetLang = null,
+        LanguagePairDTO $languagePair = null,
         Zend_Config $config = null,
         ?int $customerId = null,
     ): editor_Services_Connector|FileBasedInterface {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get(editor_Services_Connector::class);
-        $connector->connectTo($languageResource, $sourceLang, $targetLang, $config);
+        if ($languagePair === null) {
+            $languagePair = new LanguagePairDTO();
+        }
+        $connector->connectTo($languageResource, $languagePair, $config);
 
         if (isset($config)) {
             $connector->setConfig($config);

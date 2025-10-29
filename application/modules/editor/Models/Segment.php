@@ -1434,10 +1434,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * returns the segment count of the given taskGuid
      * filters are not applied since the overall count is needed for statistics
-     * @param string $taskGuid
      * @return integer the segment count
      */
-    public function count($taskGuid, $onlyEditable = false)
+    public function count(string $taskGuid, bool $onlyEditable = false): int
     {
         $s = $this->db->select()
             ->from($this->db, [

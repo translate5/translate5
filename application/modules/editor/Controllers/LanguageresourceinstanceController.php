@@ -36,6 +36,7 @@ use MittagQI\Translate5\Export\QueuedExportService;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceAction;
 use MittagQI\Translate5\LanguageResource\ActionAssert\LanguageResourceActionPermissionAssert;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
@@ -49,7 +50,9 @@ use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
@@ -105,6 +108,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     private ContentProtector $contentProtector;
 
+    private SegmentRepository $segmentRepository;
+
+    private QualityService $qualityService;
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
@@ -135,6 +142,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->languageResourceActionPermissionAssert = LanguageResourceActionPermissionAssert::create();
         $this->userRepository = new UserRepository();
         $this->contentProtector = ContentProtector::create();
+        $this->segmentRepository = SegmentRepository::create();
+        $this->qualityService = new QualityService();
     }
 
     /**
@@ -747,9 +756,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * receives a list of task and task assoc data, returns a list of taskNames grouped by languageResource
-     * @return string[]
+     * @return array<array<int, string>>
      */
-    protected function convertTasknames(array $taskInfoList)
+    protected function convertTasknames(array $taskInfoList): array
     {
         $result = [];
         foreach ($taskInfoList as $taskInfo) {
@@ -1230,6 +1239,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->decodePutData();
             if (! empty($this->data) && ! empty($this->data->toReImport)) {
+                if (! $this->data->force) {
+                    $this->checkAutoQaErrorsAndDraftSegments($this->data->toReImport);
+                }
                 foreach ($this->data->toReImport as $taskGuid) {
                     try {
                         (new ReimportSegmentsQueue())->queueSnapshot(
@@ -1240,6 +1252,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                                 ReimportSegmentsOptions::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment',
                             ]
                         );
+                        if ($this->data->force && $this->segmentRepository->hasDraftsInTask($taskGuid)) {
+                            Zend_Registry::get('logger')->info(
+                                'E1753',
+                                'Reimport: "Save segments to TM" started for a task with segments in draft status',
+                                [
+                                    'task' => $taskGuid,
+                                    'languageResourceId' => $this->entity->getId(),
+                                    'onlyEdited' => $this->data->onlyEdited,
+                                    'timeOption' => $this->data->timeOption,
+                                ]
+                            );
+                        }
                     } catch (ReimportQueueException) {
                         throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
                     }
@@ -1250,8 +1274,40 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
+
+        foreach ($taskinfo as &$row) {
+            $qualityProps = editor_Models_Db_SegmentQuality::getNumQualitiesAndFaultsForTask($row['taskGuid']);
+            // adding number of quality errors, evaluated in the export actions
+            $row['qualityErrorCount'] = $qualityProps->numQualities;
+            $row['qualityHasFaults'] = ($qualityProps->numFaults > 0);
+            $row['segmentsInDraft'] = $this->segmentRepository->hasDraftsInTask($row['taskGuid']);
+        }
+
         $this->view->rows = $taskinfo;
         $this->view->total = count($taskinfo);
+    }
+
+    private function checkAutoQaErrorsAndDraftSegments(array $taskGuids)
+    {
+        $tasksWithAutoQaErrors = $tasksWithDraftSegments = [];
+        foreach ($taskGuids as $taskGuid) {
+            if ($this->qualityService->taskHasCriticalErrors($taskGuid)) {
+                $tasksWithAutoQaErrors[] = $taskGuid;
+            }
+            if ($this->segmentRepository->hasDraftsInTask($taskGuid)) {
+                $tasksWithDraftSegments[] = $taskGuid;
+            }
+        }
+        if (! empty($tasksWithAutoQaErrors) || ! empty($tasksWithDraftSegments)) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1752' => 'Could not re-import tasks since some of them contain mandatory AutoQA criteria errors and/or segments in draft status',
+            ]);
+
+            throw new ZfExtended_Models_Entity_Conflict('E1752', [
+                'tasksWithAutoQaErrors' => $tasksWithAutoQaErrors,
+                'tasksWithDraftSegments' => $tasksWithDraftSegments,
+            ]);
+        }
     }
 
     /**
@@ -1717,21 +1773,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * returns the connector to be used
-     *
-     * @throws editor_Models_ConfigException
-     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     private function getConnectorForTask(editor_Models_Task $task): editor_Services_Connector
     {
-        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
-
-        return $manager->getConnector(
-            $this->entity,
-            $task->getSourceLang(),
-            $task->getTargetLang(),
-            $task->getConfig(),
-            (int) $task->getCustomerId()
-        );
+        return ConnectorForTaskProvider::create()->provideForTargetPretrans($this->entity, $task);
     }
 
     /**

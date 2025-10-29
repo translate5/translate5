@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
 
 /***
@@ -34,10 +35,13 @@ use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
  */
 class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_AbstractWorker
 {
+    private ConnectorForTaskProvider $connectorProvider;
+
     public function __construct()
     {
         parent::__construct();
         $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+        $this->connectorProvider = ConnectorForTaskProvider::create();
     }
 
     protected function validateParameters(array $parameters): bool
@@ -67,9 +71,6 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             return true;
         }
 
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-
         $task = new editor_Models_Task();
         $task->loadByTaskGuid($this->taskGuid);
 
@@ -77,20 +78,11 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         /* @var editor_Models_LanguageResources_LanguageResource $languageResource */
         $languageResource->load($params['languageResourceId']);
 
-        $targetLang = $task->getTargetLang();
-
         if ($isRelaisContentField) {
-            $targetLang = $task->getRelaisLang();
+            $connector = $this->connectorProvider->provideForPivotPretrans($languageResource, $task);
+        } else {
+            $connector = $this->connectorProvider->provideForTargetPretrans($languageResource, $task);
         }
-
-        $connector = $manager->getConnector(
-            $languageResource,
-            $task->getSourceLang(),
-            (int) $targetLang,
-            $task->getConfig(),
-            (int) $task->getCustomerId(),
-        );
-        /* @var editor_Services_Connector $connector */
 
         // set the worker user for the connector. This is required for the resource usage log
         $connector->setWorkerUserGuid($params['userGuid']);

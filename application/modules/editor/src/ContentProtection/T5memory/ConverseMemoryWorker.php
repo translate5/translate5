@@ -36,6 +36,7 @@ use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
@@ -116,14 +117,15 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         }
 
         $connector = new Connector();
-
+        $connector->connectTo($this->languageResource, LanguagePairDTO::fromLanguageResource($this->languageResource));
         $sourceLang = (int) $this->languageResource->getSourceLang();
         $targetLang = (int) $this->languageResource->getTargetLang();
 
-        $connector->connectTo($this->languageResource, $sourceLang, $targetLang);
-
         if ($connector->isEmpty()) {
-            $this->finaliseConversion($sourceLang, $targetLang);
+            $this->finaliseConversion(
+                $sourceLang,
+                $targetLang,
+            );
 
             return true;
         }

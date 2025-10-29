@@ -57,6 +57,7 @@ use editor_Models_LanguageResources_Languages as LanguageResourceLanguage;
 use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service;
 use Http\Client\Exception\HttpException;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use PHPUnit\Framework\TestCase;
@@ -115,7 +116,8 @@ class IsLanguageResourceHasEmptyMemoryTest extends TestCase
         }
 
         $this->connector = new Connector();
-        $this->connector->connectTo($this->languageResource, (int) $en->getId(), (int) $de->getId());
+        $languagePair = new LanguagePairDTO((int) $en->getId(), (int) $de->getId());
+        $this->connector->connectTo($this->languageResource, $languagePair);
     }
 
     public function tearDown(): void

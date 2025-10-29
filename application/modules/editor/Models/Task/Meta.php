@@ -38,10 +38,6 @@ use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
  * @method void setTbxHash(string $tbxHash)
  * @method null|string getMappingType()
  * @method void setMappingType(string $mappingType)
- * @method null|string getBconfId()
- * @method void setBconfId(int $bconfId)
- * @method null|string getBconfInZip()
- * @method void setBconfInZip(string $bconfInZip)
  * @method void setPricingPresetId(int $pricingPresetId)
  * @method string getVisualPdfWorkfile()
  * @method void setVisualPdfWorkfile(string $visualPdfWorkfile)
@@ -158,8 +154,6 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
         return new TaskMetaDTO(
             $this->getTaskGuid(),
             $this->row->mappingType, // @phpstan-ignore-line
-            editor_Utils::parseNullableInt($this->row->bconfId), // @phpstan-ignore-line
-            $this->row->bconfInZip, // @phpstan-ignore-line
             editor_Utils::parseNullableInt($this->row->pricingPresetId), // @phpstan-ignore-line
             $this->getPerTaskExport()
         );
@@ -185,8 +179,6 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
             $this->setMappingType($dto->mappingType);
         }
         // the other fields have null as default ...
-        $this->setBconfId($dto->bconfId);
-        $this->setBconfInZip($dto->bconfInZip);
         $this->setPricingPresetId($dto->pricingPresetId);
         $this->setPerTaskExport($dto->perTaskExport);
     }

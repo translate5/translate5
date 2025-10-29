@@ -63,8 +63,10 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
          */
         workflow: function(record, field){
             var userStep = Editor.data.task.get('userStep') || 'pmCheck';
-            if (userStep == record.get('workflowStep')) {
-                return false;
+            if (userStep === record.get('workflowStep')) {
+                // do not skip non-translated and draft segments
+                return (userStep === 'translation' && record.get('targetEdit') === '') ||
+                    record.get('autoStateId') === Editor.data.segments.autoStates.DRAFT;
             }
             // before: autoState != 999 // if segment is saving, consider it as edited!
             return !record.isModified(field);
@@ -217,7 +219,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         if(!rec || !rec.get('editable')) {
             return ret;
         }
-        //checking always for segments editable flag + custom isEditable  
+        //checking always for segments editable flag + custom isEditable
         while(newRec && me.rowMetaHasEmptyNext(ret)){
             newIdx = newIdx + rowIdxChange;
             newRec = store.getAt(newIdx);

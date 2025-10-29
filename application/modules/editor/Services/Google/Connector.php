@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Integration\Google\Enum\Format;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 
 class editor_Services_Google_Connector extends editor_Services_Connector_Abstract
 {
@@ -55,11 +56,10 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
 
     public function connectTo(
         editor_Models_LanguageResources_LanguageResource $languageResource,
-        $sourceLang,
-        $targetLang,
+        LanguagePairDTO $languagePair,
         $config = null
     ) {
-        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
+        parent::connectTo($languageResource, $languagePair, $config);
         $this->api = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$languageResource->getResource()]);
     }
 

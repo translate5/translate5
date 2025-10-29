@@ -50,11 +50,12 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     viewModel: {
         type:'segmentsToolbar'
     },
+
     initConfig: function(instanceConfig) {
             var me = this,
 		        config,
 		        menu;
-            
+
             menu = {
                 xtype: 'menu',
                 items: [{
@@ -131,7 +132,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     group: 'localeMenuGroup'
                 });
             });
-
 
             // add change user theme only if allowed
             if(Editor.data.frontend.changeUserThemeVisible){
@@ -277,6 +277,15 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         disabled: '{!isEditingSegment}',
                     }
                 }, {
+                    itemId: 'saveDraftBtn',
+                    dispatcher: true,
+                    hidden: !~checkedItems.indexOf('saveDraftBtn'),
+                    icon: Editor.data.moduleFolder + 'images/page_edit.png',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.saveDraft}',
+                        disabled: '{!isEditingSegment}'
+                    }
+                }, {
                     itemId: 'cancelBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('cancelBtn'),
@@ -311,6 +320,15 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
                         disabled: '{!isEditingSegment}',
+                    }
+                }, {
+                    itemId: 'saveDraftNextByWorkflowBtn',
+                    dispatcher: true,
+                    hidden: !~checkedItems.indexOf('saveDraftNextByWorkflowBtn'),
+                    icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_draft.png',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.saveDraftAndNextFiltered}',
+                        disabled: '{!isEditingSegment}'
                     }
                 }, {
                     itemId: 'goToLowerByWorkflowNoSaveBtn',
@@ -445,6 +463,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                                 disabled: '{!isEditingSegment}',
                             }
                         }, {
+                            itemId: 'saveDraftBtn',
+                            checked: !!~checkedItems.indexOf('saveDraftBtn'),
+                            icon: Editor.data.moduleFolder + 'images/page_edit.png',
+                            bind: {
+                                text: '{l10n.segmentGrid.toolbar.saveDraft}',
+                                disabled: '{!isEditingSegment}'
+                            }
+                        }, {
                             itemId: 'cancelBtn',
                             checked: !!~checkedItems.indexOf('cancelBtn'),
                             icon: Editor.data.moduleFolder + 'images/cross.png',
@@ -463,7 +489,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         }, '-', {
                             itemId: 'goToUpperByWorkflowNoSaveBtn',
                             checked: !!~checkedItems.indexOf('goToUpperByWorkflowNoSaveBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_up_filtered_nosave.png ',
+                            icon: Editor.data.moduleFolder + 'images/arrow_up_filtered_nosave.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.prevFiltered}',
                                 disabled: '{!isEditingSegment}',
@@ -474,6 +500,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             icon: Editor.data.moduleFolder + 'images/arrow_down_filtered.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
+                                disabled: '{!isEditingSegment}',
+                            }
+                        }, {
+                            itemId: 'saveDraftNextByWorkflowBtn',
+                            checked: !!~checkedItems.indexOf('saveDraftNextByWorkflowBtn'),
+                            icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_draft.png',
+                            bind: {
+                                text: '{l10n.segmentGrid.toolbar.saveDraftAndNextFiltered}',
                                 disabled: '{!isEditingSegment}',
                             }
                         }, {
@@ -606,6 +640,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             operation: 'finalizestatus',
                             bind: {
                                 text: '{l10n.segmentGrid.batchOperations.menuFinalizeStatus}',
+                                disabled: '{syncStatusDisabled}'
+                            }
+                        },{
+                            icon: Editor.data.moduleFolder+'images/page_edit.png',
+                            operation: 'draftstatus',
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuDraftStatus}',
                                 disabled: '{syncStatusDisabled}'
                             }
                         }]

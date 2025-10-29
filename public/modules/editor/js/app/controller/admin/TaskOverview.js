@@ -217,7 +217,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         levenshteinDistanceLabel: '#UT#Ø Levenshtein-Abstand innerhalb eines Workflowschritts',
         levenshteinDistanceStartLabel: '#UT#Ø Levenshtein-Distanz vor Beginn des Workflows',
         levenshteinDistanceEndLabel: '#UT#Ø Levenshtein-Distanz nach Ende des Workflows',
-        levenshteinDistanceOriginalLabel: '#UT#Ø Levenshtein-Abstand ab Beginn des Workflows'
+        levenshteinDistanceOriginalLabel: '#UT#Ø Levenshtein-Abstand ab Beginn des Workflows',
+        noFinishDueDraftSegments: '#UT#Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.'
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
@@ -956,15 +957,20 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @return {Object}
      */
     getTaskMaskBindings: function () {
-        var app = Editor.app;
+        var me = this,
+            app = Editor.app;
         return {
             callback: function (rec, op) {
                 Editor.MessageBox.addByOperation(op);
             },
             success: app.unmask,
             failure: function (rec, op) {
-                var recs = op.getRecords(),
-                    task = recs && recs[0] || false;
+                let recs = op.getRecords(),
+                    task = recs && recs[0] || false,
+                    error = op.getError();
+                if(error && error.status === 409 && error?.response?.responseJson?.errorCode === 'E1751') {
+                    Editor.MessageBox.showInfo(me.strings.noFinishDueDraftSegments, null);
+                }
                 task && task.reject();
                 app.unmask();
             }

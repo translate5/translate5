@@ -360,9 +360,6 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             extraParams.push(Ext.urlEncode({customerId: id}));
         }
 
-        // Fire before resources export event.
-        this.getView().fireEvent('beforeExportCustomerResourceUsage',extraParams);
-
         Ext.each(extraParams, function(ob){
             url += '&'+ob;
         });

@@ -41,6 +41,7 @@ Ext.define('Editor.view.segments.RowEditing', {
     editingAllowed: true,
     clicksToMoveEditor: 2,
     autoCancel: false,
+    isDraft: false,
     statics: {
         STARTEDIT_MOVEEDITOR: 0,
         STARTEDIT_SCROLLUNDER: 1

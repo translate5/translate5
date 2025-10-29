@@ -53,7 +53,8 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
       normalSearch:'#UT#Normal (Standard)',//Normal (default)
       wildcardsSearch:'#UT#Wildcards (* und ?)',
       regularExpressionSearch:'#UT#Regulärer Ausdruck',
-      saveCurrentOpen:'#UT#Segment beim Schließen speichern',//Save segment on close
+      saveCurrentOpen:'#UT#Segment beim Schließen speichern',
+      saveCurrentDraft:'#UT#Segment beim Schließen als Entwurf speichern',
       invalidRegularExpression:'#UT#Ungültiger Regulärer Ausdruck',
       unsupportedRegularExpression:'#UT#Dieser reguläre Ausdruck wird nicht unterstützt',
       segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:',
@@ -145,7 +146,23 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     bind:{
                         value:'{!isSearchView}'
                     },
+                    listeners:{
+                        change:'saveCurrentChange'
+                    },
                     boxLabel:me.strings.saveCurrentOpen
+                },{
+                    xtype:'checkbox',
+                    itemId:'saveCurrentDraft',
+                    name:'saveCurrentDraft',
+                    boxLabel:me.strings.saveCurrentDraft,
+                    bind:{
+                        visible:'{!isSearchView}'
+                    },
+                    listeners:{
+                        change:'saveCurrentChange'
+                    },
+                    // if in PM override mode
+                    disabled:!Editor.data.task.get('userStep')
                 },{
                     xtype:'checkbox',
                     itemId:'searchInLockedSegments',

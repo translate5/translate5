@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Repository\SegmentHistoryDataRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
@@ -73,6 +74,8 @@ class editor_Models_Segment_Updater
 
     private UpdateSegmentStatistics $updateStatistics;
 
+    private ConnectorForTaskProvider $connectorProvider;
+
     public function __construct(
         editor_Models_Task $task,
         private string $userGuid,
@@ -83,6 +86,7 @@ class editor_Models_Segment_Updater
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
         $this->updateStatistics = UpdateSegmentStatistics::create();
+        $this->connectorProvider = ConnectorForTaskProvider::create();
     }
 
     /**
@@ -383,21 +387,18 @@ class editor_Models_Segment_Updater
         return editor_Models_Segment_Utility::entityCleanup($content) !== editor_Models_Segment_Utility::entityCleanup($oldContent);
     }
 
-    /***
+    /**
      * This will write a log entry of how many characters are send to the adapter for translation.
-     *
-     * @param editor_Models_LanguageResources_LanguageResource $adapter
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Services_Exceptions_NoService
      */
-    protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter)
+    protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter): void
     {
-        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
-        $connector = $manager->getConnector(
-            $adapter,
-            $this->task->getSourceLang(),
-            $this->task->getTargetLang(),
-            $this->task->getConfig()
-        );
-        /* @var $connector editor_Services_Connector */
+        $connector = $this->connectorProvider->provideForTargetPretrans($adapter, $this->task);
         $connector->logAdapterUsage($this->segment);
     }
 

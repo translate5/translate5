@@ -37,6 +37,7 @@ use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\BatchDeleteException;
 use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
@@ -105,15 +106,14 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     public function connectTo(
         LanguageResource $languageResource,
-        $sourceLang,
-        $targetLang,
+        LanguagePairDTO $languagePair,
         $config = null,
     ): void {
         $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
-        $this->t5MemoryConnector->connectTo($languageResource, $sourceLang, $targetLang, $config);
-        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
+        $this->t5MemoryConnector->connectTo($languageResource, $languagePair, $config);
+        parent::connectTo($languageResource, $languagePair, $config);
     }
 
     protected function createTagHandler(array $params = []): \editor_Services_Connector_TagHandler_Abstract

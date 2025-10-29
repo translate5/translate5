@@ -96,10 +96,10 @@ $this->translations = array(
         'yes' => $translate->_('Ja'),
         'no' => $translate->_('Nein'),
     ],
-    'sendToHumanRevisionButton' => $translate->_('Zur menschlichen Revision senden'),
+    'sendToHumanRevisionButton' => $translate->_('Zur Humanrevision senden'),
     'sendToHumanRevision' => [
-        'title' => $translate->_('Zur menschlichen Revision senden'),
-        'message' => $translate->_('Zur menschlichen Revision senden?'),
+        'title' => $translate->_('Zur Humanrevision senden'),
+        'message' => $translate->_('Zur Humanrevision senden?'),
     ],
     'humanRevision' => [
         'descriptionLabel' => $translate->_('Projektbeschreibung'),
@@ -114,7 +114,8 @@ $this->translations = array(
         'message' => $translate->_('Aufgabe im TM speichern?'),
     ],
     'mtResourcesComboPrefix' => $translate->_('Verwendete MT-Resource:'),
-    'customerComboPrefix' => $translate->_('Übersetzen mit den Einstellungen für:'),
+    'customerComboPrefix' => $translate->_('mit Einstellungen für:'),
+    'autoDetectLanguage' => $translate->_('Sprache erkennen'),
 );
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
@@ -227,8 +228,13 @@ $languageSelector[] = '</form>';
 <div class="sourceSelector">
     <span class="sourceSelectorItem sourceSelector__text"><svg
             class="icon icon-t5_translate_text"/> <?= $translate->_('Text übersetzen'); ?> </span>
-    <span class="sourceSelectorItem sourceSelector__file"><svg
-            class="icon icon-t5_translate_file"/> <?= $translate->_('Datei übersetzen'); ?> </span>
+    <span class="sourceSelectorItem sourceSelector__file" ><svg
+            class="icon icon-t5_translate_file"/> <?= $translate->_('Datei übersetzen'); ?>
+    </span>
+    <span>
+        <label class="userCustomersLabel" for="userCustomers"><?= $this->translations['customerComboPrefix'] ?></label>
+        <select id="userCustomers" class="sourceSelectorItem selectSourceTarget" name="userCustomers"></select>
+    </span>
 </div>
 
 <div id="containerTranslation" class="container container__instanttranslate container__instanttranslatebody">
@@ -238,46 +244,10 @@ $languageSelector[] = '</form>';
         </div>
         <form id="sourceLanguageAndContent">
             <select id="sourceLocaleText" class="selectSourceTarget" name="sourceLocaleText" title="<?= $translate->_('Übersetzen aus'); ?>">
-                <?php
-                $sourceLangSelected = false;
-                $getParamSource = $this->source;
-                if (!is_null($getParamSource)) {
-                    $sourceLangSelected = $getParamSource;
-                } elseif (!empty($this->sourceSearchLanguagePreselectionLocaleText)) {
-                    $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocaleText;
-                }
-                $sourceLangSelected = strtolower($sourceLangSelected);
-
-                if ($this->hasAutoLanguageDetection) {
-                    $selected = false === $sourceLangSelected || 'auto' === $sourceLangSelected
-                        ? 'selected="selected"'
-                        : '';
-
-                    echo "<option value=\"auto\"  $selected>{$translate->_('Sprache erkennen')}</option>";
-                }
-
-                foreach ($this->allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
-                    $selected = ($sourceLangSelected !== false && $sourceLangSelected === strtolower($sourceLangLocale))
-                        ? 'selected="selected"'
-                        : '';
-
-                    echo "<option value=\"$sourceLangLocale\" $selected>$displayLanguage</option>";
-                }
-                ?>
+                <!-- Options will be populated by JavaScript from backend data -->
             </select>
             <select id="sourceLocaleFile" class="selectSourceTarget" name="sourceLocaleFile">
-                <?php
-                if (!empty($this->sourceSearchLanguagePreselectionLocaleFile)) {
-                    $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocaleFile;
-                }
-                foreach ($this->allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
-                    $selected = ($sourceLangSelected !== false && $sourceLangSelected == strtolower($sourceLangLocale))
-                        ? 'selected="selected"'
-                        : '';
-
-                    echo "<option value=\"$sourceLangLocale\" $selected>$displayLanguage</option>";
-                }
-                ?>
+                <!-- Options will be populated by JavaScript from backend data -->
             </select>
 
             <div class="textinput clearable box marginTop show-if-source-is-text">
@@ -325,33 +295,14 @@ $languageSelector[] = '</form>';
             />
 
             <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all box marginTop"></div>
+            <div id="targetWarning" class="message-box message-warning"></div>
         </form>
     </div>
     <div id="target">
         <form id="targetControls">
             <select id="targetLocale" class="selectSourceTarget" name="targetLocale" title="<?= $translate->_('Übersetzen in'); ?>">
-                <?php
-                $targetLangSelected = false;
-                $getParamTarget = $this->target;
-                if (!is_null($getParamTarget)) {
-                    $targetLangSelected = $getParamTarget;
-                } elseif (!empty($this->targetSearchLanguagePreselectionLocale)) {
-                    $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
-                }
-                $optionValues = [];
-                $targetLangSelected = strtolower($targetLangSelected);
-                foreach ($this->allTargetLanguageLocales as $targetLangLocale => $displayLanguage) {
-                    $selected = ($targetLangSelected !== false && $targetLangSelected == strtolower($targetLangLocale))
-                        ? ' selected="selected"'
-                        : '';
-
-                    echo "<option value=\"$targetLangLocale\" $selected>$displayLanguage</option>";
-                }
-                ?>
+                <!-- Options will be populated by JavaScript from backend data -->
             </select>
-
-
-            <select id="userCustomers" class="selectSourceTarget" name="userCustomers"></select>
 
             <!-- Language Resource selector for File Translation -->
             <select id="fileLanguageResource" class="selectSourceTarget" name="fileLanguageResource"></select>
@@ -426,6 +377,7 @@ $languageSelector[] = '</form>';
         <?php endif; ?>
     </div>
 </div>
+
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/apps/js/ErrorHandler.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/js/shared.js<?php echo $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/humanRevision.js<?= $version ?>"></script>

@@ -265,7 +265,9 @@ class editor_Models_Import_DataProvider_Project extends editor_Models_Import_Dat
      */
     protected function isPivotFileMatch(int $arrayIndex): bool
     {
-        return $this->isPivotFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getRelaisLang();
+        $fileLanguage = (int) $this->fileLanguages[$arrayIndex];
+
+        return $this->isPivotFile($arrayIndex) && $fileLanguage === $this->task->getRelaisLang();
     }
 
     /***

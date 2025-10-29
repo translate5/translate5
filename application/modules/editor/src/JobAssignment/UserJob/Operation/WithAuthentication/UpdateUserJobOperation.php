@@ -47,6 +47,7 @@ use MittagQI\Translate5\JobAssignment\UserJob\Contract\UpdateUserJobOperationInt
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidWorkflowStepProvidedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\UpdateUserJobDto;
 use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
@@ -66,6 +67,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         private readonly JobCoordinatorRepository $coordinatorRepository,
         private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly QualityService $qualityService,
+        private readonly SegmentRepository $segmentRepository,
     ) {
     }
 
@@ -82,6 +84,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
             JobCoordinatorRepository::create(),
             CoordinatorGroupJobRepository::create(),
             new QualityService(),
+            SegmentRepository::create(),
         );
     }
 
@@ -100,11 +103,7 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
 
         $this->permissionAssert->assertGranted(UserJobAction::Update, $job, $context);
 
-        $maySkipAutoQa = $this->authentication->isUserAllowed(Rights::ID, Rights::TASK_FINISH_SKIP_AUTOQA);
-        $doAutoQaCheck = ($dto->state === DefaultWorkflow::STATE_FINISH) && ! ($dto->skipAutoQaCheck && $maySkipAutoQa);
-        if ($doAutoQaCheck && $this->qualityService->taskHasCriticalErrors($job->getTaskGuid(), $job)) {
-            throw new JobNotFinishableException('E1750');
-        }
+        $this->checkAdditionalAsserts($dto, $job);
 
         $coordinator = $this->coordinatorRepository->findByUserGuid($this->authentication->getUserGuid());
 
@@ -140,5 +139,23 @@ class UpdateUserJobOperation implements UpdateUserJobOperationInterface
         }
 
         $this->permissionAssert->assertGranted(UserJobAction::UpdateDeadline, $job, $context);
+    }
+
+    /**
+     * @throws JobNotFinishableException
+     * TODO convert to proper feasibility assert
+     */
+    private function checkAdditionalAsserts(UpdateUserJobDto $dto, UserJob $job): void
+    {
+        $maySkipAutoQa = $this->authentication->isUserAllowed(Rights::ID, Rights::TASK_FINISH_SKIP_AUTOQA);
+        $doAutoQaCheck = ($dto->state === DefaultWorkflow::STATE_FINISH) && ! ($dto->skipAutoQaCheck && $maySkipAutoQa);
+        if ($doAutoQaCheck && $this->qualityService->taskHasCriticalErrors($job->getTaskGuid(), $job)) {
+            throw new JobNotFinishableException('E1750');
+        }
+
+        if ($dto->state === DefaultWorkflow::STATE_FINISH
+            && $this->segmentRepository->hasDraftsInTask($job->getTaskGuid())) {
+            throw new JobNotFinishableException('E1751');
+        }
     }
 }

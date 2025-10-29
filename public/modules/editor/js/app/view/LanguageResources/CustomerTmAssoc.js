@@ -77,6 +77,7 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssoc', {
             width: 50,
             dataIndex: 'serviceName',
             hidden: true,
+            renderer: (value) => Ext.String.htmlEncode(value),
             bind: {
                 text: '{l10n.customerTmAssoc.serviceName}'
             }
@@ -86,6 +87,7 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssoc', {
             width: 390,
             dataIndex: 'name',
             flex: 1,
+            renderer: (value) => Ext.String.htmlEncode(value),
             bind: {
                 text: '{l10n.customerTmAssoc.name}'
             }

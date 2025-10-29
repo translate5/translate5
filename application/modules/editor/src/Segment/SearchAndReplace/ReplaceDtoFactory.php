@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\SearchAndReplace;
 
+use editor_Models_Segment_AutoStates;
 use MittagQI\Translate5\Segment\SearchAndReplace\DTO\ReplaceDto;
 use MittagQI\Translate5\Segment\TrackChange\DTO\TrackChangeUserDto;
 use Zend_Controller_Request_Abstract;
@@ -110,6 +111,7 @@ class ReplaceDtoFactory
             (int) ($params['durations'] ?? 0),
             $isActiveTrackChanges,
             $trackChangeUserDto,
+            (isset($params['saveCurrentDraft']) && $params['saveCurrentDraft'] === 'true') ? editor_Models_Segment_AutoStates::DRAFT : editor_Models_Segment_AutoStates::PENDING
         );
     }
 

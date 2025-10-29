@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\Terminology\SearchCollection;
 
 class editor_Services_TermCollection_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface
@@ -48,10 +49,10 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * Set the source and the target langauge with the same value as the requested search langauges values.
      * Later the SearchCollection class filters the languages using the fuzzy logic.
      */
-    protected function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
+    protected function setServiceLanguages(LanguagePairDTO $languagePair): void
     {
-        $this->sourceLang = $sourceLang;
-        $this->targetLang = $targetLang;
+        $this->sourceLang = $languagePair->sourceLanguageId;
+        $this->targetLang = $languagePair->targetLanguageId;
     }
 
     public function addTm(array $fileinfo = null, array $params = null): bool

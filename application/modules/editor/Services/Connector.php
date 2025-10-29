@@ -32,6 +32,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\LanguageResource\QueryDurationLogger;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
@@ -145,10 +146,13 @@ class editor_Services_Connector implements ExportAdapterInterface
     /**
      * @throws editor_Services_Exceptions_NoService
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null, $config = null): void
-    {
+    public function connectTo(
+        editor_Models_LanguageResources_LanguageResource $languageResource,
+        LanguagePairDTO $languagePair = null,
+        $config = null
+    ): void {
         $this->connectToResourceOnly($languageResource->getResource());
-        $this->adapter->connectTo($languageResource, $sourceLang, $targetLang, $config);
+        $this->adapter->connectTo($languageResource, $languagePair, $config);
         $this->queryDurationLogger = new QueryDurationLogger($languageResource);
     }
 

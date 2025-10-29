@@ -27,6 +27,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\Status;
@@ -113,8 +114,7 @@ foreach ($ids as $id) {
 
         $maintenanceService->connectTo(
             $languageResource,
-            $languageResource->getSourceLang(),
-            $languageResource->getTargetLang()
+            LanguagePairDTO::fromLanguageResource($languageResource)
         );
 
         foreach (['2024', '2025'] as $year) {

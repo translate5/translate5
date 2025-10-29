@@ -206,7 +206,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     
     params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
     params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
-    
+
     //stop loading first!
     store.getProxy().abort();
     store.load({
@@ -238,7 +238,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @param {Integer} id
    */
   handleAlikesRead: function(operation, id) {
-      var me = this 
+      var me = this;
       
       if(me.isDisabled || ! operation.wasSuccessful()){
           operation.handleReadAfterSave && operation.handleReadAfterSave();

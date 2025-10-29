@@ -724,12 +724,18 @@ Ext.define('Editor.controller.Segments', {
             record.set('matchRateType', record.get('matchRateType') + ';interactive');
         }
 
+        record.set('autoStateId', Editor.data.segments.autoStates[ed.isDraft ? 'DRAFT' : 'PENDING']);
+        if(ed.isDraft){
+            ed.isDraft = false;
+        }
+
         record.save({
             scope: me,
             //prevent default ServerException handling
             preventDefaultHandler: true,
             callback: me.saveChainSaveCallback //NEXT step in save chain
         });
+
         me.saveIsRunning = true;
 
         // update length stuff in siblings of store

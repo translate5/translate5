@@ -62,6 +62,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         assocSaveError: '#UT#Fehler beim Speichern der Änderungen!',
         finishAutoQaCheck: '#UT#Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.',
         finishAutoQaCheckQuestion: '#UT#Trotzdem Status auf "abgeschlossen" setzen?',
+        noFinishDueDraftSegments: '#UT#Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.'
     },
     //***********************************************************************************
     //Begin Events
@@ -349,6 +350,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                 let error = operation.getError();
                 store.load();
                 win.setLoading(false);
+                if(error && error.status === 409 && error?.response?.responseJson?.errorCode === 'E1751') {
+                    Editor.MessageBox.showInfo(me.messages.noFinishDueDraftSegments, null);
+                    return;
+                }
                 if(error && error.status === 409 && error?.response?.responseJson?.errorCode === 'E1750') {
                     Ext.Msg.confirm(
                         Editor.MessageBox.prototype.titles.warning,

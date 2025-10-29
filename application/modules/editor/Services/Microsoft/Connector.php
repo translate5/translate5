@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
+
 class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abstract
 {
     use editor_Services_Connector_BatchTrait;
@@ -64,9 +66,12 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         ZfExtended_Logger::addDuplicatesByMessage('E1345', 'E1346');
     }
 
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang, $config = null)
-    {
-        parent::connectTo($languageResource, $sourceLang, $targetLang, $config);
+    public function connectTo(
+        editor_Models_LanguageResources_LanguageResource $languageResource,
+        LanguagePairDTO $languagePair,
+        $config = null
+    ): void {
+        parent::connectTo($languageResource, $languagePair, $config);
         $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi', [$languageResource->getResource()]);
     }
 

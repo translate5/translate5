@@ -77,6 +77,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_match_analysis_taskassoc' => 'taskGuid',
         'LEK_okapi_bconf' => false,
         'LEK_okapi_bconf_filter' => false,
+        'LEK_okapi_taskBconfAssoc' => 'taskGuid',
         'LEK_openai_finetunejob' => false,
         'LEK_openai_exampleset' => false,
         'LEK_openai_ragbased_assoc' => false,

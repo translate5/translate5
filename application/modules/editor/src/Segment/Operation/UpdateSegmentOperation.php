@@ -61,15 +61,18 @@ use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Segment\ActionAssert\Feasibility\SegmentActionFeasibilityAssert;
 use MittagQI\Translate5\Segment\Event\SegmentUpdatedEvent;
+use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
 use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentOperationInterface;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use ZfExtended_Models_Messages;
 
 class UpdateSegmentOperation implements UpdateSegmentOperationInterface
 {
+    private bool $contentWasSanitized = false;
+
     public function __construct(
         private readonly WriteableWorkflowAssert $writeableWorkflowAssert,
         private readonly ActionFeasibilityAssertInterface $feasibilityAssert,
@@ -93,13 +96,18 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
     public function update(
         Segment $segment,
         UpdateSegmentDto $updateDto,
+        ContextDto $contextDto,
         User $actor,
         ?UpdateSegmentLogger $updateLogger = null,
-        ?ZfExtended_Models_Messages $restMessages = null
+        ?UpdateSegmentHandlerInterface $resultHandler = null
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::Update, $segment);
 
-        $this->writeableWorkflowAssert->assert($segment->getTaskGuid(), $actor->getUserGuid());
+        $this->writeableWorkflowAssert->assert(
+            $segment->getTaskGuid(),
+            $actor->getUserGuid(),
+            $contextDto
+        );
 
         $task = $this->taskRepository->getByGuid($segment->getTaskGuid());
 
@@ -126,7 +134,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
             $segment->setMatchRateType($updateDto->matchRateType);
         }
 
-        $textData = $this->sanitizeEditedContent($updater, $updateDto->textData, $restMessages);
+        $textData = $this->sanitizeEditedContent($updater, $updateDto->textData);
 
         foreach ($textData as $field => $text) {
             // call via magic setter as this is the only way to set modified fields in model
@@ -137,7 +145,15 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         $segment->setUserGuid($actor->getUserGuid());
         $segment->setUserName($actor->getUserName());
 
+        if (! empty($updateDto->textData)) {
+            //reset on single save:
+            $segment->meta()->setRepetitionUsed($contextDto->flow === UpdateFlow::Repetition);
+            $segment->meta()->save();
+        }
+
         $updater->update($segment, $history);
+
+        $resultHandler?->handleResults($this->contentWasSanitized);
 
         $this->taskProgress->refreshProgress($task, $actor->getUserGuid(), fireEvent: true);
 
@@ -151,19 +167,14 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
      */
     protected function sanitizeEditedContent(
         editor_Models_Segment_Updater $updater,
-        array $textData,
-        ?ZfExtended_Models_Messages $restMessages
+        array $textData
     ): array {
-        $sanitized = false;
+        $this->contentWasSanitized = false;
         $result = [];
 
         foreach ($textData as $field => $text) {
-            $sanitized = $updater->sanitizeEditedContent($text, $field) || $sanitized;
+            $this->contentWasSanitized = $updater->sanitizeEditedContent($text, $field) || $this->contentWasSanitized;
             $result[$field] = $text;
-        }
-
-        if ($sanitized && null !== $restMessages) {
-            $restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
         }
 
         return $result;

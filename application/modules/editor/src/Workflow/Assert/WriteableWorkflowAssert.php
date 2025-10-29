@@ -34,6 +34,7 @@ use editor_Workflow_Default;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use ZfExtended_NoAccessException;
 
 class WriteableWorkflowAssert
@@ -63,6 +64,7 @@ class WriteableWorkflowAssert
     public function assert(
         string $taskGuid,
         string $userGuid,
+        ContextDto $contextDto = null,
         editor_Workflow_Default $workflow = null,
     ): void {
         $task = $this->taskRepository->getByGuid($taskGuid);
@@ -76,6 +78,12 @@ class WriteableWorkflowAssert
             $taskGuid,
             $task->getWorkflowStepName(),
         );
+
+        //Excel Re-import happens outside of an opened task, so there is no job with a used state.
+        // if the external editing is properly included we should consider to add && $workflow->isWriteable($tua)
+        if ($tua !== null && $contextDto->flow?->isExternalEditing()) {
+            return;
+        }
 
         if (empty($tua) || ! $workflow->isWritingAllowedForState($tua->getUsedState())) {
             $e = new ZfExtended_NoAccessException();

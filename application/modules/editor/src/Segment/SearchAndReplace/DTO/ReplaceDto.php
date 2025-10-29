@@ -66,6 +66,7 @@ class ReplaceDto
         public readonly int $durations,
         public readonly bool $isActiveTrackChanges,
         public readonly ?TrackChangeUserDto $trackChangeUserDto,
+        public readonly int $autoStateId,
     ) {
     }
 }
