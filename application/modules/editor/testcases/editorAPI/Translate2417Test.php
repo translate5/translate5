@@ -89,6 +89,7 @@ class Translate2417Test extends JsonTestAbstract
             'GET editor/languageresourceinstance/' . $tmId . '/query does not return an array but: ' .
             print_r($tmResults, 1) . ' and raw result is ' . print_r(static::api()->getLastResponse(), 1)
         );
+        print_r($tmResults);
         $this->assertTmResultEqualsJsonFile(
             $jsonFileName,
             $tmResults,
