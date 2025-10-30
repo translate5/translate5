@@ -1018,6 +1018,8 @@ class editor_TaskController extends ZfExtended_RestController
             LanguageResourceTaskAssocRepository::create(),
         );
         $this->entity = $cloner->clone($this->entity);
+        // save the task, following events expect a saved task ...
+        $this->entity->save();
 
         if ($this->validate()) {
             //clone the task meta data from old task for the new one
