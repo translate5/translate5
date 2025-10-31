@@ -1527,7 +1527,11 @@ Ext.define('Editor.controller.Editor', {
 
         let fieldType;
 
-        if (event.getTarget('.type-source') || (this.htmlEditor && this.htmlEditor.getEditedField() === 'sourceEdit')) {
+        if (event.getTarget('.type-source') || (
+            this.htmlEditor
+            && this.htmlEditor.getEditedField() === 'sourceEdit'
+            && !event.getTarget('.type-target')
+        )) {
             fieldType = 'source';
         } else if (event.getTarget('.type-target') || (this.htmlEditor && this.htmlEditor.getEditedField() === 'targetEdit')) {
             fieldType = 'target';
