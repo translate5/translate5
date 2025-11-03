@@ -1422,6 +1422,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             return $isSource;
         }
 
+        if ($term1->used !== $term2->used) {
+            return (int) ($term1->used < $term2->used);
+        } elseif ($term1->used) {
+            return -1;
+        }
+
         //Kriterium 4 - alphanumerische Sortierung:
         return strcmp(mb_strtolower($term1->term), mb_strtolower($term2->term));
     }
