@@ -160,9 +160,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     },
                     listeners:{
                         change:'saveCurrentChange'
-                    },
-                    // if in PM override mode
-                    disabled:!Editor.data.task.get('userStep')
+                    }
                 },{
                     xtype:'checkbox',
                     itemId:'searchInLockedSegments',

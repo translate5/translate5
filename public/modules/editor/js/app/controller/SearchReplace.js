@@ -349,11 +349,15 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //check if the segment is already visited
         if (Ext.Array.contains(me.replacedSegmentsIndex, me.activeSegment.nextSegmentIndex)) {
-            //reset the search aprametars
+            //reset the search parametars
             me.resetSearchParameters();
             //save the currently opened segment
-            Editor.app.getController('Editor').save();
 
+            if(me.getTabPanel().getActiveTab().down('#saveCurrentDraft').checked){
+                Editor.app.getController('Editor').saveDraft();
+            } else {
+                Editor.app.getController('Editor').save();
+            }
             return;
         }
 
@@ -506,7 +510,7 @@ Ext.define('Editor.controller.SearchReplace', {
             return;
         }
 
-        //set the feild for focus
+        //set the field for focus
         me.searchFieldTrigger = field;
 
         //find matches once again, the content can be changed between replaces
@@ -1170,6 +1174,7 @@ Ext.define('Editor.controller.SearchReplace', {
             activeTabViewModel = activeTab.getViewModel(),
             results = activeTabViewModel.get('result'),
             saveCurrentOpen = activeTab.down('#saveCurrentOpen').checked,
+            saveCurrentDraft = activeTab.down('#saveCurrentDraft').checked,
             searchTopChekbox = activeTab.down('#searchTopChekbox').checked,
             indexBoundaries = grid.getVisibleRowIndexBoundaries();
 
@@ -1240,7 +1245,7 @@ Ext.define('Editor.controller.SearchReplace', {
         //go to segment and open it for editing
         const callback = function (indexToGo) {
             // me.removeReplaceClass();
-            me.goToSegment(indexToGo, plug, saveCurrentOpen, activeTabViewModel);
+            me.goToSegment(indexToGo, plug, saveCurrentOpen, saveCurrentDraft);
             me.activeSegment.currentSegmentIndex = me.activeSegment.nextSegmentIndex;
             //update the segment indexes
             me.updateSegmentIndex(searchTopChekbox);
@@ -1269,7 +1274,7 @@ Ext.define('Editor.controller.SearchReplace', {
     /**
      * Scroll the segment and open it for editing
      */
-    goToSegment: function (goToIndex, plug, saveCurrentOpen, activeTabViewModel) {
+    goToSegment: function (goToIndex, plug, saveCurrentOpen, saveCurrentDraft) {
         const me = this,
             grid = plug.getSegmentGrid(),
             selModel = grid.getSelectionModel(),
@@ -1283,7 +1288,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 grid.selectOrFocus(goToIndex);
                 const sel = selModel.getSelection();
 
-                if (saveCurrentOpen === false && ed.editing) {
+                if (saveCurrentOpen === false && saveCurrentDraft === false && ed.editing) {
                     ed.cancelEdit();
                 }
 
@@ -1295,6 +1300,9 @@ Ext.define('Editor.controller.SearchReplace', {
                         editableColumn = theColum[0];
                     }
 
+                    if(saveCurrentDraft) {
+                        ed.isDraft = true;
+                    }
                     ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
 
                     //clean the mark tags from the editor
@@ -1550,8 +1558,7 @@ Ext.define('Editor.controller.SearchReplace', {
             tabPanel = me.getTabPanel(),
             activeTab = tabPanel.getActiveTab(),
             saveCurrentOpen = activeTab.down('#saveCurrentOpen').checked,
-            saveCurrentDraft = activeTab.down('#saveCurrentDraft').checked,
-            editor = Editor.app.getController('Editor');
+            saveCurrentDraft = activeTab.down('#saveCurrentDraft').checked;
 
         if (me.activeSegment.matchCount !== 0 || me.activeSegment.matchIndex <= me.activeSegment.matchCount - 1) {
             return false;
@@ -1560,9 +1567,9 @@ Ext.define('Editor.controller.SearchReplace', {
         //if there is only one match, and the save current open is active -> save the segment
         if ((saveCurrentOpen || saveCurrentDraft) && me.activeSegment.currentSegmentIndex === me.activeSegment.nextSegmentIndex) {
             if(saveCurrentDraft) {
-                editor.saveDraft();
+                Editor.app.getController('Editor').saveDraft();
             } else {
-                editor.save();
+                Editor.app.getController('Editor').save();
             }
         } else {
             me.handleRowSelection();
