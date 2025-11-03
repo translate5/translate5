@@ -15,6 +15,27 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.32.1] - 2025-11-03
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5042](https://jira.translate5.net/browse/TRANSLATE-5042): t5memory - Redo TMX cut off functionality** <br>
+7.31.2 & 7.32.1: Fix in file naming
+7.31.0: Improve RAM usage on TMX import process
+
+
+### Bugfixes
+**[TRANSLATE-5099](https://jira.translate5.net/browse/TRANSLATE-5099): Editor general - F3 shortcut problem when source editing is enabled** <br>
+FIXED: problem with F3 shortcut when source editing is enabled
+
+**[TRANSLATE-5091](https://jira.translate5.net/browse/TRANSLATE-5091): TermTagger integration - Sort terms in TermPortlet not working in certain scenarios** <br>
+FIXED: fixed terms sorting logic for TermPortlet
+
+
 ## [7.32.0] - 2025-10-29
 
 ### Important Notes:
