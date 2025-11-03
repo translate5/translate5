@@ -228,6 +228,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 store.getProxy().setUrl(
                     Editor.data.restpath + 'task/' + currentTask.getId() + '/job'
                 );
+                console.log('onUpdateProgress1', 'setProxy', store.getProxy().getUrl());
                 store.load();
             }
         });

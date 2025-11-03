@@ -39,4 +39,78 @@ Ext.define('Editor.store.admin.task.Jobs', {
     remoteFilter: false,
     pageSize: false,
     autoLoad: false,
+    logProxyUrl: function (msg) {
+        console.log(
+            msg + ': ',
+            this.getProxy ?
+                (this.getProxy()
+                    ? this.getProxy().getUrl()
+                    : 'no proxy object')
+                : 'no getProxy method'
+        );
+    },
+    load: function(options) {
+        this.logProxyUrl('load1');                                                        // +
+        var me = this;
+        // Legacy option. Specifying a function was allowed.
+        if (typeof options === 'function') {
+            options = {
+                callback: options
+            };
+        } else {
+            // We may mutate the options object in setLoadOptions.
+            options = options ? Ext.Object.chain(options) : {};
+        }
+        me.pendingLoadOptions = options;
+        // If we are configured to load asynchronously (the default for async proxies)
+        // then schedule a flush, unless one is already scheduled.
+        if (me.getAsynchronousLoad()) {
+            if (!me.loadTimer) {
+                this.logProxyUrl('load2');                                               // +
+                me.loadTimer = Ext.asap(me.flushLoad, me);
+            }
+        } else // If we are configured to load synchronously (the default for sync proxies)
+            // then flush the load now.
+        {
+            this.logProxyUrl('load3');                                                   // +
+            me.flushLoad();
+        }
+        return me;
+    },
+    /**
+     * Called when the event handler which called the {@link #method-load} method exits.
+     */
+    flushLoad: function() {
+        var me = this,
+            options = me.pendingLoadOptions,
+            operation;
+
+        this.logProxyUrl('flushLoad1');                                                  // +
+        // If it gets called programatically before the timer fired, the listener will need cancelling.
+        me.clearLoadTask();
+        if (!options) {
+            return;
+        }
+        this.logProxyUrl('flushLoad2');                                                  // +
+        me.setLoadOptions(options);
+        if (me.getRemoteSort() && options.sorters) {
+            me.fireEvent('beforesort', me, options.sorters);
+            this.logProxyUrl('flushLoad3');                                              // +
+        }
+        operation = Ext.apply({
+            internalScope: me,
+            internalCallback: me.onProxyLoad,
+            scope: me
+        }, options);
+        me.lastOptions = operation;
+        operation = me.createOperation('read', operation);
+        this.logProxyUrl('flushLoad4');
+        if (me.fireEvent('beforeload', me, operation) !== false) {
+            this.logProxyUrl('flushLoad5');                                              // +
+            me.onBeforeLoad(operation);
+            this.logProxyUrl('flushLoad6');                                              // +
+            me.loading = true;
+            operation.execute();
+        }
+    },
 });
