@@ -16,6 +16,28 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.32.2] - 2025-11-06
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5108](https://jira.translate5.net/browse/TRANSLATE-5108): LanguageResources - System slow - language resources overview doesn't load** <br>
+Performance bottleneck in language resource overview resolved. 
+
+**[TRANSLATE-5107](https://jira.translate5.net/browse/TRANSLATE-5107): Content Protection - Unprotect content in text translate flow** <br>
+Unprotect content in text translate flow
+
+**[TRANSLATE-4947](https://jira.translate5.net/browse/TRANSLATE-4947): Editor general - User approve ends in error when task is created with intial state "unconfirmed"** <br>
+Unconfirmed task could not be approved.
+
+**[TRANSLATE-4579](https://jira.translate5.net/browse/TRANSLATE-4579): Main back-end mechanisms (Worker, Logging, etc.) - Worker queue is called frequently and chained** <br>
+7.32.2: set processdaemon as new default worker trigger
+7.21.3: Performance improvement for the workers, prevention of system overload when scheduling thousands of workers.
+
+
 ## [7.32.1] - 2025-11-03
 
 ### Important Notes:
