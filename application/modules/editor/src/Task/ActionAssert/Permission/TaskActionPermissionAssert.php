@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Task\ActionAssert\Permission;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ClientRestrictedPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ConfirmPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\CoordinatorGroupUserPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\FinishPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\OpenPermissionAssert;
@@ -54,6 +55,7 @@ final class TaskActionPermissionAssert extends ActionPermissionAssert
             CoordinatorGroupUserPermissionAssert::create(),
             UserHasJobInTaskPermissionAssert::create(),
             OpenPermissionAssert::create(),
+            ConfirmPermissionAssert::create(),
             FinishPermissionAssert::create(),
         ]);
     }

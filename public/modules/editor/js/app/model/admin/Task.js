@@ -284,6 +284,9 @@ Ext.define('Editor.model.admin.Task', {
             state = me.get('userState');
         return state === Editor.model.admin.Task.userStates.VIEW || state === Editor.model.admin.Task.userStates.EDIT;
     },
+    isViewing: function() {
+        return this.get('userState') === Editor.model.admin.Task.userStates.VIEW;
+    },
     /**
      * returns if task is still in import state
      * @returns {Boolean}
@@ -296,12 +299,17 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {Boolean}
      */
     isUnconfirmed: function () {
-        var me = this,
-            unconfirmed = Editor.model.admin.Task.userStates.UNCONFIRMED;
-        if (this.get('state') === Editor.model.admin.Task.states.UNCONFIRMED) {
+        if (this.isTaskUnconfirmed()) {
             return true;
         }
-        return me.modified && me.modified.userState === unconfirmed || me.get('userState') === unconfirmed;
+        return this.isJobUnconfirmed();
+    },
+    isJobUnconfirmed: function () {
+        const unconfirmed = Editor.model.admin.Task.userStates.UNCONFIRMED;
+        return this.modified && this.modified.userState === unconfirmed || this.get('userState') === unconfirmed;
+    },
+    isTaskUnconfirmed: function () {
+        return this.get('state') === Editor.model.admin.Task.states.UNCONFIRMED;
     },
     hasCriticalErrors: function () {
         return !!this.get('hasCriticalErrors');

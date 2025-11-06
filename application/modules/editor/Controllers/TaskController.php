@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Workflow_Default as DefaultWorkflow;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Export\QueuedExportService;
@@ -1130,11 +1131,18 @@ class editor_TaskController extends ZfExtended_RestController
         $userState = $this->data->userState ?? null;
 
         $action = match ($userState) {
-            'edit' => TaskAction::Edit,
-            'view', 'open' => TaskAction::View,
-            'finished' => TaskAction::Finish,
+            DefaultWorkflow::STATE_EDIT => TaskAction::Edit,
+            DefaultWorkflow::STATE_VIEW, DefaultWorkflow::STATE_OPEN => TaskAction::View,
+            DefaultWorkflow::STATE_FINISH => TaskAction::Finish,
             default => TaskAction::Update,
         };
+
+        if ($this->entity->getState() === editor_Models_Task::STATE_UNCONFIRMED
+            && ($this->data->state ?? null) === editor_Models_Task::STATE_OPEN
+            && $userState === DefaultWorkflow::STATE_EDIT
+        ) {
+            $action = TaskAction::Confirm;
+        }
 
         try {
             $this->taskActionPermissionAssert->assertGranted(

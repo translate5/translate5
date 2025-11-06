@@ -39,4 +39,5 @@ enum TaskAction: string
     case Read = 'read';
     case Update = 'update';
     case View = 'view';
+    case Confirm = 'confirm';
 }
