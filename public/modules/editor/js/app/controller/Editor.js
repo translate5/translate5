@@ -792,6 +792,7 @@ Ext.define('Editor.controller.Editor', {
             // rec.set('autoStateId', Editor.data.segments.autoStates.DRAFT);
             // rec.commit(false);
             ed.isDraft = true;
+            ed.editor.disableContentErrorCheckOnce();
             this.save();
         }
     },
@@ -1066,8 +1067,10 @@ Ext.define('Editor.controller.Editor', {
     },
 
     saveDraftNextByWorkflow: function() {
+        let ed = this.getEditPlugin();
         this.calcNext(true);
-        this.getEditPlugin().isDraft = true;
+        ed.isDraft = true;
+        ed.editor.disableContentErrorCheckOnce();
         this.saveOtherRow();
     },
 

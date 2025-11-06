@@ -61,7 +61,7 @@ if($this->appVersion == ZfExtended_Utils::VERSION_DEVELOPMENT){
 ?>
 <script src="<?php echo $this->extJsBasepath;?>/build/ext-all<?php echo $extSuffix;?>.js"></script>
 <script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-<?php echo $this->locale.$extSuffix;?>.js"></script>
-<script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
+<script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js<?php echo $version;?>"></script>
 <script>
 <?php if($this->appVersion != ZfExtended_Utils::VERSION_DEVELOPMENT){ ?>
 Ext.manifest = {

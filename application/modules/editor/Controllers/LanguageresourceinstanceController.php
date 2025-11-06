@@ -42,6 +42,7 @@ use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
+use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsLoggerProvider;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
@@ -112,6 +113,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     private QualityService $qualityService;
 
+    private ReimportSegmentsLoggerProvider $loggerProvider;
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
@@ -144,6 +147,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->contentProtector = ContentProtector::create();
         $this->segmentRepository = SegmentRepository::create();
         $this->qualityService = new QualityService();
+        $this->loggerProvider = new ReimportSegmentsLoggerProvider();
     }
 
     /**
@@ -1253,14 +1257,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                             ]
                         );
                         if ($this->data->force && $this->segmentRepository->hasDraftsInTask($taskGuid)) {
-                            Zend_Registry::get('logger')->info(
+                            $this->loggerProvider->getLogger()->info(
                                 'E1753',
                                 'Reimport: "Save segments to TM" started for a task with segments in draft status',
                                 [
                                     'task' => $taskGuid,
-                                    'languageResourceId' => $this->entity->getId(),
+                                    'tmId' => $this->entity->getId(),
                                     'onlyEdited' => $this->data->onlyEdited,
                                     'timeOption' => $this->data->timeOption,
+                                    'languageResource' => $this->entity,
                                 ]
                             );
                         }

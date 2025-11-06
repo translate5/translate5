@@ -55,7 +55,7 @@ class CutOffTmx
 
         $writer = new XMLWriter();
 
-        $cutOffTmx = str_replace('.tmx', '', basename($tmxFile)) . '_cutoff.tmx';
+        $cutOffTmx = dirname($tmxFile) . '/' . str_replace('.tmx', '', basename($tmxFile)) . '_cutoff.tmx';
 
         $writer->openURI($cutOffTmx);
         $writer->startDocument('1.0', 'UTF-8');

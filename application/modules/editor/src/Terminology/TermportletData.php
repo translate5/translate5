@@ -90,7 +90,7 @@ class TermportletData
             'termStatMap' => TermModel::getTermStatusMap(),
             'publicModulePath' => APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module'),
             'attributeGroups' => [],
-            'termGroups' => $this->getByTaskGuidAndSegment($segment),
+            'termGroups' => array_values($this->getByTaskGuidAndSegment($segment)),
         ];
 
         $this->result['noTerms'] = empty($this->result['termGroups']);
@@ -305,7 +305,7 @@ class TermportletData
         }
 
         // Prepare comma-separated list, enclosed with single-quotes
-        $sourceIds = $this->termModel->db->getAdapter()->quoteInto('?', join(',', array_reverse($sourceIds)));
+        $allIdsSQL = $this->termModel->db->getAdapter()->quoteInto('?', join(',', array_reverse($allIds)));
 
         // Fetch terms
         $sql = $this->termModel->db->getAdapter()->select()
@@ -327,12 +327,7 @@ class TermportletData
             ->where('t1.termTbxId IN(?)', $allIds)
             ->where('t1.languageId IN (?)', $this->allUsedLanguageIds)
             ->where('t2.languageId IN (?)', $this->allUsedLanguageIds)
-            ->order(["
-                GREATEST (
-                    FIND_IN_SET(t1.termTbxId, $sourceIds),
-                    FIND_IN_SET(t2.termTbxId, $sourceIds)
-                ) DESC
-            "]);
+            ->order(["FIND_IN_SET(t2.termTbxId, $allIdsSQL) DESC"]);
 
         if (! empty($statuses)) {
             $sql->where('t1.processStatus in (?)', $statuses);

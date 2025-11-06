@@ -265,7 +265,7 @@ Ext.application({
             if (msg) Ext.get(msg).ghost("t", {remove:true});
         });
 
-        if(Editor.app.isDevelopmentVersion()) {
+        if(Editor.data.app.showDevTools) {
             const cookieSet = Ext.util.Cookies.get('use_xss_proxy') === '1',
                 colors = ['#e74c3c', '#27ae60', '#2980b9', '#f39c12', '#8e44ad', '#d35400'],
                 color = colors[Math.floor(Math.random() * colors.length)];

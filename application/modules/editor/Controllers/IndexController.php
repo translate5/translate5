@@ -623,6 +623,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         );
 
         $php2js->set('app.version', $this->view->appVersion);
+        $php2js->set(
+            'app.showDevTools',
+            ZfExtended_Utils::isDevelopment() && $this->config->runtimeOptions->debug->showDevTools ?? false
+        );
 
         $filter = ZfExtended_Factory::get(ZfExtended_Models_Filter_ExtJs6::class);
         $php2js->set('app.filters.translatedOperators', $filter->getTranslatedOperators());
