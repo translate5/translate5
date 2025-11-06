@@ -36,9 +36,8 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
 {
     /**
      * Returns join between taskassoc table and task table for languageResource's id list
-     * @param array $languageResourceids
      */
-    public function getTaskInfoForLanguageResources($languageResourceids)
+    public function getTaskInfoForLanguageResources(array $languageResourceids)
     {
         $taskAssocRepository = LanguageResourceTaskAssocRepository::create();
 
