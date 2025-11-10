@@ -94,6 +94,7 @@ final class DbHelper
         $result->cleanupNeccessary = false;
         $worker = new ZfExtended_Models_Worker();
         $summary = $worker->getSummary();
+        /** @var int $numFaulty */
         $numFaulty =
             $summary[ZfExtended_Models_Worker::STATE_SCHEDULED]
             + $summary[ZfExtended_Models_Worker::STATE_WAITING]
@@ -199,7 +200,7 @@ final class DbHelper
             if (($numTaskGuids > 0 && $numTaskGuids === $numFinished) || ($numTaskGuids === 0 && $numFinished === 1)) {
                 return;
             }
-            if ($counter % 5 == 0) {
+            if ($counter % 5 === 0) {
                 error_log('Worker state check ' . $counter . '/' . $timeout . ' [' . get_class($test) . ']');
             }
         }

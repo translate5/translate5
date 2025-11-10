@@ -39,6 +39,8 @@ abstract class Operation extends AbstractResource
 
     protected string $_taskGuid;
 
+    protected int $_maxWaitTime = Helper::RELOAD_TASK_LIMIT;
+
     /**
      * @return $this
      */
@@ -46,6 +48,16 @@ abstract class Operation extends AbstractResource
     {
         $this->_taskId = $task->getId();
         $this->_taskGuid = $task->getTaskGuid();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMaxWaitTime(int $maxWaitTime): Operation
+    {
+        $this->_maxWaitTime = $maxWaitTime;
 
         return $this;
     }

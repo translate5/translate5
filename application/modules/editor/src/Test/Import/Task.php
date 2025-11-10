@@ -110,14 +110,14 @@ final class Task extends AbstractResource
 
     private bool $_waitForImported = true;
 
+    private int $_maxWaitTime = Helper::RELOAD_TASK_LIMIT;
+
     private bool $_failOnError = true;
 
     /**
      * Defines the default-configs that will be applied for all task-imports
      */
-    private array $_importConfigs = [
-
-    ];
+    private array $_importConfigs = [];
 
     public function __construct(string $testClass, int $index)
     {
@@ -314,6 +314,18 @@ final class Task extends AbstractResource
     public function setNotToWaitForImported(): Task
     {
         $this->_waitForImported = false;
+
+        return $this;
+    }
+
+    /**
+     * Special API to det the max waiting time for a task-import
+     * Can (and should) be used to speed up the time for failing tests)
+     * @return $this
+     */
+    public function setMaxWaitTime(int $maxWaitTime): Task
+    {
+        $this->_maxWaitTime = $maxWaitTime;
 
         return $this;
     }
@@ -575,7 +587,7 @@ final class Task extends AbstractResource
     private function doCreateTask(Helper $api, bool $failOnError, bool $waitTorImport): bool
     {
         $this->autoStartImport = $waitTorImport ? 1 : 0;
-        $result = $api->createTask($this->getRequestParams(), $failOnError, $waitTorImport);
+        $result = $api->createTask($this->getRequestParams(), $failOnError, $waitTorImport, $this->_maxWaitTime);
         if ($this->validateResult($result, $api)) {
             return true;
         }

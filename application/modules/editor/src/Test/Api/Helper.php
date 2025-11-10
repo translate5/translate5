@@ -137,8 +137,11 @@ final class Helper extends ZfExtended_Test_ApiHelper
      * returns the data of the completely loaded task
      * @throws Exception
      */
-    public function waitForTaskImported(Task|stdClass $task, bool $failOnError = true): stdClass
-    {
+    public function waitForTaskImported(
+        Task|stdClass $task,
+        bool $failOnError = true,
+        int $maxWaitTime = self::RELOAD_TASK_LIMIT
+    ): stdClass {
         if ($task->taskType === self::INITIAL_TASKTYPE_PROJECT) {
             return $this->waitForProjectImported($task, $failOnError);
         } else {
@@ -147,7 +150,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
                 \editor_Models_Import_Worker_SetTaskToOpen::class,
                 [$task->taskGuid],
                 $failOnError,
-                self::RELOAD_TASK_LIMIT
+                $maxWaitTime
             );
             sleep(1);
 
@@ -162,14 +165,18 @@ final class Helper extends ZfExtended_Test_ApiHelper
      * returns the data of the completely loaded task
      * @throws Exception
      */
-    public function waitForTaskOperation(Task|stdClass $task, string $finalWorker, bool $failOnError = true): stdClass
-    {
+    public function waitForTaskOperation(
+        Task|stdClass $task,
+        string $finalWorker,
+        bool $failOnError = true,
+        int $maxWaitTime = self::RELOAD_TASK_LIMIT
+    ): stdClass {
         DbHelper::waitForWorkers(
             $this->test, /** @phpstan-ignore-line */
             $finalWorker,
             [$task->taskGuid],
             $failOnError,
-            self::RELOAD_TASK_LIMIT
+            $maxWaitTime
         );
         sleep(1);
 
@@ -285,8 +292,12 @@ final class Helper extends ZfExtended_Test_ApiHelper
      * @throws Exception
      * @throws Zend_Http_Client_Exception
      */
-    public function createTask(array $task, bool $failOnError = true, bool $waitForImport = true)
-    {
+    public function createTask(
+        array $task,
+        bool $failOnError = true,
+        bool $waitForImport = true,
+        int $maxWaitTime = self::RELOAD_TASK_LIMIT
+    ) {
         $this->initTaskPostData($task);
 
         // prevent the allowed states to be reset with session requests
@@ -316,7 +327,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
         if (! $waitForImport) {
             return $this->task;
         }
-        $this->waitForTaskImported($this->task, $failOnError);
+        $this->waitForTaskImported($this->task, $failOnError, $maxWaitTime);
 
         if ($projectTasks !== null) {
             $this->task->projectTasks = is_array($projectTasks) ? $projectTasks : [$projectTasks];
