@@ -366,17 +366,14 @@ class TestomatBitbucketListener implements TestListener
         $summary = <<<TXT
 🧪 PHPUnit Test Summary
 =========================
-✅ Passed:      {$this->testStatCounter['passed']}\n
-❌ Failed:      {$this->testStatCounter['failed']}\n
-💥 Errors:      {$this->testStatCounter['error']}\n
-⚠️  Warnings:   {$this->testStatCounter['warning']}\n
-🚧 Incomplete:  {$this->testStatCounter['incomplete']}\n
-🤔 Risky:       {$this->testStatCounter['risky']}\n
-⏭️  Skipped:    {$this->testStatCounter['skipped']}\n
+✅ Passed: {$this->testStatCounter['passed']} // ❌ Failed: {$this->testStatCounter['failed']} // 💥 Errors: {$this->testStatCounter['error']}\n
+-------------------------
+⚠️ Warnings: {$this->testStatCounter['warning']} // 🚧 Incomplete: {$this->testStatCounter['incomplete']} // 🤔 Risky: {$this->testStatCounter['risky']} // ⏭️ Skipped: {$this->testStatCounter['skipped']}\n
 =========================\n
-📊 Total Tests: {$total}\n
-📈 Pass Rate:   {$passRate}%\n
-https://app.testomat.io/projects/translate5/runs/{$runId}\n
+📊 Total Tests: $total\n
+📈 Pass Rate:   $passRate%\n
+⎇ Branch: $branch\n
+https://app.testomat.io/projects/translate5/runs/$runId\n
 https://bitbucket.org/mittagqi/translate5/pipelines/results/{$buildNumber}
 TXT;
         $summary = $this->addLastFailed($summary);
