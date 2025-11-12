@@ -69,6 +69,10 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         $this->languageRepository = LanguageRepository::create();
     }
 
+    /**
+     * @param array<string> $skippedTags
+     * @throws \MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException
+     */
     public function restoreInFuzzyResult(string $resultString, array $skippedTags, bool $isSource = true): string
     {
         $sourceLang = $this->languageRepository->find($this->sourceLang);
@@ -92,26 +96,12 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         return $dto->segment;
     }
 
+    /**
+     * @throws \MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException
+     */
     public function restoreInResult(string $resultString, bool $isSource = true): ?string
     {
-        $sourceLang = $this->languageRepository->find($this->sourceLang);
-        $targetLang = $this->languageRepository->find($this->targetLang);
-
-        $resultString = $this->restoreProtectionTags(
-            $resultString,
-            $sourceLang,
-            $targetLang,
-        );
-
-        $resultString = parent::restoreInResult($resultString, $isSource);
-
-        $dto = $this->numberProtector->convertToInternalTagsWithShortcutNumberMap(
-            $resultString,
-            $this->shortTagIdent,
-            $this->shortcutNumberMap
-        );
-
-        return $dto->segment;
+        return $this->restoreInFuzzyResult($resultString, [], $isSource);
     }
 
     private function getProtector(string $type): NumberProtectorInterface
@@ -124,6 +114,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
     }
 
     /**
+     * @param array<string> $skippedTags
      * @throws \MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException
      */
     public function restoreProtectionTags(

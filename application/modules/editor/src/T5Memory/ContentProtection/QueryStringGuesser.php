@@ -39,6 +39,11 @@ class QueryStringGuesser
         return new self();
     }
 
+    /**
+     * Filters tags from request source which are not present in memory source
+     *
+     * @return array{string, array<string>} returns the filtered source and the list of removed tags
+     */
     public function filterExtraTags(string $requestSource, string $memorySource): array
     {
         $tagsInRequestCount = preg_match_all(T5NTag::fullTagRegex(), $requestSource, $requestMatches, PREG_SET_ORDER);
