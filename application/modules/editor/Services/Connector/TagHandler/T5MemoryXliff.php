@@ -69,97 +69,39 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         $this->languageRepository = LanguageRepository::create();
     }
 
-    public function restoreInResult(string $resultString, bool $isSource = true): ?string
+    public function restoreInFuzzyResult(string $resultString, array $skippedTags, bool $isSource = true): string
     {
-        $t5nTagRegex = T5NTag::fullTagRegex();
-        $protectionDtos = [];
         $sourceLang = $this->languageRepository->find($this->sourceLang);
         $targetLang = $this->languageRepository->find($this->targetLang);
 
-        if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
-            $contentProtectionTags = [];
-            foreach ($matches as $match) {
-                $tag = T5NTag::fromMatch($match);
-                // $contentProtectionTags[*rule*][*id*] = ['tag' => *T5NTag*, 'render' => *wholeTag*];
-                $contentProtectionTags[$tag->rule][$tag->id] = [
-                    'render' => $match[0],
-                    'tag' => $tag,
-                ];
-            }
+        $resultString = $this->restoreProtectionTags(
+            $resultString,
+            $sourceLang,
+            $targetLang,
+            $skippedTags,
+        );
 
-            foreach ($contentProtectionTags as $rule => $tags) {
-                // sort tags by their ids
-                ksort($tags);
-                // get rid of the keys
-                $tags = array_values($tags);
+        $resultString = parent::restoreInResult($resultString, $isSource);
 
-                if (isset($this->contentProtectionTagMap[$rule])) {
-                    $taskSegmentTags = [];
+        $dto = $this->numberProtector->convertToInternalTagsWithShortcutNumberMap(
+            $resultString,
+            $this->shortTagIdent,
+            $this->shortcutNumberMap
+        );
 
-                    foreach ($this->contentProtectionTagMap[$rule] as $tag => $ids) {
-                        foreach ($ids as $id) {
-                            $taskSegmentTags[$id] = $tag;
-                        }
-                    }
+        return $dto->segment;
+    }
 
-                    ksort($taskSegmentTags);
-                    $taskSegmentTags = array_values($taskSegmentTags);
+    public function restoreInResult(string $resultString, bool $isSource = true): ?string
+    {
+        $sourceLang = $this->languageRepository->find($this->sourceLang);
+        $targetLang = $this->languageRepository->find($this->targetLang);
 
-                    foreach ($taskSegmentTags as $id => $segmentTag) {
-                        if (! isset($tags[$id])) {
-                            break;
-                        }
-
-                        $resultString = str_replace($tags[$id]['render'], $segmentTag, $resultString);
-
-                        unset($tags[$id]);
-                    }
-
-                    if (empty($tags)) {
-                        continue;
-                    }
-                }
-
-                foreach ($tags as ['tag' => $tag, 'render' => $render]) {
-                    if (null === $sourceLang || null === $targetLang) {
-                        // no language found, so we just unprotect the content
-                        $resultString = str_replace($render, $tag->content, $resultString);
-
-                        continue;
-                    }
-
-                    if (! isset($protectionDtos[$rule])) {
-                        $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
-
-                        $protectionDtos[$rule] = null === $recognition
-                            ? ContentProtectionDto::fake(
-                                DiffProtector::getType(),
-                                'Missing rule - in TM only',
-                                $tag->getRegex(),
-                            )
-                            : ContentProtectionDto::fake(
-                                $recognition->getType(),
-                                $recognition->getName() . ' - in TM only',
-                                $recognition->getRegex(),
-                            )
-                        ;
-                    }
-
-                    $dto = $protectionDtos[$rule];
-
-                    $resultString = str_replace(
-                        $render,
-                        $this->getProtector($dto->type)->protect(
-                            $tag->content,
-                            $dto,
-                            $sourceLang,
-                            $targetLang,
-                        ),
-                        $resultString
-                    );
-                }
-            }
-        }
+        $resultString = $this->restoreProtectionTags(
+            $resultString,
+            $sourceLang,
+            $targetLang,
+        );
 
         $resultString = parent::restoreInResult($resultString, $isSource);
 
@@ -179,6 +121,125 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         }
 
         return $this->numberProtectorProvider->getByType($type);
+    }
+
+    /**
+     * @throws \MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException
+     */
+    public function restoreProtectionTags(
+        string $resultString,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+        array $skippedTags = [],
+    ): string {
+        $t5nTagRegex = T5NTag::fullTagRegex();
+
+        if (! preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
+            return $resultString;
+        }
+
+        $protectionDtos = [];
+        $contentProtectionTags = [];
+
+        foreach ($matches as $match) {
+            $tag = T5NTag::fromMatch($match);
+            // $contentProtectionTags[*rule*][*id*] = ['tag' => *T5NTag*, 'render' => *wholeTag*];
+            $contentProtectionTags[$tag->rule][$tag->id] = [
+                'render' => $match[0],
+                'tag' => $tag,
+            ];
+        }
+
+        foreach ($contentProtectionTags as $rule => $tags) {
+            // sort tags by their ids
+            ksort($tags);
+            // get rid of the keys
+            $tags = array_values($tags);
+
+            if (isset($this->contentProtectionTagMap[$rule])) {
+                $taskSegmentTags = [];
+
+                foreach ($this->contentProtectionTagMap[$rule] as $tag => ['ids' => $ids, 'protectedContent' => $protectedContent]) {
+                    $skipIds = [];
+                    foreach ($protectedContent as $content => $protectedIds) {
+                        if (in_array($content, $skippedTags)) {
+                            // count content occurrences to skipped tags
+                            $occurrences = count(array_filter($skippedTags, fn($skipped) => $skipped === $content));
+
+                            for ($i = 0; $i < $occurrences; $i++) {
+                                $protectedId = array_shift($protectedIds);
+                                $skipIds[$protectedId] = true;
+                            }
+                        }
+                    }
+
+                    foreach ($ids as $id) {
+                        if (isset($skipIds[$id])) {
+                            continue;
+                        }
+
+                        $taskSegmentTags[$id] = $tag;
+                    }
+                }
+
+                ksort($taskSegmentTags);
+                $taskSegmentTags = array_values($taskSegmentTags);
+
+                foreach ($taskSegmentTags as $id => $segmentTag) {
+                    if (! isset($tags[$id])) {
+                        break;
+                    }
+
+                    $resultString = str_replace($tags[$id]['render'], $segmentTag, $resultString);
+
+                    unset($tags[$id]);
+                }
+
+                if (empty($tags)) {
+                    continue;
+                }
+            }
+
+            foreach ($tags as ['tag' => $tag, 'render' => $render]) {
+                if (null === $sourceLang || null === $targetLang) {
+                    // no language found, so we just unprotect the content
+                    $resultString = str_replace($render, $tag->content, $resultString);
+
+                    continue;
+                }
+
+                if (! isset($protectionDtos[$rule])) {
+                    $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
+
+                    $protectionDtos[$rule] = null === $recognition
+                        ? ContentProtectionDto::fake(
+                            DiffProtector::getType(),
+                            'Missing rule - in TM only',
+                            $tag->getRegex(),
+                        )
+                        : ContentProtectionDto::fake(
+                            $recognition->getType(),
+                            $recognition->getName() . ' - in TM only',
+                            $recognition->getRegex(),
+                        );
+                }
+
+                $dto = $protectionDtos[$rule];
+
+                $resultString = str_replace(
+                    $render,
+                    $this->getProtector($dto->type)->protect(
+                        $tag->content,
+                        $dto,
+                        $sourceLang,
+                        $targetLang,
+                    ),
+                    $resultString
+                );
+            }
+        }
+
+        return $resultString;
     }
 
     protected function convertQuery(string $queryString, bool $isSource): string

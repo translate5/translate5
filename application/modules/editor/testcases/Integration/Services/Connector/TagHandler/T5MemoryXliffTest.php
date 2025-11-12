@@ -135,6 +135,58 @@ class T5MemoryXliffTest extends TestCase
         ];
     }
 
+    public function restoreFuzzyProvider(): iterable
+    {
+        yield 'less tags in result' => [
+            'source' => '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222f number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
+            'expected' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
+            'resultString' => '2023-09-15 and <t5:n id="1" r="ZGVmYXVsdCBZLW0tZA==" n="2024-10-19"/>',
+            'skippedTags' => ['2023-09-15'],
+        ];
+
+        yield 'less tags in result. same content twice' => [
+            'source' => '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222f number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222f number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
+            'expected' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222f number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
+            'resultString' => '2023-09-15 and <t5:n id="1" r="ZGVmYXVsdCBZLW0tZA==" n="2023-09-15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="2024-10-19"/>',
+            'skippedTags' => ['2023-09-15'],
+        ];
+
+        foreach ($this->restoreProvider() as $key => $data) {
+            yield $key => [
+                'source' => $data['source'],
+                'expected' => $data['expected'],
+                'resultString' => $data['resultString'],
+                'skippedTags' => [],
+            ];
+        }
+    }
+
+    /**
+     * @dataProvider restoreFuzzyProvider
+     */
+    public function testRestoreInFuzzyResult(
+        string $source,
+        string $expected,
+        string $resultString,
+        array $skippedTags
+    ): void {
+        $tagHandler = ZfExtended_Factory::get(
+            editor_Services_Connector_TagHandler_T5MemoryXliff::class,
+            [[
+                'gTagPairing' => false,
+            ]]
+        );
+        $tagHandler->setLanguages(5, 6);
+
+        // we need this step to fill \editor_Services_Connector_TagHandler_T5MemoryXliff::$numberTagMap
+        $tagHandler->prepareQuery($source);
+
+        self::assertSame(
+            $expected,
+            $tagHandler->restoreInFuzzyResult($resultString, $skippedTags)
+        );
+    }
+
     public function providePrepareQueryTarget(): iterable
     {
         yield 'encoded content in target' => [
