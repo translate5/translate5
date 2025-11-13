@@ -536,6 +536,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Mixin_document_fragment__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Mixin/document-fragment */ "./Mixin/document-fragment.js");
 /* harmony import */ var _DataCleanup_insert_preprocessor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../DataCleanup/insert-preprocessor */ "./DataCleanup/insert-preprocessor.js");
 /* harmony import */ var _Tools_calculate_node_length__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../Tools/calculate-node-length */ "./Tools/calculate-node-length.js");
+/* harmony import */ var _Editor_language_resolver__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../Editor/language-resolver */ "./Editor/language-resolver.js");
+
 
 
 
@@ -565,6 +567,7 @@ class EditorWrapper {
         ON_SELECTION_CHANGE_COMPLETED: 'onSelectionChangeCompleted',
     };
 
+    #languageResolver = new _Editor_language_resolver__WEBPACK_IMPORTED_MODULE_9__["default"]();
     #font = null;
     #tagsModeProvider = null;
 
@@ -576,11 +579,22 @@ class EditorWrapper {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
 
+    /**
+     * @param {HTMLElement} element
+     * @param {TagsModeProvider} tagsModeProvider
+     * @param {boolean} userCanModifyWhitespaceTags
+     * @param {boolean} userCanInsertWhitespaceTags
+     * @param {string} uiLocale
+     * @param {string} editorLocale
+     * @returns {Promise<EditorWrapper>}
+     */
     constructor(
         element,
         tagsModeProvider,
         userCanModifyWhitespaceTags,
-        userCanInsertWhitespaceTags
+        userCanInsertWhitespaceTags,
+        uiLocale,
+        editorLocale,
     ) {
         this._element = element;
         this._editor = null;
@@ -619,7 +633,7 @@ class EditorWrapper {
             9999
         );
 
-        return this.#create();
+        return this.#create(uiLocale, editorLocale);
     }
 
     get font() {
@@ -1178,14 +1192,20 @@ class EditorWrapper {
     /**
      * Create an editor instance
      *
+     * @param {string} uiLocale
+     * @param {string} editorLocale
      * @returns {Promise<EditorWrapper>}
      * @private
      */
-    #create() {
+    #create(uiLocale, editorLocale) {
         return _Source__WEBPACK_IMPORTED_MODULE_0___default().create(
             this._element,
             {
                 toolbar: [],
+                language: {
+                    ui: this.#languageResolver.resolveLanguage(uiLocale),
+                    content: this.#languageResolver.resolveLanguage(editorLocale),
+                },
                 htmlSupport: {
                     allow: [
                         {
@@ -1861,6 +1881,81 @@ class EditorWrapper {
     }
 }
 
+
+/***/ }),
+
+/***/ "./Editor/language-resolver.js":
+/*!*************************************!*\
+  !*** ./Editor/language-resolver.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ LanguageResolver)
+/* harmony export */ });
+class LanguageResolver {
+    #supportedLocales = [
+        "ar",
+        "bn",
+        "bg",
+        "ca",
+        "zh",
+        "zh-tw",
+        "cs",
+        "da",
+        "nl",
+        "en",
+        "et",
+        "fi",
+        "fr",
+        "de",
+        "el",
+        "he",
+        "hi",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "lv",
+        "lt",
+        "ms",
+        "no",
+        "pl",
+        "pt-br",
+        "pt",
+        "ro",
+        "ru",
+        "sr",
+        "sk",
+        "es",
+        "sv",
+        "th",
+        "tr",
+        "uk",
+        "vi",
+    ];
+
+    /**
+     * @param {string} locale
+     * @returns {string}
+     */
+    resolveLanguage(locale) {
+        const normalizedLocale = locale.toLowerCase();
+        if (this.#supportedLocales.includes(normalizedLocale)) {
+            return normalizedLocale;
+        }
+
+        const primarySubtag = normalizedLocale.split('-')[0];
+        if (this.#supportedLocales.includes(primarySubtag)) {
+            return primarySubtag;
+        }
+
+        return 'en';
+    }
+}
 
 /***/ }),
 

@@ -102,7 +102,9 @@ Ext.define('Ext.translate5.Editor', {
             element,
             new TagsModeProvider(),
             true,
-            true
+            true,
+            Editor.data.locale,
+            Ext.getStore('admin.Languages').getById(Editor.data.task.get('targetLang')).get('rfc5646'),
         ).then((editor) => {
             this.editor = editor;
 
