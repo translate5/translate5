@@ -121,7 +121,7 @@ class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport
         foreach ($segments as $segment) {
             $source = $segmentTagger->toExcel($segment->getSource());
             $target = $segmentTagger->toExcel($segment->getTargetEdit());
-            $this->excel->addSegment($segment->getSegmentNrInTask(), $source, $target);
+            $this->excel->addSegment((int) $segment->getSegmentNrInTask(), $source, $target, $segment->isEditable());
         }
 
         // .. then send the excel

@@ -194,6 +194,10 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         $workflow = $wfm->getActiveByTask($this->task);
 
         foreach ($this->excel->getSegments() as $segment) {
+            if ($segment === null) {
+                continue;
+            }
+
             //segment must be initialized completly new
             $t5Segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $t5Segment editor_Models_Segment */
@@ -442,6 +446,9 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         // compare all segments if an empty segment in excel is not-empty in task
         $emptySegments = [];
         foreach ($tempExcelSegments as $excelSegment) {
+            if ($excelSegment === null) {
+                continue; //to be ignored segment
+            }
             if (empty($excelSegment->target)) {
                 $t5Segment->loadBySegmentNrInTask($excelSegment->nr, $this->task->getTaskGuid());
                 if (! empty($t5Segment->getTargetEdit())) {
