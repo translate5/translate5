@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ZfExtended;
 
 use MittagQI\ZfExtended\Models\Entity\ExcelExport;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PHPUnit\Framework\TestCase;
 
@@ -44,8 +45,10 @@ class ExcelExportTest extends TestCase
         $excel->setLabel('currency1', 'Money test');
         $excel->setHiddenField('hidden1');
         $excel->setFieldTypeCurrency('currency1');
+        $excel->setFieldTypeCurrency('currencyFromString');
         $excel->setFieldTypeDate('date1');
         $excel->setFieldTypePercent('percent1');
+        $excel->setFieldTypePercent('percentFromString');
         $excel->setFieldType('date2', NumberFormat::FORMAT_DATE_DATETIME);
         $excel->setCallback('callback1', fn ($x) => str_replace('FOO', 'BAR', $x));
         $excel->loadArrayData([
@@ -59,6 +62,8 @@ class ExcelExportTest extends TestCase
                 'percent1' => 11.1,
                 'hidden1' => 'Hidden1',
                 'callback1' => 'FOO1',
+                'currencyFromString' => '11.1',
+                'percentFromString' => '99.1',
             ],
             [
                 'col1' => 'Test2ColA',
@@ -69,8 +74,12 @@ class ExcelExportTest extends TestCase
                 'currency1' => 10,
                 'percent1' => 10,
                 'callback1' => 'FOO2',
+                'currencyFromString' => '10',
+                'percentFromString' => '99',
             ],
         ]);
+
+        //$excel->saveToDisc('test.xlsx');
 
         $this->assertEquals(
             [
@@ -83,16 +92,20 @@ class ExcelExportTest extends TestCase
                     'F' => 'Money test',
                     'G' => 'percent1',
                     'H' => 'callback1',
+                    'I' => 'currencyFromString',
+                    'J' => 'percentFromString',
                 ],
                 2 => [
                     'A' => 'Test1ColA',
                     'B' => 'Test1ColB',
                     'C' => '=1+1',
                     'D' => '1970-01-01',
-                    'E' => '8/4/40 0:00',
-                    'F' => '11 €',
+                    'E' => '8/4/40 0:00', //is just reflecting the status quo, might be wrong
+                    'F' => '11.10 €',
                     'G' => '11.1%',
                     'H' => 'BAR1',
+                    'I' => '11.10 €',
+                    'J' => '99.1%',
                 ],
                 3 => [
                     'A' => 'Test2ColA',
@@ -100,13 +113,28 @@ class ExcelExportTest extends TestCase
                     'C' => '=2+1',
                     'D' => '2025-10-22',
                     'E' => '2025-10-22 10:00:00',
-                    'F' => '10 €',
+                    'F' => '10.00 €',
                     'G' => '10.0%',
                     'H' => 'BAR2',
+                    'I' => '10.00 €',
+                    'J' => '99.0%',
                 ],
             ],
+            //DANGER: toArray is just returning the internal data,
+            // it is not returning the same as it would be rendered in a Calc Tool
             $excel->getSpreadsheet()->getActiveSheet()->toArray(null, true, true, true),
             'Generated Array of Excel file is not as expected'
+        );
+
+        //strings to be used as currency must be stored internally as number and not as string,
+        // otherwise its rendered wrong in the calc tool!
+        $this->assertSame(
+            DataType::TYPE_NUMERIC,
+            $excel->getSpreadsheet()->getActiveSheet()->getCell('I2')->getDataType()
+        );
+        $this->assertSame(
+            DataType::TYPE_NUMERIC,
+            $excel->getSpreadsheet()->getActiveSheet()->getCell('I3')->getDataType()
         );
     }
 }
