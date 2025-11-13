@@ -157,14 +157,20 @@ class UpliftFuzzySearchTest extends TestCase
             'getTargetLang' => 2,
             'getSourceLangCode' => 'de',
             'getTargetLangCode' => 'en',
-            'getSpecificData' => [['filename' => 't5memory_test']],
+            'getSpecificData' => [[
+                'filename' => 't5memory_test',
+            ]],
         ]);
 
         $segment = <<<HTML
 <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222f number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>
 HTML;
 
-        $config = new \Zend_Config(['runtimeOptions' => ['LanguageResources' => []]]);
+        $config = new \Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [],
+            ],
+        ]);
 
         $result = $fuzzySearchService->query(
             $languageResource,

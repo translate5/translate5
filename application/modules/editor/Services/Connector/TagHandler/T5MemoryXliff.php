@@ -155,7 +155,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                     foreach ($protectedContent as $content => $protectedIds) {
                         if (in_array($content, $skippedTags)) {
                             // count content occurrences to skipped tags
-                            $occurrences = count(array_filter($skippedTags, fn($skipped) => $skipped === $content));
+                            $occurrences = count(array_filter($skippedTags, fn ($skipped) => $skipped === $content));
 
                             for ($i = 0; $i < $occurrences; $i++) {
                                 $protectedId = array_shift($protectedIds);
