@@ -35,22 +35,12 @@ class editor_Models_Metrics
 
     public const TYPE_GAUGE = 'gauge';
 
-    public const TYPE_HISTOGRAM = 'histogram';
+    protected array $metrics = [];
 
-    public const TYPE_SUMMARY = 'summary';
-
-    protected $metrics = [];
-
-    public function __construct()
-    {
-        $this->serverDir = explode(DIRECTORY_SEPARATOR, trim($_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR));
-        array_pop($this->serverDir); //remove public
-        $this->serverDir = array_pop($this->serverDir);
-        //or better REQUEST_TIME_FLOAT?
-        $this->requestTime = str_replace('.', '', (string) $_SERVER['REQUEST_TIME_FLOAT']);
-    }
-
-    public function collect()
+    /**
+     * @throws Zend_Exception
+     */
+    public function collect(): void
     {
         $this->worker();
         $this->tasks();
@@ -58,10 +48,9 @@ class editor_Models_Metrics
         $this->eventlogs();
     }
 
-    protected function jobs()
+    protected function jobs(): void
     {
-        $task = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $task editor_Models_TaskUserAssoc */
+        $task = new editor_Models_TaskUserAssoc();
         $this->addMeta('jobs_total', 'Current amount of jobs', self::TYPE_GAUGE);
         $summary = $task->getSummary();
         foreach ($summary as $count) {
@@ -73,10 +62,9 @@ class editor_Models_Metrics
         }
     }
 
-    protected function tasks()
+    protected function tasks(): void
     {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        $task = new editor_Models_Task();
         $this->addMeta('tasks_total', 'Current amount of tasks', self::TYPE_GAUGE);
         $this->addMeta('task_words_total', 'Current amount of words in tasks', self::TYPE_GAUGE);
         $this->addMeta('task_segments_total', 'Current amount of segments in tasks', self::TYPE_GAUGE);
@@ -97,7 +85,7 @@ class editor_Models_Metrics
         }
     }
 
-    protected function worker()
+    protected function worker(): void
     {
         $worker = new ZfExtended_Models_Worker();
         $summary = $worker->getSummary(['state', 'worker']);
@@ -110,13 +98,13 @@ class editor_Models_Metrics
         }
     }
 
-    protected function eventlogs()
+    /**
+     * @throws Zend_Exception
+     */
+    protected function eventlogs(): void
     {
-        $db = ZfExtended_Factory::get('ZfExtended_Models_Db_ErrorLog');
-        /* @var $db ZfExtended_Models_Db_ErrorLog */
-
+        $db = new ZfExtended_Models_Db_ErrorLog();
         $logger = Zend_Registry::get('logger');
-        /* @var $logger ZfExtended_Logger */
 
         $s = $db->select()
             ->from($db, [
@@ -141,7 +129,7 @@ class editor_Models_Metrics
     /**
      * Adds the meta information like help and type string
      */
-    protected function addMeta(string $name, string $help, string $type = self::TYPE_COUNTER)
+    protected function addMeta(string $name, string $help, string $type = self::TYPE_COUNTER): void
     {
         // # HELP node_cpu_scaling_frequency_hertz Current scaled cpu thread frequency in hertz.
         // # TYPE node_cpu_scaling_frequency_hertz gauge
@@ -152,7 +140,7 @@ class editor_Models_Metrics
     /**
      * Adds a metric dataset
      */
-    protected function addMetric(string $name, string $value, array $tags = [], string $timestamp = null)
+    protected function addMetric(string $name, string $value, array $tags = [], string $timestamp = null): void
     {
         $this->getMetric($name)->data[] = [
             'value' => $value,
@@ -171,11 +159,14 @@ class editor_Models_Metrics
         return $this->metrics[$key];
     }
 
-    public function get()
+    public function get(): array
     {
         return $this->metrics;
     }
 
+    /**
+     * @throws Zend_Exception
+     */
     public function __toString()
     {
         $this->collect();
