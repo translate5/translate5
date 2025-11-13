@@ -26,8 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Protection;
 
 /**#@+
  * @author Marc Mittag
@@ -42,6 +44,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
  */
 class editor_Models_Excel_ExImport
 {
+    private const LOCKED_CAPTION = 'Locked';
+
     /**
      * the taskGuid the excel belongs to
      * @var string
@@ -146,17 +150,20 @@ class editor_Models_Excel_ExImport
      * Write the segment informations into the 'review job' sheet
      * the row this informations are written is $this->segmentRow
      */
-    public function addSegment(int $nr, string $source, string $target)
+    public function addSegment(int $nr, string $source, string $target, bool $isEditable)
     {
         $sheet = $this->getSheetJob();
         $sheet->setCellValue('A' . $this->segmentRow, $nr);
         // for the following fields setCellValueExplicit() is used. Else this fields will be interpreted as formula fields if a segment starts with "="
-        $sheet->setCellValueExplicit('B' . $this->segmentRow, $source, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-        $sheet->setCellValueExplicit('C' . $this->segmentRow, $target, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('B' . $this->segmentRow, $isEditable ? 'No' : 'Yes', DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('C' . $this->segmentRow, $source, DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('D' . $this->segmentRow, $target, DataType::TYPE_STRING);
 
         // disable write protection for fields 'target' and 'comment'
-        $sheet->getStyle('C' . $this->segmentRow)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
-        $sheet->getStyle('D' . $this->segmentRow)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+        if ($isEditable) {
+            $sheet->getStyle('D' . $this->segmentRow)->getProtection()->setLocked(Protection::PROTECTION_UNPROTECTED);
+            $sheet->getStyle('E' . $this->segmentRow)->getProtection()->setLocked(Protection::PROTECTION_UNPROTECTED);
+        }
 
         $this->segmentRow++;
     }
@@ -233,13 +240,31 @@ class editor_Models_Excel_ExImport
         $tempReturn = [];
         $sheet = $this->getSheetJob();
 
+        $colSource = 'C';
+        $colTarget = 'D';
+        $colComment = 'E';
+        //legacy table layout (no locked column)
+        $secondColumnHeadline = (string) $sheet->getCell('B1')->getValue();
+        if ($secondColumnHeadline !== self::LOCKED_CAPTION) {
+            $colSource = 'B';
+            $colTarget = 'C';
+            $colComment = 'D';
+        }
+
         // read the excel rows until the field which contains the task-nr is empty
         while ($nr = $sheet->getCell('A' . $this->segmentRow)->getValue()) {
+            if ($colSource === 'C' && (string) $sheet->getCell('B' . $this->segmentRow)->getValue() === 'Yes') {
+                $this->segmentRow++;
+                $tempReturn[] = null; //null → segment to be ignored on re-import
+
+                continue;
+            }
+
             $tempSegment = new excelExImportSegmentContainer();
             $tempSegment->nr = $nr;
-            $tempSegment->source = $sheet->getCell('B' . $this->segmentRow)->getValue();
-            $tempSegment->target = $sheet->getCell('C' . $this->segmentRow)->getValue();
-            $tempSegment->comment = trim($sheet->getCell('D' . $this->segmentRow)->getValue() ?: '');
+            $tempSegment->source = $sheet->getCell($colSource . $this->segmentRow)->getValue();
+            $tempSegment->target = $sheet->getCell($colTarget . $this->segmentRow)->getValue();
+            $tempSegment->comment = trim($sheet->getCell($colComment . $this->segmentRow)->getValue() ?: '');
             $tempReturn[] = $tempSegment;
 
             $this->segmentRow++;
@@ -313,16 +338,18 @@ class editor_Models_Excel_ExImport
 
         // set column width
         $sheet->getColumnDimension('A')->setWidth(5);
-        $sheet->getColumnDimension('B')->setWidth(70);
+        $sheet->getColumnDimension('B')->setWidth(8);
         $sheet->getColumnDimension('C')->setWidth(70);
-        $sheet->getColumnDimension('D')->setWidth(50);
+        $sheet->getColumnDimension('D')->setWidth(70);
+        $sheet->getColumnDimension('E')->setWidth(50);
 
         // write fieldnames in header
         $sheet->setCellValue('A1', 'ID');
-        $sheet->setCellValue('B1', 'Source');
-        $sheet->setCellValue('C1', 'Target (Please enter your changes in this column)');
-        $sheet->setCellValue('D1', 'Comment');
-        $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+        $sheet->setCellValue('B1', self::LOCKED_CAPTION);
+        $sheet->setCellValue('C1', 'Source');
+        $sheet->setCellValue('D1', 'Target (Please enter your changes in this column)');
+        $sheet->setCellValue('E1', 'Comment');
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
     }
 
     /**
