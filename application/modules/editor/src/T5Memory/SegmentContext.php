@@ -34,13 +34,24 @@ class SegmentContext
 {
     private const SEGMENT_NR_CONTEXT_PREFIX = 'SegmentNr: ';
 
+    public function __construct(
+        private readonly \Zend_Config $config,
+    ) {
+    }
+
     public static function create(): self
     {
-        return new self();
+        return new self(
+            \Zend_Registry::get('config'),
+        );
     }
 
     public function getContext(\editor_Models_Segment $segment): string
     {
+        if ($this->config->runtimeOptions->LanguageResources->t5memory->import?->skipContext) {
+            return '-';
+        }
+
         return $segment->meta()->getSegmentDescriptor()
             ?: self::SEGMENT_NR_CONTEXT_PREFIX . $segment->getSegmentNrInTask();
     }

@@ -49,6 +49,7 @@ use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
+use MittagQI\Translate5\T5Memory\SegmentContext;
 use MittagQI\Translate5\T5Memory\TagHandlerProvider;
 use MittagQI\Translate5\T5Memory\UpdateSegmentService;
 
@@ -64,8 +65,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     public const TAG_HANDLER_CONFIG_PART = 't5memory';
 
     public const NEXT_SUFFIX = '_next-';
-
-    private const SEGMENT_NR_CONTEXT_PREFIX = 'SegmentNr: ';
 
     /**
      * Connector
@@ -103,6 +102,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     private readonly TagHandlerProvider $tagHandlerProvider;
 
+    protected readonly SegmentContext $segmentContext;
+
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -132,6 +133,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->queryCache = QueryCache::create();
         $this->updateSegmentService = UpdateSegmentService::create();
         $this->tagHandlerProvider = TagHandlerProvider::create();
+        $this->segmentContext = SegmentContext::create();
     }
 
     public function connectTo(
@@ -365,7 +367,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     ): editor_Services_ServiceResult {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
-        $context = $this->getSegmentContext($segment);
+        $context = $this->segmentContext->getContext($segment);
 
         //TODO final implemenation: get prefix and other key relevant information from underlying api instance
         $key = [
@@ -790,7 +792,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 return $matchRate;
             }
 
-            $context = $this->getSegmentContext($segment);
+            $context = $this->segmentContext->getContext($segment);
 
             $isExacExac = false;
             $isContext = false;
@@ -1003,11 +1005,5 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $this->languageResource,
             TmFileExtension::fromMimeType($mime, count($memories) > 1)
         );
-    }
-
-    protected function getSegmentContext(editor_Models_Segment $segment): string
-    {
-        return $segment->meta()->getSegmentDescriptor()
-            ?: self::SEGMENT_NR_CONTEXT_PREFIX . $segment->getSegmentNrInTask();
     }
 }
