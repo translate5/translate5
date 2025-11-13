@@ -32,6 +32,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
 /**
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API with TrackChanges specialities
+ * @see RemoveTrackChangesTest
  */
 class TrackChangesTest extends SegmentTagsTestAbstract
 {

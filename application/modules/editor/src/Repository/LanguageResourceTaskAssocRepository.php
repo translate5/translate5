@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_LanguageResources_LanguageResource;
-use editor_Models_Db_SegmentQuality;
 use editor_Models_Db_Task;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Db\TaskAssociation as TaskAssociationDb;
@@ -186,7 +185,7 @@ class LanguageResourceTaskAssocRepository
         return (int) $this->db->fetchOne($s) > 0;
     }
 
-    public function getTaskInfoForLanguageResources($languageResourceids)
+    public function getTaskInfoForLanguageResources(array $languageResourceids): array
     {
         if (empty($languageResourceids)) {
             return [];
@@ -217,15 +216,6 @@ class LanguageResourceTaskAssocRepository
         $rows = $this->db->fetchAll($s);
         if (empty($rows)) {
             return [];
-        }
-
-        $segmentRepository = SegmentRepository::create();
-        foreach ($rows as &$row) {
-            $qualityProps = editor_Models_Db_SegmentQuality::getNumQualitiesAndFaultsForTask($row['taskGuid']);
-            // adding number of quality errors, evaluated in the export actions
-            $row['qualityErrorCount'] = $qualityProps->numQualities;
-            $row['qualityHasFaults'] = ($qualityProps->numFaults > 0);
-            $row['segmentsInDraft'] = $segmentRepository->hasDraftsInTask($row['taskGuid']);
         }
 
         return $rows;

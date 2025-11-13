@@ -66,6 +66,7 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
                 TaskAction::Delete,
                 TaskAction::View,
                 TaskAction::Edit,
+                TaskAction::Confirm,
             ],
             true
         );
@@ -82,7 +83,14 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
             $object->getTaskGuid()
         );
 
-        if ($hasJobInTask && in_array($action, [TaskAction::Read, TaskAction::View, TaskAction::Edit], true)) {
+        $actionAffected = in_array($action, [
+            TaskAction::Read,
+            TaskAction::View,
+            TaskAction::Edit,
+            TaskAction::Confirm,
+        ], true);
+
+        if ($hasJobInTask && $actionAffected) {
             return;
         }
 

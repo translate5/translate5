@@ -372,7 +372,9 @@ Ext.define('Editor.view.segments.new.EditorNew', {
             element,
             new TagsModeProvider(),
             !!Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
-            !!Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags')
+            !!Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
+            Editor.data.locale,
+            Ext.getStore('admin.Languages').getById(Editor.data.task.get('targetLang')).get('rfc5646'),
         ).then((editor) => {
             this.editor = editor;
 

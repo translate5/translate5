@@ -133,6 +133,7 @@ class editor_Workflow_Default
     protected $readableStates = [
         self::STATE_UNCONFIRMED,
         self::STATE_WAITING,
+        self::STATE_AUTO_FINISH,
         self::STATE_FINISH,
         self::STATE_OPEN,
         self::STATE_EDIT,

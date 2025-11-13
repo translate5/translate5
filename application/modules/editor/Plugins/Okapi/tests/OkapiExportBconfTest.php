@@ -88,6 +88,7 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $config->import(
             $config
                 ->addTask('en', 'de')
+                ->setMaxWaitTime(100)
                 ->setImportBconfId(self::$bconf1->getId())
                 ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
                 ->setToEditAfterImport()

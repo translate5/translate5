@@ -7,6 +7,7 @@ import ModelNode from "./model-node";
 import DocumentFragment from "../Mixin/document-fragment";
 import InsertPreprocessor from "../DataCleanup/insert-preprocessor";
 import calculateNodeLength from "../Tools/calculate-node-length";
+import LanguageResolver from "../Editor/language-resolver";
 // import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 export default class EditorWrapper {
@@ -27,6 +28,7 @@ export default class EditorWrapper {
         ON_SELECTION_CHANGE_COMPLETED: 'onSelectionChangeCompleted',
     };
 
+    #languageResolver = new LanguageResolver();
     #font = null;
     #tagsModeProvider = null;
 
@@ -38,11 +40,22 @@ export default class EditorWrapper {
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
 
+    /**
+     * @param {HTMLElement} element
+     * @param {TagsModeProvider} tagsModeProvider
+     * @param {boolean} userCanModifyWhitespaceTags
+     * @param {boolean} userCanInsertWhitespaceTags
+     * @param {string} uiLocale
+     * @param {string} editorLocale
+     * @returns {Promise<EditorWrapper>}
+     */
     constructor(
         element,
         tagsModeProvider,
         userCanModifyWhitespaceTags,
-        userCanInsertWhitespaceTags
+        userCanInsertWhitespaceTags,
+        uiLocale,
+        editorLocale,
     ) {
         this._element = element;
         this._editor = null;
@@ -81,7 +94,7 @@ export default class EditorWrapper {
             9999
         );
 
-        return this.#create();
+        return this.#create(uiLocale, editorLocale);
     }
 
     get font() {
@@ -640,14 +653,20 @@ export default class EditorWrapper {
     /**
      * Create an editor instance
      *
+     * @param {string} uiLocale
+     * @param {string} editorLocale
      * @returns {Promise<EditorWrapper>}
      * @private
      */
-    #create() {
+    #create(uiLocale, editorLocale) {
         return Editor.create(
             this._element,
             {
                 toolbar: [],
+                language: {
+                    ui: this.#languageResolver.resolveLanguage(uiLocale),
+                    content: this.#languageResolver.resolveLanguage(editorLocale),
+                },
                 htmlSupport: {
                     allow: [
                         {

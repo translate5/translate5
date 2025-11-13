@@ -279,10 +279,16 @@ class editor_Services_Connector implements ExportAdapterInterface
             $results = $serviceResult->getResult();
             if (count($results) > 0) {
                 // revert the internal and whitespace tags to the input format
-                $results[0]->target = $this->contentProtector->unprotect(
-                    $utilities->internalTag->restore($results[0]->target),
-                    false
-                );
+                foreach ($results as $result) {
+                    $result->source = $this->contentProtector->unprotect(
+                        $utilities->internalTag->restore($result->source),
+                        true
+                    );
+                    $result->target = $this->contentProtector->unprotect(
+                        $utilities->internalTag->restore($result->target),
+                        false
+                    );
+                }
                 $serviceResult->setResults($results);
             }
         } else {

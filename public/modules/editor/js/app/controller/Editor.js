@@ -718,10 +718,10 @@ Ext.define('Editor.controller.Editor', {
     },
 
     onOpenEditorViewport: function(app, task) {
-        if(! task.isUnconfirmed()) {
-            return;
+        //show window always when job is unconfirmed, but fur unconfirmed task only if it makes sense for the job
+        if(task.isJobUnconfirmed() || task.isTaskUnconfirmed() && task.isViewing()) {
+            this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
         }
-        this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
     },
     /**
      * Cleanup stuff in the editor view port
@@ -1792,6 +1792,13 @@ Ext.define('Editor.controller.Editor', {
         if (!record) {
             return;
         }
+
+        // If it's an attempt to paste into comment or any concordance
+        // search field - do nothing to allow native paste event to happen
+        if (e.target && ~['INPUT', 'TEXTAREA'].indexOf(e.target.tagName)) {
+            return;
+        }
+
         e.stopPropagation();
         e.preventDefault();
 

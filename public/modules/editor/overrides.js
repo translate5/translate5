@@ -1685,8 +1685,12 @@ Ext.define('Translate5.override.form.field.VTypes', {
         }
         return Editor.data.frontend.php.upload_max_filesize > (files[0].size/(1024*1024));
     },
-    tmFileUploadSizeText:Editor.data.frontend.override.VTypes.tmFileUploadSizeText
+    tmFileUploadSizeText:Editor.data.frontend.override.VTypes.tmFileUploadSizeText,
 
+    emailRe: /^(")?(?:[^\."\s])(?:(?:[\.])?(?:[\w\-!#$%&'*+/=?^_`{|}~]))*\1@(\w[\-\w]*\.){1,5}([A-Za-z]){2,24}$/,
+    email: function(value) {
+        return this.emailRe.test(value);
+    },
 });
 
 Ext.define('Translate5.override.grid.feature.Grouping', {

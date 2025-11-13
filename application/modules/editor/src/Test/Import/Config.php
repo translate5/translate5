@@ -148,8 +148,13 @@ final class Config
      * @param string|array|null $targetLanguage
      * @param string|null $filePathInTestFolder : if set, the file is added as upload
      */
-    public function addTask(string $sourceLanguage = null, $targetLanguage = null, int $customerId = -1, string $filePathInTestFolder = null): Task
-    {
+    public function addTask(
+        string $sourceLanguage = null,
+        $targetLanguage = null,
+        int $customerId = -1,
+        string $filePathInTestFolder = null,
+        int $maxImportWaitTime = -1
+    ): Task {
         $next = count($this->tasks);
         $task = new Task($this->testClass, $next);
         if ($customerId > -1) {
@@ -163,6 +168,9 @@ final class Config
         }
         if ($filePathInTestFolder != null) {
             $task->addUploadFile($filePathInTestFolder);
+        }
+        if ($maxImportWaitTime > 0) {
+            $task->setMaxWaitTime($maxImportWaitTime);
         }
         $this->tasks[] = $task;
 
@@ -249,10 +257,17 @@ final class Config
      * This resource must inherit from MittagQI\Translate5\Test\Import\Operation
      * It will only be created, nor requested
      */
-    public function addTaskOperation(Task $task, string $className, array $params = []): Operation
-    {
+    public function addTaskOperation(
+        Task $task,
+        string $className,
+        array $params = [],
+        int $maxOperatioWaitTime = -1
+    ): Operation {
         $operation = new $className($this->testClass, 0, ...$params);
         $operation->setTask($task);
+        if ($maxOperatioWaitTime > 0) {
+            $task->setMaxWaitTime($maxOperatioWaitTime);
+        }
 
         return $operation;
     }
