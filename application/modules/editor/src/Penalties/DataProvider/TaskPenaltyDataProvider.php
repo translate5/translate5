@@ -107,16 +107,27 @@ class TaskPenaltyDataProvider
         // For source and target
         foreach (['source', 'target'] as $type) {
             $languageId = $langPairOfTheMatch[$type] ?? $meta[$langresId][$type . 'Lang'];
-            $lang = $this->languageRepository->get((int) $languageId);
 
             // Get sublanguage
-            $subLang[$type]['langres'] = Languages::sublangCodeByRfc5646($lang->getRfc5646());
+            // -----
+            // $subLang[$type]['langres'] here is array rather than string, for two reasons:
+            // 1. to support cases when
+            //    language resource is a TermCollection, and therefore sublanguage penalties have to
+            //    be calculated based on term-level rather than on languageresource-level,
+            //    so $languageId here is expected to be given via $langPairOfTheMatch arguments
+            // 2. to prevent unnecessary SQL queries for fetching language record if we've
+            //    previously get a sublanguage code for a same languageId
+            if (! isset($subLang[$type]['langres'][$languageId])) {
+                $subLang[$type]['langres'][$languageId] = Languages::sublangCodeByRfc5646(
+                    $this->languageRepository->get((int) $languageId)->getRfc5646()
+                );
+            }
 
             // If both task and langres have sublanguages, but they don't match - return sublang penalty
             if (
                 $subLang[$type]['task']
-                && $subLang[$type]['langres']
-                && $subLang[$type]['langres'] !== $subLang[$type]['task']
+                && $subLang[$type]['langres'][$languageId]
+                && $subLang[$type]['langres'][$languageId] !== $subLang[$type]['task']
             ) {
                 return [
                     'penaltyGeneral' => $meta[$langresId]['penaltyGeneral'],
