@@ -271,6 +271,11 @@ SQL
 
 $ruleIds = $db->fetchCol('SELECT id FROM `LEK_content_protection_content_recognition` WHERE type IN ("integer", "float") and isDefault = 1');
 
+// workers shall not run in API-tests
+if ($this->isTestOrInstallEnvironment()) { // @phpstan-ignore-line
+    return;
+}
+
 foreach ($ruleIds as $ruleId) {
     $worker = new RecalculateRulesHashWorker();
     $worker->init(parameters: [

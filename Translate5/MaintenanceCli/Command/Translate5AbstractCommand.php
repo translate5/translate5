@@ -57,6 +57,53 @@ abstract class Translate5AbstractCommand extends Command
         return new static();
     }
 
+    /**
+     * Runs the single given CLI command in an non-interactive manner for use e.g. in a database-update script
+     * returns true, if the command was successfully executed
+     * be aware, that the command has no output when called this way (unless last param is used)
+     * This solves the problem, that the database-choice for several commands for test-enabled instances
+     * is resolved automatically
+     * @param string $commandClass The class of the command to execute. It should inherit from Translate5AbstractCommand
+     * @throws \Exception
+     */
+    public static function runSingleCliCommand(
+        string $commandClass,
+        array $commandOptions = [],
+        string $newCommandName = null,
+        string $newCommandLabel = null,
+        bool $quiet = true
+    ): bool {
+        /** @var Command $command */
+        $command = new $commandClass();
+        $options = [
+            'command' => $command::getDefaultName(),
+        ];
+        foreach ($commandOptions as $name => $value) {
+            $options[$name] = $value;
+        }
+        if ($quiet) {
+            $options['--quiet'] = null;
+        } else {
+            $options['--ansi'] = null;
+            $options['--verbose'] = null;
+        }
+        if ($newCommandName !== null) {
+            $options['--newName'] = $newCommandName;
+        }
+        if ($newCommandLabel !== null) {
+            $options['--newLabel'] = $newCommandLabel;
+        }
+        $options['--called-by-script'] = null;
+
+        $cli = new \Symfony\Component\Console\Application();
+        $cli->setAutoExit(false);
+        $cli->add($command);
+        $cli->setCatchExceptions(false);
+        $input = new \Symfony\Component\Console\Input\ArrayInput($options);
+
+        return $cli->run($input) === 0;
+    }
+
     public function __construct($name = null)
     {
         parent::__construct($name);
@@ -64,6 +111,11 @@ abstract class Translate5AbstractCommand extends Command
             name: 'porcelain',
             mode: InputOption::VALUE_NONE,
             description: 'Return the output in a machine readable way - if implemented in the command.'
+        );
+        $this->addOption(
+            name: 'called-by-script',
+            mode: InputOption::VALUE_NONE,
+            description: 'Sets the command to be called by a script. Do not use when calling manually.'
         );
     }
 
@@ -82,7 +134,8 @@ abstract class Translate5AbstractCommand extends Command
     }
 
     /**
-     * Initializes the translate5 application bridge (setup the translate5 Zend Application so that Models and the DB can be used)
+     * Initializes the translate5 application bridge
+     * (setup the translate5 Zend Application so that Models and the DB can be used)
      * @throws \Zend_Exception
      */
     protected function initTranslate5(string $applicationEnvironment = 'application')
@@ -93,7 +146,8 @@ abstract class Translate5AbstractCommand extends Command
 
     /**
      * Initializes the translate5 application bridge
-     * If the installation is setup for API tests, it will ask for the environment to bootstrap, otherwise the application environment will be initialized without notice
+     * If the installation is setup for API tests, it will ask for the environment to bootstrap,
+     * otherwise the application environment will be initialized without notice
      * This API expects  input & output to be inited
      * @throws \Zend_Exception
      */
@@ -102,10 +156,22 @@ abstract class Translate5AbstractCommand extends Command
         // the app is uninitalized, so we cannot use APPLICATION_PATH
         $installationIniFile = getcwd() . '/application/config/installation.ini';
         $iniVars = file_exists($installationIniFile) ? parse_ini_file($installationIniFile) : false;
-        if ($iniVars !== false && array_key_exists('testSettings.testsAllowed', $iniVars) && $iniVars['testSettings.testsAllowed'] === '1') {
-            $question = new Question('Which database shall be used ? For the test-DB, type "t" or "test", anything else will use the application DB', 'application');
-            $answer = strtolower($this->io->askQuestion($question));
-            $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
+        if ($iniVars !== false && array_key_exists('testSettings.testsAllowed', $iniVars) &&
+            $iniVars['testSettings.testsAllowed'] === '1'
+        ) {
+            if ($this->input->getOption('called-by-script')) {
+                $environment = defined('APPLICATION_ENV') ? APPLICATION_ENV : 'application';
+                error_log('Command “' . static::getDefaultName() .
+                    '” is called via script in environment: ' . $environment);
+            } else {
+                $question = new Question(
+                    'Which database shall be used ? For the test-DB, type "t" or "test",' .
+                    ' anything else will use the application DB',
+                    'application'
+                );
+                $answer = strtolower($this->io->askQuestion($question));
+                $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
+            }
             $this->initTranslate5($environment);
             $config = \Zend_Registry::get('config');
             if (! $this->isPorcelain) {

@@ -42,13 +42,13 @@ use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiWorkerHelper;
 use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
-use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
 use MittagQI\ZfExtended\ApiRequestDTO;
 
 /**
  * OKAPI file converter and segmenter plugin
  *
  * There are several debug options for this Plugin:
+ * runtimeOptions.debug.plugin.OkapiWorkers => Turns general debugging on for the Import/Export Workers
  * runtimeOptions.debug.plugin.OkapiInitEvents => Turns general debugging on for the Plugins initialisation/events
  * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging on for the packing/unpacking of bconfs
  * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging on for the processing of bconfs
