@@ -1792,6 +1792,13 @@ Ext.define('Editor.controller.Editor', {
         if (!record) {
             return;
         }
+
+        // If it's an attempt to paste into comment or any concordance
+        // search field - do nothing to allow native paste event to happen
+        if (e.target && ~['INPUT', 'TEXTAREA'].indexOf(e.target.tagName)) {
+            return;
+        }
+
         e.stopPropagation();
         e.preventDefault();
 

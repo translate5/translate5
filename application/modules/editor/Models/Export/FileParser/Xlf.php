@@ -58,6 +58,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      */
     protected $_exportChunksWithSourceFallback = [];
 
+    protected int $transUnitLength = 0;
+
     /**
      * @param string $path The absolute path to the file where the content is written to
      * @param array $options see $this->options for available options

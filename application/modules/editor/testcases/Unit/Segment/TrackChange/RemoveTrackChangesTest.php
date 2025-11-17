@@ -30,9 +30,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Segment\TrackChange;
 
+use editor_Segment_Tag;
+use MittagQI\Translate5\Segment\Tag\SegmentTagSequence;
 use MittagQI\Translate5\Segment\TrackChange\RemoveTrackChanges;
+use MittagQI\Translate5\Test\Unit\Segment\TrackChangesTest;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @see TrackChangesTest
+ */
 class RemoveTrackChangesTest extends TestCase
 {
     /**
@@ -43,6 +49,29 @@ class RemoveTrackChangesTest extends TestCase
         $remover = new RemoveTrackChanges();
 
         self::assertSame($expected, $remover->remove($text));
+    }
+
+    /**
+     * @dataProvider cases
+     */
+    public function testRemoveWithTagSequence(string $text, string $expected): void
+    {
+        $text = str_replace([
+            '<del>',
+            '<ins>',
+        ],[
+            '<del class="trackchanges ownttip deleted">',
+            '<ins class="trackchanges ownttip deleted">'],
+            $text
+        );
+
+        $tagSequence = new SegmentTagSequence($text);
+        $cloneWithoutTrackChanges = $tagSequence->cloneWithoutTrackChanges([
+            editor_Segment_Tag::TYPE_INTERNAL,
+            editor_Segment_Tag::TYPE_ANY,
+            editor_Segment_Tag::TYPE_MQM
+        ]);
+        self::assertSame($expected, $cloneWithoutTrackChanges->render());
     }
 
     public function cases(): iterable
@@ -85,6 +114,11 @@ class RemoveTrackChangesTest extends TestCase
         yield 'img tag' => [
             '<img class="content-tag" src="2" alt="TaggingError" />Ichbin<ins class="trackchanges ownttip" data-userguid="{00000000-0000-0000-C100-CCDDEE000002}" data-username="lector test" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2018-11-20T10:38:16+01:00">einTerm Ichbin</ins>einTerm',
             '<img class="content-tag" src="2" alt="TaggingError" />IchbineinTerm IchbineinTerm',
+        ];
+
+        yield 'real live problem' => [
+            '<del>Away </del><del>NotHere</del><ins>Hello translate5 <del>ShouldBeDeleted</del></ins><ins>World</ins><del>away</del><del>removed</del>',
+            'Hello translate5 World',
         ];
     }
 }

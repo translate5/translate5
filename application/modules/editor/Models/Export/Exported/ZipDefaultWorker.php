@@ -76,14 +76,14 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
 
         // Call parent
         $this->init($taskGuid, [
-            'folderToBeZipped' => $parameters['exportFolder'],
+            'folderToBeZipped' => $parameters['exportFolder'] ?? null,
             'zipFile' => $zipFile,
-            'targetZipFilePath' => $parameters['targetZipFilePath'] ?: null,
-            'cleanZipPaths' => $parameters['cleanZipPaths'] ?: null,
+            'targetZipFilePath' => $parameters['targetZipFilePath'] ?? null,
+            'cleanZipPaths' => $parameters['cleanZipPaths'] ?? null,
         ]);
 
         // Return zipFile
-        return $parameters['targetZipFilePath'] ?: $zipFile;
+        return $parameters['targetZipFilePath'] ?? $zipFile;
     }
 
     /**

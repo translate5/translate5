@@ -85,6 +85,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $repetitionMasterSegments = [];
 
+    protected ?TaskPenaltyDataProvider $taskPenaltyDataProvider = null;
+
     /**
      * Holds the repetition updater
      * @var RepetitionUpdater
@@ -114,6 +116,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->manager = Factory::get(editor_Services_Manager::class);
         $this->repetitionUpdater = RepetitionUpdater::create();
         $this->connectorProvider = ConnectorForTaskProvider::create();
+        $this->taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
         parent::__construct($analysisId);
     }
@@ -424,14 +427,34 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $bestResultCurrentConnector->matchrate = null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match) {
+                $isTermCollection = $match->languageResourceType == MatchRateType::TYPE_TERM_COLLECTION;
+
                 // Setup penalties and deduct them from match rate
                 if (isset($match->languageResourceid)) {
+                    // Assign general penalty
                     $match->penaltyGeneral = $this->penalty['general'][$match->languageResourceid];
-                    $match->penaltySublang = $this->penalty['sublang'][$match->languageResourceid];
+
+                    // If the current match is coming from TermCollection
+                    if ($isTermCollection) {
+                        // Detect sublanguage penalty on a term-level
+                        $match->penaltySublang = $this->taskPenaltyDataProvider->getPenalties(
+                            $this->task->getTaskGuid(),
+                            $match->languageResourceid,
+                            [
+                                'source' => $match->sourceLanguageId,
+                                'target' => $match->targetLanguageId,
+                            ]
+                        )['penaltySublang'];
+
+                        // Else use sublanguage penalty delected on a languageresource-level
+                    } else {
+                        $match->penaltySublang = $this->penalty['sublang'][$match->languageResourceid];
+                    }
+
+                    // Deduct both kinds of penalties from the matchrate
                     $match->matchrate -= $match->penaltyGeneral + $match->penaltySublang;
                 }
 
-                $isTermCollection = $match->languageResourceType == MatchRateType::TYPE_TERM_COLLECTION;
                 if ($bestResultCurrentConnector->matchrate > $match->matchrate) {
                     continue;
                 }
@@ -706,8 +729,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             Status::NOT_LOADED,
         ];
 
-        $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
-
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = Factory::get(LanguageResource::class);
             $languageResource->load((int) $languageResourceId);
@@ -723,7 +744,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $this->resources[(int) $languageResource->getId()] = $languageResource;
 
             // Detect penalties to be applied
-            $penalties = $taskPenaltyDataProvider->getPenalties($this->task->getTaskGuid(), $languageResourceId);
+            $penalties = $this->taskPenaltyDataProvider->getPenalties($this->task->getTaskGuid(), $languageResourceId);
 
             // Setup general penalty
             $this->penalty['general'][$languageResourceId] = $penalties['penaltyGeneral'];

@@ -62,7 +62,7 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
         $filters = parent::decode($todecode);
 
         foreach ($filters as &$filter) {
-            if ($filter->field === 'isRepeated') {
+            if (($filter->field ?? null) === 'isRepeated') {
                 if (array_intersect([1, 2], $filter->value)) {
                     $filter->value[] = 3;
                 }
