@@ -89,18 +89,29 @@ class TrackChangesTest extends SegmentTagsTestAbstract
 
     public function testTrackChanges6(): void
     {
-        // ins/del will invalidate inner ins/dels
+        // ins/del will invalidate inner ins/dels but not newer del in ins
         $segmentId = 766543;
-        $markup = 'Lorem <ins1>ipsum <del2>dolor<4/></del2> sit</ins1> amet, consetetur sadipscing elitr<del1>, sed <ins2>diam nonumy </ins2>eirmod tempor</del1> invidunt ut.';
-        $textNoTC = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr invidunt ut.';
-        $markupNoTC = 'Lorem ipsum dolor<4/> sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markup = 'Lorem <ins1>ipsum<del2> dolor<4/></del2> sit</ins1> amet, consetetur sadipscing elitr<del1>, sed <ins2>diam nonumy </ins2>eirmod tempor</del1> invidunt ut.';
+        $textNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markupNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
 
         $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
     }
 
     public function testTrackChanges7(): void
     {
-        // ins/del will invalidate inner ins/dels
+        // ins/del will invalidate inner ins/dels but not newer del in ins
+        $segmentId = 766543;
+        $markup = 'Lorem <ins1>ipsum<del2> dolor</del2><4/> sit</ins1> amet, consetetur sadipscing elitr<del1>, sed <ins2>diam nonumy </ins2>eirmod tempor</del1> invidunt ut.';
+        $textNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markupNoTC = 'Lorem ipsum<4/> sit amet, consetetur sadipscing elitr invidunt ut.';
+
+        $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
+    }
+
+    public function testTrackChanges8(): void
+    {
+        // ins/del will invalidate inner ins/dels but not newer del in ins
         $segmentId = 766543;
         $markup = 'Lorem <ins1>ipsum <ins2><ins3>dolor</ins3><4/></ins2> sit amet</ins1>, consetetur sadipscing elitr<del1>, sed <del2>diam<3/><del3> nonumy</del3> eirmod</del2> tempor</del1> invidunt ut.';
         $textNoTC = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr invidunt ut.';
@@ -109,31 +120,42 @@ class TrackChangesTest extends SegmentTagsTestAbstract
         $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
     }
 
-    public function testTrackChanges8(): void
-    {
-        // ins/del will invalidate inner ins/dels
-        $segmentId = 766543;
-        $markup = 'Lorem <ins1>ipsum <del2><ins3>dolor</ins3><4/></del2> sit amet</ins1>, consetetur sadipscing elitr<del1>, sed <ins2>diam<3/><del3> nonumy</del3> eirmod</ins2> tempor</del1> invidunt ut.';
-        $textNoTC = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr invidunt ut.';
-        $markupNoTC = 'Lorem ipsum dolor<4/> sit amet, consetetur sadipscing elitr invidunt ut.';
-
-        $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
-    }
-
     public function testTrackChanges9(): void
     {
-        // ins/del will invalidate inner ins/dels
+        // ins/del will invalidate inner ins/dels but not newer del in ins
         $segmentId = 766543;
-        $markup = 'Lorem <ins1>ipsum <del2><del3>dolor</del3><4/></del2> sit amet</ins1>, consetetur sadipscing elitr<del1>, sed <ins2>diam<3/><ins3> nonumy</ins3> eirmod</ins2> tempor</del1> invidunt ut.';
-        $textNoTC = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr invidunt ut.';
-        $markupNoTC = 'Lorem ipsum dolor<4/> sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markup = 'Lorem <ins1>ipsum<del2><ins3> dolor</ins3><4/></del2> sit amet</ins1>, consetetur sadipscing elitr<del1>, sed <ins2>diam<3/><del3> nonumy</del3> eirmod</ins2> tempor</del1> invidunt ut.';
+        $textNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markupNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
 
         $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
     }
 
     public function testTrackChanges10(): void
     {
-        // ins/del will invalidate inner ins/dels
+        // ins/del will invalidate inner ins/dels but not newer del in ins
+        $segmentId = 766543;
+        $markup = 'Lorem <ins1>ipsum <del2><del3>dolor</del3><4/> </del2>sit amet</ins1>, consetetur sadipscing elitr<del1>, sed <ins2>diam<3/><ins3> nonumy</ins3> eirmod</ins2> tempor</del1> invidunt ut.';
+        $textNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markupNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+
+        $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
+    }
+
+    public function testTrackChanges11(): void
+    {
+        // ins/del will invalidate inner ins/dels but not newer del in ins
+        $segmentId = 766543;
+        $markup = 'Lorem <ins1>ipsum <del2><del3>dolor</del3> <4/></del2>sit amet</ins1>, consetetur sadipscing elitr<del1>, sed <ins2>diam<3/><ins3> nonumy</ins3> eirmod</ins2> tempor</del1> invidunt ut.';
+        $textNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+        $markupNoTC = 'Lorem ipsum sit amet, consetetur sadipscing elitr invidunt ut.';
+
+        $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
+    }
+
+    public function testTrackChanges12(): void
+    {
+        // ins/del will invalidate inner ins/dels but not newer del in ins
         $segmentId = 766543;
         $markup = 'Lorem ipsum <del1>dolor sit amet<ins1><3/><4/></ins1></del1>, consetetur sadipscing elitr.';
         $textNoTC = 'Lorem ipsum , consetetur sadipscing elitr.';
@@ -142,13 +164,35 @@ class TrackChangesTest extends SegmentTagsTestAbstract
         $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
     }
 
-    public function testTrackChanges11(): void
+    public function testTrackChanges13(): void
     {
-        // ins/del will invalidate inner ins/dels
+        // ins/del will invalidate inner ins/dels but not newer del in ins
+        $segmentId = 766543;
+        $markup = 'Lorem ipsum <ins1>dolor sit amet<del1> eirmod tempor</del1> invidunt</ins1>, consetetur sadipscing elitr.';
+        $textNoTC = 'Lorem ipsum dolor sit amet invidunt, consetetur sadipscing elitr.';
+        $markupNoTC = 'Lorem ipsum dolor sit amet invidunt, consetetur sadipscing elitr.';
+
+        $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
+    }
+
+    public function testTrackChanges14(): void
+    {
+        // ins/del will invalidate inner ins/dels but not newer del in ins
         $segmentId = 766543;
         $markup = 'Lorem ipsum <ins1>dolor sit amet<del1><3/><4/></del1></ins1>, consetetur sadipscing elitr.';
         $textNoTC = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.';
-        $markupNoTC = 'Lorem ipsum dolor sit amet<3/><4/>, consetetur sadipscing elitr.';
+        $markupNoTC = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.';
+
+        $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
+    }
+
+    public function testTrackChanges15(): void
+    {
+        // ins/del will invalidate inner ins/dels but not newer del in ins
+        $segmentId = 766543;
+        $markup = 'Lorem ipsum <ins1>dolor sit<del1> amet</del1><ins2><3/><4/></ins2></ins1>, consetetur sadipscing elitr.';
+        $textNoTC = 'Lorem ipsum dolor sit, consetetur sadipscing elitr.';
+        $markupNoTC = 'Lorem ipsum dolor sit<3/><4/>, consetetur sadipscing elitr.';
 
         $this->createReplacedTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
     }

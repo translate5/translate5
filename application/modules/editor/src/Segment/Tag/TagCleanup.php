@@ -53,8 +53,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\Tag;
 
-use editor_Models_Task;
-use editor_Segment_FieldTags;
 use editor_Segment_Internal_Tag;
 use editor_Segment_Tag;
 
@@ -66,18 +64,16 @@ use editor_Segment_Tag;
 class TagCleanup
 {
     public function __construct(
-        private editor_Models_Task $task,
         private bool $stripWhitespace = false
     ) {
     }
 
     /**
-     * @param int $segmentId Usually not needed as this class does not save stuff
      * @throws \ZfExtended_Exception
      */
-    public function clean(string $segmentMarkup, int $segmentId = 0): array
+    public function clean(string $segmentMarkup): array
     {
-        $tags = new editor_Segment_FieldTags($this->task, $segmentId, $segmentMarkup, 'target', 'targetEdit');
+        $tags = new SegmentTagSequence($segmentMarkup);
         // remove trackchanges and all types but internal tags
         $tags = $tags->cloneWithoutTrackChanges([editor_Segment_Tag::TYPE_INTERNAL]);
         // replace or strip whitespace-tags

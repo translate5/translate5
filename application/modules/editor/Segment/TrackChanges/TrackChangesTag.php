@@ -62,4 +62,16 @@ class editor_Segment_TrackChanges_TrackChangesTag extends editor_Segment_Tag
 
         return false;
     }
+
+    public function getDataTimestamp(): int
+    {
+        $timestamp = $this->getData('timestamp');
+        if (! empty($timestamp)) {
+            $time = strtotime($timestamp);
+
+            return ($time === false) ? 0 : $time;
+        }
+
+        return 0;
+    }
 }

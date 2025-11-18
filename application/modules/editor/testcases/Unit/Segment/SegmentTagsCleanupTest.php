@@ -91,14 +91,13 @@ class SegmentTagsCleanupTest extends SegmentTagsTestAbstract
 
     private function createCleanupTest(string $markup, array $expected): void
     {
-        $cleanup = new TagCleanup($this->getTestTask());
+        $cleanup = new TagCleanup();
         $this->assertEquals($expected, $cleanup->clean($this->shortToFull($markup)));
     }
 
     private function createStripWhitespaceCleanupTest(string $markup, array $expected): void
     {
-        $task = $this->getTestTask();
-        $cleanup = new TagCleanup($task, true);
+        $cleanup = new TagCleanup(true);
         $this->assertEquals($expected, $cleanup->clean($this->shortToFull($markup)));
     }
 }

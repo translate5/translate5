@@ -56,15 +56,15 @@ use editor_Models_Segment as Segment;
 use JsonException;
 use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
+use MittagQI\Translate5\Segment\SegmentMarkupValidation;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_BadRequest;
-use ZfExtended_Log;
 use ZfExtended_Sanitized_HttpRequest;
 
 class UpdateSegmentDtoFactory
 {
     public function __construct(
-        //        private readonly ZfExtended_Log $logger,
+        private readonly SegmentMarkupValidation $markupValidation,
     ) {
     }
 
@@ -74,7 +74,7 @@ class UpdateSegmentDtoFactory
     public static function create(): self
     {
         return new self(
-            //            new ZfExtended_Log(),
+            new SegmentMarkupValidation()
         );
     }
 
@@ -130,6 +130,7 @@ class UpdateSegmentDtoFactory
     }
 
     /**
+     * performing basic cleanup for the textual data (= Segment Markup) that was sent
      * @return array<string, string>
      */
     public function getTextData(Segment $segment, array $data): array
@@ -143,15 +144,20 @@ class UpdateSegmentDtoFactory
             if (! in_array($key, $allowedAlternatesToChange)) {
                 continue;
             }
-            //search for the img tag, get the data and remove it
+            // Cleanup: May a duplicate savecheck was not removed by the frontend
             $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
             $match = [];
 
             if (preg_match($regex, $value, $match)) {
-                $textData[$key] = str_replace($match[0], '', $value);
-
-                continue;
+                $value = str_replace($match[0], '', $value);
             }
+
+            $value = $this->markupValidation->prepare(
+                $value,
+                (int) $segment->getId(),
+                (int) $segment->getSegmentNrInTask(),
+                $key
+            );
 
             $textData[$key] = $value;
             //            //if segmentId and fieldname from content differ to the segment to be saved, throw the error!

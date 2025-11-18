@@ -409,6 +409,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     }
 
     /**
+     * Retrieves if a tag has no text-length, so it's start-index equals it's end-index
+     */
+    public function hasZeroLength(): bool
+    {
+        return $this->startIndex === $this->endIndex;
+    }
+
+    /**
      * Identifies a tag by a quality entry from the DB
      * This is needed only for the persistance of the falsePositive flag, all other props will be re-evaluated anyway
      * NOTE: this default implementation checks for the position in the segment OR the content of the tag. Note, that this implementation hypothetically can produce false results when qualities with the same content exist multiple times in the segment
