@@ -42,6 +42,7 @@ use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use MittagQI\Translate5\T5Memory\FuzzySearchService;
+use MittagQI\Translate5\T5Memory\Import\CutOffTmx;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
@@ -260,17 +261,17 @@ class FuzzySearchServiceTest extends TestCase
             ],
             'otherMatches' => [
                 [
-                    'matchRate' => 75,
-                    'rawTarget' => 'Our nice 4 segment<ph id="2"/>',
-                    'metaData' => [
-                        'timestamp' => '2017-03-23 16:24:28 CET',
-                    ],
-                ],
-                [
-                    'matchRate' => 75,
+                    'matchRate' => 100,
                     'rawTarget' => 'Our nice 4 segment',
                     'metaData' => [
                         'timestamp' => '2016-03-23 16:24:28 CET',
+                    ],
+                ],
+                [
+                    'matchRate' => 97,
+                    'rawTarget' => 'Our nice 4 segment<ph id="2"/>',
+                    'metaData' => [
+                        'timestamp' => '2017-03-23 16:24:28 CET',
                     ],
                 ],
             ],
@@ -318,6 +319,7 @@ class FuzzySearchServiceTest extends TestCase
             CreateMemoryService::create(),
             RetryService::create(),
             WipeMemoryService::create(),
+            CutOffTmx::create(),
         );
     }
 }
