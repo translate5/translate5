@@ -42,12 +42,18 @@ use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Remover;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\Tagger;
 use MittagQI\Translate5\Segment\Processing\AbstractProcessingWorker;
+use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
 use MittagQI\Translate5\Segment\Processing\State;
 use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
+use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
+use Zend_Uri_Http;
 use ZfExtended_Exception;
 use ZfExtended_Logger;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * Tags terms (or removes the tags in case no terminology is set) for operations like import, analysis, etc.
@@ -75,15 +81,15 @@ class Worker extends AbstractProcessingWorker
      */
     protected function createService(): Service
     {
-        $service = editor_Plugins_TermTagger_Bootstrap::createService('termtagger');
         // Persistent Connections currently create Problems in the Termtagger leading taggers not responding
         // $service->setPersistentConnections($this->isThreaded());
-
-        return $service;
+        return editor_Plugins_TermTagger_Bootstrap::createService('termtagger');
     }
 
     /**
      * Creates the Processor
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
      */
     protected function createProcessor(): Tagger|Remover
     {
@@ -93,6 +99,15 @@ class Worker extends AbstractProcessingWorker
         } else {
             // in case there is no terminology (never set or removed) we remove all term-tags
             return new Remover($this->task, $this->service, $this->processingMode, $this->serviceUrl, true);
+        }
+    }
+
+    protected function createLooperConfiguration(): LooperConfigurationDTO
+    {
+        if ($this->task->getTerminologie()) {
+            return Tagger::createLooperConfiguration($this->task);
+        } else {
+            return Remover::createLooperConfiguration($this->task);
         }
     }
 
@@ -119,10 +134,17 @@ class Worker extends AbstractProcessingWorker
 
     /**
      * @param State[] $problematicStates
-     * @throws \MittagQI\ZfExtended\Worker\Exception\SetDelayedException
+     * @throws SetDelayedException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
-    {
+    protected function onLooperException(
+        Exception $loopedProcessingException,
+        array $problematicStates,
+        bool $isReprocessing,
+    ): int {
         // A NoResponse Exception hints at the TermTagger has too many requests
         // also a CheckTbxTimeOutException that happened when checking/loading the TBX
         // which happends before each term-tagging request points at this
@@ -269,7 +291,7 @@ class Worker extends AbstractProcessingWorker
                 $urlUsageCounter[$slot['url']] = 0;
             }
             $urlUsageCounter[$slot['url']]++;
-            $currentUrl = \Zend_Uri_Http::fromString($slot['url']);
+            $currentUrl = Zend_Uri_Http::fromString($slot['url']);
             $ipIndex = $urlUsageCounter[$slot['url']] % count($urlToIpMap[$slot['url']]);
             $currentUrl->setHost($urlToIpMap[$slot['url']][$ipIndex]);
             $this->slots[$idx]['url'] = $currentUrl->__toString();

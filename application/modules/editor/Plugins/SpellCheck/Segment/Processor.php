@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\SpellCheck\Segment;
 
+use editor_Models_ConfigException;
 use editor_Models_Segment;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
@@ -42,11 +43,15 @@ use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\AdapterConfigDTO;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
 use MittagQI\Translate5\Segment\Processing\State;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
+use ReflectionException;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * Encapsulates the processing of segments with the languagetool-service
@@ -57,11 +62,18 @@ class Processor extends AbstractProcessor
     /**
      * Reports the defect segments that occurred during spellchecking if any
      * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public static function reportDefectSegments(editor_Models_Task $task, string $processingMode)
+    public static function reportDefectSegments(editor_Models_Task $task, string $processingMode): void
     {
         $processingState = new Processing();
-        $segmentIds = $processingState->getSegmentsForState($task->getTaskGuid(), Service::SERVICE_ID, State::UNPROCESSABLE);
+        $segmentsToLog = [];
+        $segmentIds = $processingState->getSegmentsForState(
+            $task->getTaskGuid(),
+            Service::SERVICE_ID,
+            State::UNPROCESSABLE
+        );
         if (! empty($segmentIds)) {
             $logger = Zend_Registry::get('logger')->cloneMe(Configuration::getLoggerDomain($processingMode));
             $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
@@ -70,7 +82,8 @@ class Processor extends AbstractProcessor
 
             foreach ($segmentIds as $segmentId) {
                 $segment->load($segmentId);
-                $segmentsToLog[] = $segment->getSegmentNrInTask() . '; Source-Text: ' . strip_tags($segment->get($fieldManager->getFirstSourceName()));
+                $segmentsToLog[] = $segment->getSegmentNrInTask() . '; Source-Text: '
+                    . strip_tags($segment->get($fieldManager->getFirstSourceName()));
             }
             $logger->warn('E1465', 'Some segments could not be checked by the spellchecker', [
                 'task' => $task,
@@ -86,11 +99,11 @@ class Processor extends AbstractProcessor
     private string $qualityType;
 
     /**
-     * @throws \ZfExtended_Exception
-     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws Zend_Exception
-     * @throws \ReflectionException
-     * @throws \editor_Models_ConfigException
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
      */
     public function __construct(
         editor_Models_Task $task,
@@ -114,16 +127,18 @@ class Processor extends AbstractProcessor
     }
 
     /**
-     * batch-size when spellchecking
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
      */
-    public function getBatchSize(): int
+    public static function createLooperConfiguration(editor_Models_Task $task): LooperConfigurationDTO
     {
-        return $this->task->getConfig()->runtimeOptions->SpellCheck->languagetool->processorBatchSize;
-    }
-
-    public function getLoopingPause(): int
-    {
-        return $this->task->getConfig()->runtimeOptions->SpellCheck->languagetool->processorLoopingInterval;
+        return new LooperConfigurationDTO(
+            $task->getSegmentCount(),
+            $task->getConfig()->runtimeOptions->SpellCheck->languagetool->processorLoopingInterval,
+            $task->getConfig()->runtimeOptions->SpellCheck->languagetool->processorBatchSize,
+        );
     }
 
     /**
@@ -134,7 +149,7 @@ class Processor extends AbstractProcessor
      * @throws TimeOutException
      * @throws Zend_Exception
      */
-    public function processBatch(array $segmentsTags)
+    public function processBatch(array $segmentsTags): void
     {
         // Cleanup batch data from previous run, if any
         Check::purgeBatch();
@@ -169,7 +184,7 @@ class Processor extends AbstractProcessor
      * @throws TimeOutException
      * @throws Zend_Exception
      */
-    public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true)
+    public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true): void
     {
         // Fetch segment
         $segment = $segmentTags->getSegment();
@@ -195,7 +210,8 @@ class Processor extends AbstractProcessor
             break;
         }
         if ($saveTags) {
-            // Save qualities if the tags-model should be saved - we do not add any tags to the segment's markup, only quality entries
+            // Save qualities if the tags-model should be saved - we do not add any tags to the segment's markup,
+            //  only quality entries
             $segmentTags->save(true, false);
         }
     }

@@ -77,7 +77,6 @@ class editor_Models_Export
     {
         $this->task = $task;
         $this->taskGuid = $task->getTaskGuid();
-        Zend_Registry::set('affected_taskGuid', $this->taskGuid); //for TRANSLATE-600 only
         $this->optionDiff = $diff;
     }
 

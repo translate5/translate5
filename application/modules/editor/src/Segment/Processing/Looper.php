@@ -32,10 +32,16 @@ use editor_Models_Task;
 use Exception;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\Translate5\Test\Api\Helper;
 use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
+use Zend_Db_Exception;
+use Zend_Exception;
+use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
+use ZfExtended_Worker_Abstract;
 
 /**
- * A processing Looper processes segments/processing-states in a loop until all segments are in state "processed" or higher
+ * A processing Looper processes segments/processing-states in a loop until
+ *  all segments are in state "processed" or higher
  * This usually is done with multiple loopers in parallel
  */
 final class Looper
@@ -52,19 +58,12 @@ final class Looper
      */
     public const MIN_DELAY_SEGMENTS = 150;
 
-    private int $batchSize;
-
     private bool $isReprocessing = false;
 
     /**
      * Holds the timestamp of the last write on the DB
      */
     private int $lastTime = 0;
-
-    /**
-     * Between processing segments and fetching new ones a pause can be configured to make db-deadlocks less probable
-     */
-    private int $loopingPause;
 
     /**
      * Tracks the number of processed segments
@@ -80,14 +79,15 @@ final class Looper
      */
     private array $toProcess = [];
 
+    private LooperConfigurationDTO $looperConfiguration;
+
     public function __construct(
-        private ProgressInterface $progressReporter,
-        private editor_Models_Task $task,
-        private AbstractProcessor $processor,
-        private int $workerIndex,
+        private readonly ProgressInterface $progressReporter,
+        private readonly editor_Models_Task $task,
+        private readonly AbstractProcessor $processor,
+        private readonly int $workerIndex,
     ) {
-        $this->batchSize = $processor->getBatchSize();
-        $this->loopingPause = $processor->getLoopingPause();
+        $this->looperConfiguration = $processor->createLooperConfiguration($task);
         $this->processingTable = new Processing();
         $this->state = new State($processor->getServiceId());
     }
@@ -109,7 +109,8 @@ final class Looper
             }
             // we wrap the processing of a batch in a transaction
             // when the processor leads to an exception, this transaction needs to be closed ...
-            // we do that only, if the processing saves back to the tag-state, otherwise we create nested locks in an potentially uncertain order
+            // we do that only, if the processing saves back to the tag-state,
+            // otherwise we create nested locks in an potentially uncertain order
             $amount = count($segmentsTags);
             if ($amount === 1) {
                 $this->processor->process($segmentsTags[0]);
@@ -207,9 +208,9 @@ final class Looper
      * Returns if segments could be found
      *
      * @throws SetDelayedException
-     * @throws \Zend_Db_Exception
-     * @throws \Zend_Exception
-     * @throws \ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
      * @phpstan-impure
      */
     private function fetchNext(bool $fromTheTop): bool
@@ -227,9 +228,9 @@ final class Looper
                 // (but with sleeps) because we want to avoid being dependent on the cronjobs
                 // we must respect the max. import time / max delay time to avoid creating endless processes
                 // higher indexes will simply finish
-                $until = (defined('APPLICATION_APITEST') && APPLICATION_APITEST) ?
-                    \MittagQI\Translate5\Test\Api\Helper::RELOAD_TASK_LIMIT // max-sleep for API-tests is shorter ...
-                    : \ZfExtended_Worker_Abstract::MAX_SINGLE_DELAY_LIMIT;
+                $until = (defined('APPLICATION_APITEST') && APPLICATION_APITEST)
+                    ? Helper::RELOAD_TASK_LIMIT // max-sleep for API-tests is shorter ...
+                    : ZfExtended_Worker_Abstract::MAX_SINGLE_DELAY_LIMIT;
                 if ($this->workerIndex === 0) {
                     sleep(self::BLOCKED_DELAY);
                     $until -= self::BLOCKED_DELAY;
@@ -260,7 +261,7 @@ final class Looper
                 throw new SetDelayedException(
                     $this->processor->getServiceId(),
                     null,
-                    static::BLOCKED_DELAY
+                    Looper::BLOCKED_DELAY
                 );
             }
         }
@@ -272,19 +273,24 @@ final class Looper
      * Fetch the next states to process, either processing or reprocessing mode
      * Returns, if there was something found
      *
-     * @throws \Zend_Db_Exception
-     * @throws \Zend_Exception
-     * @throws \ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
      * @phpstan-impure
      */
     private function fetchNextStates(bool $fromTheTop, string $taskGuid): bool
     {
         $this->setDbWriteTime(); // must be called before any write-operation
         $this->isReprocessing = false;
-        $this->toProcess = $this->state->fetchNextStates(State::UNPROCESSED, $taskGuid, $fromTheTop, $this->batchSize);
+        $this->toProcess = $this->state->fetchNextStates(
+            State::UNPROCESSED,
+            $taskGuid,
+            $fromTheTop,
+            $this->looperConfiguration->batchSize
+        );
         // may we are in     *  the reprocessing phase
         if (empty($this->toProcess)) {
-            $this->toProcess = $this->state->fetchNextStates(State::REPROCESS, $taskGuid, $fromTheTop, 1);
+            $this->toProcess = $this->state->fetchNextStates(State::REPROCESS, $taskGuid, $fromTheTop);
             $this->isReprocessing = (count($this->toProcess) > 0);
         }
 
@@ -299,7 +305,7 @@ final class Looper
     {
         // hint: if there are blocked segments, these are blocked segments for all running loopers
         // we do not need to delay more batches than the task has segments
-        $maxInstances = (int) ceil((int) $this->task->getSegmentCount() / $this->batchSize);
+        $maxInstances = $this->looperConfiguration->getMaxWorkerInstances();
 
         // normally $maxInstances cannot be 0, but we do not know in which contexts the class may be used
         return $this->workerIndex < $maxInstances || $maxInstances === 0;
@@ -313,10 +319,8 @@ final class Looper
      */
     private function needsToWaitForLockedSegments(): bool
     {
-        return (
-            $this->task->getSegmentCount() <= self::MIN_DELAY_SEGMENTS ||
-            (defined('APPLICATION_APITEST') && APPLICATION_APITEST)
-        );
+        return $this->task->getSegmentCount() <= self::MIN_DELAY_SEGMENTS
+            || (defined('APPLICATION_APITEST') && APPLICATION_APITEST);
     }
 
     private function setDbWriteTime(): void
@@ -325,8 +329,8 @@ final class Looper
         $now = (int) (microtime(true) * 1000);
         $elapsed = ($now - $this->lastTime);
         // if not enough time is already passed since the last write, we have to wait
-        if ($elapsed < $this->loopingPause) {
-            usleep($this->loopingPause - $elapsed);
+        if ($elapsed < $this->looperConfiguration->loopingPause) {
+            usleep($this->looperConfiguration->loopingPause - $elapsed);
             $this->lastTime = (int) (microtime(true) * 1000);
         } else {
             $this->lastTime = $now;

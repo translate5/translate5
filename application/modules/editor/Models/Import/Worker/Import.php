@@ -81,19 +81,9 @@ class editor_Models_Import_Worker_Import
         $this->task = $task;
         $this->importConfig = $importConfig;
 
-        $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get(editor_Models_Import_FileList::class, [$this->importConfig, $this->task]);
 
-        //down from here should start the import worker
-        //in the worker again:
-        Zend_Registry::set('affected_taskGuid', $this->task->getTaskGuid()); //for TRANSLATE-600 only
-
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
-
-        $this->events->trigger('beforeImportFiles', $this, [
-            'task' => $task,
-            'importConfig' => $importConfig,
-        ]);
 
         //call import Methods:
         $this->importFiles();
@@ -108,11 +98,6 @@ class editor_Models_Import_Worker_Import
         $workflowManager = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $workflowManager->getByTask($this->task)->hookin()->doImport($this->task, $importConfig);
         $workflowManager->initDefaultUserPrefs($this->task);
-
-        $this->events->trigger('importCleanup', $this, [
-            'task' => $task,
-            'importConfig' => $importConfig,
-        ]);
     }
 
     protected function importFiles(): void
