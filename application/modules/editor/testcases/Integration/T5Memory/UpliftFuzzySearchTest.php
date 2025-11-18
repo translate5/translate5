@@ -212,7 +212,7 @@ HTML,
             'expected' => [
                 'source' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
                 'target' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
-            ]
+            ],
         ];
 
         yield 'case 2' => [
@@ -280,7 +280,7 @@ HTML,
             'expected' => [
                 'source' => 'Heute ist der 12. Oktober <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default simple" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="2025" data-target="2025" class="full"></span></div>.',
                 'target' => 'Nulla sodales libero proin 12. platea <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default simple" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="2025" data-target="2025" class="full"></span></div>.',
-            ]
+            ],
         ];
     }
 }
