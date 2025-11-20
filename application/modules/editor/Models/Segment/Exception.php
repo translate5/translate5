@@ -42,6 +42,7 @@ class editor_Models_Segment_Exception extends ZfExtended_ErrorCodeException
         'E1082' => 'Segment length calculation: missing pixel width for several characters.',
         'E1155' => 'Unable to save the segment. The segment model tried to save to the materialized view directly.',
         'E1343' => 'Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed',
-        'E1610' => 'Rendering TagSequence tags led to a invalid tag structure that could not be processed',
+        'E1610' => 'Rendering the segment tags led to an invalid tag structure that could not be processed',
+        'E1761' => 'Invalid (nested) TrackChanges tags have been sent by the frontend and automatically repaired. Please check segments {segmentNrInTask} content.',
     ];
 }

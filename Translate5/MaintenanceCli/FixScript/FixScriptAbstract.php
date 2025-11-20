@@ -38,9 +38,16 @@ use Zend_Db_Table;
 abstract class FixScriptAbstract
 {
     /**
-     * A debug flag that can be set when calling the script via CLI
+     * The flag to really fix stuff
+     * Normally, problems are only reported
      */
-    protected bool $debug;
+    protected bool $doFix;
+
+    /**
+     * The reporting flag is normally active (script called without options)
+     * This will add additional logging
+     */
+    protected bool $doReport;
 
     protected SymfonyStyle $io;
 
@@ -49,9 +56,10 @@ abstract class FixScriptAbstract
      */
     protected Zend_Db_Adapter_Abstract $db;
 
-    public function __construct(SymfonyStyle $io, bool $doDebug = true)
+    public function __construct(SymfonyStyle $io, bool $doFix = false)
     {
-        $this->debug = $doDebug;
+        $this->doFix = $doFix;
+        $this->doReport = ! $doFix;
         $this->io = $io;
         $this->db = Zend_Db_Table::getDefaultAdapter();
     }
@@ -61,7 +69,7 @@ abstract class FixScriptAbstract
      */
     protected function log(string $text): void
     {
-        if ($this->debug) {
+        if ($this->doReport) {
             $this->io->writeln($text);
         }
     }

@@ -79,10 +79,13 @@ class editor_Models_Import_Worker extends editor_Models_Task_AbstractWorker
         $eventTrigger = new ImportEventTrigger();
 
         try {
+            $importConfig->isValid($task->getTaskGuid());
+            $eventTrigger->triggerBeforeImportWorkerRun($task, (int) $this->workerModel->getId(), $importConfig);
+
             $import = ZfExtended_Factory::get(editor_Models_Import_Worker_Import::class);
             $import->import($task, $importConfig);
 
-            $eventTrigger->triggerAfterImport($task, (int) $this->workerModel->getId(), $importConfig);
+            $eventTrigger->triggerAfterImportWorkerRun($task, (int) $this->workerModel->getId(), $importConfig);
 
             return true;
         } catch (Throwable $e) {

@@ -14,7 +14,45 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+## [7.32.4] - 2025-11-19
 
+### Important Notes:
+
+
+### Bugfixes
+**[TRANSLATE-5135](https://jira.translate5.net/browse/TRANSLATE-5135): Sometimes the UI produces strange TrackChanges mark-up** <br>
+Sometimes the UI produces strange TrackChanges mark-up
+
+
+
+## [7.32.3] - 2025-11-13
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5116](https://jira.translate5.net/browse/TRANSLATE-5116): Editor general - Add proper support of the right-to-left languages to the editor** <br>
+[🐞 Fix] Added proper support of right-to-left languages
+
+**[TRANSLATE-5113](https://jira.translate5.net/browse/TRANSLATE-5113): MatchAnalysis & Pretranslation, TermPortal - Termcollection pretranslation doesn't regard sublanguage** <br>
+Fixed that the sub-language penalty is respected for pure term translations: e.g. for en-gb task the en-us term is used for pretranslation. When there are multiple target terms the best one is used.
+
+**[TRANSLATE-5112](https://jira.translate5.net/browse/TRANSLATE-5112): Installation & Update - Fix logged deprecation messages** <br>
+Several smaller fixes to prevent PHP deprecation messages in the log and be ready for the next PHP version.
+
+**[TRANSLATE-5109](https://jira.translate5.net/browse/TRANSLATE-5109): Editor general - copy-paste in comment not possible with opened segment** <br>
+FIXED: custom logic for pasting from clipboard is now skipped when pasting into comment field
+
+**[TRANSLATE-5085](https://jira.translate5.net/browse/TRANSLATE-5085): Import/Export - Excel ex and re-import does not care about non editable segments** <br>
+Excel re-import is now respecting non editable columns. A new column in excel to show that its not editable is added.
+
+**[TRANSLATE-5059](https://jira.translate5.net/browse/TRANSLATE-5059): Export - Prevent formulas to be used in different excel exports** <br>
+7.32.3: Fixed proper rendering of currency columns
+7.31.1: Updated used spreadsheet generation libraries, ensured that now malicious formulas could be generated
+
+**[TRANSLATE-4477](https://jira.translate5.net/browse/TRANSLATE-4477): User Management - Emailadresses with the valid TLD marketing can not be created in the UI** <br>
+FIXED: updated email validation to support newer and longer top level domains like .marketing
 
 
 ## [7.32.2] - 2025-11-06

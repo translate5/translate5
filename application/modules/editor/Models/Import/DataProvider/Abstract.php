@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+
 /**#@+
  * @author Marc Mittag
 * @package editor
@@ -199,7 +201,7 @@ abstract class editor_Models_Import_DataProvider_Abstract
     }
 
     /**
-     * is bound to importCleanup event after import process by the import class.
+     * is bound to afterImport event after import process by the import class.
      * stub method, to be overridden.
      */
     public function postImportHandler()
@@ -223,9 +225,13 @@ abstract class editor_Models_Import_DataProvider_Abstract
     public function __wakeup()
     {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        /* @var $eventManager Zend_EventManager_StaticEventManager */
         //must be called before default cleanup (which has priority 1)
-        $eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', [$this, 'postImportHandler'], -100);
+        $eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_IMPORT,
+            [$this, 'postImportHandler'],
+            -100
+        );
 
         //restoring the taskPath as SPLInfo
         $this->taskPath = new SplFileInfo($this->taskPath);

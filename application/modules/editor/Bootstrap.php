@@ -41,6 +41,7 @@ use MittagQI\Translate5\Statistics\Helpers\UnmodifiedSegmentsEventHandler;
 use MittagQI\Translate5\T5Memory\T5MemoryLanguageResourceSpecificDataSnapshot;
 use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 use MittagQI\Translate5\Workflow\DeleteOpenidUsersAction;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
@@ -99,13 +100,13 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         // also this needs to be a point in the import-process after the languuege-resources in the wizard have been set
         // and it should be as early as possible to ensure the progress-bar does not flutter
         $eventManager->attach(
-            editor_Models_Import_Worker_FileTree::class,
-            'afterDirectoryParsing',
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_IMPORT,
             function (Zend_EventManager_Event $event) {
                 /* @var editor_Models_Task $task */
                 $task = $event->getParam('task');
                 // this represents the id of the import worker, see ProjectWorkersHandler::queueImportWorkers
-                $parentId = (int) $event->getParam('workerParentId');
+                $parentId = (int) $event->getParam('parentWorkerId');
                 editor_Segment_Quality_Manager::instance()->queueImport($task, $parentId);
             }
         );
