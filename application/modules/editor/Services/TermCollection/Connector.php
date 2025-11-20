@@ -32,6 +32,8 @@ use MittagQI\Translate5\Terminology\SearchCollection;
 
 class editor_Services_TermCollection_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface
 {
+    protected const TAG_HANDLER_CONFIG_PART = 'termCollection';
+
     /**
      * If the query for the term had tags, the match rate must be less then 100% so that the user has to fix the tags
      * @var integer
