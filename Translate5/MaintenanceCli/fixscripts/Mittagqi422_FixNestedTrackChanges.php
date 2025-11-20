@@ -75,7 +75,7 @@ class Mittagqi422_FixNestedTrackChanges extends FixScriptAbstract
         $affectedSegments = $this->db->fetchAssoc(
             "SELECT `segmentId`, `name` FROM `LEK_segment_data` WHERE" .
             " `taskGuid` IN ('" . implode("','", $taskGuids) . "')" .
-            " AND (`edited` REGEXP '<ins[^>]*>(?:(?!<\/ins>)[\\\\s\\\\S])*<del' OR `edited` REGEXP '<del[^>]*>(?:(?!<\/del>)[\\\\s\\\\S])*<ins') OR `edited` REGEXP '<ins[^>]*>(?:(?!<\/ins>)[\\\\s\\\\S])*<ins' OR `edited` REGEXP '<del[^>]*>(?:(?!<\/del>)[\\\\s\\\\S])*<del'"
+            " AND (`edited` REGEXP '<ins[^>]*>(?:(?!<\/ins>)[\\\\s\\\\S])*<del' OR `edited` REGEXP '<del[^>]*>(?:(?!<\/del>)[\\\\s\\\\S])*<ins')"
         );
         // array like: segmentId => [fields] where field ias "source" or "target" and will always be the edited variant ...
         $segmentMap = [];
@@ -105,6 +105,8 @@ class Mittagqi422_FixNestedTrackChanges extends FixScriptAbstract
 
         $savedFields = [];
 
+        $history = $segment->getNewHistoryEntity();
+
         foreach ($fields as $field) {
             $markup = $segment->get($field . 'Edit');
             $tags = new SegmentTagSequence($markup);
@@ -113,6 +115,7 @@ class Mittagqi422_FixNestedTrackChanges extends FixScriptAbstract
                 $tags->normalizeTrackChangesTags();
                 $newMarkup = $tags->render();
                 $toSort = $segment->stripTags($newMarkup, $field === 'source');
+
                 if ($this->doFix) {
                     $segment->set($field . 'Edit', $newMarkup);
                     $segment->set($field . 'EditToSort', $toSort);
@@ -122,16 +125,21 @@ class Mittagqi422_FixNestedTrackChanges extends FixScriptAbstract
             }
         }
 
-        if (count($savedFields) > 0) {
-            if ($this->doFix) {
-                $segment->save();
-            }
-            $this->info(
-                $this->doFix ? 'Fixed ' : 'Will fix ' . 'Segment ' . $segmentId . ', Nr. ' . $segment->getSegmentNrInTask() .
-                ' in task ' . $segment->getTaskGuid() . ' where fields "' .
-                implode('", "', $savedFields) . '" were affected' . "\n"
-            );
-            $this->numFixedSegments++;
+        if (count($savedFields) === 0) {
+            return;
         }
+
+        if ($this->doFix) {
+            $history->save();
+            $segment->save();
+        }
+
+        $this->info(
+            $this->doFix ? 'Fixed ' : 'Will fix ' . 'Segment ' . $segmentId . ', Nr. ' . $segment->getSegmentNrInTask() .
+            ' in task ' . $segment->getTaskGuid() . ' where fields "' .
+            implode('", "', $savedFields) . '" were affected' . "\n"
+        );
+
+        $this->numFixedSegments++;
     }
 }
