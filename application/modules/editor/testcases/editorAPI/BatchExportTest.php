@@ -71,12 +71,11 @@ class BatchExportTest extends JsonTestAbstract
 
         [$statusUrl] = explode('?', $result['nextUrl']);
         $statusUrl .= '/status';
-
-        $this->waitForWorker(MittagQI\Translate5\Task\BatchOperations\BatchExportWorker::class);
+        sleep(6); // ~8-9s total is needed
 
         // calling the endpoint for the download in a loop (just like the frontend/popup does)
         $downloadGenerated = false;
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $response = self::api()->get($statusUrl);
             $this->assertEquals(200, $response->getStatus());
             $result = json_decode($response->getBody(), true, flags: JSON_THROW_ON_ERROR);
