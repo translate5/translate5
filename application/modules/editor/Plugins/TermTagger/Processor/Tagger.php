@@ -44,25 +44,35 @@ use editor_Segment_Tags;
 use MittagQI\Translate5\Plugins\TermTagger\Configuration;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\AbstractException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\CheckTbxTimeOutException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\DownException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\OpenException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\RemovedException;
+use MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
 use MittagQI\Translate5\Segment\Processing\State;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
+use ReflectionException;
 use SplFileInfo;
 use stdClass;
 use Throwable;
+use Zend_Db_Statement_Exception;
 use Zend_Exception;
+use Zend_Http_Client_Exception;
 use Zend_Registry;
 use ZfExtended_Debug;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * Encapsulates the tagging of groups of segment-tags
@@ -76,7 +86,7 @@ final class Tagger extends AbstractProcessor
     /**
      * Finds term tags of certain classes (= certain term stati) in the tags that represent a problem
      */
-    public static function findAndAddQualitiesInTags(editor_Segment_Tags $tags)
+    public static function findAndAddQualitiesInTags(editor_Segment_Tags $tags): void
     {
         $type = editor_Plugins_TermTagger_Tag::TYPE;
         foreach ($tags->getTagsByTypeForField($type) as $field => $termTags) {
@@ -91,13 +101,23 @@ final class Tagger extends AbstractProcessor
 
     /**
      * Reports the too-long & defect segments that occurred during term-tagging
+     * @throws ReflectionException
      * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public static function reportDefectSegments(editor_Models_Task $task, string $processingMode): void
     {
         $processingState = new Processing();
-        $defectSegmentIds = $processingState->getSegmentsForState($task->getTaskGuid(), Service::SERVICE_ID, State::UNPROCESSABLE);
-        $toolongSegmentIds = $processingState->getSegmentsForState($task->getTaskGuid(), Service::SERVICE_ID, State::TOOLONG);
+        $defectSegmentIds = $processingState->getSegmentsForState(
+            $task->getTaskGuid(),
+            Service::SERVICE_ID,
+            State::UNPROCESSABLE
+        );
+        $toolongSegmentIds = $processingState->getSegmentsForState(
+            $task->getTaskGuid(),
+            Service::SERVICE_ID,
+            State::TOOLONG
+        );
         $segmentIds = array_unique(array_merge($defectSegmentIds, $toolongSegmentIds));
 
         if (! empty($segmentIds)) {
@@ -112,7 +132,8 @@ final class Tagger extends AbstractProcessor
                 if (in_array($segmentId, $toolongSegmentIds)) {
                     $segmentsToLog[] = $segment->getSegmentNrInTask() . ': Segment to long for the TermTagger';
                 } else {
-                    $segmentsToLog[] = $segment->getSegmentNrInTask() . '; Source-Text: ' . strip_tags($segment->get($fieldManager->getFirstSourceName()));
+                    $segmentsToLog[] = $segment->getSegmentNrInTask()
+                        . '; Source-Text: ' . strip_tags($segment->get($fieldManager->getFirstSourceName()));
                 }
             }
             $logger->warn('E1123', 'Some segments could not be tagged by the TermTagger.', [
@@ -182,9 +203,15 @@ final class Tagger extends AbstractProcessor
     /**
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
+     * @throws ReflectionException
      */
-    public function __construct(editor_Models_Task $task, DockerServiceAbstract $service, string $processingMode, string $serviceUrl = null, bool $isWorkerContext = true)
-    {
+    public function __construct(
+        editor_Models_Task $task,
+        DockerServiceAbstract $service,
+        string $processingMode,
+        string $serviceUrl = null,
+        bool $isWorkerContext = true
+    ) {
         parent::__construct($task, $service, $processingMode, $serviceUrl, $isWorkerContext);
 
         $this->logger = Zend_Registry::get('logger')->cloneMe(
@@ -197,14 +224,19 @@ final class Tagger extends AbstractProcessor
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'TermTaggerRequests');
     }
 
-    public function getBatchSize(): int
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
+     */
+    public static function createLooperConfiguration(editor_Models_Task $task): LooperConfigurationDTO
     {
-        return $this->task->getConfig()->runtimeOptions->termTagger->taggerBatchSize;
-    }
-
-    public function getLoopingPause(): int
-    {
-        return $this->task->getConfig()->runtimeOptions->termTagger->taggerLoopingInterval;
+        return new LooperConfigurationDTO(
+            $task->getSegmentCount(),
+            $task->getConfig()->runtimeOptions->termTagger->taggerBatchSize,
+            $task->getConfig()->runtimeOptions->termTagger->taggerLoopingInterval,
+        );
     }
 
     /**
@@ -212,16 +244,24 @@ final class Tagger extends AbstractProcessor
      * @param editor_Segment_Tags[] $segmentsTags
      * @throws AbstractException
      * @throws CheckTbxTimeOutException
+     * @throws DownException
      * @throws MalfunctionException
+     * @throws NoResponseException
      * @throws OpenException
+     * @throws ReflectionException
+     * @throws RemovedException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_Exception
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
-     * @throws \Zend_Http_Client_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
-    public function processBatch(array $segmentsTags)
+    public function processBatch(array $segmentsTags): void
     {
         foreach ($segmentsTags as $tags) {
             $tags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
@@ -240,16 +280,24 @@ final class Tagger extends AbstractProcessor
      * Processes a single segment
      * @throws AbstractException
      * @throws CheckTbxTimeOutException
+     * @throws DownException
      * @throws MalfunctionException
+     * @throws NoResponseException
      * @throws OpenException
+     * @throws ReflectionException
+     * @throws RemovedException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_Exception
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
-     * @throws \Zend_Http_Client_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
-    public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true)
+    public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true): void
     {
         $segmentTags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
         // creating the service-data model used by the termtagger-service
@@ -266,12 +314,20 @@ final class Tagger extends AbstractProcessor
      * Returns an array of terms applicable for particular segment
      * @throws AbstractException
      * @throws CheckTbxTimeOutException
+     * @throws DownException
      * @throws MalfunctionException
+     * @throws NoResponseException
      * @throws OpenException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
-     * @throws \Zend_Http_Client_Exception
+     * @throws ReflectionException
+     * @throws RemovedException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     public function retrieveTermsForSegmentTags(editor_Segment_Tags $segmentsTags): iterable
     {
@@ -309,11 +365,14 @@ final class Tagger extends AbstractProcessor
 
     /**
      * Applies the result of the termtagging to the sent segment-tags
-     * @throws ZfExtended_Exception
-     * @throws editor_Models_ConfigException
      * @throws MalfunctionException
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
-    private function applyTaggingResult(stdClass $result, array $segmentsTags, bool $saveTags = true)
+    private function applyTaggingResult(stdClass $result, array $segmentsTags, bool $saveTags = true): void
     {
         $taggedSegments = $this->markTransFound($result->segments);
         $taggedSegmentsById = $this->groupResponseById($taggedSegments);
@@ -344,8 +403,9 @@ final class Tagger extends AbstractProcessor
     /**
      * Transfers a single termtagger response to the corresponding tags-model
      * @throws MalfunctionException
+     * @throws ZfExtended_Exception
      */
-    private function applyResponseToTags(array $responseGroup, editor_Segment_Tags $tags)
+    private function applyResponseToTags(array $responseGroup, editor_Segment_Tags $tags): void
     {
         // UGLY: this should better be done by adding real tag-objects instead of setting the tags via text
         if (count($responseGroup) < 1) {
@@ -366,7 +426,8 @@ final class Tagger extends AbstractProcessor
             if (! array_key_exists('SourceOriginal', $responseFields)) {
                 throw new MalfunctionException('E1120', [
                     'task' => $this->task,
-                    'reason' => 'Response of termtagger did not contain data for the original source for the segment ID ' . $tags->getSegmentId(),
+                    'reason' => 'Response of termtagger did not contain data '
+                        . 'for the original source for the segment ID ' . $tags->getSegmentId(),
                 ]);
             }
             $source = $tags->getOriginalSource();
@@ -381,7 +442,8 @@ final class Tagger extends AbstractProcessor
             if (! array_key_exists($field, $responseFields)) {
                 throw new MalfunctionException('E1120', [
                     'task' => $this->task,
-                    'reason' => 'Response of termtagger did not contain the field "' . $field . '" for the segment ID ' . $tags->getSegmentId(),
+                    'reason' => 'Response of termtagger did not contain the field "'
+                        . $field . '" for the segment ID ' . $tags->getSegmentId(),
                 ]);
             }
             $target->setTagsByText($responseFields[$field]->target);
@@ -422,6 +484,7 @@ final class Tagger extends AbstractProcessor
     /**
      * Creates the server communication data-model for the current task and the given segment-tags
      * @param editor_Segment_Tags[] $segmentsTags
+     * @throws MalfunctionException
      */
     private function createServiceData(array $segmentsTags): ServiceData
     {
@@ -445,14 +508,24 @@ final class Tagger extends AbstractProcessor
 
             foreach ($tags->getTargets() as $target) {
                 $targetText = $target->render($typesToExclude);
-                $serviceData->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $targetText);
+                $serviceData->addSegment(
+                    $target->getSegmentId(),
+                    $target->getTermtaggerName(),
+                    $sourceText,
+                    $targetText
+                );
                 if ($firstTargetText === null) {
                     $firstTargetText = $targetText;
                 }
             }
             if ($tags->hasOriginalSource()) {
                 $sourceOriginal = $tags->getOriginalSource();
-                $serviceData->addSegment($sourceOriginal->getSegmentId(), $sourceOriginal->getTermtaggerName(), $sourceOriginal->render($typesToExclude), $firstTargetText);
+                $serviceData->addSegment(
+                    $sourceOriginal->getSegmentId(),
+                    $sourceOriginal->getTermtaggerName(),
+                    $sourceOriginal->render($typesToExclude),
+                    $firstTargetText
+                );
             }
         }
 
@@ -462,6 +535,12 @@ final class Tagger extends AbstractProcessor
     /**
      * tag the terms via the communication & termtagger services
      * @return stdClass or null on error
+     * @throws DownException
+     * @throws NoResponseException
+     * @throws ReflectionException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Http_Client_Exception
      */
     private function tagTerms(string $url): stdClass
     {
@@ -494,9 +573,11 @@ final class Tagger extends AbstractProcessor
 
     /**
      * replaces ihe internal tags with img placeholders since the termtagger cannot deal with tags but with imgs
-     * CRUCIAL: The img-tags meed to have a blank before the closing- marker like <img src="..." /> otherwise termtagger crashes
+     * CRUCIAL: The img-tags meed to have a blank before the closing- marker like <img src="..." /> otherwise
+     * termtagger crashes
+     * @throws ReflectionException
      */
-    private function encodeSegments()
+    private function encodeSegments(): void
     {
         foreach ($this->serviceData->segments as &$segment) {
             $segment->source = $this->encodeSegment($segment, 'source');
@@ -517,6 +598,9 @@ final class Tagger extends AbstractProcessor
         return $data;
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function encodeSegment(stdClass $segment, string $field): string
     {
         $trackChangeTag = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
@@ -540,9 +624,11 @@ final class Tagger extends AbstractProcessor
         $text = $trackChangeTag->protect($text);
         //store the text with track changes
         $trackChangeTag->textWithTrackChanges = $text;
-        $this->segments[$this->createUniqueKey($segment, $field)] = $trackChangeTag; //we have to store one instance per segment since it contains specific data for recreation
+        //we have to store one instance per segment since it contains specific data for recreation
+        $this->segments[$this->createUniqueKey($segment, $field)] = $trackChangeTag;
 
-        // Now remove the stored TrackChange-Nodes from the text for termtagging (with the general helper to keep the original tags inside the specific instance)
+        // Now remove the stored TrackChange-Nodes from the text for termtagging
+        //  (with the general helper to keep the original tags inside the specific instance)
         return $this->generalTrackChangesHelper->removeTrackChanges($text);
     }
 
@@ -562,7 +648,10 @@ final class Tagger extends AbstractProcessor
         // TODO FIXME: if you do the above there are problems with trackchanges tags getting lost ...
         // if($trackChangeTag->hasOriginalTags()){
         if (true) {
-            $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges($text, $trackChangeTag->textWithTrackChanges);
+            $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges(
+                $text,
+                $trackChangeTag->textWithTrackChanges
+            );
             //check if content is valid XML, or if textual content has changed
             $oldFlagValue = libxml_use_internal_errors(true);
             // delete tags and internal tags are masked, thats ok for the check here
@@ -585,10 +674,13 @@ final class Tagger extends AbstractProcessor
             return $text;
         }
         // TODO FIXME: DOCUMENTATION !!!
-        $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
-        $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
+        $text = preg_replace(
+            '"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"',
+            '<img class="content-tag" src="\\1" alt="TaggingError" />',
+            $text
+        );
 
-        return $text;
+        return str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
     }
 
     /**
@@ -602,11 +694,12 @@ final class Tagger extends AbstractProcessor
     /**
      * marks terms in the source with transFound, if translation is present in the target
      * and with transNotFound if not. A translation which is of type
-     * editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED or editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED
-     * is handled as transNotFound
+     * editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED
+     * or editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED is handled as transNotFound
      *
      * @param array $segments array of stdClass. example: array(object(stdClass)#529 (4) {
      * @return array $segments
+     * @throws Zend_Exception
      */
     public function markTransFound(array $segments): array
     {
@@ -625,14 +718,22 @@ final class Tagger extends AbstractProcessor
      * If not already loaded, tries to load the tbx-file from the task.
      * Throws Exceptions if TBX could not be loaded!
      * @throws AbstractException
-     * @throws OpenException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\DownException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\NoResponseException
-     * @throws \MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException
      * @throws CheckTbxTimeOutException
-     * @throws \Zend_Http_Client_Exception
+     * @throws DownException
+     * @throws NoResponseException
+     * @throws OpenException
+     * @throws ReflectionException
+     * @throws RemovedException
+     * @throws RequestException
+     * @throws TimeOutException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
-    private function checkTermTaggerTbx(string $url, ?string &$tbxHash)
+    private function checkTermTaggerTbx(string $url, ?string &$tbxHash): void
     {
         try {
             // test if tbx-file is already loaded
@@ -665,10 +766,13 @@ final class Tagger extends AbstractProcessor
      * returns the TBX string to be loaded into the termtagger
      * @return array{data: string, hash: string}
      * @throws OpenException
-     * @throws \ReflectionException
-     * @throws \Zend_Db_Statement_Exception
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ReflectionException
+     * @throws RemovedException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     private function getTbxData(): array
     {

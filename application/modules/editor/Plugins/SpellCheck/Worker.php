@@ -28,6 +28,7 @@
 
 namespace MittagQI\Translate5\Plugins\SpellCheck;
 
+use editor_Models_ConfigException;
 use editor_Plugins_SpellCheck_Init;
 use Exception;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\AbstractException;
@@ -39,11 +40,15 @@ use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Configuration;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Processor;
 use MittagQI\Translate5\Segment\Processing\AbstractProcessingWorker;
+use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
 use MittagQI\Translate5\Segment\Processing\State;
+use MittagQI\ZfExtended\Worker\Exception\SetDelayedException;
+use ReflectionException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Exception;
 use ZfExtended_Logger;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * Processes the spellchecking of segments in operations like import, analysis, etc.
@@ -74,10 +79,20 @@ class Worker extends AbstractProcessingWorker
 
     /**
      * Creates the Processor
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     protected function createProcessor(): Processor
     {
         return new Processor($this->task, $this->service, $this->processingMode, $this->serviceUrl, true);
+    }
+
+    protected function createLooperConfiguration(): LooperConfigurationDTO
+    {
+        return Processor::createLooperConfiguration($this->task);
     }
 
     /**
@@ -93,15 +108,22 @@ class Worker extends AbstractProcessingWorker
 
     /**
      * @param State[] $problematicStates
-     * @throws \MittagQI\ZfExtended\Worker\Exception\SetDelayedException
+     * @throws SetDelayedException
      */
-    protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
-    {
+    protected function onLooperException(
+        Exception $loopedProcessingException,
+        array $problematicStates,
+        bool $isReprocessing
+    ): int {
         // If Malfunction exception caught, it means the LanguageTool is up, but HTTP response code was not 2xx, so that
-        // - we set the segments status to 'recheck', so each segment will be checked again, segment by segment, not in a bulk manner,
-        //   but if while running one-by-one recheck it will result the same problem, then each status will be set as 'defect' one-by-one
+        // - we set the segments status to 'recheck', so each segment will be checked again, segment by segment,
+        //   not in a bulk manner, but if while running one-by-one recheck it will result the same problem,
+        //   then each status will be set as 'defect' one-by-one
         // - we log all the data producing the error.
-        if ($loopedProcessingException instanceof MalfunctionException || $loopedProcessingException instanceof TimeOutException || $loopedProcessingException instanceof RequestException) {
+        if ($loopedProcessingException instanceof MalfunctionException
+            || $loopedProcessingException instanceof TimeOutException
+            || $loopedProcessingException instanceof RequestException
+        ) {
             // set the failed segments either to reprocess or unprocessable depending if we are already reprocessing
             if ($isReprocessing) {
                 $this->setUnprocessedStates($problematicStates, State::UNPROCESSABLE);
@@ -114,7 +136,8 @@ class Worker extends AbstractProcessingWorker
             // in any case we continue processing
             return 1;
         }
-        // a Down Exception will be created if all services are down to create an import error. If other URLs are still up, we simply end the worker without further notice
+        // a Down Exception will be created if all services are down to create an import error.
+        // If other URLs are still up, we simply end the worker without further notice
         if ($loopedProcessingException instanceof DownException) {
             // when languagetool is down, the behaviour depends on if we are a load-balanced service or not
             $this->onServiceDown($loopedProcessingException);

@@ -59,7 +59,7 @@ class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plug
         $this->eventManager->attach(
             ImportEventTrigger::class,
             ImportEventTrigger::AFTER_IMPORT,
-            [$this, 'handleAfterImportCleanup'],
+            [$this, 'handleAfterImport'],
             -11000
         );
         $this->eventManager->attach(
@@ -87,7 +87,7 @@ class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plug
      * handler for event: editor_Models_Import#afterImport
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterImportCleanup(Zend_EventManager_Event $event): void
+    public function handleAfterImport(Zend_EventManager_Event $event): void
     {
         $this->callWorker(
             $event->getParam('task'),

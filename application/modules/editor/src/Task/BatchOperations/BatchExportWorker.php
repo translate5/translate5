@@ -96,7 +96,8 @@ class BatchExportWorker extends ZfExtended_Worker_Abstract
             $finalExportWorker->queue($workerId);
         }
 
-        $parentWorker->getModel()->schedulePrepared();
+        $parentWorker->schedulePrepared(); //AndStart
+        //$parentWorker->getModel()->schedulePreparedOnly();
 
         return $parentWorkerId;
     }

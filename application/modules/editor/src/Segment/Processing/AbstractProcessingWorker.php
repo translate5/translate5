@@ -33,6 +33,7 @@ use MittagQI\Translate5\PooledService\AbstractPooledWorker;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use Throwable;
 use ZfExtended_Logger;
+use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
 
 /**
  * A processing worker processes segments in a loop until no unprocessed segments are available for the task
@@ -62,6 +63,8 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
      */
     protected int $numReports = 0;
 
+    private LooperConfigurationDTO $looperConfiguration;
+
     /**
      * Must be implemented to create the logger
      * This function is also used in a static context and must not use internal dependencies
@@ -74,16 +77,23 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
     abstract protected function createProcessor(): AbstractProcessor;
 
     /**
+     * creates the looper config, must be called after init method
+     */
+    abstract protected function createLooperConfiguration(): LooperConfigurationDTO;
+
+    /**
      * Will be called when the looper has an Exception and can be used to intercept the Exception
      * The returned integer steers the behaviour of the looper:
      * - a positive integer causes the looping to continue and processing the remaining segments there might be
      * - "0" halts the looping/processing and causes the worker to finish without exception
      * - a negative integer leads to the passed exception being thrown ending the processing
      * @param State[] $problematicStates
-     * @throws \MittagQI\ZfExtended\Worker\Exception\SetDelayedException
      */
-    protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
-    {
+    protected function onLooperException(
+        Exception $loopedProcessingException,
+        array $problematicStates,
+        bool $isReprocessing,
+    ): int {
         return -1;
     }
 
@@ -101,18 +111,22 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
 
     public function onInit(array $parameters): bool
     {
-        if (parent::onInit($parameters)) {
+        $result = parent::onInit($parameters);
+        if ($result) {
             // this ensures, that worker 0 ... 2 ... are fetching processing-states from the top
             // while 1 ... 3 ... fetch from the back.
             //In theory, this should make deadlocks less likely
             $this->fromTheTop = $this->workerIndex % 2 === 0;
-
-            return true;
         }
 
-        return false;
+        $this->looperConfiguration = $this->createLooperConfiguration();
+
+        return $result;
     }
 
+    /**
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     */
     public function reportProcessed(int $numProcessed): void
     {
         // when the num of processed segments exceeds our next progress interval
@@ -123,14 +137,21 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     protected function work(): bool
     {
         $this->processor = $this->createProcessor();
         if ($this->doDebug) {
-            error_log('AbstractProcessingWorker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': work for ' . $this->processingMode . ' using slot ' . $this->workerModel->getSlot() . ' with processor ' . get_class($this->processor));
+            error_log(
+                'AbstractProcessingWorker: ' . get_class($this) . '|' . $this->workerModel->getSlot()
+                . ': work for ' . $this->processingMode . ' using slot ' . $this->workerModel->getSlot()
+                . ' with processor ' . get_class($this->processor)
+            );
         }
-        // special: some processors may decide not to process - usually because conditions not yet have been clear in queueing-phase
-        // simply all workers with higher index will terminate then
+        // special: some processors may decide not to process - usually because conditions not yet have been clear
+        // in queueing-phase simply all workers with higher index will terminate then
         if ($this->processor->prepareWorkload($this->workerIndex)) {
             // loop through the segments to process
             $this->logger = $this->createLogger($this->processingMode);
@@ -138,7 +159,11 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
             $this->doLoop();
         } else {
             if ($this->doDebug) {
-                error_log('AbstractProcessingWorker: ' . get_class($this) . ' with index ' . $this->workerIndex . ' terminates because the processor ' . get_class($this->processor) . ' decided processing is not neccessary');
+                error_log(
+                    'AbstractProcessingWorker: ' . get_class($this) . ' with index ' . $this->workerIndex
+                    . ' terminates because the processor ' . get_class($this->processor)
+                    . ' decided processing is not neccessary'
+                );
             }
         }
 
@@ -149,7 +174,7 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
      * Sets all Segments in the batch, that are not of state processed, to the given state
      * @param State[] $problematicStates
      */
-    protected function setUnprocessedStates(array $problematicStates, int $errorState)
+    protected function setUnprocessedStates(array $problematicStates, int $errorState): void
     {
         $this->looper->setUnprocessedStates($problematicStates, $errorState, $this->doDebug);
     }
@@ -157,9 +182,9 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
     /**
      * Loops through the segments until the looper returns
      * stops/continues on Exception according the decision in ::onLooperException
-     * @throws Exception
+     * @throws Throwable
      */
-    private function doLoop()
+    private function doLoop(): void
     {
         $isFinished = false;
         while (! $isFinished) {
@@ -175,7 +200,11 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
                 // we must set the global "processing" state back
                 // how ever the inheriting worker reacts on ::onLooperException
                 try {
-                    $flag = $this->onLooperException($processingException, $states, $this->looper->isReprocessingLoop());
+                    $flag = $this->onLooperException(
+                        $processingException,
+                        $states,
+                        $this->looper->isReprocessingLoop()
+                    );
                 } catch (Throwable $e) {
                     // even when onLooperException itself creates an exception
                     // the global state must be set back, otherwise other workers may be delayed forever
@@ -200,5 +229,12 @@ abstract class AbstractProcessingWorker extends AbstractPooledWorker implements 
                 }
             }
         }
+    }
+
+    protected function limitMaxParallel(int $calculatedMaxParallel): int
+    {
+        return parent::limitMaxParallel(
+            min($this->looperConfiguration->getMaxWorkerInstances(), $calculatedMaxParallel)
+        );
     }
 }

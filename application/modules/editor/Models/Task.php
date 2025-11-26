@@ -97,7 +97,6 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setCustomerId(string|int|null $customerId)
  * @method string getUsageMode()
  * @method void setUsageMode(string $usageMode)
- * @method string|null getSegmentCount()
  * @method void setSegmentCount(string|int $segmentCount)
  * @method string getSegmentEditableCount()
  * @method void setSegmentEditableCount(string|int $segmentEditableCount)
@@ -1528,5 +1527,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public function getRelaisLang(): int
     {
         return (int) $this->get('relaisLang');
+    }
+
+    public function getSegmentCount(): int
+    {
+        return (int) $this->get('segmentCount');
     }
 }
