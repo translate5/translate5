@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+
 /**
  * Initial Class of Plugin "Transit"
  *
@@ -78,9 +80,9 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract
             [$this, 'handleBeforeImport']
         );
         $this->eventManager->attach(
-            editor_Models_Import_Worker_Import::class,
-            'importCleanup',
-            [$this, 'handleTransitImportCleanup'],
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_IMPORT,
+            [$this, 'handleTransitAfterImport'],
             -10
         );
         // end of event-listeners
@@ -139,11 +141,10 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract
     /**
      * handler for event: editor_Models_Import#afterImport
      */
-    public function handleTransitImportCleanup(Zend_EventManager_Event $event)
+    public function handleTransitAfterImport(Zend_EventManager_Event $event)
     {
-        $params = $event->getParams();
-        $importConfig = $params['importConfig'];
         /* @var $importConfig editor_Models_Import_Configuration */
+        $importConfig = $event->getParam('importConfig');
         $this->importFolder = $importConfig->importFolder;
         $this->reviewDirName = $importConfig->getWorkfilesDirName();
         $this->renameTargetFiles('cleanup');

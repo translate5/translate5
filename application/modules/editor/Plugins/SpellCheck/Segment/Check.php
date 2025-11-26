@@ -40,6 +40,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Adapter;
 use MittagQI\Translate5\Tag\TagSequence;
 use stdClass;
 use Zend_Exception;
+use ZfExtended_ErrorCodeException;
 use ZfExtended_Exception;
 
 /**
@@ -50,58 +51,58 @@ use ZfExtended_Exception;
 class Check
 {
     // Css classes
-    public const CSS_GROUP_GENERAL = 't5general';
+    public const string CSS_GROUP_GENERAL = 't5general';
 
-    public const CSS_GROUP_STYLE = 't5style';
+    public const string CSS_GROUP_STYLE = 't5style';
 
-    public const CSS_GRAMMAR = 't5grammar';
+    public const string CSS_GRAMMAR = 't5grammar';
 
-    public const CSS_MISSPELLING = 't5misspelling';
+    public const string CSS_MISSPELLING = 't5misspelling';
 
-    public const CSS_TYPOGRAPHICAL = 't5typographical';
+    public const string CSS_TYPOGRAPHICAL = 't5typographical';
 
     // General error types
-    public const GROUP_GENERAL = 'group-general';
+    public const string GROUP_GENERAL = 'group-general';
 
-    public const CHARACTERS = 'characters';
+    public const string CHARACTERS = 'characters';
 
-    public const DUPLICATION = 'duplication';
+    public const string DUPLICATION = 'duplication';
 
-    public const INCONSISTENCY = 'inconsistency';
+    public const string INCONSISTENCY = 'inconsistency';
 
-    public const LEGAL = 'legal';
+    public const string LEGAL = 'legal';
 
-    public const UNCATEGORIZED = 'uncategorized';
+    public const string UNCATEGORIZED = 'uncategorized';
 
     // Style error types
-    public const GROUP_STYLE = 'group-style';
+    public const string GROUP_STYLE = 'group-style';
 
-    public const REGISTER = 'register';
+    public const string REGISTER = 'register';
 
-    public const LOCALE_SPECIFIC_CONTENT = 'locale-specific-content';
+    public const string LOCALE_SPECIFIC_CONTENT = 'locale-specific-content';
 
-    public const LOCALE_VIOLATION = 'locale-violation';
+    public const string LOCALE_VIOLATION = 'locale-violation';
 
-    public const GENERAL_STYLE = 'style';
+    public const string GENERAL_STYLE = 'style';
 
-    public const PATTERN_PROBLEM = 'pattern-problem';
+    public const string PATTERN_PROBLEM = 'pattern-problem';
 
-    public const WHITESPACE = 'whitespace';
+    public const string WHITESPACE = 'whitespace';
 
-    public const TERMINOLOGY = 'terminology';
+    public const string TERMINOLOGY = 'terminology';
 
-    public const INTERNATIONALIZATION = 'internationalization';
+    public const string INTERNATIONALIZATION = 'internationalization';
 
-    public const NON_CONFORMANCE = 'non-conformance';
+    public const string NON_CONFORMANCE = 'non-conformance';
 
-    public const NUMBERS = 'numbers';
+    public const string NUMBERS = 'numbers';
 
     // Remaining error types
-    public const GRAMMAR = 'grammar';
+    public const string GRAMMAR = 'grammar';
 
-    public const MISSPELLING = 'misspelling';
+    public const string MISSPELLING = 'misspelling';
 
-    public const TYPOGRAPHICAL = 'typographical';
+    public const string TYPOGRAPHICAL = 'typographical';
 
     /**
      * Mappings for issueType-values provided by LanguageTool API response
@@ -261,7 +262,7 @@ class Check
     /**
      * Retrieves the evaluated states
      *
-     * @return string[][]
+     * @return array<string, array<object>>
      */
     public function getStates(): array
     {
@@ -300,7 +301,8 @@ class Check
     /**
      * Get value of $segment's $targetField applicable to be sent to LanguageTool
      *
-     * @throws ZfExtended_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
      */
     public static function prepareTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target): string
     {

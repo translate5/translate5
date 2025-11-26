@@ -42,7 +42,6 @@ use MittagQI\Translate5\Plugins\Okapi\Worker\OkapiWorkerHelper;
 use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
-use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
 use MittagQI\ZfExtended\ApiRequestDTO;
 
 /**
@@ -543,8 +542,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 
         //Archives the temporary data folder again after converting the files with okapi:
         $this->eventManager->attach(
-            editor_Models_Import_Worker_Import::class,
-            'importCleanup',
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_IMPORT,
             [$this, 'handleAfterImport']
         );
 

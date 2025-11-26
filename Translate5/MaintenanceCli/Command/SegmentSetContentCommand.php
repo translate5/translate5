@@ -34,6 +34,7 @@ use editor_Models_Segment_RepetitionHash;
 use editor_Models_SegmentFieldManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -69,9 +70,9 @@ class SegmentSetContentCommand extends Translate5AbstractCommand
             ->addOption(
                 'updateOriginals',
                 'o',
-                InputArgument::OPTIONAL,
-                'If set, the original value will be updated. If not set, only sourceEdit/targetEdit will be updated.',
-                false,
+                InputOption::VALUE_NONE,
+                'If option set, the original values of source/target will be updated as well.' .
+                ' If not set, only sourceEdit/targetEdit will be updated.',
             )
         ;
     }
@@ -161,10 +162,11 @@ class SegmentSetContentCommand extends Translate5AbstractCommand
 
                 if ($updateOriginals) {
                     $segment->setTarget($target);
+                    $segment->set('targetToSort', $toSort);
                 }
 
                 $segment->setTargetEdit($target);
-                $segment->set('targetToSort', $toSort);
+                $segment->set('targetEditToSort', $toSort);
                 $segment->setTargetMd5($hasher->hashTarget($hashTarget, $hashSource));
             }
 
@@ -172,6 +174,9 @@ class SegmentSetContentCommand extends Translate5AbstractCommand
 
             $what = ($source !== null && $target !== null) ?
                 'source and target' : ($source !== null ? 'only source' : 'only target');
+            if ($updateOriginals) {
+                $what .= ', with originals';
+            }
             $success[] = 'Updated Segment with id "' . $id . '", ' . $what . '.';
         }
 

@@ -379,8 +379,6 @@ class ImportService
         $importConfig->userName = $user->getUsername();
         $importConfig->userGuid = $user->getUserGuid();
 
-        Zend_Registry::set('affected_taskGuid', $task->getTaskGuid()); //for TRANSLATE-600 only
-
         //pre import methods:
         try {
             $dataProvider->checkAndPrepare($task);

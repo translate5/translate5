@@ -129,10 +129,11 @@ class Translate3967_TagsPairedByRidFixer extends FixScriptAbstract
                         . " AND `category` = 'internal_tag_structure_faulty'"
                         . " AND `type` = 'internal'";
 
-                    if ($this->debug) {
+                    if ($this->doReport) {
                         $this->log('SAVE SEGMENT: ' . $segment->getId() . ' in task ' . $task->getId());
                         $this->log('REMOVE QUALITY: ' . $qualitySql);
-                    } else {
+                    }
+                    if ($this->doFix) {
                         // save the segment and remove quality entries
                         $segment->save();
                         $task->db->getAdapter()->query($qualitySql);
@@ -217,12 +218,14 @@ class Translate3967_TagsPairedByRidFixer extends FixScriptAbstract
             // create fixed markup
             $markupFixed = $this->fixSegmentField($fieldTags, $field);
             if (! empty($markupFixed)) {
-                if ($this->debug) {
+                if ($this->doReport) {
                     $this->log('FIXED SEGMENT ' . $segment->getId() . ":");
                     $this->log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
                     $this->log('  AFTER: ' . $this->debugSegmentMarkup($markupFixed) . "\n");
                 }
-                $segment->set($dataName, $markupFixed);
+                if ($this->doFix) {
+                    $segment->set($dataName, $markupFixed);
+                }
 
                 return 1;
             }
@@ -343,7 +346,7 @@ class Translate3967_TagsPairedByRidFixer extends FixScriptAbstract
                         $tagPair[1]->setTagIndex($repairIndex);
                         $changed = true;
 
-                        if ($this->debug) {
+                        if ($this->doReport) {
                             $after = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
                             $this->log(
                                 'FIXED internal tag paired by RID ' . $rid

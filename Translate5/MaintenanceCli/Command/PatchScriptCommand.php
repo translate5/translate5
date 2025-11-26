@@ -43,7 +43,7 @@ class PatchScriptCommand extends Translate5AbstractCommand
 {
     public const SCRIPTNAME = 'scriptname';
 
-    public const DEBUG = 'debug';
+    public const FIX = 'fix';
 
     protected static $defaultName = 'patch:script';
 
@@ -60,6 +60,7 @@ class PatchScriptCommand extends Translate5AbstractCommand
                 . ' The script is expected to be present in Translate5/fixscripts'
                 . ' and it is expected to contains a class matching the filename'
                 . ' extending Translate5\MaintenanceCli\FixScript\FixScriptAbstract.'
+                . ' Without options, the scripty will just report problems, one must use --fix to really fix.'
             );
 
         $this->addArgument(
@@ -69,10 +70,10 @@ class PatchScriptCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
-            self::DEBUG,
-            'd',
+            self::FIX,
+            'f',
             InputOption::VALUE_NONE,
-            'If set, the script will run in debug-mode (must be implemented in the script)'
+            'If set, the script will really fix stuff (must be implemented in the script)'
         );
     }
 
@@ -91,7 +92,7 @@ class PatchScriptCommand extends Translate5AbstractCommand
         $this->initTranslate5();
 
         $scriptName = $input->getArgument(self::SCRIPTNAME);
-        $doDebug = $input->getOption(self::DEBUG);
+        $doFix = $input->getOption(self::FIX);
         $scriptsDir = APPLICATION_ROOT . '/Translate5/MaintenanceCli/fixscripts';
 
         if (! empty($scriptName) && ! str_ends_with($scriptName, '.php')) {
@@ -114,11 +115,11 @@ class PatchScriptCommand extends Translate5AbstractCommand
             return self::FAILURE;
         }
 
-        $pretitle = $doDebug ? 'Debug' : 'Apply';
+        $pretitle = $doFix ? 'Apply' : 'Report';
         $this->writeTitle($pretitle . ' fix by calling script "' . $scriptName . '"');
         $this->io->newLine(1);
 
-        $this->executeScript($scriptPath, $doDebug);
+        $this->executeScript($scriptPath, $doFix);
 
         $this->io->newLine(2);
         $this->io->success('Script "' . $scriptName . '" executed.');
@@ -140,13 +141,13 @@ class PatchScriptCommand extends Translate5AbstractCommand
         return $files;
     }
 
-    private function executeScript(string $scriptPath, bool $debug): void
+    private function executeScript(string $scriptPath, bool $doFix): void
     {
         $className = pathinfo($scriptPath, PATHINFO_FILENAME);
 
         require_once $scriptPath;
 
-        $scriptInstance = ZfExtended_Factory::get($className, [$this->io, $debug]);
+        $scriptInstance = ZfExtended_Factory::get($className, [$this->io, $doFix]);
         /** @var FixScriptAbstract $scriptInstance */
 
         $scriptInstance->fix();

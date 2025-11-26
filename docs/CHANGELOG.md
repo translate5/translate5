@@ -14,7 +14,14 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+## [7.32.4] - 2025-11-19
 
+### Important Notes:
+
+
+### Bugfixes
+**[TRANSLATE-5135](https://jira.translate5.net/browse/TRANSLATE-5135): Sometimes the UI produces strange TrackChanges mark-up** <br>
+Sometimes the UI produces strange TrackChanges mark-up
 
 
 

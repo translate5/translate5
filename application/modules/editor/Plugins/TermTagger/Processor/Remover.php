@@ -28,12 +28,18 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\TermTagger\Processor;
 
+use editor_Models_ConfigException;
 use editor_Models_Db_SegmentQuality;
+use editor_Models_Task;
 use editor_Plugins_TermTagger_Tag;
 use editor_Segment_Processing;
 use editor_Segment_Tags;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Segment\AbstractProcessor;
+use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
+use ReflectionException;
+use Zend_Exception;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * Encapsulates the removal of the term-tags of groups of segment-tags
@@ -47,13 +53,16 @@ final class Remover extends AbstractProcessor
     /**
      * Special: The Termtagger-Worker will also be queued for import-workers, actually not having a terminology applied
      * This is because at that point of the import the terminology is not yet set
-     * This processor removes the term-tags from the segments if no terminology is set, what is not needed for an import obviously
-     * Also, removing the terminology does not utilize a service, so one processing worker using bigger batch-sizes is enough in any case
+     * This processor removes the term-tags from the segments if no terminology is set,
+     *  what is not needed for an import obviously
+     * Also, removing the terminology does not utilize a service, so one processing worker
+     *  using bigger batch-sizes is enough in any case
      */
     public function prepareWorkload(int $workerIndex): bool
     {
         if ($this->processingMode !== editor_Segment_Processing::IMPORT) {
-            // when terms are removed the qualities also need to be removed - this is done much more efficiently for the whole task
+            // when terms are removed the qualities also need to be removed - this is done
+            //  much more efficiently for the whole task
             $table = new editor_Models_Db_SegmentQuality();
             $table->removeByTaskGuidAndType($this->task->getTaskGuid(), editor_Plugins_TermTagger_Tag::TYPE);
 
@@ -63,36 +72,43 @@ final class Remover extends AbstractProcessor
         return false;
     }
 
-    public function getBatchSize(): int
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
+     */
+    public static function createLooperConfiguration(editor_Models_Task $task): LooperConfigurationDTO
     {
-        return $this->task->getConfig()->runtimeOptions->termTagger->removerBatchSize;
-    }
-
-    public function getLoopingPause(): int
-    {
-        return $this->task->getConfig()->runtimeOptions->termTagger->removerLoopingInterval;
+        return new LooperConfigurationDTO(
+            $task->getSegmentCount(),
+            $task->getConfig()->runtimeOptions->termTagger->removerBatchSize,
+            $task->getConfig()->runtimeOptions->termTagger->removerLoopingInterval,
+        );
     }
 
     /**
      * Processes a batch of segments
      * @param editor_Segment_Tags[] $segmentsTags
      */
-    public function processBatch(array $segmentsTags)
+    public function processBatch(array $segmentsTags): void
     {
         foreach ($segmentsTags as $segmentTags) {
-            $this->process($segmentTags, true);
+            $this->process($segmentTags);
         }
     }
 
     /**
      * Processes a single segment
      */
-    public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true)
+    public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true): void
     {
         if (count($segmentTags->getTagsByType(editor_Plugins_TermTagger_Tag::TYPE)) > 0) {
             $segmentTags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
             if ($saveTags) {
-                $segmentTags->save(false); // we do not save qualities as they are removed batch-wise in the quality provider using ::removeAllQualities
+                // we do not save qualities as they are removed batch-wise in
+                //  the quality provider using ::removeAllQualities
+                $segmentTags->save(false);
             }
         }
     }

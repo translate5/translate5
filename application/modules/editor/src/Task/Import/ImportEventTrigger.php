@@ -76,6 +76,8 @@ class ImportEventTrigger
 
     public const AFTER_IMPORT = 'afterImport';
 
+    public const string BEFORE_IMPORT_WORKER_RUN = 'afterImportWorkerRun';
+
     public const AFTER_IMPORT_ERROR = 'afterImportError';
 
     public const INIT_TASK_META = 'initTaskMeta';
@@ -93,12 +95,24 @@ class ImportEventTrigger
      * Using this proxy method for triggering the event to keep the legacy code bound to this class
      * instead to the new worker class
      */
-    public function triggerAfterImport(
+    public function triggerAfterImportWorkerRun(
         editor_Models_Task $task,
         int $parentWorkerId,
         editor_Models_Import_Configuration $importConfig
     ): void {
         $this->triggerEvent(self::AFTER_IMPORT, [
+            'task' => $task,
+            'parentWorkerId' => $parentWorkerId,
+            'importConfig' => $importConfig,
+        ]);
+    }
+
+    public function triggerBeforeImportWorkerRun(
+        editor_Models_Task $task,
+        int $parentWorkerId,
+        editor_Models_Import_Configuration $importConfig
+    ): void {
+        $this->triggerEvent(self::BEFORE_IMPORT_WORKER_RUN, [
             'task' => $task,
             'parentWorkerId' => $parentWorkerId,
             'importConfig' => $importConfig,

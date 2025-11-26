@@ -30,17 +30,12 @@ namespace MittagQI\Translate5\Segment;
 
 use editor_Models_Task;
 use editor_Segment_Tags;
+use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
 use MittagQI\Translate5\Service\AbstractHttpService;
 use ZfExtended_Exception;
 
 abstract class AbstractProcessor
 {
-    /**
-     * This prop can be used to adjust the batched/looped processing. If set, this time is slept between saving the processed segments and fetching unprocessed ones
-     * @var int: milliseconds
-     */
-    protected int $loopingPause = 100;
-
     protected editor_Models_Task $task;
 
     protected AbstractHttpService $service;
@@ -50,6 +45,8 @@ abstract class AbstractProcessor
     protected string $processingMode;
 
     protected bool $isWorkerContext;
+
+    private LooperConfigurationDTO $looperConfiguration;
 
     /**
      * @throws ZfExtended_Exception
@@ -66,6 +63,7 @@ abstract class AbstractProcessor
         $this->processingMode = $processingMode;
         $this->serviceUrl = $serviceUrl ?? $service->getServiceUrl();
         $this->isWorkerContext = $isWorkerContext;
+        $this->looperConfiguration = static::createLooperConfiguration($task);
     }
 
     /**
@@ -82,6 +80,12 @@ abstract class AbstractProcessor
     abstract public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true);
 
     /**
+     * creates a looper config for the concrete Processor
+     *  must be static since processor is hard to instance at all needed places
+     */
+    abstract public static function createLooperConfiguration(editor_Models_Task $task): LooperConfigurationDTO;
+
+    /**
      * Retrieves the ID of the bound service
      */
     public function getServiceId(): string
@@ -90,39 +94,17 @@ abstract class AbstractProcessor
     }
 
     /**
-     * Retrieves the url of the bound service, which is usually set as constructor-argument
-     */
-    public function getServiceUrl(): string
-    {
-        return $this->serviceUrl;
-    }
-
-    /**
-     * Retrieves the size of the batch we wish to process
-     */
-    public function getBatchSize(): int
-    {
-        return 1;
-    }
-
-    /**
-     * Adds slepping-time between caving the processed & fetching unprocessed segments in looped processing
-     */
-    public function getLoopingPause(): int
-    {
-        return $this->loopingPause;
-    }
-
-    /**
      * Special interceptor-API that can prevent a processing-worker to process
      * It will be called by every worker before starting the work
-     * This is meant for situations, where in the queuing phase of the workers conditions may are not yet set that affect, if a processing is neccessary or not
+     * This is meant for situations, where in the queuing phase of the workers conditions may are
+     *  not yet set that affect, if a processing is neccessary or not
      * Note, that the worker inited the processor before so dependencies are set
      */
     public function prepareWorkload(int $workerIndex): bool
     {
         // we dismiss the workload, if there are not enough segments to cover N x the batchsize
-        if ($workerIndex > 0 && (int) $this->task->getSegmentCount() < ($workerIndex + 1) * $this->getBatchSize()) {
+        if ($workerIndex > 0
+            && $this->task->getSegmentCount() < ($workerIndex + 1) * $this->looperConfiguration->batchSize) {
             return false;
         }
 

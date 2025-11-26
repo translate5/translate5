@@ -392,7 +392,8 @@ abstract class TagSequence implements JsonSerializable
     /* Rendering API */
 
     /**
-     * Renders the tag-sequence
+     * @throws \Zend_Exception
+     * @throws editor_Models_Segment_Exception
      */
     public function render(array $skippedTypes = null): string
     {
@@ -521,7 +522,7 @@ abstract class TagSequence implements JsonSerializable
                 $errorData['container'] = $container->toJson();
                 $errorData['tag'] = $tag->toJson();
 
-                $errorData = $this->logError('E1610', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
+                $errorData = $this->logError('E1610', 'Rendering the segment tags led to an invalid tag structure that could not be processed', $errorData);
 
                 throw new editor_Models_Segment_Exception('E1610', $errorData);
             }
@@ -557,15 +558,6 @@ abstract class TagSequence implements JsonSerializable
 
     /* Unparsing API */
 
-    /**
-     * Unparses Segment markup into FieldTags
-     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
-     * @throws \PHPHtmlParser\Exceptions\CircularException
-     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
-     * @throws \PHPHtmlParser\Exceptions\LogicalException
-     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
-     * @throws \PHPHtmlParser\Exceptions\StrictException
-     */
     public function unparse(string $html): void
     {
         // decompose html into a wrapping tag
