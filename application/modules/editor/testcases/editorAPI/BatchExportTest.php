@@ -75,6 +75,9 @@ class BatchExportTest extends JsonTestAbstract
 
         // calling the endpoint for the download in a loop (just like the frontend/popup does)
         $downloadGenerated = false;
+
+        //using a custom loop instead waitForWorker method, since we are dealing with delayed workers here.
+        // waitForWorker in conjunction with delayed workers will lead to 3 minutes delays what is too long for tests.
         for ($i = 1; $i <= 20; $i++) {
             $response = self::api()->get($statusUrl);
             $this->assertEquals(200, $response->getStatus());
