@@ -89,12 +89,9 @@ class QueryStringGuesser
             if (! isset($memoryTags[$rule])) {
                 $requestSource = $this->revertTags($requestSource, ...$requestRuleTags);
 
-                $skippedTags[] = array_merge(
-                    $skippedTags,
-                    array_map(
-                        fn ($tag) => $tag->content,
-                        array_column($requestRuleTags, 'tag')
-                    )
+                $skippedTags[] = array_map(
+                    fn ($tag) => $tag->content,
+                    array_column($requestRuleTags, 'tag')
                 );
 
                 continue;
@@ -136,12 +133,12 @@ class QueryStringGuesser
                 if (str_contains($memorySource, $reverted)) {
                     $requestSource = $this->revertTags($requestSource, $requestRuleTag);
 
-                    $skippedTags[] = $requestRuleTag['tag']->content;
+                    $skippedTags[] = [$requestRuleTag['tag']->content];
                 }
             }
         }
 
-        return [$requestSource, $skippedTags];
+        return [$requestSource, array_merge(...$skippedTags)];
     }
 
     private function revertTags(string $requestSource, array ...$tags): string
