@@ -30,35 +30,23 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory;
 
-use editor_Services_Connector_TagHandler_Abstract as TagHandler;
-use MittagQI\Translate5\LanguageResource\Adapter\TagsProcessing\TagHandlerFactory;
+use editor_Services_Connector_TagHandler_T5MemoryXliff as TagHandler;
 use Zend_Config;
 
 class TagHandlerProvider
 {
-    public function __construct(
-        private readonly TagHandlerFactory $tagHandlerFactory,
-    ) {
-    }
-
     public static function create(): self
     {
-        return new self(
-            TagHandlerFactory::create(),
-        );
+        return new self();
     }
 
     public function getTagHandler(int $sourceLang, int $targetLang, Zend_Config $config): TagHandler
     {
         $sendWhitespaceAsTag = (bool) $config->runtimeOptions->LanguageResources->t5memory?->sendWhitespaceAsTag;
-        $tagHandler = $this->tagHandlerFactory->createTagHandler(
-            't5memory',
-            $config,
-            [
-                'gTagPairing' => false,
-                TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $sendWhitespaceAsTag,
-            ],
-        );
+        $tagHandler = new TagHandler([
+            'gTagPairing' => false,
+            TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $sendWhitespaceAsTag,
+        ]);
         $tagHandler->setLanguages($sourceLang, $targetLang);
 
         return $tagHandler;

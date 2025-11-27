@@ -160,10 +160,10 @@ class FuzzySearchService
         $currentBestMatch = null;
 
         foreach ($iterator as $found) {
-            $target = $tagHandler->restoreInResult($found->target, false);
+            $target = $tagHandler->restoreInFuzzyResult($found->target, $found->skippedTags, false);
             $hasTargetErrors = $tagHandler->hasRestoreErrors();
 
-            $source = $tagHandler->restoreInResult($found->source);
+            $source = $tagHandler->restoreInFuzzyResult($found->source, $found->skippedTags);
             $hasSourceErrors = $tagHandler->hasRestoreErrors();
 
             $matchRate = $found->matchRate;
@@ -276,7 +276,7 @@ class FuzzySearchService
         bool $isInternalFuzzy,
         bool $hasSkippedTms,
     ): iterable {
-        $tunedQuery = $this->queryStringGuesser->filterExtraTags($query, $match->source);
+        [$tunedQuery, $skippedTags] = $this->queryStringGuesser->filterExtraTags($query, $match->source);
 
         if ($tunedQuery === $query) {
             return yield from [];
@@ -303,8 +303,9 @@ class FuzzySearchService
         foreach ($responses as $response) {
             foreach ($response->getMatches() as $found) {
                 if ($found->matchRate > $match->matchRate) {
+                    $found = $found->withSkippedTags($skippedTags);
                     // we mark it as not optimal here because some tms may be skipped in current lookup
-                    yield $hasSkippedTms ? $found->makeGuessed()->makeNotOptimal() : $found->makeGuessed();
+                    yield $hasSkippedTms ? $found->makeNotOptimal() : $found;
                 }
             }
         }
@@ -516,7 +517,7 @@ class FuzzySearchService
             }
         }
 
-        if ($found->guessed) {
+        if ($found->guessed()) {
             $item = new \stdClass();
             $item->name = 'Guessed';
             $item->value = 'Some content was unprotected to get a better match';
