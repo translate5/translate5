@@ -1,5 +1,10 @@
 Ext.define('TMMaintenance.mixin.ErrorMessage', {
     showServerError: function (error) {
+        if (error.status === 401) {
+            document.location.reload();
+            return;
+        }
+
         this.showGeneralError(this.getErrorMessage(error), this.getDialogTitle(error));
     },
 
