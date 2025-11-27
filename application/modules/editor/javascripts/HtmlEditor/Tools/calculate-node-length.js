@@ -7,8 +7,16 @@
 export default function calculateNodeLength(node) {
     let length = 0;
 
+    if (node.nodeType === Node.TEXT_NODE) {
+        return node.length;
+    }
+
+    if (node.tagName === 'IMG') {
+        return 1;
+    }
+
     for (const child of node.childNodes) {
-        // Simplifid check if node is an internal tag
+        // Simplified check if node is an internal tag
         if (child.tagName === 'IMG') {
             length += 1;
 
