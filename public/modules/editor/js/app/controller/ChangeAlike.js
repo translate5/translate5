@@ -519,9 +519,11 @@ Ext.define('Editor.controller.ChangeAlike', {
 
         for (let alikeId of alikes) {
             let segment = store.getById(alikeId);
-            segment.set('editable', false);
-            segment.set('autoStateId', Editor.data.segments.autoStates.EDITING_BY_USER);
-            segment.commit(false); //trigger render
+            if(segment) {
+                segment.set('editable', false);
+                segment.set('autoStateId', Editor.data.segments.autoStates.EDITING_BY_USER);
+                segment.commit(false); //trigger render
+            }
         }
 
         me.cleanUpAlikeSegments();
