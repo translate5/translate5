@@ -433,9 +433,9 @@ final class Helper extends ZfExtended_Test_ApiHelper
      * @param int $taskId : if given, this task is taken, otherwise the current task
      * @return array|stdClass
      */
-    public function setTaskToFinished(int $taskId = -1)
+    public function setTaskToFinished(int $taskId = -1, bool $failOnError = true)
     {
-        return $this->setTaskUserState($taskId, 'finished');
+        return $this->setTaskUserState($taskId, 'finished', $failOnError);
     }
 
     public function setTaskToError(int $taskId = -1)
@@ -457,7 +457,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
      * @param int $taskId : if given, this task is taken, otherwise the current task
      * @return array|stdClass
      */
-    private function setTaskUserState(int $taskId, string $userState)
+    private function setTaskUserState(int $taskId, string $userState, bool $failOnError = true)
     {
         if ($taskId < 1 && $this->task) {
             $taskId = $this->task->id;
@@ -466,7 +466,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
             return $this->putJson('editor/task/' . $taskId, [
                 'userState' => $userState,
                 'id' => $taskId,
-            ]);
+            ], expectedToFail: ! $failOnError);
         }
 
         return $this->createResponseResult(null, 'No Task to set state for');

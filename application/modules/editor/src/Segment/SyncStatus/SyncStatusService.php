@@ -127,8 +127,11 @@ class SyncStatusService
         if ($segments instanceof \Iterator && ! $segments->valid()) {
             return;
         }
-        $segmentIds = [];
+
         $task = $this->taskRepository->getByGuid($dto->taskGuid);
+        if (! $task->getLockLocked()) {
+            return;
+        }
 
         $toDraft = ($dto->autoStateId === editor_Models_Segment_AutoStates::DRAFT);
         // always true for drafts
@@ -136,11 +139,12 @@ class SyncStatusService
             || $task->getConfig()->runtimeOptions->segments?->userCanIgnoreTagValidation);
         $tagValidationFailed = false;
 
+        $segmentIds = [];
         /* @var $segment editor_Models_Segment */
         foreach ($segments as $segment) {
-            $isLockLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
-            if (! $isLockLocked
+            if (! $this->autoStates->isLocked((int) $segment->getAutoStateId())
                 && ! $this->autoStates->isBlocked((int) $segment->getAutoStateId())
+                && ! $segment->meta()->getLocked()
                 && $segment->isTargetTranslated()) {
                 if (! $userCanIgnoreTagValidation) {
                     $comparison = new editor_Segment_Internal_TagComparision(

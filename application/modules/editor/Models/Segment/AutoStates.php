@@ -600,4 +600,9 @@ class editor_Models_Segment_AutoStates
     {
         return $autoState === self::BLOCKED;
     }
+
+    public function isLocked(int $autoState): bool
+    {
+        return $autoState === self::LOCKED;
+    }
 }
