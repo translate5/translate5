@@ -58,7 +58,7 @@
         </trans-unit>
         <trans-unit id='U2VnbWVudCB3dXJkZSBhdWYgZGVyIFNlcnZlcnNlaXRlIGdlw6RuZGVydC48YnIvPjxiPlF1ZWxsdGV4dDo8L2I+PGJyLz57c291cmNlfTxici8+PGI+WmllbHRleHQ6PC9iPjxici8+e3RhcmdldH08YnIvPk3DtmNodGVuIFNpZSBkaWUgw4RuZGVydW5nZW4gYWt6ZXB0aWVyZW4/'>
             <source>Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:</b><br/>{source}<br/><b>Zieltext:</b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?</source>
-            <target>Segment was changed on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?</target>
+            <target>Current state of segment on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?</target>
         </trans-unit>
         <trans-unit id='U2VnbWVudCB3dXJkZSBhdWYgZGVyIFNlcnZlcnNlaXRlIGdlw6RuZGVydA=='>
             <source>Segment wurde auf der Serverseite geändert</source>

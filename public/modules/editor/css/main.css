@@ -88,7 +88,8 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 }
 
 .segment-tag-column div.term,
-.segment-tag-container div.term {
+.segment-tag-container div.term,
+.x-box-item div.term {
     display: inline;
 }
 
@@ -100,7 +101,8 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-container.x-form-display-field div.single,
 .segment-tag-container .x-autocontainer-innerCt div.open,
 .segment-tag-container .x-autocontainer-innerCt div.close,
-.segment-tag-container .x-autocontainer-innerCt div.single {
+.segment-tag-container .x-autocontainer-innerCt div.single,
+.x-box-item div.internal-tag {
     display: inline;
     background: #cfcfcfaa;
     border-radius: 4px;
@@ -111,7 +113,9 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-column div.x-grid-cell-inner del,
 .segment-tag-column div.x-grid-cell-inner img,
 .segment-tag-column div.x-grid-cell-inner div.internal-tag,
-.segment-tag-column div.x-grid-cell-inner div.internal-tag span {
+.segment-tag-column div.x-grid-cell-inner div.internal-tag span,
+.x-box-item div.internal-tag,
+.x-box-item div.internal-tag span {
     user-select: none;
 }
 
@@ -310,7 +314,8 @@ div.single + div {
 
 /* Term Tags, der folgende Code ist im HtmlEditor body css redundant vorhanden. Ebenso im Helper View_Helper_WorkflowNotifyHtmlMailSegmentList */
 .segment-tag-column div.x-grid-cell-inner div.term,
-.segment-tag-container div.term {
+.segment-tag-container div.term,
+.x-box-item div.term {
     background: transparent;
     border-bottom: 1px solid #0000ff;
 }
@@ -367,7 +372,8 @@ div.single + div {
 
 /* false positive term tags */
 .segment-tag-column div.x-grid-cell-inner div.term.t5qfalpos,
-.segment-tag-container div.term.t5qfalpos {
+.segment-tag-container div.term.t5qfalpos,
+.x-box-item div.term.t5qfalpos {
     background: transparent;
     border-bottom: 1px solid #8282FF;
 }
