@@ -304,6 +304,16 @@ class TrackChangesTest extends SegmentTagsTestAbstract
         $this->createTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
     }
 
+    public function testRealData11(): void
+    {
+        $segmentId = 766543;
+        // testing "real" segment content with a sequence of connected segment-tags
+        $markup = '手動モードでは、<del class="trackchanges ownttip deleted" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-06-24T12:29:51+02:00">レシプロ</del><ins class="trackchanges ownttip" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-06-24T12:29:51+02:00"><del class="trackchanges ownttip deleted" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-06-24T12:34:41+02:00">往復運動装置</del><ins class="trackchanges ownttip" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-06-24T12:34:41+02:00"><del class="trackchanges ownttip deleted" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-07-02T21:11:38+02:00">レシプロ</del><ins class="trackchanges ownttip" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-07-02T21:11:38+02:00"></ins></ins></ins><del class="trackchanges ownttip deleted" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-07-03T20:49:15+02:00">レシプロケーターケータ</del><ins class="trackchanges ownttip" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-07-03T20:49:15+02:00">レシプロケーター</ins>を手動で動かし、<del class="trackchanges ownttip deleted" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-07-05T03:10:09+02:00">コンベヤ</del><ins class="trackchanges ownttip" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-07-05T03:10:09+02:00">コンベヤー</ins>に吊り下げられた<del class="trackchanges ownttip deleted" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-06-30T13:45:21+02:00">ワーク</del><ins class="trackchanges ownttip" data-usertrackingid="" data-usercssnr="usernr" data-workflowstep="" data-timestamp="2025-06-30T13:45:21+02:00">被塗物</ins>を使って位置決めします。';
+        $textNoTC = '手動モードでは、レシプロケーターを手動で動かし、コンベヤーに吊り下げられた被塗物を使って位置決めします。';
+        $markupNoTC = '手動モードでは、レシプロケーターを手動で動かし、コンベヤーに吊り下げられた被塗物を使って位置決めします。';
+        $this->createTrackChangesTest($segmentId, $markup, $textNoTC, $markupNoTC);
+    }
+
     private function createReplacedTrackChangesTest(
         int $segmentId,
         string $markup,

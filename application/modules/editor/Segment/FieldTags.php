@@ -31,8 +31,6 @@ use MittagQI\Translate5\Segment\Tag\SegmentTagSequence;
 /**
  * Abstraction to bundle the segment's text and it's internal tags to an OOP accessible structure
  * The structure of the tags in this class is a simple sequence, any nesting / interleaving is covered with rendering / unparsing
- * @method editor_Segment_FieldTags cloneFiltered(array $includedTypes = null, bool $finalize = true)
- * @method editor_Segment_FieldTags cloneWithoutTrackChanges(array $includedTypes = null, bool $condenseBlanks = true)
  */
 class editor_Segment_FieldTags extends SegmentTagSequence
 {
