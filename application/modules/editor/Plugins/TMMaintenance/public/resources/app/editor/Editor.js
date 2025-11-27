@@ -1,7 +1,7 @@
 Ext.define('Ext.translate5.Editor', {
     extend: 'Ext.grid.CellEditor',
     xtype: 't5editor',
-
+    hideMode: 'offsets',
     editor: null,
     currentEditingRecord: null,
 
@@ -98,13 +98,14 @@ Ext.define('Ext.translate5.Editor', {
             }
         }
 
+        const locale = Ext.ComponentQuery.query('app-main')[0].getViewModel().data.uiLocale;
         new RichTextEditor.EditorWrapper(
             element,
             new TagsModeProvider(),
             true,
             true,
-            Editor.data.locale,
-            Ext.getStore('admin.Languages').getById(Editor.data.task.get('targetLang')).get('rfc5646'),
+            locale,
+            locale
         ).then((editor) => {
             this.editor = editor;
 

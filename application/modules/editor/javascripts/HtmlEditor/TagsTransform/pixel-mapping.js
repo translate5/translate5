@@ -15,7 +15,8 @@ export default class PixelMapping {
      * @return {int}
      */
     getPixelLengthFromTag(tagNode) {
-        if (!this.getPixelMappingSettings()
+        if (
+            !this.getPixelMappingSettings()
             || (this.font.sizeUnit !== PixelMapping.SIZE_UNIT_FOR_PIXEL_MAPPING)
         ) {
             return 0;
@@ -102,12 +103,20 @@ export default class PixelMapping {
     getPixelMappingForSegment() {
         const pixelMapping = this.getPixelMappingSettings();
 
+        if (!pixelMapping) {
+            return null;
+        }
+
         return pixelMapping[this.font.fontFamily][this.font.fontSize];
     }
 
     getPixelMappingSettings() {
         // TODO think how we will handle global settings
-        return Editor.data.task.get('pixelMapping');
+        if (typeof Editor.data.task !== 'undefined') {
+            return Editor.data.task.get('pixelMapping');
+        }
+
+        return null;
     }
 
     // region Helpers

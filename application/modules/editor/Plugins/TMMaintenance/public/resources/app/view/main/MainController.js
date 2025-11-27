@@ -74,6 +74,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 // Load locale file given by extjs
                 Ext.Loader.loadScriptsSync(['/editor/plugins/resources/TMMaintenance/locales/' + data.locale + '.js']);
 
+                data.uiLocale = data.locale;
                 me.getViewModel().setData(data);
 
                 const localeField = me.getView().down('[reference=locale]');
