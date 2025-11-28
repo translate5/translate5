@@ -526,6 +526,7 @@ BUILD=$patch
                 . '" application/modules/editor/PrivatePlugins library/ZfExtended ' . $sql . ' ' . $md,
             'git push',
         ];
-        return file_put_contents($releaseVersionFile,join(";\n", $cmds)) > 0;
+
+        return file_put_contents($releaseVersionFile, join(";\n", $cmds)) > 0;
     }
 }

@@ -92,20 +92,17 @@ class OkapiAddCommand extends Translate5AbstractCommand
             $this->io->warning('Plugin Okapi is disabled - the config changes are still applied!');
         }
 
-        if($detectVersions){
-
+        if ($detectVersions) {
             $addedUrls = $config->addJettyUrl($url);
 
-            if(empty($addedUrls)){
+            if (empty($addedUrls)) {
                 $this->io->error('No OKAPI versions detected behind ' . $url);
             } else {
-                foreach($addedUrls as $name => $url){
+                foreach ($addedUrls as $name => $url) {
                     $this->io->success('Added/Updated ' . $name . ' with ' . $url);
                 }
             }
-
         } else {
-
             $oldValue = $config->addServer($url, $name);
             if (empty($oldValue)) {
                 $this->io->success('Added ' . $name . ' with ' . $url);

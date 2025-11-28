@@ -154,7 +154,7 @@ class DevelopmentNewdbchangeCommand extends Translate5AbstractCommand
         if (empty($numbers)) {
             $next = '001';
         } else {
-            $next = str_pad(max($numbers) + 1, 3, '0', STR_PAD_LEFT);
+            $next = str_pad(strval(max($numbers) + 1), 3, '0', STR_PAD_LEFT);
         }
 
         return $next . '-' . $name;
