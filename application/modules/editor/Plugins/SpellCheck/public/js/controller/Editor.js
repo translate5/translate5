@@ -1179,11 +1179,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         let pointer = 0;
 
         function traverseNodes(node) {
-            if (node.nodeType === Node.TEXT_NODE) {
-                const isWithinNode = pointer <= position && pointer + node.length >= position;
+            if (node.nodeType === Node.TEXT_NODE || tagsConversion.isTag(node)) {
+                const nodeLength = RichTextEditor.calculateNodeLength(node);
+
+                const isWithinNode = pointer <= position && pointer + nodeLength >= position;
 
                 if (!isWithinNode) {
-                    pointer += node.length;
+                    pointer += nodeLength;
 
                     return null;
                 }

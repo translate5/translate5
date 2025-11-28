@@ -309,7 +309,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       return Editor.data.task.get('enableSourceEditing');
   },
   /**
-   * Startet das Speichern der Wiederholungen. Wird je nach Einstellung automatisch oder manuell getriggert.
+   * Starts saving the repetitions. Triggered automatically or manually, depending on the setting.
    */
   handleSaveChangeAlike: function() {
     var me = this,
@@ -428,7 +428,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     });
   },
   /**
-   * gibt ein Array mit den als Wiederholungen zu bearbeitenden SegmentIDs zurück
+   * returns an array with the segment IDs to be processed as repetitions
    * @return {Number[]}
    */
   getAlikesToProcess: function() {
@@ -513,6 +513,19 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikes = me.alikesToProcess;
 
     if (Editor.data.plugins.hasOwnProperty('FrontEndMessageBus')) {
+        me.cleanUpAlikeSegments();
+
+        const store = me.getStore('Segments');
+
+        for (let alikeId of alikes) {
+            let segment = store.getById(alikeId);
+            if(segment) {
+                segment.set('editable', false);
+                segment.set('autoStateId', Editor.data.segments.autoStates.EDITING_BY_USER);
+                segment.commit(false); //trigger render
+            }
+        }
+
         me.cleanUpAlikeSegments();
 
         Editor.MessageBox.addSuccess(Ext.String.format(me.messages.alikesScheduled, data.total));

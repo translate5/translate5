@@ -1896,6 +1896,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ LanguageResolver)
 /* harmony export */ });
 class LanguageResolver {
+    // list of supported languages by the editor
+    // @link https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/ui-language.html#list-of-available-professional-translations
     #supportedLocales = [
         "ar",
         "bn",
@@ -2269,7 +2271,8 @@ class PixelMapping {
      * @return {int}
      */
     getPixelLengthFromTag(tagNode) {
-        if (!this.getPixelMappingSettings()
+        if (
+            !this.getPixelMappingSettings()
             || (this.font.sizeUnit !== PixelMapping.SIZE_UNIT_FOR_PIXEL_MAPPING)
         ) {
             return 0;
@@ -2356,12 +2359,20 @@ class PixelMapping {
     getPixelMappingForSegment() {
         const pixelMapping = this.getPixelMappingSettings();
 
+        if (!pixelMapping) {
+            return null;
+        }
+
         return pixelMapping[this.font.fontFamily][this.font.fontSize];
     }
 
     getPixelMappingSettings() {
         // TODO think how we will handle global settings
-        return Editor.data.task.get('pixelMapping');
+        if (typeof Editor.data.task !== 'undefined') {
+            return Editor.data.task.get('pixelMapping');
+        }
+
+        return null;
     }
 
     // region Helpers
@@ -3583,8 +3594,16 @@ __webpack_require__.r(__webpack_exports__);
 function calculateNodeLength(node) {
     let length = 0;
 
+    if (node.nodeType === Node.TEXT_NODE) {
+        return node.length;
+    }
+
+    if (node.tagName === 'IMG') {
+        return 1;
+    }
+
     for (const child of node.childNodes) {
-        // Simplifid check if node is an internal tag
+        // Simplified check if node is an internal tag
         if (child.tagName === 'IMG') {
             length += 1;
 
@@ -3819,6 +3838,126 @@ function insertHtmlAt(htmlString, position, htmlToInsert) {
     }
 
     return dom.innerHTML;
+}
+
+
+/***/ }),
+
+/***/ "./Tools/split-node.js":
+/*!*****************************!*\
+  !*** ./Tools/split-node.js ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ splitNode)
+/* harmony export */ });
+/* harmony import */ var _calculate_node_length_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calculate-node-length.js */ "./Tools/calculate-node-length.js");
+
+
+
+
+/**
+ * @param {HTMLElement} node
+ * @param {int} offset
+ *
+ * @returns {Node[]}
+ */
+function splitNode(node, offset) {
+    if (node.nodeType === Node.TEXT_NODE) {
+        const left = node.cloneNode();
+        const right = node.cloneNode();
+
+        left.textContent = node.textContent.slice(0, offset);
+        right.textContent = node.textContent.slice(offset);
+
+        return [left, right];
+    }
+
+    const total = (0,_calculate_node_length_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node);
+    let remaining = Math.max(0, Math.min(offset, total)); // clamp [0..total]
+
+    const leftEl = node.cloneNode(false);
+    const rightEl = node.cloneNode(false);
+
+    for (const child of node.childNodes) {
+        if (remaining <= 0) {
+            rightEl.appendChild(child.cloneNode(true));
+
+            continue;
+        }
+
+        if (child.nodeType === Node.TEXT_NODE) {
+            const text = /** @type {Text} */ (child).data;
+            const length = text.length;
+
+            if (remaining >= length) {
+                leftEl.appendChild(child.cloneNode(true));
+                remaining -= length;
+            } else {
+                const leftText = document.createTextNode(text.slice(0, remaining));
+                const rightText = document.createTextNode(text.slice(remaining));
+
+                if (leftText.data.length > 0) {
+                    leftEl.appendChild(leftText);
+                }
+
+                if (rightText.data.length > 0) {
+                    rightEl.appendChild(rightText);
+                }
+
+                remaining = 0;
+            }
+
+            continue;
+        }
+
+        if (child.nodeType === Node.ELEMENT_NODE) {
+            const element = /** @type {Element} */ (child);
+
+            if (element.tagName.toLowerCase() === 'img') {
+                if (remaining >= 1) {
+                    leftEl.appendChild(element.cloneNode(true));
+                    remaining -= 1;
+                } else {
+                    rightEl.appendChild(element.cloneNode(true));
+                }
+
+                continue;
+            }
+
+            const length = (0,_calculate_node_length_js__WEBPACK_IMPORTED_MODULE_0__["default"])(element);
+
+            if (remaining >= length) {
+                leftEl.appendChild(element.cloneNode(true));
+                remaining -= length;
+            } else {
+                const [partLeft, partRight] = splitNode(element, remaining);
+
+                if (partLeft.childNodes.length > 0) {
+                    leftEl.appendChild(partLeft);
+                }
+
+                if (partRight.childNodes.length > 0) {
+                    rightEl.appendChild(partRight);
+                }
+
+                remaining = 0;
+            }
+
+            continue;
+        }
+
+        if (remaining > 0) {
+            leftEl.appendChild(child.cloneNode(true));
+        } else {
+            rightEl.appendChild(child.cloneNode(true));
+        }
+    }
+
+    return [leftEl, rightEl.childNodes.length > 0 ? rightEl : null];
 }
 
 
@@ -7574,6 +7713,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   escapeHtml: () => (/* reexport safe */ _Tools_escape_html__WEBPACK_IMPORTED_MODULE_4__["default"]),
 /* harmony export */   insertHtmlAt: () => (/* reexport safe */ _Tools_insert_into_html__WEBPACK_IMPORTED_MODULE_10__["default"]),
 /* harmony export */   nodesAreSame: () => (/* reexport safe */ _Tools_compare_html_nodes__WEBPACK_IMPORTED_MODULE_9__["default"]),
+/* harmony export */   splitNode: () => (/* reexport safe */ _Tools_split_node__WEBPACK_IMPORTED_MODULE_11__["default"]),
 /* harmony export */   stringToDom: () => (/* reexport safe */ _Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_3__["default"]),
 /* harmony export */   unescapeHtml: () => (/* reexport safe */ _Tools_unescape_html__WEBPACK_IMPORTED_MODULE_5__["default"]),
 /* harmony export */   unwrapHtmlNodeToText: () => (/* reexport safe */ _Tools_unwrap_html_node__WEBPACK_IMPORTED_MODULE_8__["default"])
@@ -7589,6 +7729,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Tools_unwrap_html_node__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../Tools/unwrap-html-node */ "./Tools/unwrap-html-node.js");
 /* harmony import */ var _Tools_compare_html_nodes__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../Tools/compare-html-nodes */ "./Tools/compare-html-nodes.js");
 /* harmony import */ var _Tools_insert_into_html__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../Tools/insert-into-html */ "./Tools/insert-into-html.js");
+/* harmony import */ var _Tools_split_node__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../Tools/split-node */ "./Tools/split-node.js");
+
 
 
 

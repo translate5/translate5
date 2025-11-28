@@ -37,6 +37,7 @@ use editor_Segment_TagCreator;
 use editor_Segment_TrackChanges_DeleteTag as DeleteTag;
 use editor_Segment_TrackChanges_InsertTag as InsertTag;
 use editor_Segment_TrackChanges_TrackChangesTag as TrackChangesTag;
+use MittagQI\Translate5\Segment\TrackChange\RemoveTrackChanges;
 use MittagQI\Translate5\Tag\TagSequence;
 use PHPHtmlParser\Dom\Node\HtmlNode;
 use stdClass;
@@ -322,7 +323,18 @@ class SegmentTagSequence extends TagSequence
      */
     public function cloneWithoutTrackChanges(array $includedTypes = null, bool $condenseBlanks = true): static
     {
-        $clonedTags = $this->cloneFiltered($includedTypes, false);
+        // Clean trackchanges with the new cleaner
+        $markup = $this->cloneFiltered($includedTypes, false)->render();
+        $remover = new RemoveTrackChanges();
+        $markup = $remover->remove($markup);
+        $clonedTags = $this->cloneFiltered();
+        $clonedTags->text = '';
+        $clonedTags->textLength = 0;
+        $clonedTags->tags = [];
+        $clonedTags->orderIndex = -1;
+        $clonedTags->capturedErrors = [];
+        $clonedTags->_setMarkup($markup);
+
         if ($clonedTags->hasNestedTrackChangesTags()) {
             $clonedTags->normalizeTrackChangesTags();
         }
@@ -511,6 +523,8 @@ class SegmentTagSequence extends TagSequence
     }
 
     /**
+     * @deprecated use \MittagQI\Translate5\Segment\TrackChange\RemoveTrackChanges class instead
+     *
      * Removes all TrackChanges tags, also deletes all contents of del-tags
      * Returns, if stuff was removed and the tags resorted/reordered
      */

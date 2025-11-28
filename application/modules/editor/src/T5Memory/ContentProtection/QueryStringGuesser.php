@@ -39,18 +39,29 @@ class QueryStringGuesser
         return new self();
     }
 
-    public function filterExtraTags(string $requestSource, string $memorySource): ?string
+    /**
+     * Filters tags from request source which are not present in memory source
+     *
+     * @return array{string, array<string>} returns the filtered source and the list of removed tags
+     */
+    public function filterExtraTags(string $requestSource, string $memorySource): array
     {
         $tagsInRequestCount = preg_match_all(T5NTag::fullTagRegex(), $requestSource, $requestMatches, PREG_SET_ORDER);
 
         if ($tagsInRequestCount === 0) {
-            return $requestSource;
+            return [$requestSource, []];
         }
 
-        $tagsInRequestCount = preg_match_all(T5NTag::fullTagRegex(), $memorySource, $memoryMatches, PREG_SET_ORDER);
+        $tagsInMemoryCount = preg_match_all(T5NTag::fullTagRegex(), $memorySource, $memoryMatches, PREG_SET_ORDER);
 
-        if ($tagsInRequestCount === 0) {
-            return preg_replace(T5NTag::fullTagRegex(), '$3', $requestSource);
+        if ($tagsInMemoryCount === 0) {
+            return [
+                preg_replace(T5NTag::fullTagRegex(), '$3', $requestSource),
+                array_map(
+                    fn ($match) => T5NTag::fromMatch($match)->content,
+                    $requestMatches,
+                ),
+            ];
         }
 
         $requestTags = [];
@@ -72,9 +83,16 @@ class QueryStringGuesser
             ];
         }
 
+        $skippedTags = [];
+
         foreach ($requestTags as $rule => $requestRuleTags) {
             if (! isset($memoryTags[$rule])) {
                 $requestSource = $this->revertTags($requestSource, ...$requestRuleTags);
+
+                $skippedTags[] = array_map(
+                    fn ($tag) => $tag->content,
+                    array_column($requestRuleTags, 'tag')
+                );
 
                 continue;
             }
@@ -114,11 +132,13 @@ class QueryStringGuesser
 
                 if (str_contains($memorySource, $reverted)) {
                     $requestSource = $this->revertTags($requestSource, $requestRuleTag);
+
+                    $skippedTags[] = [$requestRuleTag['tag']->content];
                 }
             }
         }
 
-        return $requestSource;
+        return [$requestSource, array_merge(...$skippedTags)];
     }
 
     private function revertTags(string $requestSource, array ...$tags): string

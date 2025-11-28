@@ -47,10 +47,6 @@ class T5MemoryDeleteTmCommand extends Translate5AbstractCommand
 
     protected static $defaultName = 't5memory:delete';
 
-    private const OPTION_TM_NAME = 'tmName';
-
-    private const ARGUMENT_UUID = 'uuid';
-
     protected function configure(): void
     {
         $this->setDescription('Reorganizes particular TM');

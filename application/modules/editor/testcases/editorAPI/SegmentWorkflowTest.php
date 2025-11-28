@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Workflow_Default as DefaultWorkflow;
+use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
 use MittagQI\Translate5\Test\Enums\TestUser;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
@@ -188,7 +189,7 @@ class SegmentWorkflowTest extends ImportTestAbstract
             $workflowStep
         );
 
-        //reloat the task and test the current workflow progress
+        //reload the task and test the current workflow progress
         $reloadProgresTask = static::api()->reloadTask();
 
         //check if the local segmentFinishCount is the same as the calculated one for the task
@@ -272,8 +273,120 @@ class SegmentWorkflowTest extends ImportTestAbstract
         );
     }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @depends testSecondReviewStep
+     */
+    public function testDraftUndraftSegment(): void
+    {
+        $segments = static::api()->getSegments();
+        $segToTest = $segments[0];
+
+        // set one segment to draft state
+        $this->updateSegmentStatus($segToTest->id, editor_Models_Segment_AutoStates::DRAFT);
+
+        // check that job can not be finished with segments in draft state
+        $json = static::api()->setTaskToFinished(failOnError: false);
+        $this->assertEquals('409', $json->status);
+        $this->assertEquals('E1751', $json->errorCode);
+
+        // finalize segment
+        $this->updateSegmentStatus($segToTest->id);
+
+        // verify that no segments are in draft state
+        $segments = static::api()->getSegments();
+        $drafts = array_filter($segments, function ($item) {
+            return (int) $item->autoStateId === editor_Models_Segment_AutoStates::DRAFT;
+        });
+        $this->assertEmpty($drafts);
+    }
+
+    /**
+     * checks set all segments to draft state and that job can not be finished with a segment in draft state
+     *
+     * @throws Zend_Http_Client_Exception
+     * @depends testDraftUndraftSegment
+     */
+    public function testSetAllSegmentsToDraftsAndTaskFinishError()
+    {
+        //static::api()->setTaskToEdit();
+        $segments = static::api()->getSegments();
+        $firstSegment = $segments[0];
+        // set all segments to draft state
+        $task = static::api()->getTask();
+        $this->updateSegmentStatus($firstSegment->id, editor_Models_Segment_AutoStates::DRAFT, (int) $task->id);
+        $this->waitForWorker(QueuedBatchUpdateWorker::class, $task);
+        // verify that all segments are in draft state
+
+        $segments = static::api()->getSegments();
+        $notDrafts = array_filter($segments, function ($item) {
+            return (int) $item->autoStateId !== editor_Models_Segment_AutoStates::DRAFT;
+        });
+        $this->assertEmpty($notDrafts);
+        // check that job can not be finished with segments in draft state
+        $json = static::api()->setTaskToFinished(failOnError: false);
+        $this->assertEquals('409', $json->status);
+        $this->assertEquals('E1751', $json->errorCode);
+    }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @depends testSetAllSegmentsToDraftsAndTaskFinishError
+     */
+    public function testFinalizeAllSegments()
+    {
+        $task = static::api()->reloadTask();
+        $this->assertEquals('edit', $task->userState);
+
+        $segments = static::api()->getSegments();
+        // finalize all segments one by one
+        foreach ($segments as $segment) {
+            $this->updateSegmentStatus($segment->id);
+        }
+
+        // finalize all at once doesn't work for some reason
+        //$this->updateSegmentStatus($segments[0]->id, editor_Models_Segment_AutoStates::PENDING, true);
+        //$this->waitForWorker(QueuedBatchUpdateWorker::class, $task);
+
+        /*WARN ZfExtended_NoAccessException: E9999 - In the meantime, the task was opened in read-only mode.
+        in core in phpstorm://open?file=/application/modules/editor/src/Workflow/Assert/WriteableWorkflowAssert.php&line=89
+        User: system (system user) ({00000000-0000-0000-0000-000000000000})
+
+        #0 in phpstorm://open?file=/application/modules/editor/src/Segment/Operation/UpdateSegmentOperation.php&line=106 MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert->assert('{f6dfc97b-2bb6-...', '{00000000-0000-...', Object(MittagQI\Translate5\Segment\Operation\DTO\ContextDto))
+        #1 in phpstorm://open?file=/application/modules/editor/src/Segment/SyncStatus/SyncStatusService.php&line=230 MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation->update(Object(editor_Models_Segment), Object(MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto), Object(MittagQI\Translate5\Segment\Operation\DTO\ContextDto), Object(MittagQI\Translate5\User\Model\User))
+        */
+
+        static::api()->setTaskToFinished(); // throws error if there are segments in draft state
+    }
+
     protected function assertSegment($expected, $actual): void
     {
         $this->assertEquals($expected, preg_replace('#data-tbxid="[0-9a-f-]{36}"#', 'data-tbxid="X"', $actual));
+    }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
+    private function updateSegmentStatus(
+        int $segmentId,
+        int $autoStateId = editor_Models_Segment_AutoStates::PENDING,
+        int $allSegmentsInTaskId = 0
+    ) {
+        if (! $allSegmentsInTaskId) {
+            static::api()->saveSegment($segmentId, additionalPutData: [
+                'autoStateId' => $autoStateId,
+            ]);
+
+            return;
+        }
+        $params = [
+            'filter' => '[]',
+            'qualities' => '',
+            'segmentId' => $segmentId,
+        ];
+        if ($autoStateId === editor_Models_Segment_AutoStates::DRAFT) {
+            $params['draft'] = 1;
+        }
+        static::api()->post('editor/taskid/' . $allSegmentsInTaskId . '/segment/syncstatus/batch', $params);
     }
 }

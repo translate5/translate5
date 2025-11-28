@@ -51,7 +51,7 @@ final class MatchDTO
         public readonly int $matchRate,
         public readonly int $fuzzyWords,
         public readonly int $fuzzyDiffs,
-        public readonly bool $guessed = false,
+        public readonly array $skippedTags = [],
         public readonly bool $possiblyNotOptimal = false,
     ) {
     }
@@ -80,7 +80,12 @@ final class MatchDTO
         );
     }
 
-    public function makeGuessed(): self
+    public function guessed(): bool
+    {
+        return ! empty($this->skippedTags);
+    }
+
+    public function withSkippedTags(array $tags): self
     {
         return new self(
             source: $this->source,
@@ -101,7 +106,7 @@ final class MatchDTO
             matchRate: $this->matchRate,
             fuzzyWords: $this->fuzzyWords,
             fuzzyDiffs: $this->fuzzyDiffs,
-            guessed: true,
+            skippedTags: $tags,
         );
     }
 
@@ -126,7 +131,7 @@ final class MatchDTO
             matchRate: $this->matchRate,
             fuzzyWords: $this->fuzzyWords,
             fuzzyDiffs: $this->fuzzyDiffs,
-            guessed: $this->guessed,
+            skippedTags: $this->skippedTags,
             possiblyNotOptimal: true,
         );
     }

@@ -99,7 +99,7 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        pcntl_signal(SIGUSR1, function() {
+        pcntl_signal(SIGUSR1, function () {
             error_log((string) new \Exception('WHERE AM I'));
         });
 

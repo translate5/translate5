@@ -14,6 +14,68 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+
+## [7.32.5] - 2025-11-27
+
+### Important Notes:
+#### [TRANSLATE-5141](https://jira.translate5.net/browse/TRANSLATE-5141)
+Don't call "docker pull" on update till we provide a solution! 
+MariaDB would be updated to 12.1 which is not compatible with translate5 at the moment!
+ 
+
+
+### Added
+**[TRANSLATE-4797](https://jira.translate5.net/browse/TRANSLATE-4797): Export - Add batch operation for task export "original format, translated/reviewed"** <br>
+7.32.5: Test fix related to worker problems
+7.30.2: Improved queueing of batch export workers
+7.30.0: Added batch operation for task export "original format, translated/reviewed"
+
+
+
+### Changed
+**[TRANSLATE-5141](https://jira.translate5.net/browse/TRANSLATE-5141): Docker Setup - Incompatible MariaDB update** <br>
+Don't call docker pull till we provide a solution! 
+MariaDB would be updated to 12.1 which is not compatible with translate5 at the moment! 
+
+**[TRANSLATE-5114](https://jira.translate5.net/browse/TRANSLATE-5114): t5memory - Improve fuzzy uplifting tag handling** <br>
+Improve fuzzy uplifting tag handling
+
+
+### Bugfixes
+**[TRANSLATE-5139](https://jira.translate5.net/browse/TRANSLATE-5139): Workflows - Workflow-action error for visualApprove workflow** <br>
+* Fix potentially wrong ClassName in Workflow-Configuration for Visual Workflow Actions
+
+**[TRANSLATE-5131](https://jira.translate5.net/browse/TRANSLATE-5131): InstantTranslate - Double encoding problem in InstantTranslate** <br>
+FIXED: ampersand and doublequote characters are not double-encoded anymore
+
+**[TRANSLATE-5129](https://jira.translate5.net/browse/TRANSLATE-5129): Repetition editor - Save and open next segment with repetition editor results in race condition** <br>
+Fix of race condition with confirmation window when using repetition editor
+
+**[TRANSLATE-5128](https://jira.translate5.net/browse/TRANSLATE-5128): InstantTranslate - Instant translate: customer dropdown wrongly evaluated on text translation** <br>
+Fixed problem where client dropdown in file translation will filter the resources also for text translation.
+
+**[TRANSLATE-5120](https://jira.translate5.net/browse/TRANSLATE-5120): MatchAnalysis & Pretranslation - Wrong tag handler used with Term Collection** <br>
+Set paired xliff tag handler for Term Collection usage
+
+**[TRANSLATE-5119](https://jira.translate5.net/browse/TRANSLATE-5119): InstantTranslate - pre-selected languages in InstantTranslate always alphabetical first** <br>
+Fix the problem where default instant translate pre-selected languages config was not evaluated correctly.
+
+**[TRANSLATE-5104](https://jira.translate5.net/browse/TRANSLATE-5104): Main back-end mechanisms (Worker, Logging, etc.) - There are more processing workers run than is actually needed for a task** <br>
+For small tasks to much termtagger workers were scheduled leading to follow up problems
+
+**[TRANSLATE-5100](https://jira.translate5.net/browse/TRANSLATE-5100): Editor general - Create tests for draft status** <br>
+7.32.5: Added tests for draft status
+
+**[TRANSLATE-5080](https://jira.translate5.net/browse/TRANSLATE-5080): TM Maintenance - error message in case of lost session in TM maintenance** <br>
+Redirect to login page on no auth error
+
+**[TRANSLATE-5062](https://jira.translate5.net/browse/TRANSLATE-5062): Editor general - Editor: drag & drop tag in open segment removes adjacent tag** <br>
+[🐞 Fix] Now dropping a tag between two other tags does not cause tag disappearing when moving tags with drag'n'drop
+
+**[TRANSLATE-4999](https://jira.translate5.net/browse/TRANSLATE-4999): TM Maintenance - segment editing faulty in TM maintenance** <br>
+[🐞 Fix] repaired editing segments in TM Maintenance
+
+
 ## [7.32.4] - 2025-11-19
 
 ### Important Notes:

@@ -80,8 +80,6 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
     private const OPTION_CLONED_NAME_PART = 'cloned_name_part';
 
-    private const OPTION_TM_NAME = 'tm-name';
-
     private const OPTION_CREATE_EMPTY = 'create-empty';
 
     private const OPTION_SOURCE_LANGUAGE = 'source-language';

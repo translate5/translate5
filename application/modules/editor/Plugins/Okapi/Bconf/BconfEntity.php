@@ -849,8 +849,7 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
             throw new ZfExtended_NoAccessException('You can not delete the system default bconf.');
         }
 
-        // @phpstan-ignore-next-line
-        $id = $this->row->id;
+        $id = (int) $this->row->id;
         $this->row->delete();
         $this->removeFiles($id);
         // DEBUG

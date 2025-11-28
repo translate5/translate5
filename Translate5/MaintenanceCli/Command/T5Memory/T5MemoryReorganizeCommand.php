@@ -51,8 +51,6 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
     protected static $defaultName = 't5memory:reorganize';
 
-    private const OPTION_TM_NAME = 'tmName';
-
     private const ARGUMENT_ID = 'id';
 
     private const OPTION_BATCH_SIZE = 'batchSize';

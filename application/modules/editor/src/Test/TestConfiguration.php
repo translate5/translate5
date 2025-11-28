@@ -84,6 +84,7 @@ final class TestConfiguration
         'runtimeOptions.server.name' => null,
         'runtimeOptions.server.protocol' => null,
         'runtimeOptions.errorCodesUrl' => null,
+        'runtimeOptions.worker.triggerType' => null, // to be able to test the different trigger-types
         'runtimeOptions.LanguageResources.moses.server' => null, // TODO FIXME: this should come from a proper ExternalService
         'runtimeOptions.LanguageResources.sdllanguagecloud.server' => null, // TODO FIXME: this should come from a proper ExternalService
         'runtimeOptions.LanguageResources.microsoft.apiUrl' => null, // TODO FIXME: this should come from a proper ExternalService

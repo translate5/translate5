@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+declare(strict_types=1);
+
 namespace MittagQI\Translate5\Plugins\Okapi;
 
 use editor_Plugins_Okapi_Init;
@@ -281,7 +283,7 @@ final class OkapiAdapter
     {
         $http = $this->service->createClient($this->projectUrl . '/outputFiles/' . $fileName);
         $response = $http->request('GET');
-        file_put_contents($targetFile, $this->processResponse($response));
+        file_put_contents((string) $targetFile, $this->processResponse($response));
     }
 
     /**
@@ -300,7 +302,7 @@ final class OkapiAdapter
             $fileName = $type . '/' . $fileName;
         }
         $http = $this->service->createClient($this->projectUrl . '/inputFiles/' . $fileName);
-        $http->setFileUpload($realFilePath, 'inputFile');
+        $http->setFileUpload((string) $realFilePath, 'inputFile');
         $response = $http->request('PUT');
         $this->processResponse($response);
     }

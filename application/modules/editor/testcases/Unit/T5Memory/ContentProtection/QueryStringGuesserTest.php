@@ -38,14 +38,26 @@ class QueryStringGuesserTest extends TestCase
     /**
      * @dataProvider cases
      */
-    public function test(string $requestSource, string $memorySource, string $expectedSource): void
-    {
+    public function test(
+        string $requestSource,
+        string $memorySource,
+        string $expectedSource,
+        array $expectedSkippedTags
+    ): void {
         $guesser = new QueryStringGuesser();
+
+        [$tunedQuery, $skippedTags] = $guesser->filterExtraTags($requestSource, $memorySource);
 
         self::assertSame(
             $expectedSource,
-            $guesser->filterExtraTags($requestSource, $memorySource),
+            $tunedQuery,
             'The filtered source does not match the expected source.'
+        );
+
+        self::assertEquals(
+            $expectedSkippedTags,
+            $skippedTags,
+            'The skipped tags do not match the expected skipped tags.'
         );
     }
 
@@ -55,30 +67,35 @@ class QueryStringGuesserTest extends TestCase
             'requestSource' => '<p>Test</p>',
             'memorySource' => '<p>Test</p>',
             'expectedSource' => '<p>Test</p>',
+            'expectedSkippedTags' => [],
         ];
 
         yield 'extra tags in request' => [
             'requestSource' => 'Eine <t5:n id="1" r="fghjkjhg" n="1"/>-kanalig',
             'memorySource' => 'Eine 1-kanalig',
             'expectedSource' => 'Eine 1-kanalig',
+            'expectedSkippedTags' => ['1'],
         ];
 
         yield 'different tags in request' => [
             'requestSource' => 'Eine <t5:n id="1" r="fghjkjhg" n="1"/>-kanalig und <t5:n id="2" r="rfipue3rifucbei" n="2025-10-14"/>',
             'memorySource' => 'Eine 1-kanalig und <t5:n id="2" r="rfipue3rifucbei" n="2025-10-14"/>',
             'expectedSource' => 'Eine 1-kanalig und <t5:n id="2" r="rfipue3rifucbei" n="2025-10-14"/>',
+            'expectedSkippedTags' => ['1'],
         ];
 
         yield 'string that can be translated to single and double smth' => [
             'requestSource' => 'Eine <t5:n id="1" r="fghjkjhg" n="1"/>-kanalig und <t5:n id="2" r="fghjkjhg" n="2"/>-kanalig und <t5:n id="3" r="fghjkjhg" n="3"/>-kanalig und <t5:n id="4" r="fghjkjhg" n="4"/>-kanalig die <t5:n id="5" r="rfipue3rifucbei" n="2025-10-14"/>',
             'memorySource' => 'Eine 1-kanalig und 2-kanalig und <t5:n id="1" r="fghjkjhg" n="3"/>-kanalig und <t5:n id="2" r="fghjkjhg" n="4"/>-kanalig die <t5:n id="3" r="rfipue3rifucbei" n="2023-10-09"/>',
             'expectedSource' => 'Eine 1-kanalig und 2-kanalig und <t5:n id="3" r="fghjkjhg" n="3"/>-kanalig und <t5:n id="4" r="fghjkjhg" n="4"/>-kanalig die <t5:n id="5" r="rfipue3rifucbei" n="2025-10-14"/>',
+            'expectedSkippedTags' => ['1', '2'],
         ];
 
         yield 'mixed numbers' => [
             'requestSource' => 'Eine <t5:n id="1" r="fghjkjhg" n="1"/>-kanalig und <t5:n id="2" r="fghjkjhg" n="3"/>-kanalig und <t5:n id="3" r="fghjkjhg" n="4"/>-kanalig die <t5:n id="4" r="rfipue3rifucbei" n="2025-10-14"/>',
             'memorySource' => 'Eine 1-kanalig und 2-kanalig und <t5:n id="1" r="fghjkjhg" n="3"/>-kanalig die <t5:n id="2" r="rfipue3rifucbei" n="2023-10-09"/>',
             'expectedSource' => 'Eine 1-kanalig und <t5:n id="2" r="fghjkjhg" n="3"/>-kanalig und <t5:n id="3" r="fghjkjhg" n="4"/>-kanalig die <t5:n id="4" r="rfipue3rifucbei" n="2025-10-14"/>',
+            'expectedSkippedTags' => ['1'],
         ];
     }
 }

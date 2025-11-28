@@ -11,6 +11,7 @@ Ext.define('TMMaintenance.view.main.MainModel', {
         hasMoreRecords: false,
         l10n: {},
         languages: {},
+        uiLocale: null,
         tms: {},
         totalAmount: false,
         loadingTotalAmount: false,

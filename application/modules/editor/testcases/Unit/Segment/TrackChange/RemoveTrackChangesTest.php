@@ -56,12 +56,14 @@ class RemoveTrackChangesTest extends TestCase
      */
     public function testRemoveWithTagSequence(string $text, string $expected): void
     {
-        $text = str_replace([
-            '<del>',
-            '<ins>',
-        ],[
-            '<del class="trackchanges ownttip deleted">',
-            '<ins class="trackchanges ownttip deleted">'],
+        $text = str_replace(
+            [
+                '<del>',
+                '<ins>',
+            ],
+            [
+                '<del class="trackchanges ownttip deleted">',
+                '<ins class="trackchanges ownttip deleted">'],
             $text
         );
 
@@ -69,7 +71,7 @@ class RemoveTrackChangesTest extends TestCase
         $cloneWithoutTrackChanges = $tagSequence->cloneWithoutTrackChanges([
             editor_Segment_Tag::TYPE_INTERNAL,
             editor_Segment_Tag::TYPE_ANY,
-            editor_Segment_Tag::TYPE_MQM
+            editor_Segment_Tag::TYPE_MQM,
         ]);
         self::assertSame($expected, $cloneWithoutTrackChanges->render());
     }
@@ -119,6 +121,11 @@ class RemoveTrackChangesTest extends TestCase
         yield 'real live problem' => [
             '<del>Away </del><del>NotHere</del><ins>Hello translate5 <del>ShouldBeDeleted</del></ins><ins>World</ins><del>away</del><del>removed</del>',
             'Hello translate5 World',
+        ];
+
+        yield 'real live problem with deeper nesting' => [
+            '手動モードでは、<del>レシプロ1</del><ins><del>往復運動装置</del><ins><del>レシプロ2</del><ins></ins></ins></ins><del>レシプロ3ケーターケータ</del><ins>レシプロケーター</ins>を手動で動かし、<del>コンベヤ</del><ins>コンベヤー</ins>に吊り下げられた<del>ワーク</del><ins>被塗物</ins>を使って位置決めします。',
+            '手動モードでは、レシプロケーターを手動で動かし、コンベヤーに吊り下げられた被塗物を使って位置決めします。',
         ];
     }
 }

@@ -34,11 +34,14 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 trait FilteringByNameTrait
 {
+    protected const string OPTION_TM_NAME = 'tmName';
+
+    protected const string ARGUMENT_UUID = 'uuid';
+
     abstract protected function getInput(): InputInterface;
 
     private function isFilteringByName(): bool
     {
-        // TODO move OPTION_TM_NAME constant here after migrating to PHP 8.2
         return ! empty($this->getInput()->getOption(self::OPTION_TM_NAME));
     }
 

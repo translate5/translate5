@@ -107,15 +107,17 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
                 $protectedContent = html_entity_decode($protectedContent);
 
                 if ($isSource) {
-                    if (! isset($numberTagMap[$tagProps['regex']][$tag])) {
-                        $numberTagMap[$tagProps['regex']][$tag] = new \SplQueue();
+                    if (! isset($numberTagMap[$tagProps['regex']][$tag]['ids'])) {
+                        $numberTagMap[$tagProps['regex']][$tag]['ids'] = new \SplQueue();
                     }
-                    $numberTagMap[$tagProps['regex']][$tag]->enqueue($currentId);
+                    $numberTagMap[$tagProps['regex']][$tag]['ids']->enqueue($currentId);
                 } else {
-                    $ids = $numberTagMap[$tagProps['regex']][$tag] ?? null;
+                    $ids = $numberTagMap[$tagProps['regex']][$tag]['ids'] ?? null;
 
                     $currentId = null !== $ids && ! $ids->isEmpty() ? $ids->dequeue() : $currentId;
                 }
+
+                $numberTagMap[$tagProps['regex']][$tag]['protectedContent'][$protectedContent][] = $currentId;
 
                 $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
 

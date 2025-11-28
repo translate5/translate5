@@ -9,6 +9,7 @@ import calculateNodeOffsets from "../Tools/calculate-node-offsets";
 import unwrapHtmlNodeToText from "../Tools/unwrap-html-node";
 import nodesAreSame from "../Tools/compare-html-nodes";
 import insertHtmlAt from "../Tools/insert-into-html";
+import splitNode from "../Tools/split-node";
 
 export {
     EditorWrapper,
@@ -22,4 +23,5 @@ export {
     unwrapHtmlNodeToText,
     nodesAreSame,
     insertHtmlAt,
+    splitNode,
 };

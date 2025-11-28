@@ -47,8 +47,6 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
 
     protected static $defaultName = 't5memory:list';
 
-    private const OPTION_TM_NAME = 'tmName';
-
     protected function configure(): void
     {
         $this->setDescription('Lists all translation memories in t5memory with statuses');

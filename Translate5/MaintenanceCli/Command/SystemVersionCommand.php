@@ -55,7 +55,7 @@ class SystemVersionCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        if($this->isPorcelain) {
+        if ($this->isPorcelain) {
             $output->write(ZfExtended_Utils::getAppVersion());
         } else {
             $this->io->success('Translate5 version: ' . ZfExtended_Utils::getAppVersion());

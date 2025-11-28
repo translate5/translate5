@@ -49,7 +49,9 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
     protected static $defaultName = 'filesystem:external:check';
 
     private int $idx = 0;
+
     private int $idToListContents;
+
     private ?DirectoryListing $toListContents = null;
 
     protected function configure()
@@ -129,11 +131,11 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
         if ($this->toListContents !== null) {
             $content = $this->toListContents->toArray();
             $this->io->section('Content found in chosen config: ');
-            if(empty($content)) {
+            if (empty($content)) {
                 $this->io->warning('No content in chosen config');
             } else {
                 foreach ($content as $dir) {
-                    $this->io->text('#'.$this->idToListContents.'#: '.$dir->path());
+                    $this->io->text('#' . $this->idToListContents . '#: ' . $dir->path());
                 }
             }
         }
@@ -159,7 +161,6 @@ class FilesystemExternalCheckCommand extends Translate5AbstractCommand
             if (($this->idx - 1) === $this->idToListContents) {
                 $this->toListContents = $filesystem->listContents('/');
             }
-
         } catch (FilesystemException|FilesystemOperationFailed $e) {
             $result = $e->getMessage();
             while ($e->getPrevious()) {

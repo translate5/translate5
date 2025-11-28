@@ -90,7 +90,7 @@ class TestCreateFaultySegmentCommand extends Translate5AbstractCommand
 
         // check if the segment already is faulty
         if ($tagCheckEnabled) {
-            $existingFaults = $qualityTable->fetchFiltered(null, $segment->getId(), \editor_Segment_Tag::TYPE_INTERNAL, false, \editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY);
+            $existingFaults = $qualityTable->fetchFiltered(null, (int) $segment->getId(), \editor_Segment_Tag::TYPE_INTERNAL, false, \editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY);
             if ($existingFaults->count() > 0) {
                 $this->io->warning('Segment ' . $segment->getId() . ' is already faulty.');
 
