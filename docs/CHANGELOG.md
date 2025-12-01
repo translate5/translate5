@@ -15,6 +15,40 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.32.6] - 2025-12-01
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4797](https://jira.translate5.net/browse/TRANSLATE-4797): Export - Add batch operation for task export "original format, translated/reviewed"** <br>
+7.32.6: Tests fixed
+7.32.5: Test fix related to worker problems
+7.30.2: Improved queueing of batch export workers
+7.30.0: Added batch operation for task export "original format, translated/reviewed"
+
+
+
+### Changed
+**[TRANSLATE-4099](https://jira.translate5.net/browse/TRANSLATE-4099): LanguageResources - Update DeepL SDK recurring issue** <br>
+Internal update of the DeepL SDK (Internal API)
+
+
+### Bugfixes
+**[TRANSLATE-5145](https://jira.translate5.net/browse/TRANSLATE-5145): Task Management - autoclose not triggered for unconfirmed tasks** <br>
+Include unconfirmed tasks in auto-close job evaluation.
+
+**[TRANSLATE-5144](https://jira.translate5.net/browse/TRANSLATE-5144): Repetition editor - Wrong repetition hash calculation** <br>
+Fix hash calculation of repetitions
+
+**[TRANSLATE-4579](https://jira.translate5.net/browse/TRANSLATE-4579): Main back-end mechanisms (Worker, Logging, etc.) - Worker queue is called frequently and chained** <br>
+7.32.6: small fix for tests
+7.32.2: set processdaemon as new default worker trigger
+7.21.3: Performance improvement for the workers, prevention of system overload when scheduling thousands of workers.
+
+
 ## [7.32.5] - 2025-11-27
 
 ### Important Notes:
