@@ -41,6 +41,11 @@ use ZfExtended_Models_User;
 
 class UserRepository
 {
+    public static function create(): UserRepository
+    {
+        return new self();
+    }
+
     /**
      * @return iterable<User>
      */

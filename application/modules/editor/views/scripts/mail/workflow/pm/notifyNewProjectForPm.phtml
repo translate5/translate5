@@ -56,6 +56,11 @@ $message = 'Im Projektportal {portalLink} wurde ein neues {projectType} erstellt
 <strong>Project ID:</strong> {projectId} <br />
 <strong>Project Name:</strong> {projectName}';
 
+if(!empty($this->showTaskDescription)){
+    $data['taskDescription'] = $this->project->getDescription();
+    $message .= '<br /> <strong>'.$this->translate->_('Projektbeschreibung').':</strong> {taskDescription}';
+}
+
 if ($this->createdByUser) {
     $data['createdByUser'] = $this->createdByUser;
     $message .= ' <br />

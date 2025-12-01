@@ -26,7 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\CustomFields\FieldFilter;
 use MittagQI\Translate5\Workflow\NextStepCalculator;
 
 /**
@@ -530,7 +529,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
             'project' => $project = $this->config->task,
             'user' => (array) $user->getDataObject(),
             'createdByUser' => $this->config->createdByUser,
-            'taskCustomFields' => $this->getHumanRevisionCustomFields($project, $user),
         ]);
 
         // Get trigger config
@@ -550,7 +548,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     /**
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */
-    public function notifyNewTaskForPm()
+    public function notifyNewTaskForPm(): void
     {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
@@ -890,51 +888,5 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
         }
 
         return (bool) $config->runtimeOptions->workflow->disableNotifications;
-    }
-
-    /**
-     * Get task custom fields which where available in human revision popup. This is workaround until we implement
-     * separate template for human revision.
-     * TODO: move this to separate human revision template
-     * @throws Zend_Exception
-     */
-    private function getHumanRevisionCustomFields(editor_Models_Task $task, ZfExtended_Models_User $user): array
-    {
-        $reduced = [];
-
-        try {
-            $customFieldModel = new MittagQI\Translate5\Task\CustomFields\Field();
-            $customFieldFilter = FieldFilter::create();
-            $allowedCustomFields = $customFieldFilter->getAllowedCustomFieldsByUserRoles($customFieldModel, $user->getRoles());
-            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-
-            foreach ($allowedCustomFields as $customField) {
-                $value = $task->{'getCustomField' . $customField['id']}();
-
-                // special case. For booleans we need to convert this to human understandable "flags"
-                if ($customField['type'] == 'checkbox') {
-                    $value = $value === '1' ? $translate->_('Ja') : $translate->_('Nein');
-                }
-
-                if ($customField['type'] == 'combobox' && ! empty($customField['comboboxData'])) {
-                    try {
-                        $jsonDecoded = json_decode($customField['comboboxData'], true);
-                        $value = $customFieldModel->localizeLabel(json_encode($jsonDecoded[$value]), '', $user->getLocale());
-                    } catch (Exception $e) {
-                        // fallback in case something is wrong with json translation. You never know..
-                        $value = $task->{'getCustomField' . $customField['id']}();
-                    }
-                }
-
-                $reduced[] = [
-                    'label' => $customFieldModel->localizeLabel($customField['label'], '', $user->getLocale()),
-                    'value' => $value,
-                ];
-            }
-        } catch (Zend_Acl_Exception $e) {
-            $reduced = [];
-        }
-
-        return $reduced;
     }
 }
