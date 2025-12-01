@@ -420,7 +420,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         }
 
         // we use our visual representation like "</6>" as key to compare tags
-        if ($this->shortTag != null) {
+        if (! $this->isNumber() && $this->shortTag != null) {
             return Markup::unescapeAllQuotes($this->shortTag->getText());
         }
 

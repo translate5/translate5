@@ -128,5 +128,11 @@ class RepetitionHashTest extends TestCase
             'Press the <div class="single 69742069643d2233222063747970653d22782d622220706f733d226f70656e223e266c743b622667743b3c2f6974 internal-tag ownttip"><span class="short" title="&lt;it id=&quot;3&quot; ctype=&quot;x-b&quot; pos=&quot;open&quot;&gt;&amp;lt;b&amp;gt;&lt;/it&gt;">&lt;1/&gt;</span><span class="full" data-originalid="3" data-length="-1">&lt;it id="3" ctype="x-b" pos="open"&gt;&amp;lt;b&amp;gt;&lt;/it&gt;</span></div> button.',
             false,
         ];
+
+        yield 'different CP rules' => [
+            '<div class="single 6e756d62657220747970653d22666c6f617422206e616d653d2264656661756c742067656e65726963207769746820636f6d6d612220736f757263653d22382c35222069736f3d22382e3522207461726765743d22382e35222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a476b4961366c7247316f444a6d42547447674e4e4853436c71616d684552326a70324e745a61385943394b716f716c5a41364a71596a513139557342222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt; CP: default generic with comma">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="3" data-source="8,5" data-target="8.5"></span></div> Test',
+            '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d222b35222069736f3d222b3522207461726765743d222b35222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt; CP: default simple">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="+5" data-target="+5"></span></div> Test',
+            false,
+        ];
     }
 }

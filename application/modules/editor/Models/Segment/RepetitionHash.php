@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\DTO\ProtectedContentTagData;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
@@ -171,7 +172,10 @@ class editor_Models_Segment_RepetitionHash
             }
 
             if (in_array($match[3], $this->protectedContentTagList)) {
-                return '<internal-cp-tag>';
+                $numberTag = \editor_Models_Segment_InternalTag::decodeTagContent($match);
+                $matchProtectedData = ProtectedContentTagData::fromTag($numberTag);
+
+                return sprintf('<internal-cp-tag-%s>', $matchProtectedData->uniqueKey());
             }
 
             if (preg_match(Placeable::DETECTION_REGEX, $match[0])) {

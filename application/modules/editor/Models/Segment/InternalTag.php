@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\DTO\ProtectedContentTagData;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\ZfExtended\Tools\Markup;
@@ -264,6 +265,29 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         return strpos($match[3], self::IGNORE_ID_PREFIX) === 0 && strpos($match[0], self::IGNORE_CLASS) !== false;
     }
 
+    public static function decodeTagContent(array $match): string
+    {
+        $id = $match[3];
+        $data = $match[2];
+
+        //restore packed data
+        $result = pack('H*', $data);
+
+        //if single-tag is regex-tag no <> encapsulation is needed
+        if ($id === self::TYPE_REGEX) {
+            return $result;
+        }
+
+        //the following search and replace is needed for TRANSLATE-464
+        //backwards compatibility of already imported tasks
+        $search = ['hardReturn /', 'softReturn /', 'macReturn /'];
+        $replace = ['hardReturn/', 'softReturn/', 'macReturn/'];
+        $result = str_replace($search, $replace, $result);
+
+        //the original data is without <>
+        return '<' . $result . '>';
+    }
+
     /**
      * restores the original escaped tag
      * @param array $tagsToRestore optional, if not empty - only provided tags list will be rostored
@@ -274,7 +298,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         string $segment,
         $tagsToRestore = [],
         &$highestTagNr = 0,
-        array &$shortcutNumberMap = []
+        array &$shortcutNumberMap = [],
     ): string {
         return $this->replace($segment, function ($match) use ($tagsToRestore, &$highestTagNr, &$shortcutNumberMap) {
             $id = $match[3];
@@ -293,23 +317,12 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                 return $match[0];
             }
 
-            $data = $match[2];
-            //restore packed data
-            $result = pack('H*', $data);
+            $result = self::decodeTagContent($match);
 
             //if single-tag is regex-tag no <> encapsulation is needed
             if ($id === self::TYPE_REGEX) {
                 return $result;
             }
-
-            //the following search and replace is needed for TRANSLATE-464
-            //backwards compatibility of already imported tasks
-            $search = ['hardReturn /', 'softReturn /', 'macReturn /'];
-            $replace = ['hardReturn/', 'softReturn/', 'macReturn/'];
-            $result = str_replace($search, $replace, $result);
-
-            //the original data is without <>
-            $result = '<' . $result . '>';
 
             $shortcutNumberMapKey = $result;
 
@@ -341,7 +354,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $removeOther = true,
         &$replaceMap = null,
         &$newid = 1,
-        array $dontRemoveTags = []
+        array $dontRemoveTags = [],
     ) {
         //xliff 1.2 needs an id for bpt/bx and ept/ex tags.
         // matching of bpt/bx and ept/ex is done by separate rid, which is filled with the original ID
@@ -647,7 +660,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $removeOther = true,
         &$replaceMap = null,
         &$newid = 1,
-        array $dontRemoveTags = []
+        array $dontRemoveTags = [],
     ) {
         $result = $this->toXliff($segment, $removeOther, $replaceMap, $newid, $dontRemoveTags);
         $xml = ZfExtended_Factory::get('editor_Models_Converter_XmlPairer');
@@ -779,7 +792,8 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
     /**
      * When using TMs it can happen, that the TM result contains more tags as we can use in the segment.
-     * For visual reasons in the GUI we have to add them as "additional tags", but such tags may not be saved to the DB then.
+     * For visual reasons in the GUI we have to add them as "additional tags", but such tags may not be saved to the DB
+     * then.
      * @return string the generated tag as string
      */
     public function makeAdditionalHtmlTag(int $shortTag, string $type = 'single'): string
@@ -859,7 +873,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         string $segmentContent,
         callable $updateField,
         bool $ignoreWhitespace = true,
-        bool $callBackOnNotEqualTags = false
+        bool $callBackOnNotEqualTags = false,
     ): bool {
         $trackChangeTagHelper = new editor_Models_Segment_TrackChangeTag();
         $segmentContent = $trackChangeTagHelper->protect($segmentContent);
@@ -960,15 +974,24 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                         return $match[0];
                     }
 
-                    $processedTagsCount++;
-
-                    // if same tag hash is used, we can use the original tag
+                    // if same rule used, we count the tag as processed
                     if (
-                        in_array($match[3], $this->protectedContentTagList)
-                        && $match[2] === $originalMatch[2]
+                        in_array($match[3], $this->protectedContentTagList, true)
                         && $shortTagNumber === $this->getTagNumber($originalMatch[0])
                     ) {
-                        return $match[0];
+                        $matchNumberTag = self::decodeTagContent($match);
+                        $originalNumberTag = self::decodeTagContent($originalMatch);
+
+                        $matchProtectedData = ProtectedContentTagData::fromTag($matchNumberTag);
+                        $originalProtectedData = ProtectedContentTagData::fromTag($originalNumberTag);
+
+                        if ($matchProtectedData->uniqueKey() === $originalProtectedData->uniqueKey()) {
+                            $processedTagsCount++;
+                        }
+                    }
+
+                    if (! in_array($match[3], $this->protectedContentTagList, true)) {
+                        $processedTagsCount++;
                     }
 
                     return $originalMatch[0];
