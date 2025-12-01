@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "905509364d7236a10c50063bd5f6ce03",
+    "content-hash": "e7aed9d900fba4debd3cd0308ea48982",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -326,16 +326,16 @@
         },
         {
             "name": "deeplcom/deepl-php",
-            "version": "v1.10.0",
+            "version": "v1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DeepLcom/deepl-php.git",
-                "reference": "a0957084135e92b3813971a893b305a5fed4e73d"
+                "reference": "9919364b390ee0be75979fa242fba1a903a28dfc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/a0957084135e92b3813971a893b305a5fed4e73d",
-                "reference": "a0957084135e92b3813971a893b305a5fed4e73d",
+                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/9919364b390ee0be75979fa242fba1a903a28dfc",
+                "reference": "9919364b390ee0be75979fa242fba1a903a28dfc",
                 "shasum": ""
             },
             "require": {
@@ -383,9 +383,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DeepLcom/deepl-php/issues",
-                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.10.0"
+                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.14.0"
             },
-            "time": "2024-11-15T11:24:00+00:00"
+            "time": "2025-11-10T19:59:35+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -9870,14 +9870,14 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "shardj/zf1-future": 20,
-        "querypath/querypath": 20,
         "dream-group/horde-text-diff": 20,
-        "translate5/rangy-lib": 20,
-        "translate5/php-html-parser": 20,
-        "wilsonglasser/spout": 20,
+        "mittagqi/restful-zend-framework": 20,
+        "querypath/querypath": 20,
         "select2/select2": 5,
-        "mittagqi/restful-zend-framework": 20
+        "shardj/zf1-future": 20,
+        "translate5/php-html-parser": 20,
+        "translate5/rangy-lib": 20,
+        "wilsonglasser/spout": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -9909,7 +9909,7 @@
         "ext-bcmath": "*",
         "ext-xsl": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.3.23"
     },
