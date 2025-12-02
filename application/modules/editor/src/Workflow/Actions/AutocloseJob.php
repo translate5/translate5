@@ -100,6 +100,7 @@ class AutocloseJob extends editor_Workflow_Actions_Abstract
             ], 't.taskGuid = tua.taskGuid', [])
             ->where('t.state IN(?)', [
                 editor_Models_Task::STATE_OPEN,
+                editor_Models_Task::STATE_UNCONFIRMED,
             ])
             ->where('tua.state NOT IN (?)', [
                 editor_Workflow_Default::STATE_AUTO_FINISH,

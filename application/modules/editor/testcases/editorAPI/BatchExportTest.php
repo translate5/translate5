@@ -91,5 +91,42 @@ class BatchExportTest extends JsonTestAbstract
         }
         self::assertTrue($downloadGenerated);
 
+        $downloadUrl = preg_replace('/status$/', 'download', $statusUrl);
+        $response = self::api()->get($downloadUrl);
+        $this->assertEquals(200, $response->getStatus());
+
+        $filesInZip = $this->listZipFilesFromBinary($response->getBody());
+        $this->assertEquals(2, count($filesInZip));
+        foreach ($filesInZip as $filename => $size) {
+            $this->assertStringEndsWith('.zip', $filename, "Bad filename: $filename");
+            $this->assertGreaterThan(0, $size, "Bad size for $filename");
+        }
+    }
+
+    /**
+     * Returns a list of files inside a ZIP archive given its binary data.
+     *
+     * @param string $zipBinary Binary ZIP content (e.g. from $response->getBody()).
+     * @return array List of file names contained in the ZIP.
+     */
+    private function listZipFilesFromBinary(string $zipBinary): array
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'zip_');
+        if (false === $tmp) {
+            return [];
+        }
+        file_put_contents($tmp, $zipBinary);
+        $zip = new ZipArchive();
+        $files = [];
+        if ($zip->open($tmp) === true) {
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $file = $zip->statIndex($i);
+                $files[$file['name']] = $file['size'];
+            }
+            $zip->close();
+        }
+        unlink($tmp);
+
+        return $files;
     }
 }
