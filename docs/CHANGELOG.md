@@ -16,6 +16,18 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.32.7] - 2025-12-02
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5147](https://jira.translate5.net/browse/TRANSLATE-5147): Editor general - Tags can not be selected anymore** <br>
+[🐞 Fix] Fixed error wich caused tags to be not selectable in segment grid
+
+
 ## [7.32.6] - 2025-12-01
 
 ### Important Notes:
