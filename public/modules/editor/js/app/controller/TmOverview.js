@@ -859,7 +859,11 @@ Ext.define('Editor.controller.TmOverview', {
             fn: function (button) {
                 if (button === "yes") {
                     if (isDelete === false) {
-                        me.editLangaugeResource(true);
+                        if (response.retry) {
+                            response.retry(true);
+                        } else {
+                            me.editLangaugeResource(true);
+                        }
                         return true
                     }
 
