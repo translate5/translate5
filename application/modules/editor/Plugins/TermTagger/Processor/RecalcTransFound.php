@@ -46,6 +46,10 @@ use ZfExtended_Factory;
  */
 class RecalcTransFound
 {
+    private const string TERMS_BYCLASS_REGEX = '/(<div[^>]*class=")([^"]*term[^"]*)("[^>]*>)/';
+
+    private const string TERMS_BYTBXID_REGEX = '~<div[^>]*data-tbxid="@srcId@"[^>]*>~';
+
     protected editor_Models_Task $task;
 
     protected editor_Models_Terminology_Models_TermModel $termModel;
@@ -399,7 +403,7 @@ class RecalcTransFound
         $strip = ['transFound', 'transNotFound', 'transNotDefined'];
 
         // Strip statuses
-        return preg_replace_callback('/(<div[^>]*class=")([^"]*term[^"]*)("[^>]*>)/', function ($matches) use ($strip) {
+        return preg_replace_callback(self::TERMS_BYCLASS_REGEX, function ($matches) use ($strip) {
             // Get array of found classes
             $classesFound = explode(' ', $matches[2]);
 
@@ -414,11 +418,11 @@ class RecalcTransFound
     protected function insertMark(string $source, string $srcId, array $values): string
     {
         // Tag regular expression and replacements counter
-        $rex = '~<div[^>]*data-tbxid="' . $srcId . '"[^>]*>~';
+        $regEx = str_replace('@srcId@', $srcId, self::TERMS_BYTBXID_REGEX);
         $idx = 0;
 
         // For each occurrence inject the value according occurrence index
-        return preg_replace_callback($rex, function ($matches) use ($srcId, &$idx, $values) {
+        return preg_replace_callback($regEx, function ($matches) use ($srcId, &$idx, $values) {
             // Replacement
             $replace = $matches[0];
 
@@ -464,7 +468,7 @@ class RecalcTransFound
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
         // Array of [oldTbxId => newTbxId] pairs
-        $spoof = [];
+        $oldToNewTbx = [];
 
         // Arrays to indicate termEntries having at least one term used in source/target
         $used = [
@@ -513,9 +517,9 @@ class RecalcTransFound
                         // If yes - mark it as used instead of current term
                         foreach ($unusedTarget as $termEntryId_now => $termA) {
                             if (is_int($idx_now = $termA[$term['term']] ?? false)) {
-                                $oldTbxId = $this->termsByEntry[$termEntryId_was][$idx_was]['termTbxId'];
-                                $newTbxId = $this->termsByEntry[$termEntryId_now][$idx_now]['termTbxId'];
-                                $spoof[$oldTbxId] = $newTbxId;
+                                $oldTbxId = (string) $this->termsByEntry[$termEntryId_was][$idx_was]['termTbxId'];
+                                $newTbxId = (string) $this->termsByEntry[$termEntryId_now][$idx_now]['termTbxId'];
+                                $oldToNewTbx[$oldTbxId] = $newTbxId;
 
                                 break;
                             }
@@ -526,29 +530,44 @@ class RecalcTransFound
         }
 
         // If nothing to be spoofed - return
-        if (! count($spoof)) {
+        if (! count($oldToNewTbx)) {
             return;
         }
 
-        // Shortcuts
-        $oldTbxIdA = array_keys($spoof);
-        $newTbxIdA = array_values($spoof);
+        // Replace old/new tbx-ids in segment target
+        foreach ($oldToNewTbx as $oldTbxId => $newTbxId) {
+            $target = $this->replaceTbxIdInMarkup($oldTbxId, $newTbxId, $target);
+        }
 
-        // Replace in segment target
-        $target = str_replace($oldTbxIdA, $newTbxIdA, $target);
+        // Shortcuts
+        $oldTbxIds = array_keys($oldToNewTbx);
+        $newTbxIds = array_values($oldToNewTbx);
 
         // Replace in $tbxIdA
-        array_walk($tbxIdA, fn (&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId);
+        array_walk($tbxIdA, fn (&$tbxId) => $tbxId = $oldToNewTbx[$tbxId] ?? $tbxId);
 
         // Replace in $this->trgIdA
-        array_walk($this->trgIdA, fn (&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId);
+        array_walk($this->trgIdA, fn (&$tbxId) => $tbxId = $oldToNewTbx[$tbxId] ?? $tbxId);
 
         // Unset term data for old tbx ids
-        foreach ($oldTbxIdA as $oldTbxId) {
+        foreach ($oldTbxIds as $oldTbxId) {
             unset($this->exists[$oldTbxId]);
         }
 
         // Append term data for new tbx ids
-        $this->exists += $db->query(sprintf($existsSql, join("','", $newTbxIdA)))->fetchAll(PDO::FETCH_UNIQUE);
+        $this->exists += $db->query(sprintf($existsSql, join("','", $newTbxIds)))->fetchAll(PDO::FETCH_UNIQUE);
+    }
+
+    /**
+     * Exchanges a tbx-id in a markup-string
+     */
+    private function replaceTbxIdInMarkup(string $oldTbxId, string $newTbxId, string $markup): string
+    {
+        // FIXME unescaped $oldTbxId values containing regex delimiters/meta characters will break the pattern and trigger a preg_replace_callback TypeError; escape or avoid regex usage here.
+        $regEx = str_replace('@srcId@', $oldTbxId, self::TERMS_BYTBXID_REGEX);
+
+        return preg_replace_callback($regEx, function ($matches) use ($oldTbxId, $newTbxId) {
+            return str_replace('data-tbxid="' . $oldTbxId . '"', 'data-tbxid="' . $newTbxId . '"', (string) $matches[0]);
+        }, $markup);
     }
 }

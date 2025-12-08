@@ -509,7 +509,7 @@ final class Tagger extends AbstractProcessor
             foreach ($tags->getTargets() as $target) {
                 $targetText = $target->render($typesToExclude);
                 $serviceData->addSegment(
-                    $target->getSegmentId(),
+                    (string) $target->getSegmentId(),
                     $target->getTermtaggerName(),
                     $sourceText,
                     $targetText
@@ -521,7 +521,7 @@ final class Tagger extends AbstractProcessor
             if ($tags->hasOriginalSource()) {
                 $sourceOriginal = $tags->getOriginalSource();
                 $serviceData->addSegment(
-                    $sourceOriginal->getSegmentId(),
+                    (string) $sourceOriginal->getSegmentId(),
                     $sourceOriginal->getTermtaggerName(),
                     $sourceOriginal->render($typesToExclude),
                     $firstTargetText
@@ -647,7 +647,7 @@ final class Tagger extends AbstractProcessor
         // remerge trackchanges and terms - don't do it if there were no INS/DEL!
         // TODO FIXME: if you do the above there are problems with trackchanges tags getting lost ...
         // if($trackChangeTag->hasOriginalTags()){
-        if (true) {
+        if (true) { // @phpstan-ignore-line
             $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges(
                 $text,
                 $trackChangeTag->textWithTrackChanges
