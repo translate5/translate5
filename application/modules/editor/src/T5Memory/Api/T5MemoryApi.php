@@ -46,6 +46,7 @@ use MittagQI\Translate5\T5Memory\Api\Contract\ReorganizeInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\SavesTmsInterface;
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\Api\Exception\UnsuccessfulRequestException;
 use MittagQI\Translate5\T5Memory\Api\Request\CloneTmRequest;
@@ -98,6 +99,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
     public function __construct(
         private readonly ClientInterface & PoolAsyncClientInterface $client,
         private readonly SegmentLengthValidator $segmentLengthValidator,
+        private readonly SegmentUpdateResultValidator $segmentUpdateResultValidator,
     ) {
     }
 
@@ -109,6 +111,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
         return new self(
             $httpClient,
             SegmentLengthValidator::create(),
+            SegmentUpdateResultValidator::create(),
         );
     }
 
@@ -417,6 +420,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
     /**
      * @throws ClientExceptionInterface
      * @throws SegmentTooLongException
+     * @throws SegmentErroneousException
      */
     public function update(
         string $baseUrl,
@@ -441,7 +445,10 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
         );
         $response = $this->client->sendRequest($request);
 
-        return UpdateResponse::fromResponse($response);
+        $updateResponse = UpdateResponse::fromResponse($response);
+        $this->segmentUpdateResultValidator->ensureSegmentValid($updateResponse);
+
+        return $updateResponse;
     }
 
     /**

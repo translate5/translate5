@@ -235,6 +235,7 @@ class ReimportSnapshotTest extends TestCase
                         'failedSegments' => [],
                         'task' => $taskMock,
                         'languageResource' => $languageResourceMock,
+                        'erroneousSegments' => [],
                     ],
                 ]
             );

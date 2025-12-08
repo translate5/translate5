@@ -28,15 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
+namespace MittagQI\Translate5\T5Memory\Api\Exception;
 
-class ReimportSegmentsResult
+use Exception;
+
+class SegmentErroneousException extends Exception
 {
-    public function __construct(
-        public readonly int $emptySegmentsAmount,
-        public readonly int $successfulSegmentsAmount,
-        public readonly array $failedSegmentIds,
-        public readonly array $erroneousSegmentsIds,
-    ) {
-    }
 }

@@ -28,15 +28,29 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
+namespace MittagQI\Translate5\T5Memory\Api;
 
-class ReimportSegmentsResult
+use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
+
+class SegmentUpdateResultValidator
 {
-    public function __construct(
-        public readonly int $emptySegmentsAmount,
-        public readonly int $successfulSegmentsAmount,
-        public readonly array $failedSegmentIds,
-        public readonly array $erroneousSegmentsIds,
-    ) {
+    public static function create()
+    {
+        return new self();
+    }
+
+    /**
+     * @throws SegmentErroneousException
+     */
+    public function ensureSegmentValid(ResponseInterface $response): void
+    {
+        if ($response->successful()) {
+            return;
+        }
+
+        if ($response->getErrorMessage() === 'Error in xml in source or target!') {
+            throw new SegmentErroneousException($response->getErrorMessage());
+        }
     }
 }
