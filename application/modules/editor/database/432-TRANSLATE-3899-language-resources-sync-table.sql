@@ -34,9 +34,9 @@ CREATE TABLE `LEK_cross_language_resource_synchronization_connection` (
     `customerId` int NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `languageResourcePair` (`sourceLanguageResourceId`, `targetLanguageResourceId`, `customerId`),
-    FOREIGN KEY (`sourceLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
-    FOREIGN KEY (`targetLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
-    FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `LEK_cross_language_resource_synchronization_connection_ibfk_1` FOREIGN KEY (`sourceLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `LEK_cross_language_resource_synchronization_connection_ibfk_2` FOREIGN KEY (`targetLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `LEK_cross_language_resource_synchronization_connection_ibfk_3` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE RESTRICT
 );
 
 

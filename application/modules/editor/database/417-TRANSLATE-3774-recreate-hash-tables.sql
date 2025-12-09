@@ -32,8 +32,8 @@ CREATE TABLE `LEK_content_protection_language_rules_hash` (
     `targetLanguageId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_languages',
     `hash` varchar(32) NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`sourceLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`targetLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_language_rules_hash_ibfk_1` FOREIGN KEY (`sourceLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_language_rules_hash_ibfk_2` FOREIGN KEY (`targetLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
     UNIQUE (`sourceLanguageId`, `targetLanguageId`)
 );
 

@@ -28,7 +28,7 @@ CREATE TABLE `LEK_content_protection_language_rules_hash` (
     `languageId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_languages',
     `hash` varchar(32) NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_language_rules_hash_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
     UNIQUE (`languageId`)
 );
 
@@ -39,8 +39,8 @@ CREATE TABLE `LEK_content_protection_language_resource_rules_hash` (
     `hash` varchar(32) NOT NULL,
     `conversionStarted` datetime DEFAULT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_language_resource_rules_hash_ibfk_1` FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_language_resource_rules_hash_ibfk_2` FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
     UNIQUE (`languageResourceId`, `languageId`)
 );
 

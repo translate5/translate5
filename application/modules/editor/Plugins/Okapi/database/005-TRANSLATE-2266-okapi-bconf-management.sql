@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf` (
     `versionIdx` INT(10) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE(`name`),
-    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
+    CONSTRAINT `LEK_okapi_bconf_ibfk_1` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_filter` (
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_filter` (
     `notes` VARCHAR(200) DEFAULT NULL,
     `extensions` VARCHAR(200) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`bconfId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
+    CONSTRAINT `LEK_okapi_bconf_filter_ibfk_1` FOREIGN KEY (`bconfId`) REFERENCES `LEK_okapi_bconf` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `LEK_okapi_bconf_default_filter` (

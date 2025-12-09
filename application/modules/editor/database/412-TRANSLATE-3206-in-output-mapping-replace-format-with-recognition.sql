@@ -25,9 +25,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-alter table `LEK_content_protection_output_mapping` drop column `format`;
-alter table `LEK_content_protection_output_mapping`
-    change column `contentRecognitionId` `inputContentRecognitionId` int (11) not null;
-alter table `LEK_content_protection_output_mapping` add column `outputContentRecognitionId` int (11);
-alter table `LEK_content_protection_output_mapping` add foreign key (`outputContentRecognitionId`)
-    references `LEK_content_protection_content_recognition` (`id`) on delete set null;
+ALTER TABLE `LEK_content_protection_output_mapping` DROP COLUMN `format`;
+ALTER TABLE `LEK_content_protection_output_mapping`
+    CHANGE COLUMN `contentRecognitionId` `inputContentRecognitionId` INT (11) NOT NULL;
+ALTER TABLE `LEK_content_protection_output_mapping` ADD COLUMN `outputContentRecognitionId` int (11);
+ALTER TABLE `LEK_content_protection_output_mapping` ADD CONSTRAINT `LEK_content_protection_output_mapping_ibfk_3` FOREIGN KEY (`outputContentRecognitionId`)
+    REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE SET NULL;

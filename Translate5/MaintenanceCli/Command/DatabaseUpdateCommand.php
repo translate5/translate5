@@ -34,6 +34,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
+use ZfExtended_Models_Db_DbVersion as DbVersion;
+use ZfExtended_Models_Installer_DbUpdater as DbUpdater;
 
 class DatabaseUpdateCommand extends Translate5AbstractCommand
 {
@@ -95,6 +97,22 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'DANGER: removes an entry from the dbversion table, identified by hash. Use only if you know what you do'
         );
+
+        $this->addOption(
+            'check-only',
+            'c',
+            InputOption::VALUE_NONE,
+            'Checks the newest database-update files for problems but does not perform any updates.' .
+                ' Overrides all other params.'
+        );
+
+        $this->addOption(
+            'check-all',
+            'a',
+            InputOption::VALUE_NONE,
+            'Checks all database-update files for problems but does not perform any updates.' .
+            ' Overrides all other params'
+        );
     }
 
     /**
@@ -112,10 +130,32 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
 
         $this->writeTitle('database management');
 
-        $dbupdater = \ZfExtended_Factory::get(\ZfExtended_Models_Installer_DbUpdater::class, [true]);
+        $dbupdater = \ZfExtended_Factory::get(DbUpdater::class, [true]);
+
+        if ($this->input->getOption('check-only') || $this->input->getOption('check-all')) {
+            $usedPathes = ($this->input->getOption('check-all')) ?
+                $dbupdater->calculateAllAsNew() : $dbupdater->calculateChanges();
+
+            $what = ($this->input->getOption('check-all')) ?
+                'All Database-update files' : 'The new Database-update files';
+
+            $this->warnUsedPathes($usedPathes);
+
+            $dbupdater->checkNewFiles();
+
+            if (! empty($dbupdater->getErrors())) {
+                $this->io->error($dbupdater->getErrors());
+                $this->io->warning('Some of the checked files have problems, these must be solved!');
+
+                return self::FAILURE;
+            }
+            $this->io->success($what . ' are free of problems');
+
+            return self::SUCCESS;
+        }
 
         if ($remove = $this->input->getOption('remove-imported')) {
-            $dbversion = \ZfExtended_Factory::get(\ZfExtended_Models_Db_DbVersion::class);
+            $dbversion = \ZfExtended_Factory::get(DbVersion::class);
             $found = $dbversion->fetchRow($dbversion->select()->where('md5 = ?', $remove));
 
             if (empty($found)) {
@@ -139,16 +179,9 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
 
             return self::SUCCESS;
         }
-
-        //print on develop machines the configured sqlPaths and in the Browser GUI
-        $usedPaths = $dbupdater->calculateChanges();
-        $usedPaths = array_filter($usedPaths, function ($item) {
-            return strpos($item, 'library/ZfExtended/database/') === false && strpos($item, 'modules/default/database/') === false && strpos($item, 'modules/editor/database/') === false;
-        });
-        if (! empty($usedPaths)) {
-            array_unshift($usedPaths, 'Additional configured DB search path(s): ');
-            $this->io->warning($usedPaths);
-        }
+        $usedPathes = $dbupdater->calculateChanges();
+        // add warning about additional pathes
+        $this->warnUsedPathes($usedPathes);
 
         $result = $this->processOnlyOneFile($dbupdater);
         if ($result >= 0) {
@@ -160,9 +193,9 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         if (! empty($newFiles)) {
             $this->io->section('New files (can be imported automatically with "-i")');
             $this->io->table(['origin', 'file', 'hash'], array_map(function ($file) use (&$toProcess) {
-                $toProcess[$file['entryHash']] = 1;
+                $toProcess[$file->entryHash] = 1;
 
-                return [$file['origin'], $file['relativeToOrigin'], $file['entryHash']];
+                return [$file->origin, $file->relativeToOrigin, $file->entryHash];
             }, $newFiles));
         }
 
@@ -170,22 +203,22 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         if (! empty($modified)) {
             $this->io->section('Modified files (can NOT be imported automatically - "-i" marks them as imported!)');
             $this->io->table(['origin', 'file', 'hash'], array_map(function ($file) use (&$toProcess) {
-                $toProcess[$file['entryHash']] = 1;
+                $toProcess[$file->entryHash] = 1;
 
-                return [$file['origin'], $file['relativeToOrigin'], $file['entryHash']];
+                return [$file->origin, $file->relativeToOrigin, $file->entryHash];
             }, $modified));
         }
 
         if (empty($modified) && empty($newFiles)) {
             $this->io->note("Nothing to do: no database files to be imported!");
 
-            return 0;
+            return self::SUCCESS;
         }
 
         if ($this->input->getOption('assume-imported')) {
             $this->io->warning('--assume-imported can only be used on one single file! Nothing is assumed as imported.');
 
-            return 1;
+            return self::FAILURE;
         }
         $import = $this->input->getOption('import');
 
@@ -228,11 +261,12 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             }
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
-    protected function processOnlyOneFile(\ZfExtended_Models_Installer_DbUpdater $dbupdater)
+    protected function processOnlyOneFile(DbUpdater $dbupdater)
     {
+        $file = null;
         $fileName = $this->input->getArgument('filename');
         if (empty($fileName)) {
             return -1;
@@ -240,27 +274,26 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         $new = $dbupdater->getNewFiles();
         $modified = $dbupdater->getModifiedFiles();
         foreach ($modified as &$mod) {
-            $mod['modified'] = 1;
+            $mod->modified = true;
         }
         $all = array_merge($new, $modified);
-        $found = false;
-        foreach ($all as $file) {
-            if ($file['entryHash'] === $fileName || strpos($file['relativeToOrigin'], $fileName) !== false) {
-                $found = true;
+        foreach ($all as $updateFile) {
+            if ($updateFile->entryHash === $fileName || strpos($updateFile->relativeToOrigin, $fileName) !== false) {
+                $file = $updateFile;
 
                 break;
             }
         }
-        if (! $found) {
+        if ($file === null) {
             $this->io->warning('No file matching ' . $fileName . ' found!');
 
             return 1;
         }
-        $this->output->writeln(file_get_contents($file['absolutePath']));
+        $this->output->writeln(file_get_contents($file->absolutePath));
         if ($this->input->getOption('assume-imported')) {
-            $this->io->success('Marked file as already imported: ' . $file['relativeToOrigin'] . '!');
+            $this->io->success('Marked file as already imported: ' . $file->relativeToOrigin . '!');
             $dbupdater->assumeImported([
-                $file['entryHash'] => 1,
+                $file->entryHash => 1,
             ]);
 
             return 0;
@@ -268,29 +301,28 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         if (! $this->input->getOption('import')) {
             return 0;
         }
-        if (empty($file['modified'])) {
+        if (! $file->modified) {
             $dbupdater->applyNew([
-                $file['entryHash'] => 1,
+                $file->entryHash => 1,
             ]);
         } else {
             $dbupdater->updateModified([
-                $file['entryHash'] => 1,
+                $file->entryHash => 1,
             ]);
         }
-        $errors = $dbupdater->getErrors();
-        if (! empty($errors)) {
-            $this->io->error($errors);
+        if (! empty($dbupdater->getErrors())) {
+            $this->io->error($dbupdater->getErrors());
             $this->io->warning('Imported with errors - check them!');
 
-            return 1;
+            return self::FAILURE;
         }
-        if (empty($file['modified'])) {
-            $this->io->success('Imported file ' . $file['relativeToOrigin'] . '!');
+        if (! $file->modified) {
+            $this->io->success('Imported file ' . $file->relativeToOrigin . '!');
         } else {
-            $this->io->warning('Marked modified ' . $file['relativeToOrigin'] . ' file as up to date - no SQL change was applied to the DB!');
+            $this->io->warning('Marked modified ' . $file->relativeToOrigin . ' file as up to date - no SQL change was applied to the DB!');
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -298,7 +330,7 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
      */
     private function renderListTable(): void
     {
-        $dbversion = \ZfExtended_Factory::get(\ZfExtended_Models_Db_DbVersion::class);
+        $dbversion = \ZfExtended_Factory::get(DbVersion::class);
         $installed = $dbversion->fetchAll()->toArray();
         $table = $this->io->createTable();
         $table->setHeaders(['id', 'origin', 'filename', 'md5', 'appVersion', 'created']);
@@ -306,5 +338,19 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             $table->addRow($inst);
         }
         $table->render();
+    }
+
+    private function warnUsedPathes(array $usedPathes): void
+    {
+        //print on develop machines the configured sqlPaths and in the Browser GUI
+        $usedPathes = array_filter($usedPathes, function ($item) {
+            return strpos($item, 'library/ZfExtended/database/') === false &&
+                strpos($item, 'modules/default/database/') === false &&
+                strpos($item, 'modules/editor/database/') === false;
+        });
+        if (! empty($usedPathes)) {
+            array_unshift($usedPathes, 'Additional configured DB search path(s): ');
+            $this->io->warning($usedPathes);
+        }
     }
 }

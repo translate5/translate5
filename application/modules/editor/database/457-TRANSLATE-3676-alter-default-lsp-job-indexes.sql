@@ -24,9 +24,9 @@
 --
 -- END LICENSE AND COPYRIGHT
 
-alter table LEK_default_lsp_job
-    drop foreign key LEK_default_lsp_job_ibfk_3;
+ALTER TABLE LEK_default_lsp_job
+    DROP FOREIGN KEY LEK_default_lsp_job_ibfk_3;
 
-alter table LEK_default_lsp_job
-    add constraint LEK_default_lsp_job_ibfk_3
-        foreign key (dataJobId) references LEK_user_assoc_default (id);
+ALTER TABLE LEK_default_lsp_job
+    ADD CONSTRAINT LEK_default_lsp_job_ibfk_3
+        FOREIGN KEY (dataJobId) REFERENCES LEK_user_assoc_default (id);

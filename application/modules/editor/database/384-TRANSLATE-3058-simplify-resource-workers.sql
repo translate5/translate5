@@ -34,7 +34,7 @@ CREATE TABLE `LEK_segment_processing` (
     `spellcheckState` tinyint(1) DEFAULT 0 NOT NULL,
     `translate24State` tinyint(1) DEFAULT 0 NOT NULL,
     PRIMARY KEY (`segmentId`),
-    CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_segment_processing_ibfk_1` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
     INDEX (`taskGuid`, `termtaggerState`),
     INDEX (`taskGuid`, `spellcheckState`),
     INDEX (`taskGuid`, `translate24State`)

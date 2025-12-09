@@ -35,8 +35,8 @@ CREATE TABLE `LEK_default_lsp_job` (
     `workflow` varchar(128) not null,
     `workflowStepName` varchar(128) not null,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_lsp` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_default_lsp_job_ibfk_1` FOREIGN KEY (`lspId`) REFERENCES `LEK_lsp` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_default_lsp_job_ibfk_2` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE,
     INDEX LEK_default_lsp_job_customerId_langs (`customerId`, `sourceLang`, `targetLang`),
     UNIQUE LEK_default_lsp_job_unique (`customerId`, `lspId`, `workflow`, `workflowStepName`, `sourceLang`, `targetLang`)
 );

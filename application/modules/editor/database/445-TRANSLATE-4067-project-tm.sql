@@ -35,8 +35,8 @@ CREATE TABLE `LEK_task_tm_task_association` (
     `taskGuid` VARCHAR(38) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `tasktm` (`languageResourceId`,`taskId`,`serviceType`),
-    FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
-    FOREIGN KEY (`taskId`) REFERENCES `LEK_task` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `LEK_task_tm_task_association_ibfk_1` FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `LEK_task_tm_task_association_ibfk_2` FOREIGN KEY (`taskId`) REFERENCES `LEK_task` (`id`) ON DELETE RESTRICT
 );
 
 UPDATE LEK_workflow_action SET actionClass = '\\MittagQI\\Translate5\\LanguageResource\\TaskTm\\Workflow\\Actions\\ReimportSegmentsAction'

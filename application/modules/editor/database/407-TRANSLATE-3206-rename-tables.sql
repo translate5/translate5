@@ -32,8 +32,8 @@ CREATE TABLE `LEK_content_protection_input_mapping` (
     `languageId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_languages',
     `contentRecognitionId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_content_protection_number_recognition',
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_input_mapping_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_input_mapping_ibfk_2` FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE CASCADE,
     UNIQUE (`languageId`, `contentRecognitionId`)
 );
 
@@ -49,8 +49,8 @@ CREATE TABLE `LEK_content_protection_output_mapping` (
     `contentRecognitionId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_content_protection_number_recognition',
     `format` varchar(124) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_output_mapping_ibfk_1` FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_content_protection_output_mapping_ibfk_2` FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE CASCADE,
     UNIQUE (`languageId`, `contentRecognitionId`)
 );
 
