@@ -8,6 +8,7 @@
 /data/TMConversion
 /data/TMExport
 /data/TmxImportPreprocessing
+/data/backup*
 
 # Dirs
 /.idea/

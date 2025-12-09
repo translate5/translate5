@@ -502,6 +502,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        $this->front->getRouter()->addRoute('editorTaskUnlock', new ZfExtended_Controller_RestLikeRoute(
+            'editor/taskunlock/:id',
+            [
+                'module' => 'editor',
+                'controller' => 'taskunlock',
+                'action' => 'unlock',
+            ]
+        ));
+
         /** @deprecated  */
         $this->front->getRouter()->addRoute('editorTaskUserAssocProject', new ZfExtended_Controller_RestLikeRoute(
             'editor/taskuserassoc/project',

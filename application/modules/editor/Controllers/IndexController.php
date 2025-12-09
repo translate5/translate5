@@ -95,6 +95,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'QualityMqm' => true,
         'SegmentQualitiesBase' => true,
         'BatchEditing' => [Rights::EDITOR_BATCH_EDITING],
+        'TaskLifecycle' => true,
     ];
 
     private ZfExtended_Acl $acl;
