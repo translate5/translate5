@@ -137,21 +137,26 @@ final class FileTypeSupport
 
     /**
      * Retrieves the file-type support for file-translations
-     * File-translations are bound to the primary customer of the current user
+     * File-translations are per customer of the current user
      * @throws \ReflectionException
      * @throws \Zend_Exception
+     * @return FileTypeSupport[]
      */
-    public static function fileTranslationInstance(): FileTypeSupport
+    public static function fileTranslationInstances(): array
     {
         if (! array_key_exists('FILETRANSLATION', self::$_instances)) {
             // usage of internal CSV file-parser is configurable
             $useCoreCsvParser = Registry::get('config')->runtimeOptions->import->fileparser->csv->active ?? false;
-            self::$_instances['FILETRANSLATION'] = new FileTypeSupport($useCoreCsvParser);
-            // event to let plugins and other providers register their filetypes
-            self::getEventManager()->trigger('registerSupportedFileTypes', self::$_instances['FILETRANSLATION'], [
-                'task' => null,
-                'customerId' => ZfExtended_Authentication::getInstance()->getUser()->getPrimaryCustomerId(),
-            ]);
+            self::$_instances['FILETRANSLATION'] = [];
+            $customerIds = ZfExtended_Authentication::getInstance()->getUser()->getCustomersArray();
+            foreach ($customerIds as $customerId) {
+                self::$_instances['FILETRANSLATION'][$customerId] = new FileTypeSupport($useCoreCsvParser);
+                // event to let plugins and other providers register their filetypes
+                self::getEventManager()->trigger('registerSupportedFileTypes', self::$_instances['FILETRANSLATION'][$customerId], [
+                    'task' => null,
+                    'customerId' => $customerId,
+                ]);
+            }
         }
 
         return self::$_instances['FILETRANSLATION'];

@@ -220,9 +220,9 @@
                 <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</source>
                 <target>Filter set selected by default on project creation if not overwritten on client level</target>
             </trans-unit>
-            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu'>
-                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</source>
-                <target>Filter set selected by default on project creation for this customer</target>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgdW5kIGluIEluc3RhbnRUcmFuc2xhdGUgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu'>
+                <source>Standardmäßig bei der Projekterstellung und in InstantTranslate ausgewähltes Filterset für diesen Kunden</source>
+                <target>Filter set selected by default on project creation and in InstantTranslate for this customer</target>
             </trans-unit>
             <trans-unit id='RmlsdGVyc2V0IGzDtnNjaGVu'>
                 <source>Filterset löschen</source>

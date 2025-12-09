@@ -62,7 +62,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         standard: '#UT#Standard',
         standardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben',
         customerStandard: '#UT#Kundenstandard',
-        customerStandardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden',
+        customerStandardTooltip: '#UT#Standardmäßig bei der Projekterstellung und in InstantTranslate ausgewähltes Filterset für diesen Kunden',
         filters: '#UT#Filter',
         filtersTooltip: '#UT#Anpassen von Dateifiltern in diesem Filterset',
         entities: '#UT#Entities',
