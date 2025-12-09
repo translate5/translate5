@@ -211,6 +211,8 @@ class CrossLanguageResourceSynchronizationService
         /** @var array<string, LanguagePair[]> $supportedLanguagePairs */
         $supportedLanguagePairs = [];
 
+        $rfcToIdMap = $this->languageRepository->getRfc5646ToIdMap();
+
         foreach ($this->connectionOptionsRepository->getPotentialConnectionOptions($source) as $option) {
             $lr = $option->languageResource;
 
@@ -243,7 +245,7 @@ class CrossLanguageResourceSynchronizationService
 
             $supportedPairs = $supportedLanguagePairs[$lr->getServiceType()];
 
-            if (! $this->optionIsInSupportedLanguagePairs($option, $supportedPairs)) {
+            if (! $this->optionIsInSupportedLanguagePairs($option, $supportedPairs, $rfcToIdMap)) {
                 continue;
             }
 
@@ -309,9 +311,13 @@ class CrossLanguageResourceSynchronizationService
 
     /**
      * @param LanguagePair[] $supportedPairs
+     * @param array<string, string> $rfcToIdMap
      */
-    private function optionIsInSupportedLanguagePairs(PotentialConnectionOption $option, array $supportedPairs): bool
-    {
+    private function optionIsInSupportedLanguagePairs(
+        PotentialConnectionOption $option,
+        array $supportedPairs,
+        array $rfcToIdMap,
+    ): bool {
         foreach ($supportedPairs as $pair) {
             if (
                 $pair->sourceId === (int) $option->sourceLanguage->getId()
@@ -320,19 +326,19 @@ class CrossLanguageResourceSynchronizationService
                 return true;
             }
 
-            $majorSource = $option->sourceLanguage;
+            $majorSourceId = (int) $option->sourceLanguage->getId();
 
             if ($option->sourceLanguage->getMajorRfc5646() !== $option->sourceLanguage->getRfc5646()) {
-                $majorSource = $this->languageRepository->findByRfc5646($option->sourceLanguage->getMajorRfc5646());
+                $majorSourceId = (int) ($rfcToIdMap[$option->sourceLanguage->getMajorRfc5646()] ?? 0);
             }
 
-            $majorTarget = $option->targetLanguage;
+            $majorTargetId = (int) $option->targetLanguage->getId();
 
             if ($option->targetLanguage->getMajorRfc5646() !== $option->targetLanguage->getRfc5646()) {
-                $majorTarget = $this->languageRepository->findByRfc5646($option->targetLanguage->getMajorRfc5646());
+                $majorTargetId = (int) ($rfcToIdMap[$option->targetLanguage->getMajorRfc5646()] ?? 0);
             }
 
-            if ($pair->sourceId === (int) $majorSource->getId() && $pair->targetId === (int) $majorTarget->getId()) {
+            if ($pair->sourceId === $majorSourceId && $pair->targetId === $majorTargetId) {
                 return true;
             }
         }

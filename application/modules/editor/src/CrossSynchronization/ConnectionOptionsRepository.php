@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\CrossSynchronization;
 
-use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
+use editor_Models_Db_LanguageResources_CustomerAssoc;
+use editor_Models_Db_LanguageResources_Languages;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\CrossSynchronization\Dto\PotentialConnectionOption;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -60,13 +60,17 @@ class ConnectionOptionsRepository
     {
         $db = $source->db;
 
-        $lrLangTable = ZfExtended_Factory::get(LanguageResourceLanguages::class)->db->info($db::NAME);
-        $lrCustomerTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
+        $lrLangTable = editor_Models_Db_LanguageResources_Languages::TABLE_NAME;
+        $lrCustomerTable = editor_Models_Db_LanguageResources_CustomerAssoc::TABLE_NAME;
+
+        $rfcToIdMap = $this->languageRepository->getRfc5646ToIdMap();
 
         [$sourceLangIds, $sourceLangs, $sourceAddedMajorToSourceMap] = $this->composeLangStructures(
+            $rfcToIdMap,
             ...array_map('intval', (array) $source->getSourceLang())
         );
         [$targetLangIds, $targetLangs, $targetAddedMajorToTargetMap] = $this->composeLangStructures(
+            $rfcToIdMap,
             ...array_map('intval', (array) $source->getTargetLang())
         );
 
@@ -175,9 +179,10 @@ class ConnectionOptionsRepository
     }
 
     /**
+     * @param array<string, string> $rfcToIdMap
      * @return array{int[], array<int, Language>, array<int, array<int, Language>>}
      */
-    private function composeLangStructures(int ...$langIds): array
+    private function composeLangStructures(array $rfcToIdMap, int ...$langIds): array
     {
         $langs = [];
         $addedMajorToLangMap = [];
@@ -193,16 +198,17 @@ class ConnectionOptionsRepository
             $langs[$langId] = $sourceLang;
             $resultLangIds[$langId] = true;
 
-            $major = $this->languageRepository->findByRfc5646($sourceLang->getMajorRfc5646());
+            $sourceLangMajorRfc = Language::primaryCodeByRfc5646($sourceLang->getRfc5646());
+            $majorId = $rfcToIdMap[$sourceLangMajorRfc] ?? null;
 
-            if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646() && null !== $major) {
-                $resultLangIds[(int) $major->getId()] = true;
+            if ($sourceLangMajorRfc !== $sourceLang->getRfc5646() && null !== $majorId) {
+                $resultLangIds[(int) $majorId] = true;
 
-                if (! isset($addedMajorToLangMap[(int) $major->getId()])) {
-                    $addedMajorToLangMap[(int) $major->getId()] = [];
+                if (! isset($addedMajorToLangMap[(int) $majorId])) {
+                    $addedMajorToLangMap[(int) $majorId] = [];
                 }
 
-                $addedMajorToLangMap[(int) $major->getId()][(int) $sourceLang->getId()] = $sourceLang;
+                $addedMajorToLangMap[(int) $majorId][$langId] = $sourceLang;
             }
         }
 
