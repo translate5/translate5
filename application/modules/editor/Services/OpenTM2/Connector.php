@@ -610,7 +610,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $dummySegment = ZfExtended_Factory::get(editor_Models_Segment::class);
         $dummySegment->init();
 
-        return $this->fuzzy(
+        $result = $this->fuzzy(
             $this->languageResource,
             $searchString,
             '',
@@ -618,6 +618,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $dummySegment,
             $this->config,
         );
+
+        return $this->getResultListGrouped($result);
     }
 
     public function delete(): void
