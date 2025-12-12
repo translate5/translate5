@@ -24,9 +24,10 @@
 --
 -- END LICENSE AND COPYRIGHT
 -- */
-alter table LEK_user_assoc_default drop constraint fk_LEK_user_assoc_default_1;
-alter table LEK_user_assoc_default drop constraint fk_LEK_user_assoc_default_2;
+ALTER TABLE LEK_user_assoc_default DROP CONSTRAINT fk_LEK_user_assoc_default_1;
+ALTER TABLE LEK_user_assoc_default DROP CONSTRAINT fk_LEK_user_assoc_default_2;
 
-alter table LEK_user_assoc_default
-add constraint foreign key fk_LEK_user_assoc_default_workflow
-    (workflowStepName, workflow) references LEK_workflow_step (name, workflowName);
+ALTER TABLE LEK_user_assoc_default
+ADD CONSTRAINT fk_LEK_user_assoc_default_workflow
+    FOREIGN KEY (workflowStepName, workflow)
+    REFERENCES LEK_workflow_step (name, workflowName);

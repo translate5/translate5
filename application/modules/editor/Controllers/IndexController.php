@@ -95,6 +95,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'QualityMqm' => true,
         'SegmentQualitiesBase' => true,
         'BatchEditing' => [Rights::EDITOR_BATCH_EDITING],
+        'TaskLifecycle' => true,
     ];
 
     private ZfExtended_Acl $acl;
@@ -245,7 +246,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         } catch (\MittagQI\Translate5\Task\Current\Exception) {
             //then add nothing
         }
-        Zend_Registry::get('logger')->warn('E1606', 'Rootcause logged: {link}', $extra);
+        Zend_Registry::get('logger')->info('E1606', 'Rootcause logged: {link}', $extra);
     }
 
     /**
@@ -625,7 +626,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.version', $this->view->appVersion);
         $php2js->set(
             'app.showDevTools',
-            ZfExtended_Utils::isDevelopment() && $this->config->runtimeOptions->debug->showDevTools ?? false
+            ZfExtended_Utils::isDevelopment() && ($this->config->runtimeOptions->debug->showDevTools ?? false)
         );
 
         $filter = ZfExtended_Factory::get(ZfExtended_Models_Filter_ExtJs6::class);

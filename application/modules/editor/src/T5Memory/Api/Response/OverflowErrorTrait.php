@@ -44,6 +44,11 @@ trait OverflowErrorTrait
             ',',
             $config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
         );
+
+        if (in_array($this->getCode(), $errorCodes)) {
+            return true;
+        }
+
         $errorCodes = array_map(fn ($code) => 'rc = ' . $code, $errorCodes);
 
         return str_replace($errorCodes, '', $this->getErrorMessage()) !== $this->getErrorMessage();

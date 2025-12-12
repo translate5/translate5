@@ -20,11 +20,21 @@
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
 --  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
---              http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+-- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 --
 -- END LICENSE AND COPYRIGHT
+-- */
 
-SET FOREIGN_KEY_CHECKS=0;
-ALTER TABLE `LEK_default_lsp_job` DROP CONSTRAINT `LEK_default_lsp_job_ibfk_1`;
-ALTER TABLE `LEK_default_lsp_job` ADD CONSTRAINT `LEK_default_lsp_job_ibfk_4` FOREIGN KEY (`lspId`) REFERENCES `LEK_lsp` (`id`) ON DELETE RESTRICT;
-SET FOREIGN_KEY_CHECKS=1;
+-- clean superflous constraint inadvertantly created
+set @var=if((SELECT true FROM information_schema.TABLE_CONSTRAINTS WHERE
+    CONSTRAINT_SCHEMA = DATABASE() AND
+    TABLE_NAME        = 'LEK_default_coordinator_group_job' AND
+    CONSTRAINT_NAME   = 'LEK_default_coordinator_group_job_ibfk_1' AND
+    CONSTRAINT_TYPE   = 'FOREIGN KEY') = true,'ALTER TABLE LEK_default_coordinator_group_job
+            DROP CONSTRAINT LEK_default_coordinator_group_job_ibfk_1','select 1');
+
+prepare stmt from @var;
+execute stmt;
+deallocate prepare stmt;
+
+

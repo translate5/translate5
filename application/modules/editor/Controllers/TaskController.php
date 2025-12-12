@@ -1492,6 +1492,7 @@ class editor_TaskController extends ZfExtended_RestController
         if (! $isEnding && (! $this->isLeavingTaskRequest())) {
             return;
         }
+
         $this->entity->unlockForUser($this->authenticatedUser->getUserGuid());
 
         if ($resetToOpen) {
@@ -1608,7 +1609,7 @@ class editor_TaskController extends ZfExtended_RestController
     private function saveUserJob(
         editor_Models_TaskUserAssoc $job,
         editor_Models_TaskUserAssoc $oldJob,
-        bool $disableWorkflowEvents
+        bool $disableWorkflowEvents,
     ): void {
         if ($disableWorkflowEvents) {
             $job->save();

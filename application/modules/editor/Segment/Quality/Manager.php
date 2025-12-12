@@ -811,17 +811,24 @@ final class editor_Segment_Quality_Manager
 
     /**
      * Returns true if the processing should be completely skipped for a processing-mode
-     * @return bool
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
-    private function isProcessingSkipped(string $processingMode, editor_Models_Task $task, bool $logSkipping = false)
-    {
+    private function isProcessingSkipped(
+        string $processingMode,
+        editor_Models_Task $task,
+        bool $logSkipping = false
+    ): bool {
         if (! self::ACTIVE) {
             return true;
         }
-        if ($processingMode === editor_Segment_Processing::IMPORT && (! $task->getTaskType()->isAutoStartAutoQA() || ! $task->getConfig()->runtimeOptions->autoQA->autoStartOnImport)) {
+        if ($processingMode === editor_Segment_Processing::IMPORT
+            && (! $task->getTaskType()->isAutoStartAutoQA()
+                || ! $task->getConfig()->runtimeOptions->autoQA->autoStartOnImport)) {
             if ($logSkipping) {
-                $task->logger('editor.task')->warn('E1432', 'AutoQA-step of the import process - is deactivated');
+                $task->logger('editor.task')->info('E1432', 'AutoQA-step of the import process - is deactivated');
             }
 
             return true;

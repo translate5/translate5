@@ -25,4 +25,4 @@
 -- END LICENSE AND COPYRIGHT
 
 ALTER TABLE `LEK_default_lsp_job` ADD COLUMN `dataJobId` INT NOT NULL;
-ALTER TABLE `LEK_default_lsp_job` ADD CONSTRAINT FOREIGN KEY (`dataJobId`) REFERENCES `LEK_taskUserAssoc` (`id`) ON DELETE RESTRICT;
+ALTER TABLE `LEK_default_lsp_job` ADD CONSTRAINT `LEK_default_lsp_job_ibfk_3` FOREIGN KEY (`dataJobId`) REFERENCES `LEK_taskUserAssoc` (`id`) ON DELETE RESTRICT;

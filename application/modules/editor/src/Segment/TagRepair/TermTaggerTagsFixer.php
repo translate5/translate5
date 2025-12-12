@@ -54,6 +54,9 @@ class TermTaggerTagsFixer
 
     private array $warnings = [];
 
+    /**
+     * @var editor_Segment_Tag[]
+     */
     private array $tags;
 
     public function __construct(
@@ -100,7 +103,7 @@ class TermTaggerTagsFixer
                      $this->tags[$nested[0]]->startIndex === $termTag->startIndex &&
                      $this->tags[$nested[0]]->endIndex === $termTag->endIndex
                 ) {
-                    // if we have a single nested tag that hase the same boundries, we swap the nesting
+                    // if we have a single nested tag that has the same boundries, we swap the nesting
                     $this->swapTags($idx, $nested[0]);
                 } elseif (count($nested) === 1 &&
                     $this->tags[$nested[0]]->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES &&
@@ -112,6 +115,10 @@ class TermTaggerTagsFixer
                     $text = $this->fieldTags->getTextPart($this->tags[$nested[0]]->startIndex, $this->tags[$nested[0]]->endIndex);
                     $this->warnings[] = 'Removed trackchanges-tag for the first character of term "' . $text
                         . '" as it created an invalid markup-structure';
+                } elseif ($this->hasOnlyNestedStartEnd($termTag, $nested)) {
+                    // the term-tag has only zero-length tags at the start and/or end
+                    // this is a fixable state
+                    $this->fixBoundaryNestingTags($termTag, $nested);
                 } else {
                     // otherwise we remove the term-tag as we cannot shrink or slice it
                     $toRemove[] = $idx;
@@ -187,12 +194,7 @@ class TermTaggerTagsFixer
                 $this->isRelevant($tag) &&
                 $tag->startIndex >= $termTag->startIndex &&
                 $tag->endIndex <= $termTag->endIndex &&
-                // crucial: exclude internal tags that are before or after the term-tag by order
-                ! (
-                    $tag->startIndex === $tag->endIndex &&
-                    (($tag->startIndex === $termTag->startIndex && $tag->order < $termTag->order) ||
-                    ($tag->startIndex === $termTag->endIndex && $tag->order > $termTag->order))
-                )
+                $tag->parentOrder === $termTag->order
             ) {
                 $children[] = $idx;
             }
@@ -207,8 +209,12 @@ class TermTaggerTagsFixer
         foreach ($this->tags as $idx => $tag) {
             if ($tag->order !== $termTag->order &&
                 $this->isRelevant($tag, false) &&
-                ($tag->startIndex > $termTag->startIndex && $tag->startIndex < $termTag->endIndex && $tag->endIndex > $termTag->endIndex ||
-                $tag->startIndex < $termTag->startIndex && $tag->endIndex > $termTag->startIndex && $tag->endIndex < $termTag->endIndex)
+                (($tag->startIndex > $termTag->startIndex &&
+                        $tag->startIndex < $termTag->endIndex &&
+                        $tag->endIndex > $termTag->endIndex) ||
+                    ($tag->startIndex < $termTag->startIndex &&
+                        $tag->endIndex > $termTag->startIndex &&
+                        $tag->endIndex < $termTag->endIndex))
             ) {
                 $children[] = $idx;
             }
@@ -266,6 +272,126 @@ class TermTaggerTagsFixer
         foreach ($this->tags as $tag) {
             if ($tag !== $removed && $tag->parentOrder === $removed->order) {
                 $tag->parentOrder = $newParentOrder;
+            }
+        }
+    }
+
+    /**
+     * @param int[] $nestedIdxs
+     */
+    private function hasOnlyNestedStartEnd(editor_Segment_Tag $holder, array $nestedIdxs): bool
+    {
+        foreach ($nestedIdxs as $idx) {
+            $tag = $this->tags[$idx];
+            if (! ($tag->hasZeroLength() &&
+                ($holder->startIndex === $tag->startIndex || $holder->endIndex === $tag->endIndex) &&
+                ($tag->parentOrder === $holder->order || $this->isNestedInOneOf($tag, $nestedIdxs)))
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param int[] $tagIdxs
+     */
+    private function isNestedInOneOf(editor_Segment_Tag $inner, array $tagIdxs): bool
+    {
+        foreach ($tagIdxs as $idx) {
+            if ($inner->order !== $this->tags[$idx]->order &&
+                $inner->parentOrder === $this->tags[$idx]->order &&
+                $inner->startIndex >= $this->tags[$idx]->startIndex &&
+                $inner->endIndex <= $this->tags[$idx]->endIndex
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Fixes a situation, where zero-length tags (usually internal tags) are nested at the start or
+     * end-index of a terminology-tag. This situation can be solved by un-nesting the nested tags and
+     * change the orders of the tags.
+     * Being the parent, the termtag comes first, then the nested start(s), then the nested end(s)
+     * The new order needs to be: Now unnested starts, termtag, unnested ends
+     * The unnesting is applied by giving the nested tags the same parent as the term tag (usually level -1 = segment)
+     * @param int[] $nestedIdxs
+     */
+    private function fixBoundaryNestingTags(editor_Segment_Tag $termTag, array $nestedIdxs): void
+    {
+        // find the tags to "unnest" - note, that thes can be further nested,
+        // e.g. can a zero-length <ins> contain an internal tag
+        $before = [];
+        $beforeOrders = [];
+        $after = [];
+        foreach ($nestedIdxs as $idx) {
+            if ($this->tags[$idx]->startIndex === $termTag->startIndex &&
+                $this->tags[$idx]->endIndex === $termTag->startIndex
+            ) {
+                $before[] = $this->tags[$idx];
+                $beforeOrders[] = $this->tags[$idx]->order;
+            } elseif ($this->tags[$idx]->startIndex === $termTag->endIndex &&
+                $this->tags[$idx]->endIndex === $termTag->endIndex
+            ) {
+                $after[] = $this->tags[$idx];
+            } else {
+                throw new \ZfExtended_Exception(
+                    'Faulty logic of detection of starting/ending nested tags in TermTaggerTagsFixer'
+                );
+            }
+        }
+        // the befores / afters now only hold direct descendants.
+        // but the befores need to be the complete abcestry to change all orders !
+        if (count($before) > 0) {
+            $added = true;
+            while ($added) {
+                $added = false;
+                foreach ($this->tags as $tag) {
+                    // add all tags nested in any of the existing before's
+                    if ($tag !== $termTag &&
+                        $tag->parentOrder !== -1 && // top-level cannot match
+                        ! in_array($tag->order, $beforeOrders) && // otherwise loop runs forever
+                        in_array($tag->parentOrder, $beforeOrders) // we are nested
+                    ) {
+                        $before[] = $tag;
+                        $beforeOrders[] = $tag->order;
+                        $added = true;
+                    }
+                }
+            }
+        }
+        // lets sort the "befores" ... we do not know if really in order
+        usort($before, [$this->fieldTags, 'compare']);
+        // now pull the "befores" ... these will include all nestings, not just direct descendants
+        $oldToNew = [];
+        $order = $oldTermTagOrder = $termTag->order;
+        // change orders of all before's to start with term-tag
+        foreach ($before as $tag) {
+            $oldOrder = $tag->order;
+            $tag->order = $order;
+            $order = $oldOrder;
+            $oldToNew[$oldOrder] = $tag->order;
+        }
+        // unnesting direct descendants of the term-tag &
+        // change parent order for all nestings pointing to a reordered tag
+        foreach ($before as $tag) {
+            if ($tag->parentOrder === $oldTermTagOrder) {
+                $tag->parentOrder = $termTag->parentOrder;
+            } elseif (array_key_exists($tag->parentOrder, $oldToNew)) {
+                $tag->parentOrder = $oldToNew[$tag->parentOrder];
+            }
+        }
+        // termtags follows
+        $termTag->order = $order;
+        // "afters" will be unnested only
+        foreach ($after as $tag) {
+            // we unnest direct descendants of the term-tag
+            if ($tag->parentOrder === $oldTermTagOrder) {
+                $tag->parentOrder = $termTag->parentOrder;
             }
         }
     }

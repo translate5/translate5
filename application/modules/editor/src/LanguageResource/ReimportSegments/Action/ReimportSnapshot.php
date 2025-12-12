@@ -44,6 +44,7 @@ use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\JsonlReimpo
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Repository\ReimportSegmentRepositoryInterface;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
@@ -103,6 +104,7 @@ class ReimportSnapshot
     ): ReimportSegmentsResult {
         $totalEmptySegmentsAmount = 0;
         $totalSuccessfulSegmentsAmount = 0;
+        $erroneousSegmentsIds = [];
         $tries = 0;
 
         while ($tries < self::MAX_TRIES) {
@@ -112,6 +114,7 @@ class ReimportSnapshot
             $totalEmptySegmentsAmount += $result->emptySegmentsAmount;
             $totalSuccessfulSegmentsAmount += $result->successfulSegmentsAmount;
             $failedSegmentsIds = $result->failedSegmentIds;
+            $erroneousSegmentsIds = $result->erroneousSegmentsIds;
 
             if (empty($failedSegmentsIds)) {
                 break;
@@ -119,6 +122,7 @@ class ReimportSnapshot
 
             $this->addFailedSegmentsLog($failedSegmentsIds, (int) $task->getId(), (int) $languageResource->getId());
 
+            sleep(1);
             $tries++;
         }
 
@@ -126,6 +130,7 @@ class ReimportSnapshot
             $totalEmptySegmentsAmount,
             $totalSuccessfulSegmentsAmount,
             $failedSegmentsIds,
+            $erroneousSegmentsIds,
         );
     }
 
@@ -147,6 +152,7 @@ class ReimportSnapshot
         $emptySegmentsAmount = 0;
         $successfulSegmentsAmount = 0;
         $failedSegmentsIds = [];
+        $erroneousSegmentsIds = [];
 
         foreach ($reimportDTOS as $reimportDTO) {
             if (! empty($updateOnlyIds) && ! in_array($reimportDTO->segmentId, $updateOnlyIds, true)) {
@@ -193,6 +199,12 @@ class ReimportSnapshot
                     continue;
                 }
 
+                if ($e->getPrevious() instanceof SegmentErroneousException) {
+                    $erroneousSegmentsIds[] = $reimportDTO->segmentId;
+
+                    continue;
+                }
+
                 $failedSegmentsIds[] = $reimportDTO->segmentId;
             } catch (Throwable) {
                 $failedSegmentsIds[] = $reimportDTO->segmentId;
@@ -207,7 +219,12 @@ class ReimportSnapshot
             $this->flushMemoryService->flushCurrentWritable($languageResource);
         }
 
-        return new ReimportSegmentsResult($emptySegmentsAmount, $successfulSegmentsAmount, $failedSegmentsIds);
+        return new ReimportSegmentsResult(
+            $emptySegmentsAmount,
+            $successfulSegmentsAmount,
+            $failedSegmentsIds,
+            $erroneousSegmentsIds,
+        );
     }
 
     private function addFinalizationLog(
@@ -234,6 +251,7 @@ class ReimportSnapshot
             'emptySegments' => $result->emptySegmentsAmount,
             'successfulSegments' => $result->successfulSegmentsAmount,
             'failedSegments' => $result->failedSegmentIds,
+            'erroneousSegments' => $result->erroneousSegmentsIds,
         ]);
 
         $message = 'Task {taskId} re-imported into the desired TM {tmId}';

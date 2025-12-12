@@ -32,11 +32,13 @@ namespace MittagQI\Translate5\T5Memory;
 
 use DatetimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Services_Connector_Abstract;
 use editor_Services_Connector_Exception;
 use editor_Services_Exceptions_NoService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status;
+use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\Api\Response\UpdateResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
@@ -124,6 +126,9 @@ class UpdateRetryService
         UpdateOptions $updateOptions,
         Zend_Config $config,
     ): void {
+        // TODO This is a huge domain leak - refactor needed
+        $isInternalFuzzy = str_contains($tmName, editor_Services_Connector_Abstract::FUZZY_SUFFIX);
+
         if ($this->reorganizeService->isReorganizingAtTheMoment($languageResource, $tmName)) {
             throw new editor_Services_Connector_Exception('E1512', [
                 'status' => Status::REORGANIZE_IN_PROGRESS,
@@ -147,7 +152,7 @@ class UpdateRetryService
                     $updateOptions->saveDifferentTargetsForSameSource,
                     $updateOptions->saveToDisk,
                 );
-            } catch (SegmentTooLongException $e) {
+            } catch (SegmentTooLongException|SegmentErroneousException $e) {
                 throw new SegmentUpdateException($e->getMessage(), previous: $e);
             }
 
@@ -170,14 +175,14 @@ class UpdateRetryService
                     $languageResource,
                     $tmName,
                     $options,
-                    ! $updateOptions->saveToDisk,
+                    $isInternalFuzzy,
                 );
             } elseif ($response->isMemoryOverflown($config)) {
                 if (! $response->isBlockOverflown($config)) {
                     $this->persistenceService->setMemoryReadonly(
                         $languageResource,
                         $tmName,
-                        ! $updateOptions->saveToDisk
+                        $isInternalFuzzy
                     );
                 }
 
@@ -191,7 +196,7 @@ class UpdateRetryService
 
                 $this->addOverflowLog($languageResource, $response->getErrorMessage());
 
-                if ($updateOptions->saveToDisk) {
+                if (! $isInternalFuzzy) {
                     $this->flushMemoryService->flush($languageResource, $tmName);
                 }
 
@@ -209,7 +214,7 @@ class UpdateRetryService
                 $this->persistenceService->addMemoryToLanguageResource(
                     $languageResource,
                     $newName,
-                    ! $updateOptions->saveToDisk,
+                    $isInternalFuzzy,
                 );
                 $tmName = $newName;
             } elseif ($response->isLockingTimeoutOccurred()) {

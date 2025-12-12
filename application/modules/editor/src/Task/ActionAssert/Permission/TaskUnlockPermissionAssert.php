@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -28,15 +28,25 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
+namespace MittagQI\Translate5\Task\ActionAssert\Permission;
 
-class ReimportSegmentsResult
+use editor_Models_Task as Task;
+use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\UserHasJobInTaskPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+
+/**
+ * @extends ActionPermissionAssert<TaskAction, Task>
+ */
+final class TaskUnlockPermissionAssert extends ActionPermissionAssert
 {
-    public function __construct(
-        public readonly int $emptySegmentsAmount,
-        public readonly int $successfulSegmentsAmount,
-        public readonly array $failedSegmentIds,
-        public readonly array $erroneousSegmentsIds,
-    ) {
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self([
+            UserHasJobInTaskPermissionAssert::create(),
+        ]);
     }
 }

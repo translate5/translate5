@@ -32,10 +32,17 @@
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Authentication\OpenId\{
     Client as OpenIdClient,
     ClientException as OpenIdClientException
 };
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\Task\ActionAssert\Permission\TaskUnlockPermissionAssert;
+use MittagQI\Translate5\Task\ActionAssert\TaskAction;
+use MittagQI\Translate5\Task\Unlock\TaskUnlockService;
 use ZfExtended_Authentication as Auth;
 
 /**
@@ -72,6 +79,24 @@ class LoginController extends ZfExtended_Controllers_Login
         if ($this->view->loginStatus == ZfExtended_Authentication::LOGIN_STATUS_OPENID) {
             $this->handleOpenIdRequest();
         }
+    }
+
+    public function logoutAction()
+    {
+        $beacon = $this->getRequest()->getParam('beacon');
+        $taskId = $this->getRequest()->getParam('taskId', false);
+        if (! empty($beacon) && ! empty($taskId)) {
+            $this->unlockTask((int) $taskId);
+        }
+
+        parent::logoutAction();
+    }
+
+    protected function isAllowed(array $userRoles, string $resource, string $privilege): bool
+    {
+        $acl = ZfExtended_Acl::getInstance();
+
+        return $acl->isInAllowedRoles($userRoles, $resource, $privilege);
     }
 
     public function doOnLogout()
@@ -181,12 +206,15 @@ class LoginController extends ZfExtended_Controllers_Login
                 'value' => $oidc->getCustomer()->getOpenIdRedirectLabel(),
                 'decorators' => [
                     ['ViewHelper'],
-                    ['HtmlTag', [
-                        'tag' => 'button',
-                        'id' => 'openid-login',
-                        'href' => 'javascript:void(0);',
-                        'onclick' => 'document.getElementById("openidredirect").value="openid"; document.getElementById("btnSubmit").click();',
-                    ]],
+                    [
+                        'HtmlTag',
+                        [
+                            'tag' => 'button',
+                            'id' => 'openid-login',
+                            'href' => 'javascript:void(0);',
+                            'onclick' => 'document.getElementById("openidredirect").value="openid"; document.getElementById("btnSubmit").click();',
+                        ],
+                    ],
 
                 ],
             ]);
@@ -197,14 +225,19 @@ class LoginController extends ZfExtended_Controllers_Login
             // Add overlay to the login page only when the user is automatically redirected to the SSO auth provider
             $overlay = new Zend_Form_Element_Note([
                 'name' => 'overlay',
-                'value' => '<div style="position: absolute;top: 50%;left: 50%;font-size: 50px;color: white;transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);">' . $this->_translate->_('Redirect to login...') . '</div>',
+                'value' => '<div style="position: absolute;top: 50%;left: 50%;font-size: 50px;color: white;transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);">' . $this->_translate->_(
+                    'Redirect to login...'
+                ) . '</div>',
                 'decorators' => [
                     ['ViewHelper'],
-                    ['HtmlTag', [
-                        'tag' => 'div',
-                        'id' => 'overlay',
-                        'style' => 'position: fixed;display: block;width: 100%;height: 100%;top: 0;left: 0;right: 0;bottom: 0;background-color: rgba(175,175,175,1);z-index: 10001;',
-                    ]],
+                    [
+                        'HtmlTag',
+                        [
+                            'tag' => 'div',
+                            'id' => 'overlay',
+                            'style' => 'position: fixed;display: block;width: 100%;height: 100%;top: 0;left: 0;right: 0;bottom: 0;background-color: rgba(175,175,175,1);z-index: 10001;',
+                        ],
+                    ],
 
                 ],
             ]);
@@ -231,7 +264,9 @@ class LoginController extends ZfExtended_Controllers_Login
 
             $this->view->errors = true;
             //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
-            $this->_form->addError($this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.'));
+            $this->_form->addError(
+                $this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.')
+            );
             $log = Zend_Registry::get('logger');
             /* @var $log ZfExtended_Logger */
 
@@ -313,5 +348,60 @@ class LoginController extends ZfExtended_Controllers_Login
             'ViewRenderer'
         );
         $renderer->view->headScript()->appendScript($openIdScript);
+    }
+
+    private function unlockTask(int $taskId): void
+    {
+        $task = TaskRepository::create()->find($taskId);
+        if (is_null($task)) {
+            $log = Zend_Registry::get('logger');
+            $log->warn('E1559', 'Task not found', [
+                'taskId' => $taskId,
+            ]);
+
+            return;
+        }
+
+        $payload = (object) [
+            'userState' => editor_Models_Task::STATE_OPEN,
+            'userStatePrevious' => $task->getState(),
+        ];
+
+        $userRepository = new UserRepository();
+        $user = $userRepository->get(
+            Auth::getInstance()->getUser()->getId()
+        );
+
+        $taskActionPermissionAssert = TaskUnlockPermissionAssert::create();
+
+        $authUserRoles = Auth::getInstance()->getUserRoles();
+
+        $isEditAllTasks = $this->isAllowed(
+            $authUserRoles,
+            MittagQI\Translate5\Acl\Rights::ID,
+            MittagQI\Translate5\Acl\Rights::EDIT_ALL_TASKS
+        )
+            || $user->getUserGuid() === $task->getPmGuid()
+            || (
+                $user->isCoordinator()
+                && $taskActionPermissionAssert->isGranted(
+                    TaskAction::Edit,
+                    $task,
+                    new PermissionAssertContext($user)
+                )
+            );
+
+        $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
+
+        // this means we are coming from the sendBeacon on logout on windwos close
+        $taskUnlockService = TaskUnlockService::create();
+        $taskUnlockService->unlock(
+            $task,
+            $payload,
+            $user,
+            $log,
+            $this->events,
+            $isEditAllTasks
+        );
     }
 }

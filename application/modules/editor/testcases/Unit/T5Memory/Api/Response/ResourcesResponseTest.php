@@ -36,6 +36,7 @@ use MittagQI\Translate5\T5Memory\Api\Exception\InvalidJsonInResponseBodyExceptio
 use MittagQI\Translate5\T5Memory\Api\Exception\InvalidResponseStructureException;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
+use MittagQI\Translate5\T5Memory\Api\SegmentUpdateResultValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
@@ -68,10 +69,11 @@ class ResourcesResponseTest extends TestCase
 
         $api = new T5MemoryApi(
             $this->getClient($response),
-            SegmentLengthValidator::create(),
+            $this->createMock(SegmentLengthValidator::class),
+            $this->createMock(SegmentUpdateResultValidator::class),
         );
 
-        self::expectException(InvalidResponseStructureException::class);
+        $this->expectException(InvalidResponseStructureException::class);
         $api->version('http://example.com');
     }
 
@@ -85,10 +87,11 @@ class ResourcesResponseTest extends TestCase
 
         $api = new T5MemoryApi(
             $this->getClient($response),
-            SegmentLengthValidator::create(),
+            $this->createMock(SegmentLengthValidator::class),
+            $this->createMock(SegmentUpdateResultValidator::class),
         );
 
-        self::expectException(CorruptResponseBodyException::class);
+        $this->expectException(CorruptResponseBodyException::class);
         $api->version('http://example.com');
     }
 
@@ -102,10 +105,11 @@ class ResourcesResponseTest extends TestCase
 
         $api = new T5MemoryApi(
             $this->getClient($response),
-            SegmentLengthValidator::create(),
+            $this->createMock(SegmentLengthValidator::class),
+            $this->createMock(SegmentUpdateResultValidator::class),
         );
 
-        self::expectException(InvalidJsonInResponseBodyException::class);
+        $this->expectException(InvalidJsonInResponseBodyException::class);
         $api->version('http://example.com');
     }
 

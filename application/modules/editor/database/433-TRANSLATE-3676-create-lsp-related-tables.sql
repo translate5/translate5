@@ -29,7 +29,7 @@ CREATE TABLE `LEK_language_service_provider` (
     `name` varchar(255) NOT NULL,
     `description` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`parentId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `LEK_language_service_provider_ibfk_1` FOREIGN KEY (`parentId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT
 );
 
 CREATE TABLE `LEK_language_service_provider_customer` (
@@ -37,8 +37,8 @@ CREATE TABLE `LEK_language_service_provider_customer` (
     `lspId` int (11) DEFAULT NULL,
     `customerId` int (11) NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
+    CONSTRAINT `LEK_language_service_provider_customer_ibfk_1` FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_language_service_provider_customer_ibfk_2` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `LEK_language_service_provider_user` (
@@ -47,8 +47,8 @@ CREATE TABLE `LEK_language_service_provider_user` (
     `lspId` int (11) DEFAULT NULL,
     `userId` int (11) NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT FOREIGN KEY (`userId`) REFERENCES `Zf_users` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_language_service_provider_user_ibfk_1` FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `LEK_language_service_provider_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `Zf_users` (`id`) ON DELETE CASCADE,
     UNIQUE (`userId`)
 );
 
@@ -59,12 +59,12 @@ CREATE TABLE `LEK_lsp_job_association` (
     `workflow` int (128) NOT NULL,
     `workflowStepName` int (128) NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
+    CONSTRAINT `LEK_lsp_job_association_ibfk_1` FOREIGN KEY (`lspId`) REFERENCES `LEK_language_service_provider` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `LEK_lsp_job_association_ibfk_2` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
     UNIQUE (`taskGuid`, `lspId`, `workflow`, `workflowStepName`)
 );
 
 ALTER TABLE `LEK_taskUserAssoc`
     ADD `type` TINYINT DEFAULT 1 NOT NULL,
     ADD `lspJobId` INT (11) DEFAULT NULL,
-    ADD CONSTRAINT FOREIGN KEY (`lspJobId`) REFERENCES `LEK_lsp_job_association` (`id`) ON DELETE RESTRICT;
+    ADD CONSTRAINT `LEK_taskUserAssoc_ibfk_1` FOREIGN KEY (`lspJobId`) REFERENCES `LEK_lsp_job_association` (`id`) ON DELETE RESTRICT;

@@ -62,7 +62,7 @@ class TaskExportCommand extends TaskCommand
             'diff',
             'd',
             InputOption::VALUE_NEGATABLE,
-            'give one or more file ids, to export only that files instead all of them',
+            'make a diff export',
             false,
         );
 

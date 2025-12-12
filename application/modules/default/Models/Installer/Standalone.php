@@ -52,7 +52,7 @@ class Models_Installer_Standalone
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    public const INSTALLER_VERSION = 17;
+    public const INSTALLER_VERSION = 18;
 
     public const VENDOR_AUTOLOAD_PHP = '/vendor/autoload.php';
 

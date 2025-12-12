@@ -56,9 +56,32 @@ function logoutOnWindowClose() {
         if (!Editor.data.logoutOnWindowClose) {
             return;
         }
-        // Destroy the user session and prevent redirect. The sendBacon uses HTTP POST requests to send data, and
-        // cookies are automatically included in the request.
-        navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?noredirect=1&beacon=true');
+
+        const route = Editor.data.pathToRunDir + '/login/logout';
+
+        const formData = new FormData();
+        formData.append('noredirect', 1);
+        formData.append('beacon', true);
+
+        var task = Editor.data.task;
+
+        if (task && task.getId()) {
+            formData.append('taskId', task.getId());
+        }
+
+        // Get the session cookie value to pass as URL parameter
+        // This ensures logout works even if SameSite cookie policy blocks the cookie
+        var sessionCookie = document.cookie.split('; ').find(row => row.startsWith('zfExtended='));
+        if (sessionCookie) {
+            var sessionId = sessionCookie.split('=')[1];
+            // Problem which might arise:
+            // if we implement https://jira.translate5.net/browse/T5DEV-295 we might run into problems here since Cookie not accesable anymore.
+            formData.append('sid', sessionId);
+        }
+
+        // Destroy the user session and prevent redirect. The sendBeacon uses HTTP POST requests to send data.
+        // We pass the session ID as URL parameter because cookies may not be sent with SameSite=Lax during beforeunload
+        navigator.sendBeacon(route,formData);
         document.cookie = "zfExtended=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     };
 }

@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `match_analysis_pricing_preset` (
     `isDefault` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE(`name`),
-    CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
+    CONSTRAINT `match_analysis_pricing_preset_ibfk_1` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE
 );
 
 -- Insert system default preset
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `match_analysis_pricing_preset_range` (
     `from` INT NOT NULL,
     `till` INT NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`presetId`) REFERENCES `match_analysis_pricing_preset` (`id`) ON DELETE CASCADE
+    CONSTRAINT `match_analysis_pricing_preset_range_ibfk_1` FOREIGN KEY (`presetId`) REFERENCES `match_analysis_pricing_preset` (`id`) ON DELETE CASCADE
 );
 
 -- Insert ranges for system default preset
@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS `match_analysis_pricing_preset_prices` (
     `currency` VARCHAR(3) NOT NULL DEFAULT '',
     `pricesByRangeIds` JSON,
     PRIMARY KEY (`id`),
-    CONSTRAINT FOREIGN KEY (`presetId`) REFERENCES `match_analysis_pricing_preset` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`sourceLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT FOREIGN KEY (`targetLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `match_analysis_pricing_preset_prices_ibfk_1` FOREIGN KEY (`presetId`) REFERENCES `match_analysis_pricing_preset` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `match_analysis_pricing_preset_prices_ibfk_2` FOREIGN KEY (`sourceLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `match_analysis_pricing_preset_prices_ibfk_3` FOREIGN KEY (`targetLanguageId`) REFERENCES `LEK_languages` (`id`) ON DELETE RESTRICT
 );
 
 -- Add constraints at last, so tables are created even when constraints fail

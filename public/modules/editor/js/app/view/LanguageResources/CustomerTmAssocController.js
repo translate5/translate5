@@ -149,7 +149,7 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
      * @param checked
      * @param record
      */
-    onToggleClientAssoc: function(column, rowIndex, checked, record) {
+    onToggleClientAssoc: function(column, rowIndex, checked, record, e) {
         var me = this,
             view = me.getView(),
             customerId = view.up('[viewModel]').getViewModel().get('record').getId(),
@@ -178,11 +178,30 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
         record.save({
             preventDefaultHandler: true,
             params: {
-                forced: 0
+                // Here we do this check to distinguish between cases when onToggleClientAssoc is called as a handler
+                // for checkchange-event with Ext.event.Event as 5th argument, and cases when onToggleClientAssoc
+                // is called by ourselves with 1 as 5th argument to be used as forced-param for PUT request
+                forced: e === true ? 1 : 0
             },
-            failure: (rec, op) => Editor.app.getController('ServerException').handleException(
-                op.error.response
-            ),
+            failure: (rec, op) => {
+
+                // Reject changes for now, because at this point we don't know whether user will press Yes-button in
+                // task <-> langres unassign confirmation dialog that will be shown if current langres is assigned to
+                // at least a single task.
+                record.reject();
+                record.refreshFlags(customerId);
+
+                // But if such a confirmation dialog will be surely shown
+                // - set up a retry() function to be called if Yes-button is pressed
+                if (~['E1447', 'E1473'].indexOf(op.error.response.responseJson?.errorCode)) {
+                    op.error.response.retry = forced => {
+                        me.onToggleClientAssoc(column, rowIndex, checked, record, forced);
+                    }
+                }
+
+                // Handle exception
+                Editor.app.getController('ServerException').handleException(op.error.response)
+            },
             success: () => {
                 record.refreshFlags(customerId);
                 Editor.MessageBox.addSuccess(

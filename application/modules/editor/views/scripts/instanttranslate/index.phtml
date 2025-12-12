@@ -278,7 +278,7 @@ $languageSelector[] = '</form>';
                 name="sourceFile"
                 type="file"
                 class="hide"
-                accept=".<?= implode(',.', $this->Php2JsVars()->get('supportedFileExtensions')); ?>"
+                accept=".<?= implode(',.', array_values($this->Php2JsVars()->get('supportedFileExtensions'))[0]); ?>"
             />
 
             <input

@@ -14,7 +14,46 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+## [7.32.8] - 2025-12-11
 
+### Important Notes:
+#### [TRANSLATE-5150](https://jira.translate5.net/browse/TRANSLATE-5150)
+IMPORTANT: session id is cleaned now when user is logged out when browser window is closed and new one will be generate on next authentication. Before the fix the old session_id was reused on each authentication.
+ 
+
+
+### Changed
+**[TRANSLATE-5152](https://jira.translate5.net/browse/TRANSLATE-5152): LanguageResources - Improve search of synchronisable language resource** <br>
+7.32.8: Improve search of synchronisable language resource
+
+**[TRANSLATE-5033](https://jira.translate5.net/browse/TRANSLATE-5033): Import/Export - Improve visual PDF export to solve getting actual downloads in short intervals** <br>
+IMPROVEMENT: Visual Export will be refreshed every time, it is initiated without any waiting-time
+
+
+### Bugfixes
+**[TRANSLATE-5162](https://jira.translate5.net/browse/TRANSLATE-5162): InstantTranslate - 100% matches shown twice in InstantTranslate** <br>
+Group matches in t5memory connector translate method call
+
+**[TRANSLATE-5157](https://jira.translate5.net/browse/TRANSLATE-5157): TermTagger integration - Problem with Termtagger creating invalid nesting in seldom circumstances** <br>
+* FIX: Termtagger may produces invalidly nested tags in rare situation - which are now automatically fixed
+
+**[TRANSLATE-5150](https://jira.translate5.net/browse/TRANSLATE-5150): Main back-end mechanisms (Worker, Logging, etc.) - Logout on windows close never clean user session** <br>
+Solves problem where user session was not cleaned up when closing the browser.
+
+**[TRANSLATE-5149](https://jira.translate5.net/browse/TRANSLATE-5149): Installation & Update - Implement a check in database:update to prevent FKs without explicit names** <br>
+Newer DB version has changed foreign key naming scheme, therefore a check was implemented that on development always names are given for foreign keys.
+
+**[TRANSLATE-5148](https://jira.translate5.net/browse/TRANSLATE-5148): TermTagger integration - Bug in Termtagging Code changing term id's directly in segment targets** <br>
+FIX: Changed terms might lead to markup-errors in a segments target if the segment contained the replaced term
+
+**[TRANSLATE-5143](https://jira.translate5.net/browse/TRANSLATE-5143): Editor general - RootCause: Cannot read properties of undefined (reading 'down')** <br>
+Fixed an error in the front-end on removing language resources from tasks in the clients tab
+
+**[TRANSLATE-5126](https://jira.translate5.net/browse/TRANSLATE-5126): InstantTranslate - Instant translate: open task for editing leaves task locked** <br>
+Task will be unlocked and the job will be closed when user closes the browser.
+
+**[TRANSLATE-5098](https://jira.translate5.net/browse/TRANSLATE-5098): InstantTranslate - Customers file filters are not used for file extension checking** <br>
+Custom customers file filters are not used for file extension checking when using file translation in InstantTranslate
 
 
 ## [7.32.7] - 2025-12-02
