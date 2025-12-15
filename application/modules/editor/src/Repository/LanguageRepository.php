@@ -89,7 +89,7 @@ class LanguageRepository
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, int>
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      */
@@ -99,7 +99,13 @@ class LanguageRepository
         $db = $languages->db->getAdapter();
         $select = $db->select()->from(editor_Models_Db_Languages::TABLE_NAME, ['rfc5646', 'id']);
 
-        return $db->query($select)->fetchAll(PDO::FETCH_KEY_PAIR);
+        $map = [];
+
+        foreach ($db->query($select)->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $map[strtolower($row['rfc5646'])] = (int) $row['id'];
+        }
+
+        return $map;
     }
 
     /**
