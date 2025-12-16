@@ -1691,7 +1691,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
-        foreach ($this->view->rows as &$row) {
+        foreach ($this->view->rows as $idx => &$row) {
             $penalties = $taskPenaltyDataProvider->getPenalties(
                 $taskGuid,
                 $languageResourceId,
@@ -1702,6 +1702,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             );
             $row->penaltyGeneral = $penalties['penaltyGeneral'];
             $row->penaltySublang = $penalties['penaltySublang'];
+
+            // Omit forbidden terms
+            if ($row->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION
+                && editor_Models_Terminology_Models_TermModel::isForbiddenTerm($row->metaData['status'])) {
+                unset($this->view->rows[$idx]);
+            }
         }
         unset($row);
 
@@ -1712,7 +1718,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $row->tmConversionState = $this->view->tmConversionState;
             }
         }
-        $this->view->total = count($this->view->rows);
+        $this->view->total = count($this->view->rows = array_values($this->view->rows));
     }
 
     /**

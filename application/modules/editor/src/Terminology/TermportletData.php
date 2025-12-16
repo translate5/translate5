@@ -131,7 +131,7 @@ class TermportletData
             return [];
         }
 
-        return $this->termModel->sortTerms($result);
+        return $this->termModel->sortTermGroups($result);
     }
 
     /**
@@ -178,6 +178,7 @@ class TermportletData
                 'sameTerm' => $db->quoteInto('`term` IN (?)', array_unique($termByTermEntryIdA)),
                 'sameLanguageId' => $db->quoteInto('`languageId` IN (?)', $this->{$type . 'Langs'}),
                 'otherTermEntryId' => $db->quoteInto('`termEntryId` NOT IN (?)', array_keys($termByTermEntryIdA)),
+                'processStatus' => $db->quoteInto('`processStatus` IN (?)', $processStatusA),
             ];
 
             // As long as we might already have some of homonyms within the current termportlet data we have to
@@ -190,16 +191,15 @@ class TermportletData
                   AND {$where['sameLanguageId']}
                   AND {$where['otherTermEntryId']}
                   AND `collectionId` IN ($collectionIds)
-                  AND `processStatus` = 'finalized'
+                  AND {$where['processStatus']}
             ")->fetchAll(\PDO::FETCH_COLUMN);
 
             // If we have something
             if ($homonymTermEntryIdA) {
                 // Prepare parts of WHERE clause to find homonyms themselves
-                $where = [
+                $where += [
                     'homonymTermEntryId' => $db->quoteInto('`termEntryId` IN (?)', array_unique($homonymTermEntryIdA)),
                     'allUsedLanguageIds' => $db->quoteInto('`languageId` IN (?)', $this->allUsedLanguageIds),
-                    'processStatus' => $db->quoteInto('`processStatus` IN (?)', $processStatusA),
                 ];
 
                 // Fetch homonyms and along with their translations as stdClass-instances, all grouped by their termEntryId

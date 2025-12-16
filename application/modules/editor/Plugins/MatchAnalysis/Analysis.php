@@ -399,6 +399,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $bestMatchRateResult = null;
         $bestMatchRate = null;
 
+        $termModel = new editor_Models_Terminology_Models_TermModel();
+        $termArray = [];
+
         //query the segment for each assigned tm
         foreach ($this->getConnectorsIterator() as $languageResourceId => $connector) {
             if ($this->isDisabledDueErrors($connector, $languageResourceId)) {
@@ -459,27 +462,29 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     continue;
                 }
 
-                //If the matchrate is the same between matches from one connector,
+                // If the matchrate is the same between matches from one connector,
                 // we only check for a new best match if it is from a termcollection
                 if ($bestResultCurrentConnector->matchrate == $match->matchrate && ! $isTermCollection) {
                     continue;
                 }
 
                 if ($isTermCollection) {
-                    // - preferred terms > permitted terms
-                    // - if multiple permitted terms: take the first
-                    if (! is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == MatchRateType::TYPE_TERM_COLLECTION) {
-                        $bestMatchMetaData = $bestMatchRateResult->metaData;
-                        $bestMatchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($bestMatchMetaData['status']);
-                        if ($bestMatchIsPreferredTerm) {
-                            continue;
-                        }
+                    // Prevent forbidden terms from being best matches
+                    if (editor_Models_Terminology_Models_TermModel::isForbiddenTerm($match->metaData['status'])) {
+                        continue;
                     }
-                    // - only allow preferred and permitted terms for best matches
-                    $metaData = $match->metaData;
-                    $matchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($metaData['status']);
-                    $matchIsPermittedTerm = editor_Models_Terminology_Models_TermModel::isPermittedTerm($metaData['status']);
-                    if (! $matchIsPreferredTerm && ! $matchIsPermittedTerm) {
+
+                    // Append term to array for further sorting
+                    $termArray[$match->matchrate][] = (object) $match->metaData;
+
+                    // Sort terms
+                    $sorted = $termModel->sortTerms(
+                        $termArray[$match->matchrate],
+                        $this->task->getTargetLang()
+                    );
+
+                    // If current one is NOT the best one - skip current one
+                    if ($match->metaData['id'] !== $sorted[0]->id) {
                         continue;
                     }
                 }

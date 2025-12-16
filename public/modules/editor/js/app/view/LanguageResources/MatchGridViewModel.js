@@ -59,8 +59,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewModel', {
                         autoLoad: false,
                         model: 'Editor.model.LanguageResources.EditorQuery',
                         sorters: [{
-                            property: 'matchrate',
-                            direction: 'DESC'
+                            sorterFn: (r1, r2) => Math.sign(r2.finalMatchRate() - r1.finalMatchRate()),
                         }]
                     }
                     /*

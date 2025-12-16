@@ -179,6 +179,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             $entity->getId(),
             $useMajorLangs ? $taskMajorSourceLangId : $this->sourceLang,
             $useMajorLangs ? $taskMajorTargetLangId : $this->targetLang,
+            $this->config?->runtimeOptions->terminology->usedTermProcessStatus?->toArray(),
         ]);
         $searchCollection->setSearchField($field);
         $results = $searchCollection->search($queryString, $useWildcards);
@@ -194,7 +195,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $definitions = $term->getDeffinitionsByEntryIds($groupids);
 
         $term = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
-        $groups = $term->sortTerms([$results]);
+        $groups = $term->sortTermGroups([$results]);
 
         $this->tagHandler->setQuerySegment($queryString);
 
