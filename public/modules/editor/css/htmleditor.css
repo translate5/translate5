@@ -200,9 +200,16 @@ body.segment-size-6 .ck .image-inline img {
     display: none;
 }
 
-.x-panel-body-default .ck .ck-editor__editable {
-    padding: 4px 9px 3px 9px;
+.x-panel-body-default .ck .ck-editor__main {
+    padding: 5px 10px 4px 10px;
 }
+
+.x-panel-body-default .ck.ck-editor__main .ck.ck-editor__editable {
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
 :root {
     --ck-inner-shadow: none;
 }
@@ -210,7 +217,7 @@ body.segment-size-6 .ck .image-inline img {
     margin: 0;
 }
 .ck-content .image-inline {
-    vertical-align: text-top;
+    vertical-align: bottom;
 }
 .ck.ck-editor__top.ck-reset_all {
     height: 0;

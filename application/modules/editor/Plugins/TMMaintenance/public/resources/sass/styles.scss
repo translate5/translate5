@@ -23,3 +23,27 @@
 .x-menuseparator {
   display: none;
 }
+
+:root {
+  --ck-inner-shadow: none;
+}
+
+.ck.ck-editor__top.ck-reset_all {
+  height: 0;
+}
+
+.x-input-wrap-el .ck.ck-editor__main {
+  padding: 5px 10px;
+
+  .ck-editor__editable {
+    margin: 0;
+    padding: 0;
+    border: none;
+
+    > p {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
