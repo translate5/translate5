@@ -74,6 +74,8 @@ abstract class editor_Task_Type_Abstract
 
     protected bool $instantFileTranslation = false;
 
+    protected bool $defaultWriteAccessAllowed = true;
+
     /**
      * Returns true if usage of term tagging is disabled for that type
      */
@@ -131,6 +133,11 @@ abstract class editor_Task_Type_Abstract
     public function supportsTaskTm(): bool
     {
         return $this->supportsTaskTm;
+    }
+
+    public function isDefaultWriteAccessAllowed(): bool
+    {
+        return $this->defaultWriteAccessAllowed;
     }
 
     public function id(): string

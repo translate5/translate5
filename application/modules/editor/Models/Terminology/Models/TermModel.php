@@ -87,6 +87,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     public const PROCESS_STATUS_FINALIZED = 'finalized';
 
+    public const PROCESS_STATUS_REJECTED = 'rejected';
+
     public const STAT_PREFERRED = 'preferredTerm';
 
     public const STAT_ADMITTED = 'admittedTerm';
@@ -102,6 +104,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     public const STAT_SUPERSEDED = 'supersededTerm';
 
     public const STAT_NOT_FOUND = 'STAT_NOT_FOUND'; //Dieser Status ist nicht im Konzept definiert, sondern wird nur intern verwendet!
+
+    public const STAT_MAP_PERMITTED = 'permitted';
+
+    public const STAT_MAP_FORBIDDEN = 'forbidden';
+
+    public const STAT_MAP_PREFERRED = 'preferred';
+
+    public const STAT_MAP_STANDARDIZED = 'standardized';
 
     public const TRANSSTAT_FOUND = 'transFound';
 
@@ -130,6 +140,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         self::STAT_SUPERSEDED => 3,
         self::STAT_NOT_FOUND => 3,
         self::STAT_ADMITTED => 99,
+    ];
+
+    protected array $processStatOrder = [
+        self::PROCESS_STATUS_FINALIZED => 1,
+        self::PROCESS_STATUS_PROV_PROCESSED => 2,
+        self::PROCESS_STATUS_UNPROCESSED => 3,
+        self::PROCESS_STATUS_REJECTED => 4,
     ];
 
     /**
@@ -1382,7 +1399,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Sortiert die Terme innerhalb der Termgruppen:
      */
-    public function sortTerms(array $termGroups): array
+    public function sortTermGroups(array $termGroups): array
     {
         foreach ($termGroups as $groupId => $group) {
             usort($group, [$this, 'compareTerms']);
@@ -1390,6 +1407,43 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         return $termGroups;
+    }
+
+    /**
+     * Sort terms by whether their language exactly match task's target language
+     * so that the matching ones to be moved at the beginning of resulting array
+     */
+    public function sortTerms(array $terms, int $taskTargetLangId): array
+    {
+        usort($terms, function ($term1, $term2) use ($taskTargetLangId) {
+            // Compare by usage status (i.e. from Standardized to Admitted)
+            $term1 = is_array($term1) ? (object) $term1 : $term1;
+            $term2 = is_array($term2) ? (object) $term2 : $term2;
+            $result = $this->compareTermStatus($term1->status, $term2->status);
+            if ($result !== 0) {
+                return $result;
+            }
+
+            // If usage status is equal - compare by whether term language exactly matches the task target language
+            $lang1match = $taskTargetLangId === (int) $term1->languageId;
+            $lang2match = $taskTargetLangId === (int) $term2->languageId;
+            if ($lang1match !== $lang2match) {
+                return $lang1match ? -1 : 1;
+            }
+
+            // If language match status is equal - compare by processStatus (i.e. from Finalized to Unprocessed)
+            $proc1 = $this->processStatOrder[$term1->processStatus];
+            $proc2 = $this->processStatOrder[$term2->processStatus];
+            if ($proc1 === $proc2) {
+                return 0;
+            } elseif ($proc1 < $proc2) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+
+        return $terms;
     }
 
     /**
@@ -1430,6 +1484,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         //Kriterium 4 - alphanumerische Sortierung:
         return strcmp(mb_strtolower($term1->term), mb_strtolower($term2->term));
+    }
+
+    public function getStatusOrder(string $status): int
+    {
+        return $this->statOrder[$status];
     }
 
     /**
@@ -1824,7 +1883,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             return false;
         }
 
-        return $termStatusMap[$termStatus] == 'preferred';
+        return $termStatusMap[$termStatus] == self::STAT_MAP_PREFERRED;
     }
 
     /**
@@ -1838,7 +1897,20 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             return false;
         }
 
-        return $termStatusMap[$termStatus] == 'permitted';
+        return $termStatusMap[$termStatus] == self::STAT_MAP_PERMITTED;
+    }
+
+    /**
+     * Is the term a "forbidden" term according to the given status?
+     */
+    public static function isForbiddenTerm(string $termStatus): bool
+    {
+        $termStatusMap = self::getTermStatusMap();
+        if (! array_key_exists($termStatus, $termStatusMap)) {
+            return false;
+        }
+
+        return $termStatusMap[$termStatus] === self::STAT_MAP_FORBIDDEN;
     }
 
     /**

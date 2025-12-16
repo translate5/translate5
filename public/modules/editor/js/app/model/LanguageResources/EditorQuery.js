@@ -48,6 +48,12 @@ Ext.define('Editor.model.LanguageResources.EditorQuery', {
     {name: 'metadata'},
     {name: 'tmConversionState', type: 'string'}
   ],
+  finalMatchRate: function() {
+      var pg = this.get('penaltyGeneral') || 0,
+          ps = this.get('penaltySublang') || 0,
+          om = this.get('matchrate'); // original matchrate
+      return om - pg - ps;
+  },
   SERVER_STATUS_LOADED:'loaded',
   SERVER_STATUS_LOADING: 'loading',
   SERVER_STATUS_NORESULT: 'noresult',

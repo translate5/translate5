@@ -1,0 +1,332 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection test</title>
+                <note>Contains the languages: en, en-GB, en-US, de-DE</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at https://translate5.local by the user Project Manager</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="ida708f240-7cef-4d51-8089-5bb31c4d44ef">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2025-11-07</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2025-11-20</date>
+                </transacGrp>
+                <langSet xml:lang="de-de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="idab69c7b8-6401-4c95-b1de-a70d988854ee">Ventilinsel</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en-us">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="idb81d9c78-704f-40b8-9bfe-72b04a58d8c6">valve manifold</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en-gb">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-11</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-20</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id575a9d70-c070-4212-ac26-31d5a0e09c69">Valve terminal preferred</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="id1e0beb23-433e-4a86-8daf-b2f4e4a0b4a3">Valve terminal legal</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">legalTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">legalTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="id55cdf2c5-27bd-4392-a920-4757dd626520">Valve terminal admitted</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">admittedTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="idb33aefb6-e9cc-44be-815e-98c04f21d216">Valve terminal deprecated</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">deprecatedTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="id40070fb8-21fa-4e31-93df-1e729fb2372d">Valve terminal superseded</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">supersededTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">supersededTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="idc1a40465-3776-44bd-b13a-3f9086e44ddf">Valve terminal regulated</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">regulatedTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">regulatedTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="id62ccb81b-51b1-456f-8c6a-90dc3573a9ca">Valve terminal standardized en-gb</term>
+                        <termNote type="processStatus">provisionallyProcessed</termNote>
+                        <termNote type="administrativeStatus">standardizedTerm-admn-sts</termNote>
+                        <termNote type="normativeAuthorization">standardizedTerm</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="id09a63c9a-4a15-461d-ad60-e7c979018018">Valve terminal standardized en-gb finalized 1st</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">standardizedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                    <tig>
+                        <term id="idc8d460cf-64d5-45ea-81a1-b2e5568d0011">Valve terminal standardized en-gb finalized 2nd</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">standardizedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-20</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-17</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-18</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id0400742c-1c25-461d-ba95-a39d679706d0">Valve terminal standardized en</term>
+                        <termNote type="processStatus">provisionallyProcessed</termNote>
+                        <termNote type="administrativeStatus">standardizedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-17</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-18</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="ide91ef0c0-6d35-4a10-bf10-5f34ec1790ba">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2025-11-07</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2025-11-07</date>
+                </transacGrp>
+                <langSet xml:lang="de-de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="ida364c27e-f50e-4c32-a413-cfd6c7180c75">Kabelverteiler</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en-gb">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2025-11-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="ide921a294-84d2-4c3f-b026-77bb41a759a3">Cable distributor</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2025-11-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+    </text>
+</martif>

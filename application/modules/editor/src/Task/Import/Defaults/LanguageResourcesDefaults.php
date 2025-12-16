@@ -64,7 +64,10 @@ class LanguageResourcesDefaults implements ITaskDefaults
                 $languageResourceId
             )['sublangMismatch'];
 
-            $segmentsUpdatable = ! empty($assocRow['writeAsDefault']) && $subLangMismatch === false;
+            $segmentsUpdatable = ! empty($assocRow['writeAsDefault'])
+                && $subLangMismatch === false
+                && $task->getTaskType()->isDefaultWriteAccessAllowed()
+            ;
 
             $this->associateTaskOperation->associate($languageResourceId, $taskGuid, $segmentsUpdatable);
 

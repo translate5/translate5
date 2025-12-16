@@ -37,9 +37,11 @@ use MittagQI\Translate5\T5Memory\Contract\TmxImportProcessor;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateFileForTmxPreprocessingException;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\ContentProtectionProcessor;
+use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\FixCreationTimeProcessor;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\TmxSymbolsFixer;
 use XMLReader;
 use XMLWriter;
 use Zend_Registry;
@@ -54,6 +56,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         private readonly LanguageRepository $languageRepository,
         private readonly iterable $tmxImportProcessors,
         private readonly ZfExtended_Logger $logger,
+        private readonly TmxSymbolsFixer $symbolsFixer,
     ) {
     }
 
@@ -68,8 +71,10 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
                 RemoveCompromisedSegmentsProcessor::create(),
                 ContentProtectionProcessor::create(),
                 TranslationUnitResegmentProcessor::create(),
+                FixCreationTimeProcessor::create(),
             ],
             Zend_Registry::get('logger')->cloneMe('editor.t5memory.tmx-import-preprocessing'),
+            new TmxSymbolsFixer(),
         );
     }
 
@@ -109,6 +114,8 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
             @mkdir($problematicDir, recursive: true);
         }
 
+        $this->symbolsFixer->fixInvalidXmlSymbols($filepath);
+
         $processedFilename = str_replace('.tmx', '', basename($filepath)) . '_processed.tmx';
         $problematicFilename = str_replace('.tmx', '', basename($filepath)) . '_problematic.tmx';
 
@@ -124,8 +131,12 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         $writer->startDocument('1.0', 'UTF-8');
         $writer->setIndent(true);
 
-        $reader = new XMLReader();
-        $reader->open($filepath);
+        $reader = XMLReader::open($filepath);
+
+        if (! $reader) {
+            throw new \RuntimeException('Unable to open TMX file for reading: ' . $filepath);
+        }
+
         $writtenElements = 0;
 
         // suppress: namespace error : Namespace prefix t5 on n is not defined
@@ -135,11 +146,11 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         $brokenTranslationUnitIndicator = BrokenTranslationUnitLogger::create($this->logger, $problematicFilepath);
 
         while ($reader->read()) {
-            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
+            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name === 'header') {
                 $writer->writeRaw($reader->readOuterXML());
             }
 
-            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
+            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name === 'tu') {
                 $tus = $processorChain->process(
                     $reader->readOuterXML(),
                     $sourceLang,

@@ -75,6 +75,8 @@ abstract class FileTranslationTypeAbstract extends editor_Task_Type_Abstract
 
     protected bool $instantFileTranslation = true;
 
+    protected bool $defaultWriteAccessAllowed = false;
+
     public function __construct()
     {
         $this->isAllowedSeeTasks = ZfExtended_Authentication::getInstance()

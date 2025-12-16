@@ -364,9 +364,9 @@ class RecalcTransFound
                         }
                     }
 
-                    // Wrap $firstA into an array to mame it compatible with further TermModel->sortTerms()
+                    // Wrap $firstA into an array to mame it compatible with further TermModel->sortTermGroups()
                     $firstA = [$firstA];
-                    $firstA = $this->termModel->sortTerms($firstA);
+                    $firstA = $this->termModel->sortTermGroups($firstA);
                     $firstA = $firstA[0];
 
                     // Get status of first translation, which is the best translation we have in terminology db

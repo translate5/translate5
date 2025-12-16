@@ -452,8 +452,12 @@ export default class EditorWrapper {
             }
 
             const root = writer.model.document.getRoot();
-            const start = writer.model.createPositionFromPath(root, [0, rangeStart]);
-            const end = writer.model.createPositionFromPath(root, [0, rangeEnd]);
+            const rootChild = root.getChild(0);
+            const maxOffset = rootChild ? rootChild.maxOffset : 0;
+            const effectiveRangeEnd = Math.min(rangeEnd, maxOffset);
+            const effectiveRangeStart = Math.min(rangeStart, effectiveRangeEnd);
+            const start = writer.model.createPositionFromPath(root, [0, effectiveRangeStart]);
+            const end = writer.model.createPositionFromPath(root, [0, effectiveRangeEnd]);
             const range = writer.model.createRange(start, end);
 
             writer.setSelection(range);

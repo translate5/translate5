@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Terminology;
 
 use editor_Models_Languages;
 use editor_Models_TermCollection_TermCollection;
+use editor_Models_Terminology_Models_TermModel as TermModel;
 use Zend_Cache_Exception;
 use ZfExtended_Factory;
 
@@ -88,13 +89,19 @@ class SearchCollection
     public function __construct(
         private int $collectionId,
         private int $sourceLang,
-        private int $targetLang
+        private int $targetLang,
+        private ?array $processStatus = null,
     ) {
         $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
         // get source and target language fuzzy
         $this->sourceLangauges = $languageModel->getFuzzyLanguages($sourceLang, 'id', true);
         $this->targetLangauges = $languageModel->getFuzzyLanguages($targetLang, 'id', true);
+
+        // Set fallback whitelist of process statuses, if needed
+        if (! $this->processStatus) {
+            $this->processStatus = [TermModel::PROCESS_STATUS_FINALIZED];
+        }
     }
 
     /***
@@ -171,6 +178,7 @@ class SearchCollection
             ->where('term ' . $compareWith . '?', $this->query)
             ->where('collectionId = ?', $this->collectionId)
             ->where('languageId IN(?)', $langauges)
+            ->where('processStatus IN(?)', $this->processStatus)
             ->group('termEntryTbxId');
 
         return $db->fetchAll($s)->toArray();
@@ -196,6 +204,7 @@ class SearchCollection
                 'ta' => 'terms_attributes',
             ], 'ta.termId = t.id AND ta.type = "processStatus"', ['ta.type AS processStatusAttribute', 'ta.value AS processStatusAttributeValue'])
             ->where('t.termEntryTbxId IN(?)', $termEntryTbxIds)
+            ->where('processStatus IN(?)', $this->processStatus)
             ->where('t.languageId IN(?)', $langauges)
             ->where('t.collectionId = ?', $this->collectionId);
 

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Terminology_Models_TermModel as TermModel;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
@@ -802,10 +803,10 @@ class Editor_SegmentController extends ZfExtended_RestController
         }
 
         $data['termStatus'] = [
-            'permitted' => $translate->_('erlaubte Benennung'),
-            'forbidden' => $translate->_('verbotene Benennung'),
-            'standardized' => $translate->_('Standardisiert'),
-            'preferred' => $translate->_('Vorzugsbenennung'),
+            TermModel::STAT_MAP_PERMITTED => $translate->_('erlaubte Benennung'),
+            TermModel::STAT_MAP_FORBIDDEN => $translate->_('verbotene Benennung'),
+            TermModel::STAT_MAP_STANDARDIZED => $translate->_('Standardisiert'),
+            TermModel::STAT_MAP_PREFERRED => $translate->_('Vorzugsbenennung'),
             'unknown' => $translate->_('Unbekannter Term Status'),
         ];
 
