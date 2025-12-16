@@ -326,16 +326,16 @@
         },
         {
             "name": "deeplcom/deepl-php",
-            "version": "v1.14.0",
+            "version": "v1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DeepLcom/deepl-php.git",
-                "reference": "9919364b390ee0be75979fa242fba1a903a28dfc"
+                "reference": "4dd0a38676b9725dd80b86b71548b91d2c0f5a69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/9919364b390ee0be75979fa242fba1a903a28dfc",
-                "reference": "9919364b390ee0be75979fa242fba1a903a28dfc",
+                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/4dd0a38676b9725dd80b86b71548b91d2c0f5a69",
+                "reference": "4dd0a38676b9725dd80b86b71548b91d2c0f5a69",
                 "shasum": ""
             },
             "require": {
@@ -383,9 +383,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DeepLcom/deepl-php/issues",
-                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.14.0"
+                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.16.0"
             },
-            "time": "2025-11-10T19:59:35+00:00"
+            "time": "2025-12-10T21:01:51+00:00"
         },
         {
             "name": "doctrine/annotations",
