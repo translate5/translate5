@@ -41,6 +41,10 @@ class TransUnitParser
         Language $sourceLang,
         Language $targetLang,
     ): TransUnitStructure {
+        if (trim($transUnit) === '') {
+            throw new BrokenTranslationUnitException($transUnit);
+        }
+
         $sourceSegment = '';
         $targetSegment = '';
 

@@ -632,7 +632,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
                 $item->name = $name;
                 $item->value = $found->{$name};
                 if ($name === 'timestamp') {
-                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
+                    // if date before unix time provided in TMX t5memory will not save time at all.
+                    // and later that will result in lots of issues on our side.
+                    // so we preserve segments but mark them as old as who knows how valid they actually are
+                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value) ?: 0);
                 }
                 $result[] = $item;
             }
