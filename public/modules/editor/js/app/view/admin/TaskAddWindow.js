@@ -245,7 +245,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     toolTip: me.strings.targetLangTip,
                                     fieldLabel: me.strings.targetLangLabel,
                                     //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
+                                    store: Ext.create('Editor.store.admin.SelectableLanguages'),
                                     typeAhead: false,
                                     autoSelect:true,
                                     //autoSelectLast:false,

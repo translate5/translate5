@@ -36,7 +36,8 @@ Ext.define('Editor.store.admin.Languages', {
         {name: 'label', type: 'string'},
         {name: 'rtl', type: 'boolean'},
         {name: 'rfc5646', type: 'string'},
-        {name: 'iso3166Part1alpha2', type: 'string'}
+        {name: 'iso3166Part1alpha2', type: 'string'},
+        {name: 'hidden', type: 'boolean'}
     ],
     alias: 'store.languagestore',
     data: Editor.data.languages,

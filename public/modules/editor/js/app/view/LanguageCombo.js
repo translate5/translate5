@@ -48,7 +48,7 @@ Ext.define('Editor.view.LanguageCombo', {
         var me = this,
             config = {
                 //each combo needs its own store instance, see EXT6UPD-8
-                store: Ext.create(Editor.store.admin.Languages),
+                store: Ext.create('Editor.store.admin.SelectableLanguages'),
             };
         
         if(instanceConfig.name && /source/.test(instanceConfig.name)) {
