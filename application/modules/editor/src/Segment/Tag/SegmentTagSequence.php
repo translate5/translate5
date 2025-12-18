@@ -326,7 +326,12 @@ class SegmentTagSequence extends TagSequence
         // Clean trackchanges with the new cleaner
         $markup = $this->cloneFiltered($includedTypes, false)->render();
         $remover = new RemoveTrackChanges();
+
+        // TODO FIXME: Does the remover also adjusts Whitespace ? E.g.
+        // Word1 <del>...</del> <del>...</del> Word2 -> Word1 Word2
         $markup = $remover->remove($markup);
+
+        // TODO FIXME: This is crazy code, why not $clonedTags = $this->createClone(); ???
         $clonedTags = $this->cloneFiltered();
         $clonedTags->text = '';
         $clonedTags->textLength = 0;
@@ -335,10 +340,14 @@ class SegmentTagSequence extends TagSequence
         $clonedTags->capturedErrors = [];
         $clonedTags->_setMarkup($markup);
 
+        // TODO FIXME: Why is this call still here when TrackChanges is already removed above ?
         if ($clonedTags->hasNestedTrackChangesTags()) {
             $clonedTags->normalizeTrackChangesTags();
         }
         // if no trackchanges-tags were removed, the method will not fix parent orders...
+
+        // TODO FIXME: Why is this call still here if TC is already removed above ? -> the whole API can be removed
+        // then instead of deprecating it ...
         if (! $clonedTags->deleteTrackChangesTags($condenseBlanks)) {
             $clonedTags->fixParentOrders();
         }

@@ -79,6 +79,12 @@ class editor_Segment_Export
      */
     public function process(bool $preserveTrackChanges = false): string
     {
+        // TODO FIXME: temporary fix for invalid markup that may prevents export
+        // see https://jira.translate5.net/browse/TRANSLATE-5171
+        // the fix is needed since some segments were imported with faulty markup for some time
+        // we do detect and fix such cases now on import and this fix can removed after half a year (so from 06/2026 on)
+        $this->fieldTags->fixTermTaggerTags();
+
         // this removes all segment tags not needed for export
         $this->fieldTags = ! $preserveTrackChanges && $this->fieldTags->hasTrackChanges()
             ? $this->fieldTags->cloneWithoutTrackChanges(QualityManager::instance()->getAllExportedTypes())
