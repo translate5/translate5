@@ -57,9 +57,10 @@ use JsonException;
 use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\Segment\SegmentMarkupValidation;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
+use MittagQI\ZfExtended\Sanitizer\Type;
 use REST_Controller_Request_Http as Request;
 use ZfExtended_BadRequest;
-use ZfExtended_Sanitized_HttpRequest;
 
 class UpdateSegmentDtoFactory
 {
@@ -97,11 +98,11 @@ class UpdateSegmentDtoFactory
 
     private function getRequestData(Segment $segment, Request $request): array
     {
-        if ($request instanceof ZfExtended_Sanitized_HttpRequest) {
+        if ($request instanceof HttpRequest) {
             $editableData = $segment->getEditableDataIndexList(true);
             $sanitizationMap = array_combine(
                 $editableData,
-                array_fill(0, count($editableData), \ZfExtended_Sanitizer::MARKUP)
+                array_fill(0, count($editableData), Type::SegmentContent)
             );
 
             return $request->getData(true, $sanitizationMap);

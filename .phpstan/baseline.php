@@ -19664,16 +19664,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method ZfExtended_Sanitized_HttpRequest\\:\\:getData\\(\\) should return array\\|stdClass\\|string but returns mixed\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method ZfExtended_Sanitized_HttpRequest\\:\\:getData\\(\\) should return array\\|stdClass\\|string but returns null\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$_GET in isset\\(\\) always exists and is not nullable\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',

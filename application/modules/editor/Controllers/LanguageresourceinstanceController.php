@@ -59,8 +59,8 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Sanitizer as Sanitizer;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
-use ZfExtended_Sanitizer as Sanitizer;
 
 /***
  * Language resource controller

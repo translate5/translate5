@@ -57,9 +57,9 @@ use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
 use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
-use ZfExtended_Sanitized_HttpRequest;
 
 class ImportEventTrigger
 {
@@ -200,7 +200,7 @@ class ImportEventTrigger
 
     public function triggerOnImportFromPost(
         editor_Models_Task $task,
-        ZfExtended_Sanitized_HttpRequest $request
+        HttpRequest $request
     ): void {
         $this->triggerEvent(self::ON_POST_IMPORT, [
             'task' => $task,

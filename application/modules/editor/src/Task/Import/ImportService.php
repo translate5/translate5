@@ -43,6 +43,7 @@ use editor_Task_Type;
 use editor_Task_Type_Default;
 use Exception;
 use MittagQI\Translate5\Task\Meta\TaskMetaImmutableDTO;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
 use ReflectionException;
 use Throwable;
 use Zend_Db_Statement_Exception;
@@ -58,7 +59,6 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
-use ZfExtended_Sanitized_HttpRequest;
 
 class ImportService
 {
@@ -115,7 +115,7 @@ class ImportService
      */
     public function importFromPost(
         editor_Models_Task $project,
-        ZfExtended_Sanitized_HttpRequest $request,
+        HttpRequest $request,
         array $data,
     ): array {
         $single = $this->prepareTaskType(

@@ -43,6 +43,7 @@ use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\ZfExtended\ApiRequestDTO;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
 
 /**
  * OKAPI file converter and segmenter plugin
@@ -759,7 +760,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     {
         /** @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        /** @var ZfExtended_Sanitized_HttpRequest $request */
+        /** @var HttpRequest $request */
         $request = $event->getParam('request');
         $bconfId = $request->getParam('bconfId');
 

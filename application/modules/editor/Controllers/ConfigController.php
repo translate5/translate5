@@ -30,6 +30,8 @@ use MittagQI\Translate5\Configuration\ConfigLoader;
 use MittagQI\Translate5\Customer\CustomerConfigService;
 use MittagQI\Translate5\DbConfig\ConfigService;
 use MittagQI\ZfExtended\Acl\ConfigLevelResource;
+use MittagQI\ZfExtended\Sanitizer;
+use MittagQI\ZfExtended\Sanitizer\Type;
 use MittagQI\ZfExtended\Service\ConfigHelper;
 
 class editor_ConfigController extends ZfExtended_RestController
@@ -46,7 +48,7 @@ class editor_ConfigController extends ZfExtended_RestController
      * The param will be sanitized dynamically, see putAction
      */
     protected array $dataSanitizationMap = [
-        'value' => ZfExtended_Sanitizer::UNSANITIZED,
+        'value' => Type::Unsanitized,
     ];
 
     /**
@@ -89,7 +91,7 @@ class editor_ConfigController extends ZfExtended_RestController
         $this->entity->loadByName($this->data->name);
 
         // we have to add dynamic sanitization here depending on the config type
-        $this->data->value = ZfExtended_Sanitizer::sanitize(
+        $this->data->value = Sanitizer::sanitize(
             $this->data->value,
             ZfExtended_DbConfig_Type_CoreTypes::sanitizationType($this->entity->getType())
         );

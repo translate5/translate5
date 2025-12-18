@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
-use ZfExtended_Sanitizer as Sanitizer;
+use MittagQI\ZfExtended\Sanitizer as Sanitizer;
 
 class Editor_ReferencefileController extends ZfExtended_RestController
 {

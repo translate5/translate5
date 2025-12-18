@@ -171,7 +171,7 @@ class QualityCsvMqmTest extends JsonTestAbstract
                 $css = $severity[$hit[1]] . ' qmflag ownttip ' . $tags[$hit[2]] . ' qmflag-' . $type;
                 $img = '/modules/editor/images/imageTags/qmsubsegment-' . $type . '-' . $dir[$hit[2]] . '.png';
 
-                return sprintf('<img  class="%s" data-t5qid="ext-%s" data-comment="" src="%s" />', $css, $id, $img);
+                return sprintf('<img class="%s" data-t5qid="ext-%s" data-comment="" src="%s" />', $css, $id, $img);
             }, $tag);
         }, $data));
     }

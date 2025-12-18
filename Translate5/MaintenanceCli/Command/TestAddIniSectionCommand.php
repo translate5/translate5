@@ -88,6 +88,8 @@ class TestAddIniSectionCommand extends Translate5AbstractTestCommand
         if (! str_contains($installationIni, 'testSettings')) {
             $installationIni .= implode("\n", [
                 "\n",
+                //needed for tests, can be removed when enabling in general
+                'runtimeOptions.input.segmentContent.warnOnly = 0',
                 ';test settings, this enables api-tests via command for the instance',
                 'testSettings.testsAllowed = 1',
             ]);

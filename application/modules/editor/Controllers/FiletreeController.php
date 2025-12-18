@@ -34,7 +34,7 @@ use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use ZfExtended_Sanitizer as Sanitizer;
+use MittagQI\ZfExtended\Sanitizer;
 
 class Editor_FiletreeController extends ZfExtended_RestController
 {

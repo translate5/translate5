@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Sanitizer\Type;
 
 class Editor_CommentController extends ZfExtended_RestController
 {
@@ -41,7 +42,7 @@ class Editor_CommentController extends ZfExtended_RestController
     protected $entity;
 
     protected array $dataSanitizationMap = [
-        'comment' => ZfExtended_Sanitizer::UNSANITIZED,
+        'comment' => Type::Unsanitized,
     ];
 
     /**
