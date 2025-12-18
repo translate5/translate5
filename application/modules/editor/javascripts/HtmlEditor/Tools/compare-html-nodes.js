@@ -7,6 +7,26 @@
  * @returns {boolean}
  */
 export default function nodesAreSame(node1, node2) {
+    if (node1.nodeType === Node.TEXT_NODE) {
+        if (node2.nodeType !== Node.TEXT_NODE) {
+            return false;
+        }
+
+        return node1.textContent === node2.textContent;
+    }
+
+    if (node2.nodeType === Node.TEXT_NODE) {
+        if (node1.nodeType !== Node.TEXT_NODE) {
+            return false;
+        }
+
+        return node1.textContent === node2.textContent;
+    }
+
+    if (node1.tagName !== node2.tagName) {
+        return false;
+    }
+
     const classes1 = Array.from(node1.classList).sort().join(' ');
     const classes2 = Array.from(node2.classList).sort().join(' ');
 

@@ -22,6 +22,12 @@ export default {
     module: {
         rules: [
             {
+                test: /\.m?js$/,
+                resolve: {
+                    fullySpecified: false  // Disable the behavior for all .js and .mjs files
+                }
+            },
+            {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
                 use: ['raw-loader']
             },
@@ -53,12 +59,15 @@ export default {
             }
         ]
     },
+    resolve: {
+        extensions: ['.js', '.mjs', '.json'],
+        fullySpecified: false  // This is the key fix for "type": "module"
+    },
     mode: 'development',
     // Useful for debugging.
     devtool: 'source-map',
     // By default, webpack logs warnings if the bundle is bigger than 200kb.
     performance: {hints: false},
-    watch: true,
     watchOptions: {
         aggregateTimeout: 600,
     },
