@@ -14,6 +14,64 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+
+## [7.32.9] - 2025-12-18
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5167](https://jira.translate5.net/browse/TRANSLATE-5167): t5memory - Create TMX processor to fix tu creation dates** <br>
+Add TMX processor to fix TU creation dates
+
+**[TRANSLATE-5166](https://jira.translate5.net/browse/TRANSLATE-5166): translate5 AI - Tag-Handling may fails for OpenAI if model response unexpectedly returned an array instead of string** <br>
+FIX potential BUG when model LLM  responce unexpectedly represents an array
+
+**[TRANSLATE-5152](https://jira.translate5.net/browse/TRANSLATE-5152): LanguageResources - Improve search of synchronisable language resource** <br>
+7.32.9: Minor fix in comparing languages
+7.32.8: Improve search of synchronisable language resource
+
+**[TRANSLATE-4099](https://jira.translate5.net/browse/TRANSLATE-4099): LanguageResources - Update DeepL SDK recurring issue** <br>
+Internal update of the DeepL SDK (Internal API)
+
+
+### Bugfixes
+**[TRANSLATE-5171](https://jira.translate5.net/browse/TRANSLATE-5171): TermTagger integration - Add automatic fixing on task-export for rare terminology-tag nesting errors created when termtagging** <br>
+FIX: Rare problem when the termtagger creates invalidly nested tags are automatically fixed on export
+
+**[TRANSLATE-5163](https://jira.translate5.net/browse/TRANSLATE-5163): Main back-end mechanisms (Worker, Logging, etc.), TermPortal - Increase the api client timeout** <br>
+The request timeout is increased to 2mins for the internal api client.
+
+**[TRANSLATE-5158](https://jira.translate5.net/browse/TRANSLATE-5158): Editor general - tracked changes in closed segments not visible** <br>
+Pure UI Fix: deleted words/symbols are now correctly displayed inside spellchecked words
+
+**[TRANSLATE-5142](https://jira.translate5.net/browse/TRANSLATE-5142): VisualReview / VisualTranslation - Task import fails because of comma in a filename** <br>
+Fixed task import failing when comma in a filename was present
+
+**[TRANSLATE-5138](https://jira.translate5.net/browse/TRANSLATE-5138): InstantTranslate, LanguageResources, Task Management - InstantTranslate user wrong TM usage** <br>
+[🐞 Fix] When opening file translation in InstantTranslate, TMs are assigned with read access only regardless of the default settings
+
+**[TRANSLATE-5113](https://jira.translate5.net/browse/TRANSLATE-5113): MatchAnalysis & Pretranslation, TermPortal - Termcollection pretranslation doesn't regard sublanguage** <br>
+7.32.9: Implemented remaining open things to the issue
+7.32.3: Fixed that the sub-language penalty is respected for pure term translations: e.g. for en-gb task the en-us term is used for pretranslation. When there are multiple target terms the best one is used.
+
+**[TRANSLATE-4579](https://jira.translate5.net/browse/TRANSLATE-4579): Main back-end mechanisms (Worker, Logging, etc.) - Worker queue is called frequently and chained** <br>
+7.32.9: Fix for delayed workers
+7.32.6: small fix for tests
+7.32.2: set processdaemon as new default worker trigger
+7.21.3: Performance improvement for the workers, prevention of system overload when scheduling thousands of workers.
+
+**[TRANSLATE-4576](https://jira.translate5.net/browse/TRANSLATE-4576): TM Maintenance - nbsp-tag dragged to end of segment results in "undefined" in TM maintenance** <br>
+[🐞 Fix] Fixed tag drag'n'drop in TM Maintenance
+
+**[TRANSLATE-4572](https://jira.translate5.net/browse/TRANSLATE-4572): Editor general - uncaught error in new editor** <br>
+[🐞 Fix] Fixed inserting whitespace tag which could produce error in certain cases
+
+**[TRANSLATE-4550](https://jira.translate5.net/browse/TRANSLATE-4550): Editor general - Validate if a bad markup problem from the old editor persists in the new editor** <br>
+[🐞 Fix] Added automatic fixing for improper markup in editor
+
+
 ## [7.32.8] - 2025-12-11
 
 ### Important Notes:
