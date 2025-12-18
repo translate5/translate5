@@ -1,6 +1,7 @@
 'use strict';
 
 import calculateNodeLength from './calculate-node-length.js';
+import nodesAreSame from './compare-html-nodes.js';
 
 /**
  * @param {HTMLElement} node
@@ -8,7 +9,7 @@ import calculateNodeLength from './calculate-node-length.js';
  *
  * @returns {Node[]}
  */
-export default function splitNode(node, offset) {
+export function splitNode(node, offset) {
     if (node.nodeType === Node.TEXT_NODE) {
         const left = node.cloneNode();
         const right = node.cloneNode();
@@ -101,4 +102,72 @@ export default function splitNode(node, offset) {
     }
 
     return [leftEl, rightEl.childNodes.length > 0 ? rightEl : null];
+}
+
+/**
+ * Split a parent node at the position of a child node ignoring the child
+ *
+ * @param {HTMLElement} parentNode - The parent node to split
+ * @param {HTMLElement} childNode - The child node to extract
+ */
+export function splitNodeByChild(parentNode, childNode) {
+    // Clone the parent node to work with
+    const parentClone = parentNode.cloneNode(true);
+
+    // Find the child in the cloned parent
+    const childInClone = findChildInClone(parentClone, childNode);
+
+    if (! childInClone) {
+        console.warn('Could not find child node in clone');
+
+        return [null, null];
+    }
+
+    // Create three fragments: before, child, after
+    const beforeNode = parentNode.cloneNode(false);
+    const afterNode = parentNode.cloneNode(false);
+
+    // Split the parent's content into before and after sections
+    let beforeChild = true;
+
+    for (let i = 0; i < parentClone.childNodes.length; i++) {
+        const child = parentClone.childNodes[i];
+
+        if (child === childInClone) {
+            beforeChild = false;
+
+            continue;
+        }
+
+        if (beforeChild) {
+            beforeNode.appendChild(child.cloneNode(true));
+
+            continue;
+        }
+
+        afterNode.appendChild(child.cloneNode(true));
+    }
+
+    return [
+        beforeNode.childNodes.length > 0 ? beforeNode : null,
+        afterNode.childNodes.length > 0 ? afterNode : null,
+    ];
+}
+
+/**
+ * Find a child node in a cloned parent by comparing structure
+ * @param {HTMLElement} clonedParent - The cloned parent node
+ * @param {HTMLElement} originalChild - The original child node to find
+ * @returns {HTMLElement|null}
+ */
+function findChildInClone(clonedParent, originalChild) {
+    const allChildren = clonedParent.querySelectorAll('*');
+
+    for (const child of allChildren) {
+        if (nodesAreSame(child, originalChild)) {
+            return child;
+        }
+    }
+
+    return null;
 }

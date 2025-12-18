@@ -2,8 +2,7 @@ import Node from "./node";
 import TagsConversion from "../TagsTransform/tags-conversion";
 import TagCheck from "../TagsTransform/tag-check";
 import PixelMapping from "../TagsTransform/pixel-mapping";
-
-const htmlEncode = require('js-htmlencode').htmlEncode;
+import { htmlEncode } from 'js-htmlencode';
 
 export default class DataTransformer {
     #userCanModifyWhitespaceTags;

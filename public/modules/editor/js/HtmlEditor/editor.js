@@ -15,7 +15,7 @@ return /******/ (() => { // webpackBootstrap
 /*!********************************************!*\
   !*** ./DataCleanup/insert-preprocessor.js ***!
   \********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -83,7 +83,7 @@ class InsertPreprocessor {
 /*!*******************************************!*\
   !*** ./DataTransform/data-transformer.js ***!
   \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -94,12 +94,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../TagsTransform/tags-conversion */ "./TagsTransform/tags-conversion.js");
 /* harmony import */ var _TagsTransform_tag_check__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../TagsTransform/tag-check */ "./TagsTransform/tag-check.js");
 /* harmony import */ var _TagsTransform_pixel_mapping__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../TagsTransform/pixel-mapping */ "./TagsTransform/pixel-mapping.js");
+/* harmony import */ var js_htmlencode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! js-htmlencode */ "./node_modules/js-htmlencode/src/htmlencode.js");
 
 
 
 
 
-const htmlEncode = (__webpack_require__(/*! js-htmlencode */ "./node_modules/js-htmlencode/src/htmlencode.js").htmlEncode);
 
 class DataTransformer {
     #userCanModifyWhitespaceTags;
@@ -169,7 +169,7 @@ class DataTransformer {
 
         let result = '';
         for (const node of nodes) {
-            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
+            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : (0,js_htmlencode__WEBPACK_IMPORTED_MODULE_4__.htmlEncode)(node._transformed.textContent);
         }
 
         return result;
@@ -204,7 +204,7 @@ class DataTransformer {
         let result = "";
 
         for (const node of this._transformedNodes) {
-            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
+            result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : (0,js_htmlencode__WEBPACK_IMPORTED_MODULE_4__.htmlEncode)(node._transformed.textContent);
         }
 
         return result;
@@ -396,7 +396,7 @@ class DataTransformer {
 /*!*******************************!*\
   !*** ./DataTransform/node.js ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -446,7 +446,7 @@ class Node {
 /*!***********************************!*\
   !*** ./Editor/callbacks-queue.js ***!
   \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -519,7 +519,7 @@ class CallbacksQueue {
 /*!**********************************!*\
   !*** ./Editor/editor-wrapper.js ***!
   \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -527,7 +527,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ EditorWrapper)
 /* harmony export */ });
 /* harmony import */ var _Source__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Source */ "./Source/build/ckeditor.js");
-/* harmony import */ var _Source__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_Source__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../TagsTransform/tags-conversion */ "./TagsTransform/tags-conversion.js");
 /* harmony import */ var _Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Tools/string-to-dom */ "./Tools/string-to-dom.js");
 /* harmony import */ var _DataTransform_data_transformer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../DataTransform/data-transformer */ "./DataTransform/data-transformer.js");
@@ -1202,7 +1201,7 @@ class EditorWrapper {
      * @private
      */
     #create(uiLocale, editorLocale) {
-        return _Source__WEBPACK_IMPORTED_MODULE_0___default().create(
+        return _Source__WEBPACK_IMPORTED_MODULE_0__.create(
             this._element,
             {
                 toolbar: [],
@@ -1892,7 +1891,7 @@ class EditorWrapper {
 /*!*************************************!*\
   !*** ./Editor/language-resolver.js ***!
   \*************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -1969,7 +1968,7 @@ class LanguageResolver {
 /*!******************************!*\
   !*** ./Editor/model-node.js ***!
   \******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2117,7 +2116,7 @@ class ModelNode {
 /*!************************************!*\
   !*** ./Mixin/document-fragment.js ***!
   \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2198,7 +2197,7 @@ function(t,e){ true?module.exports=e():0}(self,()=>(()=>{"use strict";var t={698
 /*!***************************************!*\
   !*** ./TagsTransform/check-result.js ***!
   \***************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2228,7 +2227,7 @@ class CheckResult {
 /*!*******************************!*\
   !*** ./TagsTransform/font.js ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2251,7 +2250,7 @@ class Font {
 /*!****************************************!*\
   !*** ./TagsTransform/pixel-mapping.js ***!
   \****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2461,7 +2460,7 @@ class PixelMapping {
 /*!********************************!*\
   !*** ./TagsTransform/ruler.js ***!
   \********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2509,7 +2508,7 @@ class Ruler {
 /*!************************************!*\
   !*** ./TagsTransform/tag-check.js ***!
   \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2802,7 +2801,7 @@ class TagCheck {
 /*!******************************************!*\
   !*** ./TagsTransform/tags-conversion.js ***!
   \******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -2813,13 +2812,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _templating__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./templating */ "./TagsTransform/templating.js");
 /* harmony import */ var _Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Tools/string-to-dom */ "./Tools/string-to-dom.js");
 /* harmony import */ var lodash_isEqual__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/isEqual */ "./node_modules/lodash/isEqual.js");
-/* harmony import */ var lodash_isEqual__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_isEqual__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var js_htmlencode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! js-htmlencode */ "./node_modules/js-htmlencode/src/htmlencode.js");
 
 
 
 
 
-const htmlEncode = (__webpack_require__(/*! js-htmlencode */ "./node_modules/js-htmlencode/src/htmlencode.js").htmlEncode);
 
 class TagsConversion {
     static TYPE = {
@@ -2876,7 +2874,7 @@ class TagsConversion {
                     // diffTagger-markups in Fuzzy Matches: keep the text from ins-Tags, remove del-Tags completely
                     if (item.tagName.toLowerCase() === 'ins') {
                         result = item.cloneNode();
-                        result.data = htmlEncode(item.textContent);
+                        result.data = (0,js_htmlencode__WEBPACK_IMPORTED_MODULE_4__.htmlEncode)(item.textContent);
                     }
 
                     if (item.tagName.toLowerCase() === 'del') {
@@ -3126,7 +3124,7 @@ class TagsConversion {
             && this.getInternalTagType(tag1) === this.getInternalTagType(tag2)
         )
         || (
-            this.isTag(tag1) && this.isTag(tag2) && lodash_isEqual__WEBPACK_IMPORTED_MODULE_3___default()(Array.from(tag1.classList), Array.from(tag2.classList))
+            this.isTag(tag1) && this.isTag(tag2) && lodash_isEqual__WEBPACK_IMPORTED_MODULE_3__(Array.from(tag1.classList), Array.from(tag2.classList))
         )
     }
 
@@ -3199,7 +3197,7 @@ class TagsConversion {
         data.text = spanFull.innerHTML.replace(/"/g, '&quot;');
         data.id = spanFull.getAttribute('data-originalid');
         data.qualityId = TagsConversion.getElementsQualityId(item);
-        data.title = htmlEncode(spanShort.getAttribute('title'));
+        data.title = (0,js_htmlencode__WEBPACK_IMPORTED_MODULE_4__.htmlEncode)(spanShort.getAttribute('title'));
         data.length = spanFull.getAttribute('data-length');
 
         //old way is to use only the id attribute, new way is to use separate data fields
@@ -3339,7 +3337,7 @@ class TagsConversion {
         svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
         svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="'
             + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">';
-        svg += htmlEncode(text).replace('&amp;nbsp;', '&nbsp;') + '</text></svg>';
+        svg += (0,js_htmlencode__WEBPACK_IMPORTED_MODULE_4__.htmlEncode)(text).replace('&amp;nbsp;', '&nbsp;') + '</text></svg>';
 
         return prefix + encodeURI(svg);
     }
@@ -3531,7 +3529,7 @@ class TagsConversion {
 /*!*************************************!*\
   !*** ./TagsTransform/templating.js ***!
   \*************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -3582,7 +3580,7 @@ class Templating {
 /*!****************************************!*\
   !*** ./Tools/calculate-node-length.js ***!
   \****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -3633,7 +3631,7 @@ function calculateNodeLength(node) {
 /*!*****************************************!*\
   !*** ./Tools/calculate-node-offsets.js ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -3699,7 +3697,7 @@ function calculateNodeOffsets(root, target) {
 /*!*************************************!*\
   !*** ./Tools/compare-html-nodes.js ***!
   \*************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -3715,6 +3713,26 @@ __webpack_require__.r(__webpack_exports__);
  * @returns {boolean}
  */
 function nodesAreSame(node1, node2) {
+    if (node1.nodeType === Node.TEXT_NODE) {
+        if (node2.nodeType !== Node.TEXT_NODE) {
+            return false;
+        }
+
+        return node1.textContent === node2.textContent;
+    }
+
+    if (node2.nodeType === Node.TEXT_NODE) {
+        if (node1.nodeType !== Node.TEXT_NODE) {
+            return false;
+        }
+
+        return node1.textContent === node2.textContent;
+    }
+
+    if (node1.tagName !== node2.tagName) {
+        return false;
+    }
+
     const classes1 = Array.from(node1.classList).sort().join(' ');
     const classes2 = Array.from(node2.classList).sort().join(' ');
 
@@ -3762,7 +3780,7 @@ function nodesAreSame(node1, node2) {
 /*!******************************!*\
   !*** ./Tools/escape-html.js ***!
   \******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -3791,7 +3809,7 @@ function escapeHtml(text) {
 /*!***********************************!*\
   !*** ./Tools/insert-into-html.js ***!
   \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -3851,14 +3869,17 @@ function insertHtmlAt(htmlString, position, htmlToInsert) {
 /*!*****************************!*\
   !*** ./Tools/split-node.js ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ splitNode)
+/* harmony export */   splitNode: () => (/* binding */ splitNode),
+/* harmony export */   splitNodeByChild: () => (/* binding */ splitNodeByChild)
 /* harmony export */ });
 /* harmony import */ var _calculate_node_length_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calculate-node-length.js */ "./Tools/calculate-node-length.js");
+/* harmony import */ var _compare_html_nodes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./compare-html-nodes.js */ "./Tools/compare-html-nodes.js");
+
 
 
 
@@ -3964,6 +3985,74 @@ function splitNode(node, offset) {
     return [leftEl, rightEl.childNodes.length > 0 ? rightEl : null];
 }
 
+/**
+ * Split a parent node at the position of a child node ignoring the child
+ *
+ * @param {HTMLElement} parentNode - The parent node to split
+ * @param {HTMLElement} childNode - The child node to extract
+ */
+function splitNodeByChild(parentNode, childNode) {
+    // Clone the parent node to work with
+    const parentClone = parentNode.cloneNode(true);
+
+    // Find the child in the cloned parent
+    const childInClone = findChildInClone(parentClone, childNode);
+
+    if (! childInClone) {
+        console.warn('Could not find child node in clone');
+
+        return [null, null];
+    }
+
+    // Create three fragments: before, child, after
+    const beforeNode = parentNode.cloneNode(false);
+    const afterNode = parentNode.cloneNode(false);
+
+    // Split the parent's content into before and after sections
+    let beforeChild = true;
+
+    for (let i = 0; i < parentClone.childNodes.length; i++) {
+        const child = parentClone.childNodes[i];
+
+        if (child === childInClone) {
+            beforeChild = false;
+
+            continue;
+        }
+
+        if (beforeChild) {
+            beforeNode.appendChild(child.cloneNode(true));
+
+            continue;
+        }
+
+        afterNode.appendChild(child.cloneNode(true));
+    }
+
+    return [
+        beforeNode.childNodes.length > 0 ? beforeNode : null,
+        afterNode.childNodes.length > 0 ? afterNode : null,
+    ];
+}
+
+/**
+ * Find a child node in a cloned parent by comparing structure
+ * @param {HTMLElement} clonedParent - The cloned parent node
+ * @param {HTMLElement} originalChild - The original child node to find
+ * @returns {HTMLElement|null}
+ */
+function findChildInClone(clonedParent, originalChild) {
+    const allChildren = clonedParent.querySelectorAll('*');
+
+    for (const child of allChildren) {
+        if ((0,_compare_html_nodes_js__WEBPACK_IMPORTED_MODULE_1__["default"])(child, originalChild)) {
+            return child;
+        }
+    }
+
+    return null;
+}
+
 
 /***/ }),
 
@@ -3971,7 +4060,7 @@ function splitNode(node, offset) {
 /*!********************************!*\
   !*** ./Tools/string-to-dom.js ***!
   \********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4026,7 +4115,7 @@ function stringToDom (str) {
 /*!********************************!*\
   !*** ./Tools/unescape-html.js ***!
   \********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4055,7 +4144,7 @@ function unescapeHtml(text) {
 /*!***********************************!*\
   !*** ./Tools/unwrap-html-node.js ***!
   \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -7638,18 +7727,6 @@ module.exports = stubFalse;
 /******/ 		__webpack_require__.amdO = {};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -7717,7 +7794,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   escapeHtml: () => (/* reexport safe */ _Tools_escape_html__WEBPACK_IMPORTED_MODULE_4__["default"]),
 /* harmony export */   insertHtmlAt: () => (/* reexport safe */ _Tools_insert_into_html__WEBPACK_IMPORTED_MODULE_10__["default"]),
 /* harmony export */   nodesAreSame: () => (/* reexport safe */ _Tools_compare_html_nodes__WEBPACK_IMPORTED_MODULE_9__["default"]),
-/* harmony export */   splitNode: () => (/* reexport safe */ _Tools_split_node__WEBPACK_IMPORTED_MODULE_11__["default"]),
+/* harmony export */   splitNode: () => (/* reexport safe */ _Tools_split_node__WEBPACK_IMPORTED_MODULE_11__.splitNode),
 /* harmony export */   stringToDom: () => (/* reexport safe */ _Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_3__["default"]),
 /* harmony export */   unescapeHtml: () => (/* reexport safe */ _Tools_unescape_html__WEBPACK_IMPORTED_MODULE_5__["default"]),
 /* harmony export */   unwrapHtmlNodeToText: () => (/* reexport safe */ _Tools_unwrap_html_node__WEBPACK_IMPORTED_MODULE_8__["default"])

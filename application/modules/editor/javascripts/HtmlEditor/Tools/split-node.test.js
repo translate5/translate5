@@ -1,4 +1,4 @@
-import splitNode from './split-node.js';
+import { splitNode, splitNodeByChild } from './split-node.js';
 
 describe('splitNode', () => {
     test('cut text node in the middle', () => {
@@ -108,5 +108,287 @@ describe('splitNode', () => {
         expect(right).toStrictEqual(
             expectedRight.firstChild
         );
+    });
+});
+
+describe('splitNodeByChild', () => {
+    test('split ins node with nested del in the middle', () => {
+        // Setup: <ins>before<del>nested</del>after</ins>
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip" data-usertrackingid="123">
+                before text
+                <del class="trackchanges ownttip deleted" data-usertrackingid="456">nested deletion</del>
+                after text
+            </ins>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Should return before and after nodes
+        expect(before).not.toBeNull();
+        expect(after).not.toBeNull();
+
+        // Before node should contain only "before text"
+        expect(before.tagName).toBe('INS');
+        expect(before.textContent.trim()).toBe('before text');
+        expect(before.className).toBe('trackchanges ownttip');
+
+        // After node should contain only "after text"
+        expect(after.tagName).toBe('INS');
+        expect(after.textContent.trim()).toBe('after text');
+        expect(after.className).toBe('trackchanges ownttip');
+    });
+
+    test('split ins node with nested del at the beginning', () => {
+        // Setup: <ins><del>nested</del>after</ins>
+        document.body.innerHTML =
+            `<ins class="trackchanges ownttip" data-usertrackingid="123">`
+                + `<del class="trackchanges ownttip deleted" data-usertrackingid="456">nested deletion</del>`
+                + `after text`
+            +`</ins>`;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Before should be null (no content before child)
+        expect(before).toBeNull();
+
+        // After node should contain "after text"
+        expect(after).not.toBeNull();
+        expect(after.tagName).toBe('INS');
+        expect(after.textContent.trim()).toBe('after text');
+    });
+
+    test('split ins node with nested del at the end', () => {
+        // Setup: <ins>before<del>nested</del></ins>
+        document.body.innerHTML =
+            `<ins class="trackchanges ownttip" data-usertrackingid="123">`
+                + `before text`
+                + `<del class="trackchanges ownttip deleted" data-usertrackingid="456">nested deletion</del>`
+            + `</ins>`;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Before node should contain "before text"
+        expect(before).not.toBeNull();
+        expect(before.tagName).toBe('INS');
+        expect(before.textContent.trim()).toBe('before text');
+
+        // After should be null (no content after child)
+        expect(after).toBeNull();
+    });
+
+    test('split ins node with only nested del', () => {
+        // Setup: <ins><del>only content</del></ins>
+        document.body.innerHTML =
+            `<ins class="trackchanges ownttip" data-usertrackingid="123">`
+                + `<del class="trackchanges ownttip deleted" data-usertrackingid="456">only content</del>`
+            + `</ins>`;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Both should be null (no content except the child)
+        expect(before).toBeNull();
+        expect(after).toBeNull();
+    });
+
+    test('split ins with nested del and multiple text nodes', () => {
+        // Setup with multiple text nodes and elements
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip" data-usertrackingid="123">
+                text1
+                <span class="term">span text</span>
+                text2
+                <del class="trackchanges ownttip deleted" data-usertrackingid="456">deletion</del>
+                text3
+                <span class="term">another span text</span>
+                text4
+            </ins>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Before should contain text1, span, text2
+        expect(before).not.toBeNull();
+        expect(before.querySelector('span')).not.toBeNull();
+        expect(before.textContent).toContain('text1');
+        expect(before.textContent).toContain('span text');
+        expect(before.textContent).toContain('text2');
+        expect(before.textContent).not.toContain('deletion');
+
+        // After should contain text3, strong, text4
+        expect(after).not.toBeNull();
+        expect(after.querySelector('.term')).not.toBeNull();
+        expect(after.textContent).toContain('text3');
+        expect(after.textContent).toContain('another span text');
+        expect(after.textContent).toContain('text4');
+        expect(after.textContent).not.toContain('deletion');
+    });
+
+    test('split preserves parent attributes', () => {
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip"
+                 data-usertrackingid="123"
+                 data-timestamp="2025-12-09T10:00:00"
+                 data-usercssnr="usernr1">
+                before
+                <del class="trackchanges ownttip deleted">nested</del>
+                after
+            </ins>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Both nodes should preserve parent attributes
+        expect(before.getAttribute('data-usertrackingid')).toBe('123');
+        expect(before.getAttribute('data-timestamp')).toBe('2025-12-09T10:00:00');
+        expect(before.getAttribute('data-usercssnr')).toBe('usernr1');
+
+        expect(after.getAttribute('data-usertrackingid')).toBe('123');
+        expect(after.getAttribute('data-timestamp')).toBe('2025-12-09T10:00:00');
+        expect(after.getAttribute('data-usercssnr')).toBe('usernr1');
+    });
+
+    test('split with internal tags (img elements)', () => {
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip">
+                <img class="internal-tag open" src="tag1.svg" data-tag-number="1"/>
+                text before
+                <del class="trackchanges ownttip deleted">deleted content</del>
+                text after
+                <img class="internal-tag close" src="tag2.svg" data-tag-number="2"/>
+            </ins>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Before should contain first img and text
+        expect(before).not.toBeNull();
+        expect(before.querySelectorAll('img').length).toBe(1);
+        expect(before.querySelector('img').getAttribute('data-tag-number')).toBe('1');
+        expect(before.textContent).toContain('text before');
+
+        // After should contain last img and text
+        expect(after).not.toBeNull();
+        expect(after.querySelectorAll('img').length).toBe(1);
+        expect(after.querySelector('img').getAttribute('data-tag-number')).toBe('2');
+        expect(after.textContent).toContain('text after');
+    });
+
+    test('returns undefined when child not found', () => {
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip">
+                some content
+            </ins>
+            <del class="trackchanges ownttip deleted">separate deletion</del>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del'); // This del is not a child of ins
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Should return undefined when child is not found in parent
+        expect(before).toBeNull();
+        expect(after).toBeNull();
+    });
+
+    test('split with whitespace preservation', () => {
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip">
+                    text with spaces
+                <del class="trackchanges ownttip deleted">   nested   </del>
+                    more spaces
+            </ins>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const childNode = document.querySelector('del');
+
+        const [before, after] = splitNodeByChild(parentNode, childNode);
+
+        // Whitespace should be preserved
+        expect(before).not.toBeNull();
+        expect(before.textContent).toContain('text with spaces');
+
+        expect(after).not.toBeNull();
+        expect(after.textContent).toContain('more spaces');
+    });
+
+    test('split with identical sibling dels - finds correct one', () => {
+        document.body.innerHTML = `
+            <ins class="trackchanges ownttip">
+                before
+                <del class="trackchanges ownttip deleted" data-timestamp="2025-12-09T10:00:00">first deletion</del>
+                middle
+                <del class="trackchanges ownttip deleted" data-timestamp="2025-12-09T11:00:00">second deletion</del>
+                after
+            </ins>
+        `;
+
+        const parentNode = document.querySelector('ins');
+        const allDels = document.querySelectorAll('del');
+        const secondDel = allDels[1]; // Target the second del
+
+        const [before, after] = splitNodeByChild(parentNode, secondDel);
+
+        // Before should contain "before", first del, and "middle"
+        expect(before).not.toBeNull();
+        expect(before.textContent).toContain('before');
+        expect(before.textContent).toContain('first deletion');
+        expect(before.textContent).toContain('middle');
+        expect(before.textContent).not.toContain('second deletion');
+
+        // After should contain "after"
+        expect(after).not.toBeNull();
+        expect(after.textContent.trim()).toBe('after');
+        expect(after.textContent).not.toContain('second deletion');
+    });
+
+    test('split with empty text nodes', () => {
+        const parentNode = document.createElement('ins');
+        parentNode.className = 'trackchanges ownttip';
+
+        parentNode.appendChild(document.createTextNode(''));
+        parentNode.appendChild(document.createTextNode('before'));
+
+        const delNode = document.createElement('del');
+        delNode.textContent = 'deletion';
+        delNode.className = 'trackchanges ownttip deleted';
+        parentNode.appendChild(delNode);
+
+        parentNode.appendChild(document.createTextNode(''));
+        parentNode.appendChild(document.createTextNode('after'));
+
+        document.body.innerHTML = '';
+        document.body.appendChild(parentNode);
+
+        const [before, after] = splitNodeByChild(parentNode, delNode);
+
+        expect(before).not.toBeNull();
+        expect(before.textContent.trim()).toBe('before');
+
+        expect(after).not.toBeNull();
+        expect(after.textContent.trim()).toBe('after');
     });
 });

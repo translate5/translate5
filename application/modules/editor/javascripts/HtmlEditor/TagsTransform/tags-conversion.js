@@ -2,8 +2,7 @@ import Ruler from "./ruler";
 import Templating from "./templating";
 import stringToDom from "../Tools/string-to-dom";
 import isEqual from 'lodash/isEqual';
-
-const htmlEncode = require('js-htmlencode').htmlEncode;
+import { htmlEncode } from 'js-htmlencode';
 
 export default class TagsConversion {
     static TYPE = {
