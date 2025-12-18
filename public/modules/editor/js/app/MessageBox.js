@@ -163,14 +163,15 @@ Ext.define('Editor.MessageBox', {
      */
     addMessage: function (msg, status, factor) {
         factor = factor || Editor.data.messageBox.delayFactor;
-        factor = (factor && parseFloat(factor) || 1),
-            // add some smarts to msg's duration (div by 13.3 between 3 & 9 seconds)
-            delay = msg.length / 13.3;
+        factor = (factor && parseFloat(factor) || 1);
+        msg = Ext.String.htmlEncode(msg);
+        // add some smarts to msg's duration (div by 13.3 between 3 & 9 seconds)
+        let delay = msg.length / 13.3;
         delay = Math.min(15, Math.max(3, delay));
         delay = delay * 1000 * factor;
 
         this.msgCt.alignTo(document, 't-t');
-        var found, appendedBox = appendedBox = Ext.dom.Helper.append(this.msgCt, {
+        let found, appendedBox = appendedBox = Ext.dom.Helper.append(this.msgCt, {
             style: {visibility: 'hidden'},
             html: this.buildMessageBox(status, msg)
         }, true);

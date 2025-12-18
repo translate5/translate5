@@ -64,7 +64,8 @@ class XssInjector
         ],
         '#^/editor/user($|\?)#i' => ['roles'],
         // FIXME how to ensure that Application is working with added XSS in config? With a fixed added fake config???
-        '#^/editor/(taskid/\d+/)?config($|\?)#i' => [
+        // is the config really relevant? use DOMpurifier on when loading config???
+        '#^/editor/(taskid/\d+/)?config(/runtimeOptions\.[a-zA-Z0-9._-]+)?($|\?)#i' => [
             'value',
             'name',
             'module',

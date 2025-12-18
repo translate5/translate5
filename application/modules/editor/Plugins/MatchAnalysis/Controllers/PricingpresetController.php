@@ -133,7 +133,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         }
 
         // Prompt client-side confirmation
-        $this->confirm("Are you sure you want to delete pricing preset '{$this->entity->getName()}'?");
+        $name = htmlentities($this->entity->getName());
+        $this->confirm("Are you sure you want to delete pricing preset '$name'?");
 
         // If confirmed - do delete
         $this->entity->delete();

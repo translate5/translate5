@@ -1051,7 +1051,7 @@ class editor_Utils
         // Start building data for flushing
         $flush = [
             'confirm' => self::$answer ? count(self::$answer) + 1 : true,
-            'msg' => $msg,
+            'msg' => strip_tags($msg, '<br>'), //FIXME replace with HTML Purifier
             'buttons' => $buttons,
         ];
 

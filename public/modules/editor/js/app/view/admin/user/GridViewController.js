@@ -144,7 +144,7 @@ Ext.define('Editor.view.admin.user.GridViewController', {
                         return;
                     }
                 }
-                info = Ext.String.format(msg.confirmDeleteMsg,user.get('firstName')+' '+user.get('surName'));
+                info = Ext.String.format(msg.confirmDeleteMsg, Ext.String.htmlEncode(user.get('firstName')+' '+user.get('surName')));
                 Ext.Msg.confirm(msg.confirmDeleteTitle, info, function(btn){
                     if(btn == 'yes') {
                         user.dropped = true;
