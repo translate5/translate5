@@ -36,6 +36,7 @@ use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\TmxImportPreprocessor;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\TmxSymbolsFixer;
 use PHPUnit\Framework\TestCase;
 
 class TmxImportPreprocessorTest extends TestCase
@@ -44,11 +45,13 @@ class TmxImportPreprocessorTest extends TestCase
     {
         $languageRepository = $this->createMock(LanguageRepository::class);
         $logger = $this->createMock(\ZfExtended_Logger::class);
+        $symbolsFixer = $this->createMock(TmxSymbolsFixer::class);
 
         $processor = new TmxImportPreprocessor(
             $languageRepository,
             [],
             $logger,
+            $symbolsFixer,
         );
 
         $filename = 'small.tmx';
@@ -62,6 +65,7 @@ class TmxImportPreprocessorTest extends TestCase
     {
         $languageRepository = $this->createMock(LanguageRepository::class);
         $logger = $this->createMock(\ZfExtended_Logger::class);
+        $symbolsFixer = $this->createMock(TmxSymbolsFixer::class);
 
         $languageRepository
             ->method('find')
@@ -160,6 +164,7 @@ TU;
                 $processor2,
             ],
             $logger,
+            $symbolsFixer,
         );
 
         $options = new ImportOptions(StripFramingTags::None, true, false);

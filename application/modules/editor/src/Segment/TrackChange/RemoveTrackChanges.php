@@ -131,6 +131,8 @@ class RemoveTrackChanges
             $out .= $doc->saveXML($child);
         }
 
+        // first replacement is neccessary for outdated TermTagger,
+        // who can not process singular tags without trailing space !
         return str_replace('"/>', '" />', str_replace($quotPh, '&quot;', $out));
     }
 }
