@@ -2118,6 +2118,16 @@ dl {
     padding-bottom: 2px;
 }
 
+.t5quality.t5general del.trackchanges,
+.t5quality.t5style del.trackchanges,
+.t5quality.t5grammar del.trackchanges,
+.t5quality.t5misspelling del.trackchanges,
+.t5quality.t5typographical del.trackchanges {
+    text-decoration-line: line-through;
+    text-decoration-style: solid;
+    text-decoration-color: black;
+}
+
 /* gray */
 .t5quality.t5general, .t5quality.t5general .trackchanges {
     text-decoration-color: #808080;
