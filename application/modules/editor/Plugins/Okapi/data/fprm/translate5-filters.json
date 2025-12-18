@@ -88,5 +88,14 @@
         "description": "translate5 adjusted filter for Adobe InDesign IDML documents",
         "mime": "application/vnd.adobe.indesign-idml-package",
         "extensions": ["idml"]
+    },
+    {
+        "id": "translate5-mif",
+        "type": "okf_mif",
+        "replaceId": "okf_mif",
+        "name": "t5 MIF(BETA)",
+        "description": "translate5 adjusted filter for Adobe FrameMaker MIF documents",
+        "mime": "application/vnd.mif",
+        "extensions": ["mif"]
     }
 ]
