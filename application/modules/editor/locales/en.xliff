@@ -5206,7 +5206,7 @@ another user took responsibility for the task
             </trans-unit>
             <trans-unit id='w5ggTGV2ZW5zaHRlaW4tQWJzdGFuZCBpbm5lcmhhbGIgZWluZXMgV29ya2Zsb3dzY2hyaXR0cw=='>
                 <source>Ø Levenshtein-Abstand innerhalb eines Workflowschritts</source>
-                <target>Ø Levensthein distance within 1 workflow step</target>
+                <target>Ø Levenshtein distance within 1 workflow step</target>
             </trans-unit>
             <trans-unit id='w5ggTmFjaGJlYXJiZWl0dW5nc3plaXQgYWIgQmVnaW5uIGRlcyBXb3JrZmxvd3M='>
                 <source>Ø Nachbearbeitungszeit ab Beginn des Workflows</source>
@@ -5214,7 +5214,7 @@ another user took responsibility for the task
             </trans-unit>
             <trans-unit id='w5ggTGV2ZW5zaHRlaW4tQWJzdGFuZCBhYiBCZWdpbm4gZGVzIFdvcmtmbG93cw=='>
                 <source>Ø Levenshtein-Abstand ab Beginn des Workflows</source>
-                <target>Ø Levensthein distance from the start of workflow</target>
+                <target>Ø Levenshtein distance from the start of workflow</target>
             </trans-unit>
             <trans-unit id='w5ggTGV2ZW5zaHRlaW4tRGlzdGFueiB2b3IgQmVnaW5uIGRlcyBXb3JrZmxvd3M='>
                 <source>Ø Levenshtein-Distanz vor Beginn des Workflows</source>
