@@ -28,6 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\ZfExtended\Localization;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -96,7 +97,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
 
         $session = new \Zend_Session_Namespace();
         $locale = $auth->getUser()->getLocale();
-        $session->locale = \ZfExtended_Utils::getLocale($locale);
+        $session->locale = Localization::getLocale($locale);
 
         $sessionDb = new ZfExtended_Models_Db_Session();
         $sessionId = session_id();

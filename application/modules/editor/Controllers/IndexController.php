@@ -43,6 +43,16 @@ use MittagQI\Translate5\User\FilterPreset;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * -- special config-translations --
+ * $translateConfig->___('runtimeOptions.segments.qualityFlags', 'default');
+ * $translateConfig->___('runtimeOptions.segments.stateFlags', 'default');
+ * $translateConfig->___('runtimeOptions.segments.autoStateFlags', 'default');
+ * $translateConfig->___('runtimeOptions.extJs.theme', 'defaults');
+ */
+
+/**
  * Dummy Index Controller
  */
 class Editor_IndexController extends ZfExtended_Controllers_Action
@@ -270,8 +280,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (! empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
-            $msg = 'Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
-            $msgBoxConf->initialMessages[] = sprintf($this->translate->_($msg), $onlineVersion, $currentVersion);
+            $msg = $this->translate->_('Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.');
+            $msgBoxConf->initialMessages[] = sprintf($msg, $onlineVersion, $currentVersion);
         }
     }
 

@@ -30,6 +30,12 @@ use MittagQI\Translate5\User\FilterPreset as FilterPreset;
 use MittagQI\ZfExtended\MismatchException;
 use ZfExtended_Factory as Factory;
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Sind Sie sicher?');
+ */
+
 class editor_UserfilterpresetController extends ZfExtended_RestController
 {
     /**

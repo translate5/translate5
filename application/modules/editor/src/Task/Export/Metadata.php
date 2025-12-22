@@ -97,26 +97,29 @@ class Metadata
         $this->kpiTypeLocales['processingTime'] = $this->translate->_('Ø Bearbeitungszeit') . ' / ';
         $this->kpiTypeLocales['workflowStep'] = $this->translate->_('Workflow Schritt');
         $type = $this->translate->_('Typ');
-        foreach ([
-            editor_Models_KPI::KPI_REVIEWER => 'Lektorat',
-            editor_Models_KPI::KPI_TRANSLATOR => 'Übersetzung',
-            editor_Models_KPI::KPI_TRANSLATOR_CHECK => 'Finales Lektorat',
-        ] as $key => $workflowStepTypeName) {
-            $this->kpiTypeLocales[$key] = $type . ' ' . $this->translate->_($workflowStepTypeName);
-        }
 
-        foreach ([
-            editor_Models_KPI::KPI_LEVENSHTEIN_START => 'Ø Levenshtein-Distanz vor Beginn des Workflows',
-            editor_Models_KPI::KPI_DURATION_START => 'Ø Nachbearbeitungszeit vor Beginn des Workflows',
-            editor_Models_KPI::KPI_DURATION => 'Ø Nachbearbeitungszeit innerhalb eines Workflowschritts',
-            editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS => 'Ø Levenshtein-Abstand innerhalb eines Workflowschritts',
-            editor_Models_KPI::KPI_DURATION_TOTAL => 'Ø Nachbearbeitungszeit ab Beginn des Workflows',
-            editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL => 'Ø Levenshtein-Abstand ab Beginn des Workflows',
-            editor_Models_KPI::KPI_LEVENSHTEIN_END => 'Ø Levenshtein-Distanz nach Ende des Workflows',
-            editor_Models_KPI::KPI_DURATION_END => 'Ø Nachbearbeitungszeit nach Ende des Workflows',
-        ] as $key => $text) {
-            $this->kpiTypeLocales[$key] = $this->translate->_($text);
-        }
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_REVIEWER] =
+            $type . ' ' . $this->translate->_('Lektorat');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR] =
+            $type . ' ' . $this->translate->_('Übersetzung');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR_CHECK] =
+            $type . ' ' . $this->translate->_('Finales Lektorat');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_START] =
+            $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_START] =
+            $this->translate->_('Ø Nachbearbeitungszeit vor Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION] =
+            $this->translate->_('Ø Nachbearbeitungszeit innerhalb eines Workflowschritts');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS] =
+            $this->translate->_('Ø Levenshtein-Abstand innerhalb eines Workflowschritts');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_TOTAL] =
+            $this->translate->_('Ø Nachbearbeitungszeit ab Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL] =
+            $this->translate->_('Ø Levenshtein-Abstand ab Beginn des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_END] =
+            $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_END] =
+            $this->translate->_('Ø Nachbearbeitungszeit nach Ende des Workflows');
     }
 
     /**

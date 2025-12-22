@@ -34,58 +34,61 @@ class HelpController extends ZfExtended_Controllers_Action
 {
     public function indexAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function editorAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function editordocumentationAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function languageresourceAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function taskoverviewAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function useroverviewAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function customeroverviewAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function segmentsgridAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function projectAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
     public function preferencesAction()
     {
-        $this->_helper->layout->disableLayout();
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
 
-    public function termportalAction() {
-        $this->_helper->layout->disableLayout();
+    public function termportalAction()
+    {
+        $this->_helper->layout->disableLayout(); // @phpstan-ignore-line
     }
-    public function itranslateAction() {
+
+    public function itranslateAction()
+    {
         $this->_helper->layout->disableLayout();
     }
 }

@@ -4721,40 +4721,6 @@
                 <source>Sprache</source>
                 <target>Sprache</target>
             </trans-unit>
-            <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='>
-                <source>{salutation} {surName},
-                    <br/>
-                    <br/>
-                </source>
-                <target>{salutation} {surName},
-                    <br/>
-                    <br/>
-                </target>
-            </trans-unit>
-            <trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='>
-                <source>
-                    <br/>
-                    <br/>Vielen Dank und viele Grüße,
-
-                    <br/>Ihr Projektmanagement Team
-
-                    <br/>{companyName}
-
-                    <br/>
-                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-                </source>
-                <target>
-                    <br/>
-                    <br/>Vielen Dank und viele Grüße,
-
-                    <br/>Ihr Projektmanagement Team
-
-                    <br/>{companyName}
-
-                    <br/>
-                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-                </target>
-            </trans-unit>
             <trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYge3BvcnRhbFVybH0gbmV1IGFuZ2VsZWd0IG9kZXIgSWhyIFBhc3N3b3J0IHp1csO8Y2tnZXNldHp0IHd1cmRlLiAKCklociBCZW51dHplcm5hbWU6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQp7bG9naW59Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKV2VubiBTaWUgSWhyIEtvbnRvIGvDvG5mdGlnIG51dHplbiBtw7ZjaHRlbiwgZGFubiBmb3JkZXJuIFNpZSB1bnRlciBkZXIgZm9sZ2VuZGVuCkFkcmVzc2UgZWluZSBMaW5rIGFuLCB1bSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiB6dSBrw7ZubmVuLgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e3Jlc2V0dXJsfQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'>
                 <source>{header}
 Sie erhalten diese Email, weil Ihr Konto auf {portalUrl} neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
@@ -7754,7 +7720,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='RmxpZcOfZW5kZXMgUHJvYmxlbQ=='>
                 <source>Fließendes Problem</source>
-                <target>Fließendes Problem</target>
+                <target>Textfluss-Problem</target>
             </trans-unit>
             <trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='>
                 <source>Manueller Demo Status 1</source>
@@ -8212,7 +8178,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ='>
                 <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>
-                <target>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</target>
+                <target>Status wurde allen Ereignissen innerhalb dieser Aufgabe zugewiesen</target>
             </trans-unit>
             <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
                 <source>Rechtsklick um Fehler zu ignorieren</source>
@@ -9860,7 +9826,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='T3J0ZSBkZXIgQXVzc3RlbGx1bmc='>
                 <source>Orte der Ausstellung</source>
-                <target>Orte der Ausstellung</target>
+                <target>Wird wo angezeigt</target>
             </trans-unit>
             <trans-unit id='UHJvamVrdC1Bc3Npc3RlbnQ='>
                 <source>Projekt-Assistent</source>

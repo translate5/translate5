@@ -30,6 +30,30 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Übersetzt');
+ * $translate->_('Übersetzt, auto');
+ * $translate->_('Nicht übersetzt');
+ * $translate->_('Lektoriert');
+ * $translate->_('Lektoriert, auto');
+ * $translate->_('Dauerhaft gesperrt');
+ * $translate->_('Gesperrt');
+ * $translate->_('Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss');
+ * $translate->_('Lektoriert, unverändert');
+ * $translate->_('Lektoriert, unverändert, auto');
+ * $translate->_('2. Lektorat');
+ * $translate->_('2. Lektorat, auto');
+ * $translate->_('PM lektoriert');
+ * $translate->_('PM lektoriert, auto');
+ * $translate->_('PM lektoriert, unverändert');
+ * $translate->_('PM lektoriert, unverändert, auto');
+ * $translate->_('Vorübersetzt');
+ * $translate->_('wird ermittelt...');
+ * $translate->_('In Bearbeitung');
+ */
+
+/**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
  *

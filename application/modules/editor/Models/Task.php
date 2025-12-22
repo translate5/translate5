@@ -26,6 +26,62 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * hint: these are the qmSubsegmentFlags & severities encoded in QM_Subsegment_Issues.xml
+ * TODO FIXME: we have them in german in the translations ...
+ * $translate->_('Accuracy');
+ * $translate->_('Mistranslation');
+ * $translate->_('Terminology');
+ * $translate->_('Omission');
+ * $translate->_('Addition');
+ * $translate->_('Untranslated');
+ * $translate->_('Fluency');
+ * $translate->_('Register');
+ * $translate->_('Style');
+ * $translate->_('Inconsistency');
+ * $translate->_('Spelling');
+ * $translate->_('Typography');
+ * $translate->_('Grammar');
+ * $translate->_('Locale violation');
+ * $translate->_('Unintelligible');
+ * $translate->_('Verity');
+ * $translate->_('Completeness');
+ * $translate->_('Legal requirements');
+ * $translate->_('Locale applicability');
+ * $translate->_('Critical');
+ * $translate->_('Major');
+ * $translate->_('Minor');
+ * task-grid textcols
+ * $translate->_('Endkunde');
+ * $translate->_('100%-Treffer editierbar');
+ * $translate->_('Übersetzungsaufgabe (kein Review)');
+ * $translate->_('Quellsprache bearbeitbar');
+ * $translate->_('Dateien');
+ * $translate->_('Unveränderte 100% TM Matches sind editierbar');
+ * $translate->_('Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt');
+ * $translate->_('Bestelldatum');
+ * $translate->_('Enddatum');
+ * $translate->_('Projektmanager');
+ * $translate->_('Projektmanager');
+ * $translate->_('Referenzdateien');
+ * $translate->_('Relaissprache');
+ * $translate->_('Quellsprache');
+ * $translate->_('Status');
+ * $translate->_('Zielsprache');
+ * $translate->_('Aktionen');
+ * $translate->_('Anzahl zugewiesene Sprachressourcen');
+ * $translate->_('Aufgabenname');
+ * $translate->_('Auftragsnr.');
+ * $translate->_('Terminologie');
+ * $translate->_('Benutzer');
+ * $translate->_('Wörter');
+ * $translate->_('Anzahl Wörter');
+ * $translate->_('Workflow');
+ * $translate->_('Zahl zugewiesener Benutzer');
+ */
+
 use editor_Models_Segment_AutoStates as AutoStates;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;

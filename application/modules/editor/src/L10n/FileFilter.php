@@ -37,6 +37,7 @@ use MittagQI\Translate5\File\Filter\FilterConfig;
 use MittagQI\Translate5\File\Filter\FilterException;
 use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\File\Filter\Type;
+use MittagQI\ZfExtended\Localization;
 use Zend_Registry;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -69,7 +70,7 @@ class FileFilter implements FileFilterByConfigInterface
     public function applyExportFilter(Task $task, int $fileId, string $filePath, ?string $parameters): string
     {
         $isJson = str_ends_with($filePath, '.json');
-        if (! str_ends_with($filePath, '.zxliff') && ! $isJson) {
+        if (! str_ends_with($filePath, Localization::FILE_EXTENSION_WITH_DOT) && ! $isJson) {
             return $filePath;
         }
 
@@ -77,8 +78,8 @@ class FileFilter implements FileFilterByConfigInterface
         $target = $task->getTargetLanguage()->getRfc5646();
         $resultFilePath = preg_replace('#([^a-zA-Z])' . $source . '([^a-zA-Z])#', '\1' . $target . '\2', $filePath);
         $resultFilePath = str_replace(
-            ['.zxliff$', '.json$'],
-            ['.xliff', '.json'],
+            [Localization::FILE_EXTENSION_WITH_DOT . '$', '.json$'],
+            [Localization::FILE_EXTENSION_WITH_DOT, '.json'],
             $resultFilePath . '$'
         );
 

@@ -160,9 +160,8 @@ class ExportService
         //since filter operates on finally translated texts, we have to translate the default too!
         $processingStatesLabeled = $this->segmentAutoStates->getLabelMap($this->translate);
         if (array_key_exists($conf->export->html->defaultFilters->translatedStatus, $processingStatesLabeled)) {
-            $defaultProcessingState = $this->translate->_(
-                $processingStatesLabeled[$conf->export->html->defaultFilters->translatedStatus]
-            );
+            $stateMsg = $processingStatesLabeled[$conf->export->html->defaultFilters->translatedStatus];
+            $defaultProcessingState = $this->translate->_($stateMsg);
         } else {
             $defaultProcessingState = '';
         }

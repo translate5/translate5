@@ -27,6 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Nachname');
+ * $translate->_('Vorname');
+ * $translate->_('E-Mail Adresse');
+ * $translate->_('Rolle');
+ * $translate->_('Status');
+ * $translate->_('Deadline Datum');
+ */
+
+/**
  * Utility functions usable in workflow notification E-Mails.
  *
  * @property ZfExtended_View $view

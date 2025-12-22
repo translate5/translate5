@@ -12,21 +12,21 @@
   ],
   "modeCombo": [
     {
-      "name": "Contains",
+      "name": "contains",
       "value": "contains"
     },
     {
-      "name": "Exact match",
+      "name": "exact match",
       "value": "exact"
     }
   ],
   "modeComboSourceTarget": [
     {
-      "name": "Contains",
+      "name": "contains",
       "value": "contains"
     },
     {
-      "name": "Match full segment",
+      "name": "match full segment",
       "value": "exact"
     }
   ],
@@ -39,28 +39,28 @@
     "taskTm": "Task TM",
     "select": "Select",
     "close": "Close",
-    "emptyText" : "No records available"
+    "emptyText": "No records available"
   },
   "searchForm": {
     "tm": "TM",
     "mode": "Mode",
     "source": "Source",
     "target": "Target",
-    "author": "Author",
+    "author": "Created by",
     "additionalInfo": "Additional info",
     "document": "Document name",
-    "creationDateFrom": "Creation date after",
-    "creationDateTo": "Creation date before",
+    "creationDateFrom": "Created after",
+    "creationDateTo": "Created before",
     "search": "Search",
     "deleteAll": "Delete all",
     "deleteAllTooltip": "All segments that match the current search settings are deleted",
-    "deleteAllDisabledTooltip": "All segments that match the current search settings are deleted. <br> This function is only available from 20 hits, as \"Delete all\" results in a reorganisation of the TM, <br> which can take some time during which the TM is not available.",
+    "deleteAllDisabledTooltip": "All segments that match the current search settings are deleted. <br> This function is only available if there are at least 20 search results, as “Delete all” triggers a reorganization of the TM, <br> which can take some time during which the TM is not available.",
     "sourceLanguage": "Source language",
     "targetLanguage": "Target language",
     "caseSensitive": "Case-sensitive"
   },
   "createForm": {
-    "title": "Create new",
+    "title": "Create new translation unit",
     "sourceText": "Source text",
     "targetText": "Target text",
     "save": "Save",
@@ -69,21 +69,21 @@
   "deleteBatch": {
     "no": "Cancel",
     "yes": "Delete all",
-    "warningText": "All segments in the current list will be deleted and the TM will be reorganised afterwards, this may take some time. Do you still want to delete all segments?",
-    "warningTextOneByOne": "Each segment of the current search will be deleted individually, which may take some time. The UI will be blocked until the process is complete. If you wish to use TM-Maintenance during this time, please open a new tab."
+    "warningText": "All segments in the current result list will be deleted, and the TM will be reorganized afterwards. This may take some time. Do you still want to delete all segments?",
+    "warningTextOneByOne": "Each segment of the current search will be deleted individually, which may take some time. The UI will be blocked until the process is complete. If you wish to use TM Maintenance during this time, please open a new tab."
   },
-  "list" : {
+  "list": {
     "title": "Segments",
-    "totalAmount": "Total found segments: ",
-    "calculating": "calculating...",
+    "totalAmount": "Total segments found: ",
+    "calculating": "Calculating...",
     "loadingSegmentPlaceholder": "Loading...",
     "loadingSegmentNumber": "Loading segment #",
     "loadedSoFar": "Loaded {0} segments so far",
-    "saving": "Saving. Please wait a while.",
+    "saving": "Saving... Please wait.",
     "columns": {
       "sourceText": "Source text",
       "targetText": "Target text",
-      "author": "Author",
+      "author": "Created by",
       "additionalInfo": "Additional info",
       "document": "Document",
       "creationDate": "Creation date",
@@ -96,21 +96,21 @@
     "editTarget": "Edit target",
     "delete": "Delete",
     "create": "Create",
-    "save": "Save (CTRL+S)",
+    "save": "Save (CTRL + S)",
     "cancel": "Cancel (ESC)",
     "saveGoToPrevious": "Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)",
     "saveGoToNext": "Save and open next editable segment (CTRL + ALT + ENTER)",
-    "closeGoToPrevious": "Don't save and open previous editable segment (CTRL + ALT + ↑)",
-    "closeGoToNext": "Don't save and open next editable segment (CTRL + ALT + ↓)"
+    "closeGoToPrevious": "Don’t save and open previous editable segment (CTRL + ALT + ↑)",
+    "closeGoToNext": "Don’t save and open next editable segment (CTRL + ALT + ↓)"
   },
   "error": {
     "title": "An error occurred",
     "infoTitle": "Info",
-    "couldNotProcessRequest": "Error whilst saving or reading data. Please contact our support team!",
+    "couldNotProcessRequest": "Error while saving or reading data. Please contact our support team!",
     "close": "Close",
     "responseFromServer": "Response from server",
     "messageFromServer": "Message from server",
-    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct the segment and try again."
+    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct this segment and try again."
   },
   "deleteSegment": {
     "title": "Delete segment",

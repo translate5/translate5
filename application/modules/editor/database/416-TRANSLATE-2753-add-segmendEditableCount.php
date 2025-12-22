@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,9 +27,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -45,12 +42,12 @@ $SCRIPT_IDENTIFIER = '416-TRANSLATE-2753-add-segmentEditableCount.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) { // @phpstan-ignore-line
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$tuaM          = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
-$taskM         = ZfExtended_Factory::get(editor_Models_Task::class);
+$tuaM = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+$taskM = ZfExtended_Factory::get(editor_Models_Task::class);
 $taskProgressM = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
 
 /** @var Zend_Db_Adapter_Pdo_Mysql $db */
@@ -63,13 +60,13 @@ defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', 
 $skipStates = [
     editor_Models_Task::STATE_ERROR,
     editor_Models_Task::STATE_PROJECT,
-    editor_Models_Task::STATE_IMPORT
+    editor_Models_Task::STATE_IMPORT,
 ];
 
 // Foreach task - recalculate values for segmentFinishCount and
 // segmentFinishCount fields for the task itself and it's associated users
 foreach ($taskM->loadAll() as $task) {
-    if (!in_array($task['state'], $skipStates)
+    if (! in_array($task['state'], $skipStates)
         && $task['workflowStepName'] !== editor_Workflow_Default::STEP_WORKFLOW_ENDED) {
         $taskM->load($task['id']);
         $taskProgressM->refreshProgress($taskM);

@@ -27,6 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Spalte A');
+ * $translate->_('Spalte B');
+ * $translate->_('Spalte C');
+ * $translate->_('Spalte D');
+ * $translate->_('Spalte E');
+ * $translate->_('Spalte F');
+ */
+
+/**
  * Entity Model for segment fields
  * @method string getId()
  * @method void setId(int $id)

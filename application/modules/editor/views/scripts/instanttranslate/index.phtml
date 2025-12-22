@@ -46,8 +46,8 @@ $availableTranslations = $translate->getAvailableTranslations();
 asort($availableTranslations);
 $languageSelector = [];
 
-//translated strings // TODO FIXME: cleanup, lots of them are outdated!
-$this->translations = array(
+// translated strings // TODO FIXME: cleanup, lots of them are outdated!
+$this->translations = [
     'clearText' => $translate->_('Text zurücksetzen'),
     'copy' => $translate->_('Kopieren'),
     'enterText' => $translate->_('Geben Sie Text ein'),
@@ -117,7 +117,8 @@ $this->translations = array(
     'mtResourcesComboPrefix' => $translate->_('Verwendete MT-Resource:'),
     'customerComboPrefix' => $translate->_('mit Einstellungen für:'),
     'autoDetectLanguage' => $translate->_('Sprache erkennen'),
-);
+];
+
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
 $this->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);

@@ -702,7 +702,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 });
 
                 // update fields and stop loading-icon
-                me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage.join('</br>'));
+                me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage.join('<br/>'));
                 me.getPosteditingTimeDisplay().update(me.strings.posteditingTimeLabel + ': ' + resp.posteditingTime);
                 me.getPosteditingTimeTotalDisplay().update(me.strings.posteditingTimeTotalLabel + ': ' + resp.posteditingTimeTotal);
                 me.getPosteditingTimeStartDisplay().update(me.strings.posteditingTimeStartLabel + ': ' + resp.posteditingTimeStart);

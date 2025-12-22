@@ -29,6 +29,12 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('The file is not uploaded');
+ */
+
 /***
  *
  */

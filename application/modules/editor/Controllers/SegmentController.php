@@ -51,6 +51,7 @@ use MittagQI\Translate5\Segment\SyncStatus\TagValidationTracking;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Terminology\TermportletData;
+use MittagQI\ZfExtended\Localization;
 
 class Editor_SegmentController extends ZfExtended_RestController
 {
@@ -785,7 +786,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             ?: ZfExtended_Authentication::getInstance()->getUser()->getLocale();
 
         // Get locale
-        $locale = ZfExtended_Utils::getLocale($desiredLocale);
+        $locale = Localization::getLocale($desiredLocale);
 
         //generate portlet data
         $data = (new TermportletData(

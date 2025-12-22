@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,25 +33,25 @@ Editor.controller.Localizer.addPluginInit('frontEndMessageBus', function() {
     Ext.define("Editor.locale.plugins.FrontEndMessageBus.controller.MessageBus", {
         override: "Editor.plugins.FrontEndMessageBus.controller.MessageBus",
         strings: {
-            taskCloseTitle: '<?php echo $this->translate->_('Aufgabe in anderem Fenster geschlossen');?>',
-            taskCloseMsg: '<?php echo $this->translate->_('Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.');?>',
-            taskCloseClose: '<?php echo $this->translate->_('Schließen');?>',
-            taskCloseReload: '<?php echo $this->translate->_('Erneut öffnen');?>'
+            taskCloseTitle: '<?php echo $this->translate->_('Aufgabe in anderem Fenster geschlossen'); ?>',
+            taskCloseMsg: '<?php echo $this->translate->_('Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.'); ?>',
+            taskCloseClose: '<?php echo $this->translate->_('Schließen'); ?>',
+            taskCloseReload: '<?php echo $this->translate->_('Erneut öffnen'); ?>'
         }
     });
 
     Ext.define("Editor.locale.plugins.FrontEndMessageBus.controller.MultiUserUsage", {
         override: "Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage",
         strings: {
-            noConnection: '<?php echo $this->translate->_('Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.');?>',
-            noConnectionSeg: '<?php echo $this->translate->_('Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.');?>',
-            inUseTitle: '<?php echo $this->translate->_('Segment bereits in Bearbeitung');?>',
-            inUseMsg: '<?php echo $this->translate->_('Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.');?>',
-            inUse: '<?php echo $this->translate->_('Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.');?>',
-            currentUser: '<?php echo $this->translate->_('Aktueller Bearbeiter');?>',
-            editors: '<?php echo $this->translate->_('Bearbeiter: ');?>',
-            myself: '<?php echo $this->translate->_('Ich');?>',
-            selectedBy: '<?php echo $this->translate->_('Ausgewählt von');?>',
+            noConnection: '<?php echo $this->translate->_('Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.'); ?>',
+            noConnectionSeg: '<?php echo $this->translate->_('Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.'); ?>',
+            inUseTitle: '<?php echo $this->translate->_('Segment bereits in Bearbeitung'); ?>',
+            inUseMsg: '<?php echo $this->translate->_('Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.'); ?>',
+            inUse: '<?php echo $this->translate->_('Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.'); ?>',
+            currentUser: '<?php echo $this->translate->_('Aktueller Bearbeiter'); ?>',
+            editors: '<?php echo $this->translate->_('Bearbeiter: '); ?>',
+            myself: '<?php echo $this->translate->_('Ich'); ?>',
+            selectedBy: '<?php echo $this->translate->_('Ausgewählt von'); ?>',
             segmentChangedOnServerTitle: '<?= $this->translate->_('Segment wurde auf der Serverseite geändert') ?>',
             segmentChangedOnServerMessage: '<?= $this->translate->_('Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:</b><br/>{source}<br/><b>Zieltext:</b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?'); ?>',
         }

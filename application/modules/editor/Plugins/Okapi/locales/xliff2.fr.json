@@ -1,0 +1,14 @@
+{
+  "helpLink": "http://okapiframework.org/wiki/index.php/XLIFF-2_Filter",
+  "tabOptions": "Options",
+  "tabCodeFinder": "Code Finder",
+  "maxValidation": "Effectuer une validation maximale lors du parsing",
+  "forceUniqueIds": "S’assurer que les identifiants de balises sont uniques au sein des unités",
+  "ignoreTagTypeMatch": "Ignorer les types de balises qui ne correspondent pas entre le segment source et le segment cible",
+  "discardInvalidTargets": "Rejeter les segments cibles non valides au lieu de rejeter le fichier",
+  "writeOriginalData": "L’output contient des données originales, si elles sont disponibles",
+  "subfilter": "Sous-filtre",
+  "subfilterTooltip": "Nom du sous-filtre à utiliser pour le contenu intégré",
+  "subfilterOverwriteTarget": "Sous-filtre: écraser le contenu du segment cible?",
+  "subfilterOverwriteTargetTooltip": "Le script doit-il toujours écraser les segments cibles existants, même si leur statut est définitif?"
+}

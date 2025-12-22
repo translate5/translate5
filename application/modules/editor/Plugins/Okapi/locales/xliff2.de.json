@@ -2,13 +2,13 @@
     "helpLink": "http://okapiframework.org/wiki/index.php/XLIFF-2_Filter",
     "tabOptions": "Optionen",
     "tabCodeFinder": "Code Finder",
-    "maxValidation": "Maximale Validierung beim Parsen durchführen",
+    "maxValidation": "Beim Parsen maximale Validierung durchführen",
     "forceUniqueIds": "Sicherstellen, dass die Tag-IDs innerhalb der Einheiten eindeutig sind",
-    "ignoreTagTypeMatch": "Nicht übereinstimmende Tag-Typen zwischen Quelle und Ziel ignorieren",
-    "discardInvalidTargets": "Ungültige Ziele verwerfen, anstatt die Datei zurückzuweisen",
+    "ignoreTagTypeMatch": "Zwischen Quell- und Zielsegment nicht übereinstimmende Tag-Typen ignorieren",
+    "discardInvalidTargets": "Ungültige Zielsegmente verwerfen, anstatt die Datei zurückzuweisen",
     "writeOriginalData": "Die Ausgabe enthält Originaldaten, sofern verfügbar",
-    "subfilter": "Unterfilter",
+    "subfilter": "Subfilter",
     "subfilterTooltip": "Name des für eingebettete Inhalte zu verwendenden Subfilters",
-    "subfilterOverwriteTarget": "Unterfilter: Ziel immer überschreiben?",
-    "subfilterOverwriteTargetTooltip": "Sollte der Verfasser ein bestehendes Ziel immer überschreiben, auch wenn der Zustand endgültig ist?"
+    "subfilterOverwriteTarget": "Subfilter: Zielsegment-Inhalt überschreiben?",
+    "subfilterOverwriteTargetTooltip": "Soll der Writer bestehende Zielsegmente immer überschreiben, auch wenn deren Status final ist?"
 }

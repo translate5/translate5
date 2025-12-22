@@ -42,7 +42,7 @@ class XliffFile
     public function __construct(SplFileInfo $file)
     {
         $this->file = $file;
-        $this->xmlparser = \ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        $this->xmlparser = \ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
     }
 
     /**

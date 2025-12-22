@@ -62,7 +62,16 @@ use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Sanitizer as Sanitizer;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 
-/***
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Keine Datei hochgeladen!');
+ * $translate->_('File import in language resources Error on worker init()');
+ * $translate->_('Die ausgewählte Datei war leer!');
+ * $translate->_('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
+ */
+
+/**
  * Language resource controller
  */
 class editor_LanguageresourceinstanceController extends ZfExtended_RestController

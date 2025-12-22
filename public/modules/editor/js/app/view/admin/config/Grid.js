@@ -514,14 +514,14 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         html.push(value);
         html.push('</b>');
-        html.push('</br>');
+        html.push('<br/>');
         
         if(desc){
             html.push('<i>');
             desc = Ext.String.htmlEncode(desc);
             html.push(this.makeURLsClickable(desc));
             html.push('</i>');
-            html.push('</br>');
+            html.push('<br/>');
         }
         
         Ext.Object.each(Editor.data.frontend.config.configLabelMap, function(property, v){
@@ -544,7 +544,7 @@ Ext.define('Editor.view.admin.config.Grid', {
             html.push(levels.join(", "));
             html.push('</small>');
             html.push('</i>');
-            html.push('</br>');
+            html.push('<br/>');
         }
         
         return html.join("");

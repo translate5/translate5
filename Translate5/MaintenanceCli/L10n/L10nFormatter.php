@@ -25,20 +25,41 @@
 
  END LICENSE AND COPYRIGHT
  */
+declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\L10n;
 
-/**
- * Helper class to manipulate internal l10n XLF files
- */
-class XliffLocation
-{
-    //FIXME if ! isDevelopment manipulation is only allowed in client-specifc
+use MittagQI\ZfExtended\Localization;
 
-    /**
-     * Find if a given source text exists. If a source text exists multiple times in a file, it is listed multiple times here too
-     */
-    public function findSourceText(string $source)
+class L10nFormatter
+{
+    public function process(): int
     {
+        $xliffs = [];
+
+        // find Plugins that have localization-files
+        $basePluginDir = L10nHelper::getPluginDir();
+
+        foreach (L10nHelper::getAllLocales() as $locale) {
+            $xliffs[] = L10nHelper::getModuleXliff('default', $locale);
+            $xliffs[] = L10nHelper::getModuleXliff('editor', $locale);
+            $xliffs[] = L10nHelper::getModuleXliff('library', $locale);
+            $xliffs[] = L10nHelper::getModuleXliff('erp', $locale);
+
+            foreach (L10nHelper::getAllPluginNames() as $pluginName) {
+                $pluginXliff = $basePluginDir . '/' . $pluginName . '/locales/' . $locale .
+                    Localization::FILE_EXTENSION_WITH_DOT;
+                if (file_exists($pluginXliff)) {
+                    $xliffs[] = $pluginXliff;
+                }
+            }
+        }
+
+        foreach ($xliffs as $xliff) {
+            $formatter = new XliffFormatter($xliff);
+            $formatter->format();
+        }
+
+        return count($xliffs);
     }
 }

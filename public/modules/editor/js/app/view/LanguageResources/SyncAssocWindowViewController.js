@@ -101,7 +101,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
         let tipBody = '';
 
         for (let lrName in additionalInfo) {
-            tipBody += Ext.String.htmlEncode(lrName) + '</br>';
+            tipBody += Ext.String.htmlEncode(lrName) + '<br/>';
 
             const rows = additionalInfo[lrName].map(row =>
                 '<tr>' +
@@ -114,7 +114,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
             );
 
             tipBody += '<table style="border-collapse: collapse; width: 100%; margin-top: 5px">' + rows.join('') + '</table>';
-            tipBody += '</br>';
+            tipBody += '<br/>';
         }
 
         tip.update(tipBody);

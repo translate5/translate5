@@ -29,6 +29,42 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Acl;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * // roles
+ * $translate->_('systemadmin');
+ * $translate->_('admin');
+ * $translate->_('api');
+ * $translate->_('pm');
+ * $translate->_('clientpm');
+ * $translate->_('pmlight');
+ * $translate->_('editor');
+ * $translate->_('taskOverview');
+ * $translate->_('basic');
+ * $translate->_('noRights');
+ * $translate->_('editor-only-override');
+ * $translate->_('erp');
+ * $translate->_('instantTranslate');
+ * $translate->_('instantTranslateWriteTm');
+ * $translate->_('instantTranslateHumanRevisionAllowed');
+ * $translate->_('production');
+ * $translate->_('termPM');
+ * $translate->_('termSearch');
+ * $translate->_('termCustomerSearch');
+ * $translate->_('termFinalizer');
+ * $translate->_('termProposer');
+ * $translate->_('termReviewer');
+ * $translate->_('TMMaintenance');
+ * $translate->_('TMMaintenance_allClients');
+ * $translate->_('jobCoordinator');
+ * // subroles
+ * $translate->_('clientpm_projects');
+ * $translate->_('clientpm_langresources');
+ * $translate->_('clientpm_customers');
+ * $translate->_('clientpm_users');
+ */
+
+/**
  * Holds additional roles for translate5
  *
  * @codeCoverageIgnore
@@ -81,6 +117,12 @@ final class Roles
 
     public const TERMREVIEWER = 'termReviewer';
 
+    public const TM_MAINTENANCE = 'TMMaintenance';
+
+    public const TM_MAINTENANCE_ALL_CLIENTS = 'TMMaintenance_allClients';
+
+    public const JOB_COORDINATOR = 'jobCoordinator';
+
     // region sub-roles for the client-pm
     public const CLIENTPM_PROJECTS = 'clientpm_projects';
 
@@ -90,12 +132,6 @@ final class Roles
 
     public const CLIENTPM_USERS = 'clientpm_users';
     // endregion
-
-    public const TM_MAINTENANCE = 'TMMaintenance';
-
-    public const TM_MAINTENANCE_ALL_CLIENTS = 'TMMaintenance_allClients';
-
-    public const JOB_COORDINATOR = 'jobCoordinator';
 
     private const FRONTEND_ROLES = [
         self::EDITOR,

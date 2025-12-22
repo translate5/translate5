@@ -27,6 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('taskType::default');
+ */
+
+/**
  * The default task type is a mixture of project and task!
  */
 class editor_Task_Type_Default extends editor_Task_Type_Abstract

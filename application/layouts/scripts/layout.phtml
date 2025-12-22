@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -58,9 +58,9 @@ $config = Zend_Registry::get('config');
         <meta name="description" content="Cloud open source translation, reviewing and postediting system.">
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/main.css?V=2020-10-01" />
-        <!--[if lte IE 9]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/ie9.css" /><![endif]-->
-        <!--[if lte IE 8]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/ie8.css" /><![endif]-->
+        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/assets/css/main.css?V=2020-10-01" />
+        <!--[if lte IE 9]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/assets/css/ie9.css" /><![endif]-->
+        <!--[if lte IE 8]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/assets/css/ie8.css" /><![endif]-->
         <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
         <?php echo $this->headScript()?>
     </head>
@@ -68,7 +68,7 @@ $config = Zend_Registry::get('config');
             <!-- Header -->
             <header id="header">
                 <div class="logo_container">
-                    <a href="https://www.translate5.net/" target="_blank" class="logo"><img src="<?php echo APPLICATION_RUNDIR;?>/images/translate5-transparent.png" alt="translate5" /></a>
+                    <a href="https://www.translate5.net/" target="_blank" class="logo"><img src="<?php echo APPLICATION_RUNDIR; ?>/images/translate5-transparent.png" alt="translate5" /></a>
                 </div>
             </header>
             <?php if($config->runtimeOptions->startup->showConsortiumLogos > 0 && $this->getScriptPath('fragments/header-consortium-logos.phtml')) : ?>

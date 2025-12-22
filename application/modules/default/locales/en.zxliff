@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="en" datatype="php">
+        <body>
+            <trans-unit id="LSBEaWUgRGF0ZW4gc2luZCBudXIgaW4gZGVyIEhUTUwtQW5zaWNodCBkZXIgRS1NYWlsIHZlcmbDvGdiYXIhIC0=">
+                <source>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</source>
+                <target>– The data is only available in the HTML version of that e-mail! –</target>
+            </trans-unit>
+            <trans-unit id="PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgo8Yj5RdWVsbHNwcmFjaGU6PC9iPiB7c291cmNlTGFuZ3VhZ2VUcmFuc2xhdGVkfTxiciAvPgo8Yj5aaWVsc3ByYWNoZTo8L2I+IHt0YXJnZXRMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+CntyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtOjwvYj4ge2RlYWRsaW5lRGF0ZX08YnIgLz4KPGI+V29ydGFuemFobDo8L2I+IHt3b3JkQ291bnR9PGJyIC8+">
+                <source><b>Aufgabe:</b> {task.taskName}<br />
+<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+<b>Zielsprache:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
+<b>Wortanzahl:</b> {wordCount}<br /></source>
+                <target><b>Task name:</b> {task.taskName}<br />
+<b>Source language:</b> {sourceLanguageTranslated}<br />
+<b>Target language:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Deadline:</b> {deadlineDate}<br />
+<b>Word count:</b> {wordCount}<br /></target>
+            </trans-unit>
+            <trans-unit id="PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE=">
+                <source><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+                <target><br/>
+<br/>Many thanks and best regards,
+<br/>The project management team
+<br/>{companyName}
+<br/>
+<br/>This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+            </trans-unit>
+            <trans-unit id="QW5tZWxkdW5nIG1pdCBTaW5nbGUgU2lnbiBPbiBzY2hsdWcgZmVobCwgYml0dGUgdmVyc3VjaGVuIFNpZSBlcyBlcm5ldXQu">
+                <source>Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.</source>
+                <target>Login with Single Sign-On failed, please try again.</target>
+            </trans-unit>
+            <trans-unit id="QW53ZW5kdW5nc2ZlaGxlcg==">
+                <source>Anwendungsfehler</source>
+                <target>Application error</target>
+            </trans-unit>
+            <trans-unit id="SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA==">
+                <source>Ihr Webbrowser wird nicht mehr unterstützt</source>
+                <target>Your browser is not supported any more</target>
+            </trans-unit>
+            <trans-unit id="TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg==">
+                <source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source>
+                <target>We’re sorry, but Microsoft Internet Explorer is no longer supported by translate5. Please use a more modern browser like Google Chrome, Mozilla Firefox, Apple Safari or Microsoft Edge.</target>
+            </trans-unit>
+            <trans-unit id="UmVkaXJlY3QgdG8gbG9naW4uLi4=">
+                <source>Redirect to login...</source>
+                <target>Redirect to login...</target>
+            </trans-unit>
+            <trans-unit id="U2VociBnZWVocnRlKHIp">
+                <source>Sehr geehrte(r)</source>
+                <target>Dear</target>
+            </trans-unit>
+            <trans-unit id="U2VociBnZWVocnRlIEZyYXU=">
+                <source>Sehr geehrte Frau</source>
+                <target>Dear Ms.</target>
+            </trans-unit>
+            <trans-unit id="U2VociBnZWVocnRlciBIZXJy">
+                <source>Sehr geehrter Herr</source>
+                <target>Dear Mr.</target>
+            </trans-unit>
+            <trans-unit id="VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4=">
+                <source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source>
+                <target>Our administrators are automatically notified of the error. If you have any questions or concerns, please contact our support team.</target>
+            </trans-unit>
+            <trans-unit id="V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch">
+                <source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source>
+                <target>We apologize for the problem you encountered!</target>
+            </trans-unit>
+            <trans-unit id="e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg==">
+                <source>{salutation} {surName},<br/>
+<br/></source>
+                <target>{salutation} {surName},<br/>
+<br/></target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

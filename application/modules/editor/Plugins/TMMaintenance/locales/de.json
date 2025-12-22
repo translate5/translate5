@@ -12,22 +12,22 @@
   ],
   "modeCombo": [
     {
-      "name": "Enthält",
-      "value": "contains"
+      "name": "enthält",
+      "value": "enthält"
     },
     {
-      "name": "Exact match",
-      "value": "exact"
+      "name": "exakter Treffer",
+      "value": "exakt"
     }
   ],
   "modeComboSourceTarget": [
     {
-      "name": "Enthält",
-      "value": "contains"
+      "name": "enthält",
+      "value": "enthält"
     },
     {
-      "name": "Findet nur ganzes Segment",
-      "value": "exact"
+      "name": "nur ganze Segmente",
+      "value": "exakt"
     }
   ],
   "selectTm": {
@@ -35,55 +35,55 @@
     "name": "Name",
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache",
-    "clients": "Kunden",
+    "clients": "Kunde",
     "taskTm": "Aufgaben-TM",
     "select": "Auswählen",
     "close": "Schließen",
-    "emptyText" : "Keine Datensätze verfügbar"
+    "emptyText": "Keine Datensätze verfügbar."
   },
   "searchForm": {
     "tm": "TM",
     "mode": "Modus",
-    "source": "Quelle",
-    "target": "Ziel",
-    "author": "Ersteller",
+    "source": "Quellsegment",
+    "target": "Zielsegment",
+    "author": "Erstellt von",
     "additionalInfo": "Zusätzliche Info",
     "document": "Dokumentname",
     "creationDateFrom": "Angelegt nach",
     "creationDateTo": "Angelegt vor",
     "search": "Suche",
     "deleteAll": "Alle löschen",
-    "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht",
-    "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. <br> Diese Funktion ist erst ab 20 Treffern verfügbar, da \"Alle löschen\" eine Re-Organistion des TMs nach sich zieht, <br> die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
+    "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht.",
+    "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. <br> Diese Funktion ist erst ab 20 Treffern verfügbar, da „Alle löschen“ eine Re-Organisation des TMs nach sich zieht,<br> die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache",
     "caseSensitive": "Groß- und Kleinschreibung beachten"
   },
   "createForm": {
-    "title": "Neues erstellen",
-    "sourceText": "Quelle",
-    "targetText": "Ziel",
+    "title": "Neue Übersetzungseinheit anlegen",
+    "sourceText": "Quellsegment",
+    "targetText": "Zielsegment",
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
   "deleteBatch": {
     "no": "Abbrechen",
     "yes": "Alle löschen",
-    "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?",
-    "warningTextOneByOne": "Jedes Segment der aktuellen Suche wird einzeln gelöscht, was einige Zeit dauern kann. Die Benutzeroberfläche wird blockiert, bis der Vorgang abgeschlossen ist. Wenn Sie TM-Maintenance während dieser Zeit nutzen möchten, öffnen Sie bitte einen neuen Tab."
+    "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM wird anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?",
+    "warningTextOneByOne": "Jedes Segment der aktuellen Suche wird einzeln gelöscht, was einige Zeit dauern kann. Die Benutzeroberfläche wird blockiert, bis der Vorgang abgeschlossen ist. Wenn Sie die TM Maintenance während dieser Zeit nutzen möchten, öffnen Sie bitte einen neuen Tab."
   },
-  "list" : {
+  "list": {
     "title": "Segmente",
     "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
     "calculating": "Wird berechnet...",
-    "loadingSegmentPlaceholder": "Laden...",
+    "loadingSegmentPlaceholder": "Lade...",
     "loadingSegmentNumber": "Lade Segment #",
-    "loadedSoFar": "Geladene {0} Segmente bis jetzt",
-    "saving": "Speichert, bitte warten.",
+    "loadedSoFar": "{0} Segmente geladen bis jetzt",
+    "saving": "Speichere, bitte warten.",
     "columns": {
-      "sourceText": "Quelle",
-      "targetText": "Ziel",
-      "author": "Ersteller",
+      "sourceText": "Quellsegment",
+      "targetText": "Zielsegment",
+      "author": "Erstellt von",
       "additionalInfo": "Zusätzliche Info",
       "document": "Dokumentname",
       "creationDate": "Erstellungsdatum",
@@ -92,11 +92,11 @@
       "targetLanguage": "Zielsprache"
     },
     "edit": "Bearbeiten",
-    "editSource": "Bearbeiten Quelle",
-    "editTarget": "Bearbeiten Ziel",
+    "editSource": "Quellsegment bearbeiten",
+    "editTarget": "Ziel bearbeiten",
     "delete": "Löschen",
     "create": "Neu anlegen",
-    "save": "Speichern (STRG+S)",
+    "save": "Speichern (STRG + S)",
     "cancel": "Abbrechen (ESC)",
     "saveGoToPrevious": "Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)",
     "saveGoToNext": "Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)",
@@ -110,7 +110,7 @@
     "close": "Schließen",
     "responseFromServer": "Meldung vom Server",
     "messageFromServer": "Nachricht vom Server",
-    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct the segment and try again."
+    "wrongTagsOrdering": "Einige der im Segment verwendeten Tags sind in der falschen Reihenfolge (schließendes vor öffnendem Tag oder zugehöriges Tag fehlt komplett). Bitte korrigieren das Segment und versuchen Sie es erneut."
   },
   "deleteSegment": {
     "title": "Löschen",

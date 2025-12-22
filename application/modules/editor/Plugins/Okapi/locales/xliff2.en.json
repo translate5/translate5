@@ -9,6 +9,6 @@
     "writeOriginalData": "Output includes original data when available",
     "subfilter": "Subfilter",
     "subfilterTooltip": "Name of the subfilter to use for embedded content",
-    "subfilterOverwriteTarget": "Subfilter: Always Overwrite Target?",
-    "subfilterOverwriteTargetTooltip": "Should the writer always overwrite an existing target even if state is final?"
+    "subfilterOverwriteTarget": "Subfilter: Always overwrite target?",
+    "subfilterOverwriteTargetTooltip": "Should the writer always overwrite an existing target even if status is final?"
 }

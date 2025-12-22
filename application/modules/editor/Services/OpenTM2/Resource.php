@@ -30,6 +30,14 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Entfernt keine');
+ * $translate->_('Alle');
+ * $translate->_('Tagpaare');
+ */
+
 class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_Resource
 {
     protected bool $supportsStrippingFramingTags = true;

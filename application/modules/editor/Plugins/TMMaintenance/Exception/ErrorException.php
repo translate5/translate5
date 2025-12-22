@@ -44,8 +44,7 @@ class ErrorException extends ZfExtended_ErrorCodeException
         'E1377' => 'Memory status: {status}. Please try again in a while.',
         'E1616' => 'T5Memory server version serving the selected memory is not supported',
         'E1611' => 't5memory: Requested segment not found. Probably it was deleted.',
-        'E1612' => 't5memory: Found segment id differs from the requested one, ' .
-            'probably it was deleted or edited meanwhile. Try to refresh your search.',
+        'E1612' => 't5memory: Found segment id differs from the requested one, probably it was deleted or edited meanwhile. Try to refresh your search.',
     ];
 
     protected $httpReturnCode = 422;
