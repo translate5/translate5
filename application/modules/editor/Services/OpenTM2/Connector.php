@@ -593,11 +593,44 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         }
 
         foreach ($results as $result) {
-            $resultList->addResult($this->tagHandler->restoreInResult($result->target, $isSource));
+            $resultList->addResult($this->tagHandler->restoreInResult($result->target, $isSource), 0, $this->getMetaData($result));
             $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource));
         }
 
         return $resultList;
+    }
+
+    private function getMetaData(stdClass $found): array
+    {
+        $fieldsToShow = [
+            'segmentId',
+            'documentName',
+            'matchType',
+            'author',
+            'timestamp',
+            'context',
+            'additionalInfo',
+            'internalKey',
+            'sourceLang',
+            'targetLang',
+        ];
+
+        $result = [];
+        foreach ($fieldsToShow as $field) {
+            if (property_exists($found, $field)) {
+                $item = new stdClass();
+
+                $item->name = $field;
+                $item->value = match ($field) {
+                    'timestamp' => date('Y-m-d H:i:s T', strtotime($found->{$field})),
+                    default => $found->{$field}
+                };
+
+                $result[] = $item;
+            }
+        }
+
+        return $result;
     }
 
     /**

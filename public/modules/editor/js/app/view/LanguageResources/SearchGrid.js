@@ -56,16 +56,21 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
     border: false,
     layout: 'fit',
     scrollable: true,
+    SERVER_STATUS: null,
     strings: {
         source: '#UT#Ausgangstext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
         ctrl: '#UT#STRG',
-        sourceEmptyText:'#UT#Suche im Ausgangstext',
-        targetEmptyText:'#UT#Suche im Zieltext',
-        tmresource:'#UT#TM-Ressource',
-        search:'#UT#Alle durchsuchen',
-        singleSearch:'#UT#Suche in {0}'
+        sourceEmptyText: '#UT#Suche im Ausgangstext',
+        targetEmptyText: '#UT#Suche im Zieltext',
+        tmresource: '#UT#TM-Ressource',
+        search: '#UT#Alle durchsuchen',
+        singleSearch:'#UT#Suche in {0}',
+        tooltipMsg: '#UT#Diesen Match in das geöffnete Segment übernehmen.',
+        lastEditTooltipMsg: '#UT#letzte Änderung:',
+        createdTooltipMsg: '#UT#erstellt:'
+
     },
     viewConfig: {
         enableTextSelection: true,
@@ -91,7 +96,17 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
         var me = this,
             config = null,
             segField = Editor.model.segment.Field,
-            searchItems = [];
+            searchItems = [],
+            attrTpl = new Ext.XTemplate(
+                '{title} <br/>',
+                '<table class="languageresource-meta-data">',
+                '<tpl for="metaData">',
+                '<tr><th>{[Ext.String.htmlEncode(values.name)]}</th>',
+                '<td>{[Ext.String.htmlEncode(values.value)]}</td>',
+                '</tr>',
+                '</tpl>',
+                '</table>'
+            );
 
         me.assocStore = instanceConfig.assocStore;
 
@@ -107,6 +122,29 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
 
         config = {
                 columns: [{
+                    xtype:'gridcolumn',
+                    enableTextSelection: true,
+                    tdStyle: 'width: 80px;',
+                    flex: 1,
+                    hideable: false,
+                    sortable: false,
+                    dataIndex: 'state',
+                    renderer: function(val, meta, record) {
+                        if(val !== me.SERVER_STATUS.SERVER_STATUS_LOADED) {
+                            return meta.rowIndex + 1;
+                        }
+
+                        meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(attrTpl.applyTemplate({
+                            metaData: record.get('metaData'),
+                            ctrl: me.strings.ctrl,
+                            idx: (meta.rowIndex + 1),
+                            takeMsg: me.strings.tooltipMsg
+                        })) + '"';
+                        meta.tdCls = meta.tdCls  + ' info-icon-shown';
+
+                        return meta.rowIndex + 1;
+                    }
+                },{
                     xtype: 'gridcolumn',
                     enableTextSelection: true,
                     hideable: false,
@@ -189,6 +227,9 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     }]
                 }]
             };
+
+        me.SERVER_STATUS = Editor.model.LanguageResources.EditorQuery.prototype;
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
