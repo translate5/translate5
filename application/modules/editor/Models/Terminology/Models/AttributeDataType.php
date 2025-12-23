@@ -247,7 +247,7 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
                   IF (
                     JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) != "", 
                     JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)), 
-                    `type`
+                    IFNULL(`type`, CONCAT("unnamed-", `a`.`id`))
                   )
               ) AS `title`,
               IF (JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) != "",
