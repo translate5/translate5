@@ -952,7 +952,7 @@ Ext.define('Editor.controller.SearchReplace', {
         }
 
         // If editor is not yet instantiated
-        if (!this.editor.editor) {
+        if (!this.editor?.editor) {
             me.retryFindMatchesOnEditorInstantiate = true;
             return;
         }

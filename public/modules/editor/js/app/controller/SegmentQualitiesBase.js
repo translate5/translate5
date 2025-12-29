@@ -88,6 +88,12 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     onEditableColumnRender: function (column) {
         let me = this;
         column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
+
+            // If TrackChanges plugin is active - append 'is-mqm' class to the <del> tags containing <img> tag
+            if (Editor.plugins.TrackChanges) {
+                value = value.replaceAll(/(<del class=")([^>]+><img)/g, '$1is-mqm $2');
+            }
+
             setTimeout(function () {
                 // in case no segments grid exist, ignore the logic below.
                 // this can happen i the user leaves the task, and the timeout callback kicks in
