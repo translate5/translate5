@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
                 <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
-                <target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target>
+                <target>With translate5 you can review SDLXLIFF, t5memory-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target>
             </trans-unit>
             <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'>
                 <source>Unterstützung der Entwicklung von translate5</source>
@@ -68,11 +68,11 @@
             </trans-unit>
             <trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='>
                 <source>Import von einzelnen SDLXLIFF oder CSV Dateien</source>
-                <target>Importing single SDLXLIFF, openTM2-XLIFF or CSV files</target>
+                <target>Importing single SDLXLIFF, t5memory-XLIFF or CSV files</target>
             </trans-unit>
             <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='>
                 <source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
-                <target>If you need to import a single CSV, openTM2-XLIFF or SDLXLIFF file as a project, you can upload this file directly. Creating a ZIP file here is not necessary.</target>
+                <target>If you need to import a single CSV, t5memory-XLIFF or SDLXLIFF file as a project, you can upload this file directly. Creating a ZIP file here is not necessary.</target>
             </trans-unit>
             <trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'>
                 <source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source>

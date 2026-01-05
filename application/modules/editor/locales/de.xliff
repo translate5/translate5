@@ -5625,10 +5625,6 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Import läuft</source>
                 <target>Import läuft</target>
             </trans-unit>
-            <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
-                <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
-                <target>Die angefragte OpenTM2 Instanz ist nicht erreichbar</target>
-            </trans-unit>
             <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
                 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
                 <target>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</target>
@@ -8672,8 +8668,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Andere Aufgaben-TM ausblenden</source>
                 <target>Andere Aufgaben-TMs ausblenden</target>
             </trans-unit>
-            <trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
-                <source>fileName_OpenTM2</source>
+            <trans-unit id='ZmlsZU5hbWVfVDVNZW1vcnk='>
+                <source>fileName_T5Memory</source>
                 <target>Datenbankname</target>
             </trans-unit>
             <trans-unit id='ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24='>

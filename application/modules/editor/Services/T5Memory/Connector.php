@@ -54,11 +54,11 @@ use MittagQI\Translate5\T5Memory\TagHandlerProvider;
 use MittagQI\Translate5\T5Memory\UpdateSegmentService;
 
 /**
- * T5memory / OpenTM2 Connector
+ * T5memory / T5Memory Connector
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface, ExportAdapterInterface
+class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface, ExportAdapterInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
@@ -68,7 +68,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     /**
      * Connector
-     * @var editor_Services_OpenTM2_HttpApi
+     * @var editor_Services_T5Memory_HttpApi
      */
     protected $api;
 
@@ -141,7 +141,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         LanguagePairDTO $languagePair,
         $config = null,
     ): void {
-        $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+        $this->api = ZfExtended_Factory::get('editor_Services_T5Memory_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
         parent::connectTo($languageResource, $languagePair, $config);
@@ -371,7 +371,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         //TODO final implemenation: get prefix and other key relevant information from underlying api instance
         $key = [
-            $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix,
+            $this->config->runtimeOptions->LanguageResources->t5memory->tmprefix,
             $this->languageResource->getId(),
             $fileName,
             $context,
@@ -928,7 +928,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $showMultiple100PercentMatches = $this->config
             ->runtimeOptions
             ->LanguageResources
-            ->opentm2
+            ->t5memory
             ->showMultiple100PercentMatches;
 
         $other = [];

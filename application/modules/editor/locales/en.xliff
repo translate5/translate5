@@ -1460,7 +1460,7 @@
             </trans-unit>
             <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
                 <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
-                <target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target>
+                <target>With translate5 you can review SDLXLIFF, t5memory-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target>
             </trans-unit>
             <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'>
                 <source>Unterstützung der Entwicklung von translate5</source>
@@ -1492,7 +1492,7 @@
             </trans-unit>
             <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='>
                 <source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
-                <target>If you need to import a single CSV, openTM2-XLIFF or SDLXLIFF file as a project, you can upload this file directly. Creating a ZIP file here is not necessary.</target>
+                <target>If you need to import a single CSV, t5memory-XLIFF or SDLXLIFF file as a project, you can upload this file directly. Creating a ZIP file here is not necessary.</target>
             </trans-unit>
             <trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'>
                 <source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source>
@@ -4117,10 +4117,6 @@ A task was associated to you in the task-portal {portalLink}.
             <trans-unit id='SW1wb3J0IGzDpHVmdA=='>
                 <source>Import läuft</source>
                 <target>importing</target>
-            </trans-unit>
-            <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
-                <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
-                <target>The queried OpenTM2 instance is not available</target>
             </trans-unit>
             <trans-unit id='QWxsZSBTZWdtZW50ZSBpbSBUTSBzcGVpY2hlcm4='>
                 <source>Alle Segmente im TM speichern</source>
@@ -6834,8 +6830,8 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Andere Aufgaben-TM ausblenden</source>
                 <target>Hide foreign task TMs</target>
             </trans-unit>
-            <trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
-                <source>fileName_OpenTM2</source>
+            <trans-unit id='ZmlsZU5hbWVfVDVNZW1vcnk='>
+                <source>fileName_T5Memory</source>
                 <target>Database name</target>
             </trans-unit>
             <trans-unit id='ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24='>
@@ -7878,7 +7874,7 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0gdW5kIFNETFhMSUZGLURhdGVpZW4ga8O2bm5lbiBiZWxpZWJpZyBnZW1pc2NodCB3ZXJkZW4uIERpZSBTdHJ1a3R1ciB3aXJkIGltIExla3RvcmF0IGFiZ2ViaWxkZXQu'>
                 <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
-                <target>The zip folder must include a directory called "review", which can contain multiple SDLXLIFF and / or openTM2-XLIFF and / or CSV files in any directory structure. CSV, openTM2-XLIFF and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
+                <target>The zip folder must include a directory called "review", which can contain multiple SDLXLIFF and / or t5memory-XLIFF and / or CSV files in any directory structure. CSV, t5memory-XLIFF and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
             </trans-unit>
             <trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='>
                 <source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source>

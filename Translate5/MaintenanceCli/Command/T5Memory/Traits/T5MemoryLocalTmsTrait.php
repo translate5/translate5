@@ -31,8 +31,8 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command\T5Memory\Traits;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_OpenTM2_Connector as Connector;
-use editor_Services_OpenTM2_Service as Service;
+use editor_Services_T5Memory_Connector as Connector;
+use editor_Services_T5Memory_Service as Service;
 use Generator;
 use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use ZfExtended_Factory as Factory;

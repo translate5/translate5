@@ -273,7 +273,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         //flag, indicating if analysis contains imported match rate info (to avoid duplicates info output)
         $withImportedMatchRates = false;
         foreach ($results as $res) {
-            //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+            //the key will be languageResource->ServiceType + fuzzy flag (ex: "T5Memory memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
             $isInternalFuzzy = $res['internalFuzzy'] == '1';
             if ($isInternalFuzzy) {
@@ -420,7 +420,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         if ($isInternalFuzzy) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+            //the key will be languageResourceId + fuzzy flag (ex: "T5Memory memoryfuzzy")
             //for each internal fuzzy, additional row is displayed
             //init the internal fuzzies
             foreach ($fuzzyTypes as $resourceId => $name) {

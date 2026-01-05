@@ -33,13 +33,13 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Parser to modify TMX data before importing to OpenTM2 to fix several issues
+ * Parser to modify TMX data before importing to T5Memory to fix several issues
  * - replace it|ph|ept|bpt tags with content with same tag as single tag,
  *   since content is irrelevant for translate5 and tags with content are not matched
  *   against single tags always provided by translate5
  * - remove type attributes, since tags with a type attribute may not match (beeing replaced) against the tags provided by translate5
  */
-class editor_Services_OpenTM2_FixImportParser
+class editor_Services_T5Memory_FixImportParser
 {
     public const ATTRIBUTES_TO_KEEP = [
         'i' => null,

@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  *
  * Currently default for the following types:
- * 'editor_Services_OpenTM2',
+ * 'editor_Services_T5Memory',
  * 'editor_Services_Moses',
  * 'editor_Services_LucyLT',
  * 'editor_Services_SDLLanguageCloud',

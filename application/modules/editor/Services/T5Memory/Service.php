@@ -32,34 +32,34 @@ use MittagQI\Translate5\LanguageResource\TaskTm\Operation\CreateTaskTmOperation;
 use MittagQI\Translate5\LanguageResource\TaskTm\SupportsTaskTmInterface;
 
 /**
- * T5memory / OpenTM2 Service Base Class
+ * T5memory / T5Memory Service Base Class
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract implements SupportsTaskTmInterface, SupportsContentProtectionInterface
+class editor_Services_T5Memory_Service extends editor_Services_ServiceAbstract implements SupportsTaskTmInterface, SupportsContentProtectionInterface
 {
-    public const NAME = 'OpenTM2';
+    public const NAME = 'T5Memory';
 
     public const DEFAULT_COLOR = 'aaff7f';
 
-    protected $resourceClass = editor_Services_OpenTM2_Resource::class;
+    protected $resourceClass = editor_Services_T5Memory_Resource::class;
 
     /**
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = 'https://confluence.translate5.net/display/BUS/OpenTM2';
+    protected static $helpPage = 'https://confluence.translate5.net/display/BUS/T5Memory';
 
     public function isConfigured(): bool
     {
         // since tmprefix and showMultiple100PercentMatches have workable defaults
         // (which evaulates to empty) there is no need to test them
-        return $this->isConfigSet($this->config->runtimeOptions->LanguageResources->opentm2->server);
+        return $this->isConfigSet($this->config->runtimeOptions->LanguageResources->t5memory->server);
     }
 
     protected function embedService(): void
     {
-        $urls = $this->config->runtimeOptions->LanguageResources->opentm2->server;
+        $urls = $this->config->runtimeOptions->LanguageResources->t5memory->server;
         $this->addResourceForeachUrl($this->getName(), $urls->toArray());
     }
 

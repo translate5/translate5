@@ -109,7 +109,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         }
 
         //a 404 response from the status call means:
-        // - OpenTM2 is online
+        // - T5Memory is online
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
         if ($this->api->getResponse()->getStatus() == 404) {

@@ -77,8 +77,8 @@ class MemoryNameGenerator
      */
     private function filterName($name)
     {
-        //since we are getting Problems on the OpenTM2 side with non ascii characters in the filenames,
-        // we strip them all. See also OPENTM2-13.
+        //since we are getting Problems on the T5Memory side with non ascii characters in the filenames,
+        // we strip them all. See also T5Memory-13.
         $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
 
         return preg_replace('/[^a-zA-Z0-9 _-]/', '_', $name);

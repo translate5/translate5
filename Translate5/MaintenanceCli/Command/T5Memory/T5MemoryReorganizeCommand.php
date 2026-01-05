@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_OpenTM2_Service;
+use editor_Services_T5Memory_Service;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
@@ -180,7 +180,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
                 ],
             )
             ->where('lr.id > ?', $startFromId)
-            ->where('lr.serviceName = ?', editor_Services_OpenTM2_Service::NAME)
+            ->where('lr.serviceName = ?', editor_Services_T5Memory_Service::NAME)
             ->limit($batchSize);
 
         $data = $db->fetchAll($s);

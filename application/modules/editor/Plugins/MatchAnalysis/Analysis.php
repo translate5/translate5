@@ -659,7 +659,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * Save match analysis to the database
      *
      * @param editor_Models_Segment $segment
-     * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or int (only the matchrate)
+     * @param mixed $matchRateResult : it can be stdClass (t5memory match result) or int (only the matchrate)
      * @param int $languageResourceid
      */
     protected function saveAnalysis($segment, $matchRateResult, $languageResourceid)
@@ -730,7 +730,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $availableConnectorStatus = [
             Status::AVAILABLE,
             // NOT_LOADED must be also considered as AVAILABLE,
-            // since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
+            // since T5Memory Tms are basically not loaded and therefore we can not decide if they are usable or not
             Status::NOT_LOADED,
         ];
 

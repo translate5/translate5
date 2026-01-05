@@ -48,7 +48,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser
     <?xml version="1.0" encoding="UTF-8" ?>
 
     <tmx version="1.4">
-      <header creationtoolversion="1.5.1.1" segtype="sentence" adminlang="en-us" srclang="en-US" o-tmf="OpenTM2" creationtool="OpenTM2" datatype="plaintext" />
+      <header creationtoolversion="1.5.1.1" segtype="sentence" adminlang="en-us" srclang="en-US" o-tmf="T5Memory" creationtool="T5Memory" datatype="plaintext" />
       <body>
 
         <tu tuid="16" creationdate="20200819T081431Z">

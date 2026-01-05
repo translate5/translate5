@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * See TRANSLATE-2835 - fixing TMX export from OpenTM2
+ * See TRANSLATE-2835 - fixing TMX export from T5Memory
  */
-class editor_Services_OpenTM2_FixExport
+class editor_Services_T5Memory_FixExport
 {
     /**
      * @var editor_Models_Import_FileParser_XmlParser

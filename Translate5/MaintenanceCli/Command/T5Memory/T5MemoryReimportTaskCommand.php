@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
-use editor_Services_OpenTM2_Service as Service;
+use editor_Services_T5Memory_Service as Service;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsOptions;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\ReimportSegmentsQueue;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -449,7 +449,7 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 'lrt.languageResourceId = lr.id',
                 'lr.id as languageResourceId'
             )
-            ->where('lr.serviceType = ?', \editor_Services_Manager::SERVICE_OPENTM2)
+            ->where('lr.serviceType = ?', \editor_Services_Manager::SERVICE_T5_MEMORY)
             ->where('lrt.segmentsUpdateable = 1')
         ;
 
@@ -523,7 +523,7 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 'lrt.languageResourceId = lr.id',
                 'lr.id as languageResourceId'
             )
-            ->where('lr.serviceType = ?', \editor_Services_Manager::SERVICE_OPENTM2)
+            ->where('lr.serviceType = ?', \editor_Services_Manager::SERVICE_T5_MEMORY)
             ->where('lrt.segmentsUpdateable = 1')
             ->group('task.id');
 

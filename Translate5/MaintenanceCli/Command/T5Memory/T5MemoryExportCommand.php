@@ -163,7 +163,7 @@ class T5MemoryExportCommand extends Translate5AbstractCommand
                 'tm.id = ttm.languageResourceId',
                 'IF(ISNULL(ttm.id), 0, 1) AS isTaskTm'
             )
-            ->where('tm.serviceType = ?', ServicesManager::SERVICE_OPENTM2)
+            ->where('tm.serviceType = ?', ServicesManager::SERVICE_T5_MEMORY)
             ->where('ca.customerId = ?', $customerId)
             ->where('ttm.id IS NULL')
             ->group('tm.id');

@@ -32,9 +32,9 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 
 /**
- * OpenTM2 HTTP Connection API
+ * T5Memory HTTP Connection API
  */
-class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract
+class editor_Services_T5Memory_HttpApi extends editor_Services_Connector_HttpApiAbstract
 {
     private const DATE_FORMAT = 'Ymd\THis\Z';
 
@@ -127,7 +127,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         ]);
 
         try {
-            //OpenTM2 returns invalid JSON on calling "/", so we have to fix this here by catching the invalid JSON Exception.
+            //T5Memory returns invalid JSON on calling "/", so we have to fix this here by catching the invalid JSON Exception.
             // Also this would send a list of all TMs to all error receivers, which must also prevented
             return $this->processResponse($this->http->request());
         } catch (editor_Services_Exceptions_InvalidResponse $e) {
@@ -167,7 +167,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
 
         $json->source = $queryString;
-        // In general OpenTM2 can deal with whole paths, not only with filenames.
+        // In general T5Memory can deal with whole paths, not only with filenames.
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible,
         // so we take only the single filename at the moment
         $json->documentName = $filename;
@@ -432,7 +432,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * parses and processes the response of OpenTM2, and handles the errors
+     * parses and processes the response of T5Memory, and handles the errors
      */
     protected function processResponse(Zend_Http_Response $response): bool
     {
@@ -463,7 +463,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * returns the current time stamp in the expected format for OpenTM2
+     * returns the current time stamp in the expected format for T5Memory
      */
     public function getNowDate(): string
     {
@@ -490,8 +490,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * returns true if string is to long for OpenTM2
-     * According some research, it seems that the magic border to crash OpenTM2 is on 2048 characters, but:
+     * returns true if string is to long for T5Memory
+     * According some research, it seems that the magic border to crash T5Memory is on 2048 characters, but:
      * 1,2 and 3 Byte long characters are counting as 1 character, while 4Byte Characters are counting as 2 Characters.
      * There fore the below special count is needed.
      */
@@ -503,7 +503,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             // if the real char length is shorter as half of the max count
             return false;
         }
-        //since for OpenTM2 4Byte characters seems to count 2 characters,
+        //since for T5Memory 4Byte characters seems to count 2 characters,
         // we have to count and add them to get the real count
         $smileyCount = preg_match_all('/[\x{10000}-\x{10FFFF}]/mu', $string);
 
@@ -525,7 +525,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     /**
      * Generates the Timeouts to use for a request
-     * TODO T5MEMORY: remove when OpenTM2 is out of production
+     * TODO T5MEMORY: remove when T5Memory is out of production
      */
     private function createTimeout(int $seconds): int
     {

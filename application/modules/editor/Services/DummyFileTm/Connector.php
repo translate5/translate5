@@ -185,7 +185,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         }
 
         if ($this->searchCount > 0) {
-            //to simulate the OpenTM2 paging behaviour we don't deliver the real total to the GUI
+            //to simulate the T5Memory paging behaviour we don't deliver the real total to the GUI
             // but offset + limit + 1 if there are more available results.
             // the last page contains then the real total to end paging in the GUI
             //

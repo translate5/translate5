@@ -37,8 +37,8 @@ class ErrorException extends ZfExtended_ErrorCodeException
     use \ZfExtended_ResponseExceptionTrait;
 
     protected static $localErrorCodes = [
-        'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
-        'E1333' => 'The queried OpenTM2 server has to many open TMs!',
+        'E1314' => 'The queried T5Memory TM "{tm}" is corrupt and must be reorganized before usage!',
+        'E1333' => 'The queried T5Memory server has to many open TMs!',
         'E1306' => 'Could not save segment to TM',
         'E1688' => 'Could not delete segment',
         'E1377' => 'Memory status: {status}. Please try again in a while.',

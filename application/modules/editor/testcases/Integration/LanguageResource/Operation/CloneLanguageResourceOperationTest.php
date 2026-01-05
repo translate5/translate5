@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Test\Integration\LanguageResource\Operation;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager as ServiceManager;
-use editor_Services_OpenTM2_Service as OpenTM2Service;
+use editor_Services_T5Memory_Service as T5MemoryService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\Operation\CloneLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\Operation\CreateLanguagePairOperation;
@@ -49,10 +49,10 @@ class CloneLanguageResourceOperationTest extends TestCase
     {
         $languageResource = new LanguageResource();
         $languageResource->init([
-            'resourceId' => ServiceManager::SERVICE_OPENTM2 . '_1',
+            'resourceId' => ServiceManager::SERVICE_T5_MEMORY . '_1',
             'resourceType' => 'tm',
-            'serviceType' => ServiceManager::SERVICE_OPENTM2,
-            'serviceName' => OpenTM2Service::NAME,
+            'serviceType' => ServiceManager::SERVICE_T5_MEMORY,
+            'serviceName' => T5MemoryService::NAME,
             'color' => '000000',
             'name' => 'oldName',
         ]);
@@ -79,7 +79,7 @@ class CloneLanguageResourceOperationTest extends TestCase
     {
         self::$oldLanguageResource = $this->prepareData();
 
-        $connectorMock = $this->createMock(\editor_Services_OpenTM2_Connector::class);
+        $connectorMock = $this->createMock(\editor_Services_T5Memory_Connector::class);
         $connectorMock->expects(self::once())->method('addTm');
 
         $serviceManager = $this->createMock(ServiceManager::class);

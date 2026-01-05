@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as SegmentModel;
-use editor_Services_OpenTM2_Connector as T5MemoryConnector;
+use editor_Services_T5Memory_Connector as T5MemoryConnector;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
@@ -51,7 +51,7 @@ use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\UpdateRetryService;
 
 /**
- * This is a temporary service partially copying functionality from the OpenTM2Connector
+ * This is a temporary service partially copying functionality from the T5MemoryConnector
  */
 class MaintenanceService extends \editor_Services_Connector_Abstract
 {
@@ -59,7 +59,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     protected const TAG_HANDLER_CONFIG_PART = 't5memory';
 
-    private \editor_Services_OpenTM2_HttpApi $api;
+    private \editor_Services_T5Memory_HttpApi $api;
 
     /**
      *  Is the connector generally able to support internal Tags for the translate-API
@@ -82,8 +82,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
     public function __construct()
     {
         \editor_Services_Connector_Exception::addCodes([
-            'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
-            'E1333' => 'The queried OpenTM2 server has to many open TMs!',
+            'E1314' => 'The queried T5Memory TM "{tm}" is corrupt and must be reorganized before usage!',
+            'E1333' => 'The queried T5Memory server has to many open TMs!',
             'E1306' => 'Could not save segment to TM',
             'E1688' => 'Could not delete segment',
             'E1377' => 'Memory status: {status}. Please try again in a while.',
@@ -109,7 +109,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         LanguagePairDTO $languagePair,
         $config = null,
     ): void {
-        $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+        $this->api = \ZfExtended_Factory::get('editor_Services_T5Memory_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
         $this->t5MemoryConnector->connectTo($languageResource, $languagePair, $config);

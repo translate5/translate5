@@ -184,7 +184,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
                 'languageResource.id = lrLanguage.languageResourceId',
                 []
             )
-            ->where('languageResource.serviceType = ?', 'editor_Services_OpenTM2')
+            ->where('languageResource.serviceType = ?', 'editor_Services_T5Memory')
         ;
 
         $pairs = [];

@@ -35,7 +35,7 @@ use MittagQI\Translate5\Test\Api\Helper;
  */
 abstract class LanguageResource extends AbstractResource
 {
-    public const OPEN_TM2 = 'opentm2';
+    public const T5_MEMORY = 't5memory';
 
     public const DEEPL = 'deepl';
 

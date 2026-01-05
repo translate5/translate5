@@ -77,7 +77,7 @@ class ReimportSegmentsTest extends ImportTestAbstract
         ;
 
         $config
-            ->addLanguageResource('opentm2', null, $customerId, $sourceLanguage, $targetLanguage)
+            ->addLanguageResource('t5memory', null, $customerId, $sourceLanguage, $targetLanguage)
             ->setProperty('name', 'Some resource name')
         ;
     }
@@ -165,6 +165,6 @@ class ReimportSegmentsTest extends ImportTestAbstract
             'editor/languageresourcetaskassoc?filter=' . urlencode(json_encode($filters, flags: JSON_THROW_ON_ERROR)),
         );
 
-        return array_filter($tms, static fn (stdClass $tm) => $tm->serviceName === 'OpenTM2');
+        return array_filter($tms, static fn (stdClass $tm) => $tm->serviceName === 'T5Memory');
     }
 }

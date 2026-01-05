@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
-use editor_Services_OpenTM2_Service as Service;
+use editor_Services_T5Memory_Service as Service;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\PersistenceService;
@@ -79,7 +79,7 @@ class T5MemoryCleanUpCommand extends Translate5AbstractCommand
 
         $serverMemoryList = [];
 
-        foreach ($config->runtimeOptions->LanguageResources->opentm2->server as $baseUrl) {
+        foreach ($config->runtimeOptions->LanguageResources->t5memory->server as $baseUrl) {
             if (! $api->ping($baseUrl)) {
                 $this->io->error('T5Memory server is not reachable: ' . $baseUrl);
 

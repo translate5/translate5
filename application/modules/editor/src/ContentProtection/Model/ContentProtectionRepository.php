@@ -503,6 +503,6 @@ class ContentProtectionRepository
                 'LRLanguages.languageResourceId = LanguageResource.id',
                 ['LRLanguages.sourceLang', 'LRLanguages.targetLang']
             )
-            ->where('LanguageResource.serviceType = ?', editor_Services_Manager::SERVICE_OPENTM2);
+            ->where('LanguageResource.serviceType = ?', editor_Services_Manager::SERVICE_T5_MEMORY);
     }
 }

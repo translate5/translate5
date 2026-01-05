@@ -50,12 +50,12 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Integration\Services\OpenTM2;
+namespace MittagQI\Translate5\Test\Integration\Services\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LanguageResourceLanguage;
-use editor_Services_OpenTM2_Connector as Connector;
-use editor_Services_OpenTM2_Service;
+use editor_Services_T5Memory_Connector as Connector;
+use editor_Services_T5Memory_Service;
 use Http\Client\Exception\HttpException;
 use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -80,10 +80,10 @@ class IsLanguageResourceHasEmptyMemoryTest extends TestCase
         $className = explode('\\', static::class);
         $className = array_pop($className);
         $this->languageResource->setName($className);
-        $this->languageResource->setResourceId('editor_Services_OpenTM2_1');
+        $this->languageResource->setResourceId('editor_Services_T5Memory_1');
         $this->languageResource->setResourceType('tm');
-        $this->languageResource->setServiceType('editor_Services_OpenTM2');
-        $this->languageResource->setServiceName(editor_Services_OpenTM2_Service::NAME);
+        $this->languageResource->setServiceType('editor_Services_T5Memory');
+        $this->languageResource->setServiceName(editor_Services_T5Memory_Service::NAME);
         $this->languageResource->save();
 
         $languageRepository = LanguageRepository::create();

@@ -38,7 +38,7 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
  * $translate->_('Tagpaare');
  */
 
-class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_Resource
+class editor_Services_T5Memory_Resource extends editor_Models_LanguageResources_Resource
 {
     protected bool $supportsStrippingFramingTags = true;
 

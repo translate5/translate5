@@ -35,7 +35,7 @@ use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * Test the reimport and package export features.
- * Task will be imported alongside termcollection an opentm2 memory.
+ * Task will be imported alongside termcollection an t5memory memory.
  *
  */
 class Translate3117Test extends JsonTestAbstract

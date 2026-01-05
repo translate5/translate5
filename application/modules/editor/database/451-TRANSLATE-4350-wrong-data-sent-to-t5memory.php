@@ -108,7 +108,7 @@ foreach ($ids as $id) {
     $maintenanceService = new MaintenanceService();
 
     //clear language resources from broken data
-    foreach ($data[\editor_Services_Manager::SERVICE_OPENTM2] ?? [] as $languageResourceData) {
+    foreach ($data[\editor_Services_Manager::SERVICE_T5_MEMORY] ?? [] as $languageResourceData) {
         $languageResource = new \editor_Models_LanguageResources_LanguageResource();
         $languageResource->load($languageResourceData['id']);
 

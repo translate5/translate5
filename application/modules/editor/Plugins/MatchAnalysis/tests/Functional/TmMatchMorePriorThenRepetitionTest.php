@@ -51,7 +51,7 @@ class TmMatchMorePriorThenRepetitionTest extends ImportTestAbstract
 
         $config
             ->addLanguageResource(
-                'opentm2',
+                't5memory',
                 'TmMatchMorePriorThenRepetitionTest_TM.tmx',
                 $customerId,
                 $sourceLangRfc,
@@ -83,7 +83,7 @@ class TmMatchMorePriorThenRepetitionTest extends ImportTestAbstract
         $segment1 = $segments[0];
         self::assertSame(103, (int) $segment1->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchMorePriorThenRepetitionTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchMorePriorThenRepetitionTest_TM',
             $segment1->matchRateType,
             $segmentsJson
         );
@@ -93,7 +93,7 @@ class TmMatchMorePriorThenRepetitionTest extends ImportTestAbstract
         $segment2 = $segments[1];
         self::assertSame(103, (int) $segment2->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchMorePriorThenRepetitionTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchMorePriorThenRepetitionTest_TM',
             $segment2->matchRateType,
             $segmentsJson
         );
@@ -103,7 +103,7 @@ class TmMatchMorePriorThenRepetitionTest extends ImportTestAbstract
         $segment3 = $segments[2];
         self::assertSame(100, (int) $segment3->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchMorePriorThenRepetitionTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchMorePriorThenRepetitionTest_TM',
             $segment3->matchRateType,
             $segmentsJson
         );

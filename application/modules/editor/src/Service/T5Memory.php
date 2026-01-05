@@ -33,9 +33,9 @@ namespace MittagQI\Translate5\Service;
  *
  * IMPORTANT
  *
- * For now (09/2023), T5memory is used primarily, but still OpenTM2 is in use in production (T5memory is the linux
- * ported mod of the windows OpenTM2) Therefore in the Code there are still code-sections distinguishing between the
- * two. Whenever OpenTM2 is completely out of production, we should refeactor those.
+ * For now (09/2023), T5memory is used primarily, but still T5Memory is in use in production (T5memory is the linux
+ * ported mod of the windows T5Memory) Therefore in the Code there are still code-sections distinguishing between the
+ * two. Whenever T5Memory is completely out of production, we should refeactor those.
  * They are marked with "TODO T5MEMORY"
  *
  * T5MEMORY QUIRKS
@@ -59,21 +59,21 @@ final class T5Memory extends DockerServiceAbstract
     protected bool $mandatory = false;
 
     protected array $configurationConfig = [
-        // TODO: once OpenTM2 is not used anymore, this should be renamed
-        'name' => 'runtimeOptions.LanguageResources.opentm2.server',
+        // TODO: once T5Memory is not used anymore, this should be renamed
+        'name' => 'runtimeOptions.LanguageResources.t5memory.server',
         'type' => 'list',
         'url' => 'http://t5memory.:4040/t5memory',
         'healthcheck' => '/',
         // requesting the base url will retrieve a 200 status and the version
         'healthcheckIsJson' => true,
-        // leads to new endpoints being added when using autodiscovery. TODO: remove once OpenTM2 is not used anymore
+        // leads to new endpoints being added when using autodiscovery. TODO: remove once T5Memory is not used anymore
         'additive' => true,
     ];
 
     protected array $testConfigs = [
         // this leads to the application-db configs being copied to the test-DB
-        'runtimeOptions.LanguageResources.opentm2.server' => null,
-        'runtimeOptions.LanguageResources.opentm2.tmprefix' => null,
+        'runtimeOptions.LanguageResources.t5memory.server' => null,
+        'runtimeOptions.LanguageResources.t5memory.tmprefix' => null,
     ];
 
     protected ?string $requiredVersion = '0.5.58';
@@ -84,7 +84,7 @@ final class T5Memory extends DockerServiceAbstract
     protected bool $allVersionsMustMatch = false;
 
     /**
-     * We must distinguish between t5memory and the old OpenTM2 to provide different service URLs
+     * We must distinguish between t5memory and the old T5Memory to provide different service URLs
      * (non-PHPdoc)
      * @see DockerServiceAbstract::checkConfiguredHealthCheckUrl()
      */
@@ -93,27 +93,20 @@ final class T5Memory extends DockerServiceAbstract
         string $serviceUrl,
         bool $addResult = true,
     ): bool {
-        if ($this->isT5MemoryService($serviceUrl)) {
-            // composes to "http://t5memory.:4040/t5memory_service/resources"
-            // requesting this resources-url will retrieve a 200 status and the version
-            $healthcheckUrl = rtrim($serviceUrl, '/') . '_service/resources';
-        }
+        // composes to "http://t5memory.:4040/t5memory_service/resources"
+        // requesting this resources-url will retrieve a 200 status and the version
+        $healthcheckUrl = rtrim($serviceUrl, '/') . '_service/resources';
 
         return parent::checkConfiguredHealthCheckUrl($healthcheckUrl, $serviceUrl, $addResult);
     }
 
     /**
-     * We must distinguish between t5memory and the old OpenTM2, OpenTM2 will get a fixed version
+     * We must distinguish between t5memory and the old T5Memory, T5Memory will get a fixed version
      * (non-PHPdoc)
      * @see DockerServiceAbstract::findVersionInResponseBody()
      */
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
-        if (! $this->isT5MemoryService($serviceUrl)) {
-            // there is no other version in existence anymore
-            return 'OpenTM2-1.3.0';
-        }
-
         // older revisions returned broken JSON so we have to try JSON and then a more hacky regex approach
         $resources = json_decode($responseBody);
         $matches = [];
@@ -140,13 +133,5 @@ final class T5Memory extends DockerServiceAbstract
         }
 
         return version_compare($foundVersion, $this->requiredVersion, 'gt');
-    }
-
-    /**
-     * Distinguishes between t5memory and OpenTM2
-     */
-    private function isT5MemoryService(string $serviceUrl): bool
-    {
-        return str_ends_with(rtrim($serviceUrl, '/'), 't5memory');
     }
 }

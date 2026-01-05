@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Services_Manager as ServiceManager;
-use editor_Services_OpenTM2_Service as Service;
+use editor_Services_T5Memory_Service as Service;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

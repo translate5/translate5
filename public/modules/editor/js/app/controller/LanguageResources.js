@@ -45,7 +45,7 @@ Ext.define('Editor.controller.LanguageResources', {
       'Editor.util.LanguageResources',
       'Editor.view.LanguageResources.services.Default',
       'Editor.view.LanguageResources.services.TermCollection',
-      'Editor.view.LanguageResources.services.OpenTM2',
+      'Editor.view.LanguageResources.services.T5Memory',
       'Editor.view.LanguageResources.services.DummyFileTm',
       'Editor.store.LanguageResources.LanguageResource',
   ],
@@ -116,7 +116,7 @@ Ext.define('Editor.controller.LanguageResources', {
 
       //add the specific service instances, if needed
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
-      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
+      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.T5Memory'));
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.DummyFileTm'));
   },
   assocStore: null,

@@ -32,10 +32,10 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
-Ext.define('Editor.view.LanguageResources.services.OpenTM2', {
+Ext.define('Editor.view.LanguageResources.services.T5Memory', {
     requires: ['Editor.view.LanguageResources.services.Default'],
     extend: 'Editor.view.LanguageResources.services.Default',
-    id: 'OpenTM2',
+    id: 'T5Memory',
     
     addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
     download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',

@@ -38,7 +38,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * - converting all unencode entities to encoded entities so that XML is valid
  * - convert all ph type lb tags to real newlines
  */
-class TmxFixOpenTM2Command extends Translate5AbstractCommand
+class TmxFixT5MemoryCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'tmx:otmfix';
@@ -48,8 +48,8 @@ class TmxFixOpenTM2Command extends Translate5AbstractCommand
     protected function configure()
     {
         $this
-            ->setDescription('Helper tool to sanitize TMX files with invalid XML exported from OpenTM2 according to TRANSLATE-2835')
-            ->setHelp('Helper tool to sanitize TMX files with invalid XML exported from OpenTM2 according to TRANSLATE-2835');
+            ->setDescription('Helper tool to sanitize TMX files with invalid XML exported from T5Memory according to TRANSLATE-2835')
+            ->setHelp('Helper tool to sanitize TMX files with invalid XML exported from T5Memory according to TRANSLATE-2835');
 
         $this->addArgument('file', InputArgument::REQUIRED, 'The TMX file to be converted.');
 
@@ -89,7 +89,7 @@ class TmxFixOpenTM2Command extends Translate5AbstractCommand
         }
 
         try {
-            $fixexport = new \editor_Services_OpenTM2_FixExport();
+            $fixexport = new \editor_Services_T5Memory_FixExport();
             $data = $fixexport->convert(file_get_contents($file));
         } catch (\ZfExtended_ErrorCodeException $e) {
             $logger = \Zend_Registry::get('logger');

@@ -51,7 +51,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
 
         $config
             ->addLanguageResource(
-                'opentm2',
+                't5memory',
                 'TmMatchIsUsedAsRepetitionInPretranslationTest_TM.tmx',
                 $customerId,
                 $sourceLangRfc,
@@ -83,7 +83,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
         $segment1 = $segments[0];
         self::assertSame(103, (int) $segment1->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
             $segment1->matchRateType,
             $segmentsJson
         );
@@ -93,7 +93,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
         $segment2 = $segments[1];
         self::assertSame(103, (int) $segment2->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
             $segment2->matchRateType,
             $segmentsJson
         );
@@ -104,7 +104,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
         // match-rate is 100 because segment has res-name so match is lower if it is not used
         self::assertSame(100, (int) $segment3->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
             $segment3->matchRateType,
             $segmentsJson
         );
@@ -115,7 +115,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
         // same file and segment in file does not have res-name
         self::assertSame(101, (int) $segment4->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
             $segment4->matchRateType,
             $segmentsJson
         );
@@ -126,7 +126,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
             $segment = $segments[$i];
             self::assertSame(101, (int) $segment->matchRate, $segmentsJson);
             self::assertSame(
-                'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM;auto-propagated',
+                'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM;auto-propagated',
                 $segment->matchRateType,
                 $segmentsJson
             );
@@ -138,7 +138,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
         // match-rate is 100 because segment doesn't have res-name and different filename
         self::assertSame(100, (int) $segment7->matchRate, $segmentsJson);
         self::assertSame(
-            'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
+            'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM',
             $segment7->matchRateType,
             $segmentsJson
         );
@@ -148,7 +148,7 @@ class TmMatchIsUsedAsRepetitionInPretranslationTest extends ImportTestAbstract
             $segment = $segments[$i];
             self::assertSame(100, (int) $segment->matchRate, $segmentsJson);
             self::assertSame(
-                'pretranslated;tm;OpenTM2 - TmMatchIsUsedAsRepetitionInPretranslationTest_TM;auto-propagated',
+                'pretranslated;tm;T5Memory - TmMatchIsUsedAsRepetitionInPretranslationTest_TM;auto-propagated',
                 $segment->matchRateType,
                 $segmentsJson
             );

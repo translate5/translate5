@@ -30,7 +30,7 @@ use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
- * This test class will create test task and pretranslate it with ZDemoMT and OpenTm2 TM
+ * This test class will create test task and pretranslate it with ZDemoMT and T5Memory TM
  * Then the export result from the logg will be compared against the expected result.
  */
 class Translate1484Test extends JsonTestAbstract
@@ -52,7 +52,7 @@ class Translate1484Test extends JsonTestAbstract
             ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
             ->addDefaultCustomerId($customerId);
         $config
-            ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('t5memory', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
             ->addDefaultCustomerId($customerId);
         $config
             ->addPretranslation()

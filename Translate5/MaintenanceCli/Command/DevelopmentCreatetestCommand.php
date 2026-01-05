@@ -186,7 +186,7 @@ class ' . $name . ' extends JsonTestAbstract {
         $customerId = static::getTestCustomerId();
 //TODO FOR TEST USAGE: Adding a Language-Resource, that will be automatically imported in the setup-phase
         $config
-            ->addLanguageResource(\'opentm2\', \'my-translation-memory.tmx\', $customerId, $sourceLangRfc, $targetLangRfc);
+            ->addLanguageResource(\'t5memory\', \'my-translation-memory.tmx\', $customerId, $sourceLangRfc, $targetLangRfc);
 //TODO FOR TEST USAGE: Adding a Language-Resource, that will be automatically imported in the setup-phase
         $config
             ->addLanguageResource(\'termcollection\', \'my-term-collection.tbx\', $customerId);

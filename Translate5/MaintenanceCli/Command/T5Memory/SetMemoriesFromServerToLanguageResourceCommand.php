@@ -131,7 +131,7 @@ class SetMemoriesFromServerToLanguageResourceCommand extends Translate5AbstractC
 
         $serverMemoryList = [];
 
-        foreach ($config->runtimeOptions->LanguageResources->opentm2->server as $baseUrl) {
+        foreach ($config->runtimeOptions->LanguageResources->t5memory->server as $baseUrl) {
             if ($baseUrl !== $lrBaseUrl) {
                 continue;
             }

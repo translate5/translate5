@@ -29,17 +29,17 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Import;
 
 /**
- * Represents the api-request configuration for a OpenTM2-resource
+ * Represents the api-request configuration for a T5Memory-resource
  */
-final class OpenTm2 extends LanguageResource
+final class T5Memory extends LanguageResource
 {
     public string|array $sourceLang = 'en';
 
     public string|array $targetLang = 'de';
 
-    protected string $serviceName = 'OpenTM2';
+    protected string $serviceName = 'T5Memory';
 
-    protected string $serviceType = 'editor_Services_OpenTM2';
+    protected string $serviceType = 'editor_Services_T5Memory';
 
     protected function createResourceId(int $resourceIndex): string
     {
