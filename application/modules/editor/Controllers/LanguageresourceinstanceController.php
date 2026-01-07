@@ -107,6 +107,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $categories;
 
+    protected $postBlacklist = ['id', 'serviceName'];
+
     /**
      * The download-actions need to be csrf unprotected!
      */
@@ -915,6 +917,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //set the entity resource type from the $resource
         $this->entity->setResourceType($resource->getType());
+        $this->entity->setServiceName($resource->getService());
 
         //save first to generate the languageResource id
         $this->data['id'] = $this->entity->save();
