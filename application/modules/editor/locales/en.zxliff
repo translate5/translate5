@@ -4649,10 +4649,6 @@ The users have been informed accordingly via e-mail.<br />
                 <source>OpenID server</source>
                 <target>OpenID server</target>
             </trans-unit>
-            <trans-unit id="T3BlblRNMg==">
-                <source>OpenTM2</source>
-                <target>Translation Memory (translate5)</target>
-            </trans-unit>
             <trans-unit id="T3B0aW9uYWw=">
                 <source>Optional</source>
                 <target>Optional</target>
@@ -5971,6 +5967,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             <trans-unit id="U3lzdGVtcm9sbGVuwrI=">
                 <source>Systemrollen²</source>
                 <target>System roles²</target>
+            </trans-unit>
+            <trans-unit id="VDVNZW1vcnk=">
+                <source>T5Memory</source>
+                <target>Translation Memory (translate5)</target>
             </trans-unit>
             <trans-unit id="VEJYLURhdGVp">
                 <source>TBX-Datei</source>
@@ -7517,8 +7517,8 @@ Synchronization always takes place in one direction: source data -&gt; target
                 <source>erstellt:</source>
                 <target>created:</target>
             </trans-unit>
-            <trans-unit id="ZmlsZU5hbWVfT3BlblRNMg==">
-                <source>fileName_OpenTM2</source>
+            <trans-unit id="ZmlsZU5hbWVfVDVNZW1vcnk=">
+                <source>fileName_T5Memory</source>
                 <target>Database name</target>
             </trans-unit>
             <trans-unit id="ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24=">
