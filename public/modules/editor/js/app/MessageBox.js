@@ -171,7 +171,8 @@ Ext.define('Editor.MessageBox', {
         delay = delay * 1000 * factor;
 
         this.msgCt.alignTo(document, 't-t');
-        let found, appendedBox = appendedBox = Ext.dom.Helper.append(this.msgCt, {
+
+        let found, appendedBox = Ext.dom.Helper.append(this.msgCt, {
             style: {visibility: 'hidden'},
             html: this.buildMessageBox(status, msg)
         }, true);
