@@ -16,6 +16,35 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.32.10] - 2026-01-08
+
+### Important Notes:
+#### [TRANSLATE-5185](https://jira.translate5.net/browse/TRANSLATE-5185)
+Multi target language select feature is now activated by default in instant-translate. If not needed disable it via: runtimeOptions.plugins.InstantTranslate.enableMultiLanguageFileTranslation
+ 
+
+
+### Changed
+**[TRANSLATE-5176](https://jira.translate5.net/browse/TRANSLATE-5176): LanguageResources - Force service name for language resources** <br>
+Fill internal DB field with proper service type of the affected language resource
+
+
+### Bugfixes
+**[TRANSLATE-5185](https://jira.translate5.net/browse/TRANSLATE-5185): InstantTranslate - Enable multi language picker in instant translate enabled by default** <br>
+Multi select for file translation will be enabled by default in instant translate.
+
+**[TRANSLATE-5181](https://jira.translate5.net/browse/TRANSLATE-5181): Search & Replace (editor) - RootCause: Cannot read properties of null (reading 'editor')** <br>
+FIXED: problem with Search/Replace dialog
+
+**[TRANSLATE-5126](https://jira.translate5.net/browse/TRANSLATE-5126): InstantTranslate - Instant translate: open task for editing leaves task locked** <br>
+7.32.10: Deactivated the buggy unlock on browser close functionality until fixes are ready
+7.32.8: Task will be unlocked and the job will be closed when user closes the browser.
+
+**[TRANSLATE-4338](https://jira.translate5.net/browse/TRANSLATE-4338): TrackChanges - Deleted and added MQM-tags look the same with trackChanges** <br>
+FIXED: added missing striked-through style for MQM-tags in segments grid
+
+
 ## [7.32.10] - 2026-01-08
 
 ### Important Notes:
