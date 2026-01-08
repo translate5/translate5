@@ -7348,11 +7348,11 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV9jdXN0b21lcg==">
                 <source>config_overwrite_customer</source>
-                <target>config_overwrite_customer</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV9pbnN0YW5jZQ==">
                 <source>config_overwrite_instance</source>
-                <target>config_overwrite_instance</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV9zeXN0ZW0=">
                 <source>config_overwrite_system</source>
@@ -7360,79 +7360,79 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV90YXNr">
                 <source>config_overwrite_task</source>
-                <target>config_overwrite_task</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV90YXNrSW1wb3J0">
                 <source>config_overwrite_taskImport</source>
-                <target>config_overwrite_taskImport</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV91c2Vy">
                 <source>config_overwrite_user</source>
-                <target>config_overwrite_user</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jb25maXJtRGVsZXRlVGV4dA==">
                 <source>coordinatorGroup.confirmDeleteText</source>
-                <target>coordinatorGroup.confirmDeleteText</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jb25maXJtVW5hc3NpZ25DdXN0b21lcg==">
                 <source>coordinatorGroup.confirmUnassignCustomer</source>
-                <target>coordinatorGroup.confirmUnassignCustomer</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMuYXNzaWduQnV0dG9u">
                 <source>coordinatorGroup.customers.assignButton</source>
-                <target>coordinatorGroup.customers.assignButton</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMuaWNvblRvb2x0aXBzLmRlbGV0ZQ==">
                 <source>coordinatorGroup.customers.iconTooltips.delete</source>
-                <target>coordinatorGroup.customers.iconTooltips.delete</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMuaW5mb2JveA==">
                 <source>coordinatorGroup.customers.infobox</source>
-                <target>coordinatorGroup.customers.infobox</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudGl0bGU=">
                 <source>coordinatorGroup.customers.title</source>
-                <target>coordinatorGroup.customers.title</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudW5hc3NpZ25DdXN0b21lcldpbmRvdy5idXR0b25zLm5v">
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</source>
-                <target>coordinatorGroup.customers.unassignCustomerWindow.buttons.no</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jdXN0b21lcnMudW5hc3NpZ25DdXN0b21lcldpbmRvdy5idXR0b25zLnllcw==">
                 <source>coordinatorGroup.customers.unassignCustomerWindow.buttons.yes</source>
-                <target>coordinatorGroup.customers.unassignCustomerWindow.buttons.yes</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5lZGl0LmRlc2NyaXB0aW9uLnRvb2x0aXA=">
                 <source>coordinatorGroup.edit.description.tooltip</source>
-                <target>coordinatorGroup.edit.description.tooltip</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5lZGl0LmluZm9ib3g=">
                 <source>coordinatorGroup.edit.infobox</source>
-                <target>coordinatorGroup.edit.infobox</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5lZGl0Lm5hbWUudG9vbHRpcA==">
                 <source>coordinatorGroup.edit.name.tooltip</source>
-                <target>coordinatorGroup.edit.name.tooltip</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5lbnRlckNvb3JkaW5hdG9yR3JvdXBOYW1l">
                 <source>coordinatorGroup.enterCoordinatorGroupName</source>
-                <target>coordinatorGroup.enterCoordinatorGroupName</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5pY29uVG9vbHRpcHMuYXNzaWduQ2xpZW50">
                 <source>coordinatorGroup.iconTooltips.assignClient</source>
-                <target>coordinatorGroup.iconTooltips.assignClient</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5pY29uVG9vbHRpcHMuZGVsZXRl">
                 <source>coordinatorGroup.iconTooltips.delete</source>
-                <target>coordinatorGroup.iconTooltips.delete</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5pY29uVG9vbHRpcHMuZWRpdA==">
                 <source>coordinatorGroup.iconTooltips.edit</source>
-                <target>coordinatorGroup.iconTooltips.edit</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Y3Jvc3NMYW5ndWFnZVJlc291cmNlU3luY2hyb25pemF0aW9uLmVtcHR5VGFibGVUZXh0">
                 <source>crossLanguageResourceSynchronization.emptyTableText</source>
-                <target>crossLanguageResourceSynchronization.emptyTableText</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="ZGVmYXVsdA==">
                 <source>default</source>
@@ -7440,7 +7440,7 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="ZGVmYXVsdF9nbG9zc2FyeV9pZA==">
                 <source>default_glossary_id</source>
-                <target>default_glossary_id</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="ZGllIG1lbnNjaGxpY2hlIFJldmlzaW9uIGRlciBEYXRlaSB7ZmlsZU5hbWV9IHd1cmRlIGJlZW5kZXQgdW5kIHN0ZWh0IHVudGVyIHt1cmx9IGFscyBEb3dubG9hZCB6dXIgVmVyZsO8Z3VuZy4=">
                 <source>die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.</source>
@@ -7520,19 +7520,19 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="aW5zdGFudFRyYW5zbGF0ZQ==">
                 <source>instantTranslate</source>
-                <target>instantTranslate</target>
+                <target>InstantTranslate</target>
             </trans-unit>
             <trans-unit id="aW5zdGFudFRyYW5zbGF0ZUh1bWFuUmV2aXNpb25BbGxvd2Vk">
                 <source>instantTranslateHumanRevisionAllowed</source>
-                <target>instantTranslateHumanRevisionAllowed</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="aW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0=">
                 <source>instantTranslateWriteTm</source>
-                <target>instantTranslateWriteTm</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="am9iQ29vcmRpbmF0b3I=">
                 <source>jobCoordinator</source>
-                <target>jobCoordinator</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="a2VpbmUgQW5nYWJl">
                 <source>keine Angabe</source>
@@ -7540,15 +7540,15 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="bGFuZ3VhZ2VfcmVzb3VyY2UucmVzZWdtZW50X3RteC5maWVsZA==">
                 <source>language_resource.resegment_tmx.field</source>
-                <target>language_resource.resegment_tmx.field</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="bGFuZ3VhZ2VfcmVzb3VyY2UucmVzZWdtZW50X3RteC50b29sdGlw">
                 <source>language_resource.resegment_tmx.tooltip</source>
-                <target>language_resource.resegment_tmx.tooltip</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="bGFuZ3VhZ2VfcmVzb3VyY2Uuc3RhdHVzLmNvbnZlcnRpbmc=">
                 <source>language_resource.status.converting</source>
-                <target>language_resource.status.converting</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="bGVrdG9yaWVydA==">
                 <source>lektoriert</source>
@@ -7752,7 +7752,7 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="dXNlckpvYi5kZWxldGUuY29uZmlybURlbGV0ZUNvb3JkaW5hdG9yR3JvdXBKb2I=">
                 <source>userJob.delete.confirmDeleteCoordinatorGroupJob</source>
-                <target>userJob.delete.confirmDeleteCoordinatorGroupJob</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="dmVyYm90ZW5lIEJlbmVubnVuZw==">
                 <source>verbotene Benennung</source>

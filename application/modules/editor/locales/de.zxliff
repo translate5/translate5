@@ -7556,19 +7556,19 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten-&gt; Ziel
             </trans-unit>
             <trans-unit id="aW5zdGFudFRyYW5zbGF0ZQ==">
                 <source>instantTranslate</source>
-                <target>instantTranslate</target>
+                <target>InstantTranslate</target>
             </trans-unit>
             <trans-unit id="aW5zdGFudFRyYW5zbGF0ZUh1bWFuUmV2aXNpb25BbGxvd2Vk">
                 <source>instantTranslateHumanRevisionAllowed</source>
-                <target>instantTranslateHumanRevisionAllowed</target>
+                <target>InstantTranslate Humanrevision erlaubt</target>
             </trans-unit>
             <trans-unit id="aW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0=">
                 <source>instantTranslateWriteTm</source>
-                <target>instantTranslateWriteTm</target>
+                <target>InstantTranslate in TMs schreiben</target>
             </trans-unit>
             <trans-unit id="am9iQ29vcmRpbmF0b3I=">
                 <source>jobCoordinator</source>
-                <target>jobCoordinator</target>
+                <target>Jobkoordinator</target>
             </trans-unit>
             <trans-unit id="a2VpbmUgQW5nYWJl">
                 <source>keine Angabe</source>
