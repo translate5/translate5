@@ -73,6 +73,8 @@ final class TaskUnlockService
         ZfExtended_EventManager $events,
         bool $isEditAllTasks,
     ): void {
+        return; //FIXME disabled since buggy
+
         $this->assertTaskIsNotProject($task);
 
         $data = $this->sanitizeUnlockPayload($payload);
