@@ -28,8 +28,10 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\ZfExtended\Localization;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class L10nUpdateCommand extends Translate5AbstractCommand
@@ -52,6 +54,14 @@ class L10nUpdateCommand extends Translate5AbstractCommand
                 'Extracts and updates the localization from the current source-code. Make sure, ' .
                 'all sym-links for private plugins are set up, otherwise they will not be extracted correctly'
             );
+
+        $this->addOption(
+            'mark-missing',
+            'm',
+            InputOption::VALUE_OPTIONAL,
+            'The missing translations of the  given locale will be marked. If no locale is provided, “' .
+            Localization::FALLBACK_LOCALE . '” is used.'
+        );
     }
 
     /**
@@ -66,8 +76,16 @@ class L10nUpdateCommand extends Translate5AbstractCommand
             'command' => 'l10n:extract',
             '--update' => null,
             '--amend-missing' => null,
-            '--leave-untranslated-empty' => null,
         ];
+
+        if ($input->hasParameterOption(['--mark-missing', '-m'], true)) {
+            $locale = $input->getOption('mark-missing');
+            if (empty($locale)) {
+                $locale = Localization::FALLBACK_LOCALE;
+            }
+            $commandData['--mark-untranslated'] = null;
+            $commandData['--locale'] = $locale;
+        }
 
         return $this->getApplication()->doRun(new ArrayInput($commandData), $output);
     }

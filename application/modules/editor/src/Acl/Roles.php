@@ -48,6 +48,7 @@ namespace MittagQI\Translate5\Acl;
  * $translate->_('instantTranslateWriteTm');
  * $translate->_('instantTranslateHumanRevisionAllowed');
  * $translate->_('production');
+ * $translate->_('termPM_allClients');
  * $translate->_('termPM');
  * $translate->_('termSearch');
  * $translate->_('termCustomerSearch');

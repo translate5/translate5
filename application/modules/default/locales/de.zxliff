@@ -40,6 +40,38 @@
                 <source>Anwendungsfehler</source>
                 <target>Anwendungsfehler</target>
             </trans-unit>
+            <trans-unit id="QmVudXR6ZXJuYW1l">
+                <source>Benutzername</source>
+                <target>Benutzername</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgZ2ViZW4gU2llIGVpbiBQYXNzd29ydCBhbiE=">
+                <source>Bitte geben Sie ein Passwort an!</source>
+                <target>Bitte geben Sie ein Passwort an!</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgZ2ViZW4gU2llIGVpbmVuIEJlbnV0emVybmFtZW4gYW4h">
+                <source>Bitte geben Sie einen Benutzernamen an!</source>
+                <target>Bitte geben Sie einen Benutzernamen an!</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgbGFkZW4gU2llIGRpZSBMb2dpbi1TZWl0ZSBuZXUsIGdlYmVuIFNpZSBpaHIgUGFzc3dvcnQgZXJuZXV0IGVpbiB1bmQgc2VuZGVuIFNpZSBkYXMgRm9ybXVsYXIgZXJuZXV0IGFiIC0gSWhyIEhhc2gtV2VydCB6dXIgw5xiZXJwcsO8ZnVuZyB2b24gQ3Jvc3MtU2l0ZS1Ta3JpcHRpbmctQXR0YWNrZW4gd2FyIG5pY2h0IGtvcnJla3Qu">
+                <source>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</source>
+                <target>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGlzdCB6dSBrdXJ6IQ==">
+                <source>Das Passwort ist zu kurz!</source>
+                <target>Das Passwort ist zu kurz!</target>
+            </trans-unit>
+            <trans-unit id="RGVyIEJlbnV0emVybmFtZSBlbnRow6RsdCBaZWljaGVuLCBkaWUgbmljaHQgdmVyd2VuZGV0IHdlcmRlbiBkw7xyZmVuIQ==">
+                <source>Der Benutzername enthält Zeichen, die nicht verwendet werden dürfen!</source>
+                <target>Der Benutzername enthält Zeichen, die nicht verwendet werden dürfen!</target>
+            </trans-unit>
+            <trans-unit id="RGVyIEJlbnV0emVybmFtZSBpc3QgenUga3VyeiE=">
+                <source>Der Benutzername ist zu kurz!</source>
+                <target>Der Benutzername ist zu kurz!</target>
+            </trans-unit>
+            <trans-unit id="RWlubG9nZ2Vu">
+                <source>Einloggen</source>
+                <target>Einloggen</target>
+            </trans-unit>
             <trans-unit id="SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA==">
                 <source>Ihr Webbrowser wird nicht mehr unterstützt</source>
                 <target>Ihr Webbrowser wird nicht mehr unterstützt.</target>
@@ -47,6 +79,14 @@
             <trans-unit id="TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg==">
                 <source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source>
                 <target>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla Firefox, Apple Safari oder Microsoft Edge.</target>
+            </trans-unit>
+            <trans-unit id="TG9naW4=">
+                <source>Login</source>
+                <target>Login</target>
+            </trans-unit>
+            <trans-unit id="UGFzc3dvcnQ=">
+                <source>Passwort</source>
+                <target>Passwort</target>
             </trans-unit>
             <trans-unit id="UmVkaXJlY3QgdG8gbG9naW4uLi4=">
                 <source>Redirect to login...</source>
@@ -63,6 +103,310 @@
             <trans-unit id="U2VociBnZWVocnRlciBIZXJy">
                 <source>Sehr geehrter Herr</source>
                 <target>Sehr geehrter Herr</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkNsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::CliYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=28&amp;autoplay=1" dir="auto">0:28</a> Befehlsübersicht
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=34&amp;autoplay=1" dir="auto">0:34</a> Hilfe zu einem Befehl
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=41&amp;autoplay=1" dir="auto">0:41</a> Einstellungsmöglichkeiten
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=82&amp;autoplay=1" dir="auto">1:22</a> Pluginübersicht
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OkNsaVlvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::CliYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/oUhUakQFmVw</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkN1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnQ=">
+                <source>T5::CustomerYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=19&amp;autoplay=1" dir="auto">0:19</a> Standard-Benutzerzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=188&amp;autoplay=1" dir="auto">3:08</a> Benutzerverwaltung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=206&amp;autoplay=1" dir="auto">3:26</a> Automatisierte Benutzerzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OkN1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmw=">
+                <source>T5::CustomerYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/Z-RPoxq64cI</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkVkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::EditorYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=9&amp;autoplay=1" dir="auto">0:09</a> Interface
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=66&amp;autoplay=1" dir="auto">1:06</a> Ansicht ändern
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=85&amp;autoplay=1" dir="auto">1:25</a> Bearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=108&amp;autoplay=1" dir="auto">1:48</a> Konkordanzsuche
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=121&amp;autoplay=1" dir="auto">2:01</a> Schaltflächen für die Segmentbearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=138&amp;autoplay=1" dir="auto">2:18</a> Lesezeichen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=154&amp;autoplay=1" dir="auto">2:34</a> Tastenkürzel
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=175&amp;autoplay=1" dir="auto">2:55</a> Segmentscrollen und TrackChanges-Funktion
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=210&amp;autoplay=1" dir="auto">3:30</a> Wiederholungseditor
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=224&amp;autoplay=1" dir="auto">3:44</a> Farbliche Markierung von Wörtern
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=267&amp;autoplay=1" dir="auto">4:27</a> Tags
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=289&amp;autoplay=1" dir="auto">4:49</a> Bearbeitungsstatus
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=308&amp;autoplay=1" dir="auto">5:08</a> Suchen und Ersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=323&amp;autoplay=1" dir="auto">5:23</a> Segment-Metadaten
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=341&amp;autoplay=1" dir="auto">5:41</a> Dateinbaum
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=369&amp;autoplay=1" dir="auto">6:09</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OkVkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::EditorYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/fERwuq1yXUM</target>
+            </trans-unit>
+            <trans-unit id="VDU6Okluc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudA==">
+                <source>T5::InstantTranslateYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=10&amp;autoplay=1" dir="auto">0:10</a> InstantTranslate aufrufen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=23&amp;autoplay=1" dir="auto">0:23</a> Text übersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=60&amp;autoplay=1" dir="auto">1:00</a> Datei übersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=99&amp;autoplay=1" dir="auto">1:39</a> Übersetzungsquellen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=105&amp;autoplay=1" dir="auto">1:45</a> TM-Matches
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=145&amp;autoplay=1" dir="auto">2:25</a> Fuzzy-Match Einstellung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=171&amp;autoplay=1" dir="auto">2:51</a> Anbindung TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=203&amp;autoplay=1" dir="auto">3:23</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6Okluc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZVVybA==">
+                <source>T5::InstantTranslateYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/6h8vBsRbpjk</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkxpbmtDb25zb3J0aXVt">
+                <source>T5::LinkConsortium</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnQ=">
+                <source>T5::PreferencesYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=11&amp;autoplay=1" dir="auto">0:11</a> Systemkonfigurationen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=83&amp;autoplay=1" dir="auto">1:23</a> Konfigurationen - Kunde
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=105&amp;autoplay=1" dir="auto">1:45</a> Konfigurationen - Aufgabe
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=127&amp;autoplay=1" dir="auto">2:07</a> Konfigurationen - Import
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=141&amp;autoplay=1" dir="auto">2:21</a> In-Context Schriften
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=218&amp;autoplay=1" dir="auto">3:38</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmw=">
+                <source>T5::PreferencesYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/O2Z8wlzC-oo</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::ProjectOverviewYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=18&amp;autoplay=1" dir="auto">0:18</a> Hauptbereiche
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=32&amp;autoplay=1" dir="auto">0:32</a> Projekte
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=57&amp;autoplay=1" dir="auto">0:57</a> Aufgaben
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=103&amp;autoplay=1" dir="auto">1:43</a> Sprachressourcen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=144&amp;autoplay=1" dir="auto">2:24</a> TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=157&amp;autoplay=1" dir="auto">2:37</a> InstantTranslate
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=176&amp;autoplay=1" dir="auto">2:56</a> Editor
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::ProjectOverviewYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/1TkBCfo9ovw</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlJlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::ResourcesYoutubeVideoGuideDescriptionContent</source>
+                <target><br/>
+                <figure>
+                    <figcaption><b>Übersicht:</b></figcaption>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=15&amp;autoplay=1" dir="auto">0:15</a> Sprachressourcenverwaltung<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=37&amp;autoplay=1" dir="auto">0:37</a> Sprachressource hinzufügen<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=127&amp;autoplay=1" dir="auto">2:07</a> Zugewiesene Aufgaben<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=146&amp;autoplay=1" dir="auto">2:26</a> Aufgaben reimportieren<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=200&amp;autoplay=1" dir="auto">2:40</a> Freigabeworkflow<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=212&amp;autoplay=1" dir="auto">3:32</a> Sprachressourcen im Projektfenster<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
+                </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlJlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::ResourcesYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/fgSm2Ygw0uk</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::TaskOverviewYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=10&amp;autoplay=1" dir="auto">0:10</a> Aufgabenübersicht
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=22&amp;autoplay=1" dir="auto">0:22</a> Status-Kopfzeile
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=34&amp;autoplay=1" dir="auto">0:34</a> Aktueller Workflow-Kopfzeile
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=57&amp;autoplay=1" dir="auto">0:57</a> Erweiterte Filter
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=81&amp;autoplay=1" dir="auto">1:21</a> Auswertungen anzeigen (KPIs)
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::TaskOverviewYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/iZHRx6vpjCU</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudA==">
+                <source>T5::TermPortalYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=10&amp;autoplay=1" dir="auto">0:10</a> Termcollection hinzufügen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=23&amp;autoplay=1" dir="auto">0:23</a> Zum TermPortal wechseln
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=33&amp;autoplay=1" dir="auto">0:33</a> Die verschiedenen Bereiche des TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=61&amp;autoplay=1" dir="auto">1:01</a> Suchfeld
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=75&amp;autoplay=1" dir="auto">1:15</a> Filteroptionen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=100&amp;autoplay=1" dir="auto">1:40</a> Suchergebnisse
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=113&amp;autoplay=1" dir="auto">1:53</a> Neuen Termeintrag vorschlagen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=137&amp;autoplay=1" dir="auto">2:17</a> Rechte im TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=152&amp;autoplay=1" dir="auto">2:32</a> Starte Übersetzung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=200&amp;autoplay=1" dir="auto">3:20</a> Stapelbearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=212&amp;autoplay=1" dir="auto">3:32</a> Benennungen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=232&amp;autoplay=1" dir="auto">3:52</a> Neue Benennung vorschlagen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=254&amp;autoplay=1" dir="auto">4:14</a> Freigabeworkflow
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=427&amp;autoplay=1" dir="auto">7:07</a> Attributsebenen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=507&amp;autoplay=1" dir="auto">8:27</a> InstantTranslate
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=530&amp;autoplay=1" dir="auto">8:50</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZVVybA==">
+                <source>T5::TermPortalYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/zwby0cMDdKM</target>
             </trans-unit>
             <trans-unit id="VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4=">
                 <source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source>

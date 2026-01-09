@@ -47,7 +47,7 @@ abstract class AbstractXliffProcessor
      */
     public function __construct(
         protected string $absoluteFilePath,
-        protected bool $untranslatedEmpty = false,
+        protected bool $prefillUntranslated = false,
         protected bool $markUntranslated = false
     ) {
         $content = file_get_contents($this->absoluteFilePath);
@@ -84,7 +84,7 @@ abstract class AbstractXliffProcessor
 
     protected function addTransUnit(string $source, string $target): void
     {
-        if ($target === '' && ! $this->untranslatedEmpty) {
+        if ($target === '' && ($this->prefillUntranslated || $this->markUntranslated)) {
             $target = $this->markUntranslated ? L10nConfiguration::UNTRANSLATED : $source;
         }
         $this->body .= "\n" .
@@ -107,8 +107,11 @@ abstract class AbstractXliffProcessor
         foreach ($strings as $string) {
             if (array_key_exists($string, $translations)) {
                 $this->addTransUnit($string, $translations[$string]);
-            } else {
+            } elseif ($this->prefillUntranslated || $this->markUntranslated) {
+                // when marking, we add an own section for untranslated strings
                 $untranslated[] = $string;
+            } else {
+                $this->addTransUnit($string, '');
             }
         }
         if (count($untranslated) > 0) {

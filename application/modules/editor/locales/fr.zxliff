@@ -260,7 +260,7 @@
             </trans-unit>
             <trans-unit id="QWNodHVuZyEgRnV6enkgTWF0Y2ggKHswfSUpIC0gZGllIFF1ZWxsZSBpbSBUcmFuc2xhdGlvbiBNZW1vcnkgdW50ZXJzY2hlaWRldCBzaWNoIHZvbiBJaHJlciBBbmZyYWdlLiBEaWUgVW50ZXJzY2hpZWRlIHNpbmQgbWl0IGVpbmVtIGdyYXVlbiBIaW50ZXJncnVuZCBnZWtlbm56ZWljaG5ldC4=">
                 <source>Achtung! Fuzzy Match ({0}%) - die Quelle im Translation Memory unterscheidet sich von Ihrer Anfrage. Die Unterschiede sind mit einem grauen Hintergrund gekennzeichnet.</source>
-                <target>Attention! Fuzzy match ({0}%) – la source dans la mémoire de traduction est différente de votre requête. Les différences sont signalées par un fond gris.</target>
+                <target>Attention! Fuzzy match ({0}%) – la source dans la mémoire de traduction est différente de votre requête. Les différences sont mises en évidence.</target>
             </trans-unit>
             <trans-unit id="QWNodHVuZyEgU2V0enQgZGllIEVpZ2Vuc2NoYWZ0IGbDvHIgYWxsZSBBdWZnYWJlbi9Qcm9qZWt0ZSBpbiBkZXIgYWt0dWVsbCBlaW5nZXN0ZWxsdGVuIEZpbHRlcnVuZyBkZXIgUHJvamVrdGU=">
                 <source>Achtung! Setzt die Eigenschaft für alle Aufgaben/Projekte in der aktuell eingestellten Filterung der Projekte</source>
@@ -2070,9 +2070,9 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
                 <source>Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!</source>
                 <target>La ressource sélectionnée ne peut pas traiter les fichiers de ce type!</target>
             </trans-unit>
-            <trans-unit id="RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllIFwnQWxsZXMgRXJzZXR6ZW5cJyBGdW5rdGlvbmFsaXTDpHQgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIGVpbnplbG4genUgZmluZGVuIHVuZCB6dSBiZWFyYmVpdGVuLg==">
-                <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
-                <target>Les remplacements automatiques n’ont pas pu être effectués dans tous les segments trouvés. Cela peut avoir différentes causes. Veuillez utiliser la fonction Rechercher et remplacer sans la fonctionnalité \’Remplacer tout\’ pour trouver et traiter individuellement les segments concernés.</target>
+            <trans-unit id="RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllIOKAnEFsbGVzIEVyc2V0emVu4oCdIEZ1bmt0aW9uYWxpdMOkdCB1bSBkaWUgYmV0cm9mZmVuZW4gU2VnbWVudGUgZWluemVsbiB6dSBmaW5kZW4gdW5kIHp1IGJlYXJiZWl0ZW4u">
+                <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
+                <target>Les remplacements automatiques n’ont pas pu être effectués dans tous les segments trouvés. Cela peut avoir différentes causes. Veuillez utiliser la fonction Rechercher et remplacer sans la fonctionnalité “Remplacer tout” pour trouver et traiter individuellement les segments concernés.</target>
             </trans-unit>
             <trans-unit id="RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIEF1c2dhbmd0ZXh0Ojxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u">
                 <source>Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.</source>
@@ -2194,6 +2194,10 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
                 <source>Doppeltes schließendes Anführungszeichen einfügen</source>
                 <target>Insérer des guillemets fermants doubles</target>
             </trans-unit>
+            <trans-unit id="RHJhZnQ=">
+                <source>Draft</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="RHJhZyBhbmQgRHJvcCBvZGVyIGFua2xpY2tlbiB6dW0gSG9jaGxhZGVuIGVpbmVyIERhdGVp">
                 <source>Drag and Drop oder anklicken zum Hochladen einer Datei</source>
                 <target>Glisser-déposer ou cliquer pour charger un fichier</target>
@@ -2230,9 +2234,9 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
                 <source>Duplication</source>
                 <target>Duplication</target>
             </trans-unit>
-            <trans-unit id="RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyBcJ3swfVw=">
-                <source>Durch das System gesperrt mit dem Status \'{0}\</source>
-                <target>Verrouillé par le système avec le statut \’{0}\</target>
+            <trans-unit id="RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyDigJx7MH3igJ0=">
+                <source>Durch das System gesperrt mit dem Status “{0}”</source>
+                <target>Verrouillé par le système avec le statut “{0}”</target>
             </trans-unit>
             <trans-unit id="RHVyY2hzY2huaXR0">
                 <source>Durchschnitt</source>
@@ -3169,6 +3173,10 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
             <trans-unit id="SWdibw==">
                 <source>Igbo</source>
                 <target>Igbo</target>
+            </trans-unit>
+            <trans-unit id="SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiB7YXBwfSBuaWNodCBvZmZpemllbGwgdW50ZXJzdMO8dHp0LjxiciAvPkRpZSBBbndlbmR1bmcgd3VyZGUgaGluc2ljaHRsaWNoIEZ1bmt0aW9uYWxpdMOkdCB1bmQgUGVyZm9ybWFuY2UgaW4gZGVuIGZvbGdlbmRlbiBCcm93c2VyIG9mZml6aWVsbCBnZXRlc3RldDogPHVsPjxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPjxsaT5Nb3ppbGxhIEZpcmVmb3ggYWIgVmVyc2lvbiA0NDwvbGk+PGxpPkFwcGxlIFNhZmFyaSBhYiBWZXJzaW9uIDk8L2xpPjxsaT5NaWNyb3NvZnQgRWRnZSBhYiBWZXJzaW9uIDgwPC9saT48L3VsPlByaW56aXBpZWxsIGthbm4ge2FwcH0gYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiBIaWVyIGthbm4gZXMgYWJlciB6dSB1bnZvcmhlcmdlc2VoZW5lbiBGZWhsZXJuIGtvbW1lbi4gUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u">
+                <source>Ihr Browser oder Ihre Browser-Version wird von {app} nicht offiziell unterstützt.<br />Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet: <ul><li>Google Chrome ab Version 48</li><li>Mozilla Firefox ab Version 44</li><li>Apple Safari ab Version 9</li><li>Microsoft Edge ab Version 80</li></ul>Prinzipiell kann {app} auch mit anderen Browsern bzw. älteren Versionen funktionieren. Hier kann es aber zu unvorhergesehenen Fehlern kommen. Potentiell können auch manche Features komplett nicht funktionieren.</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg==">
                 <source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source>
@@ -5958,9 +5966,13 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
                 <source>Systemrollen²</source>
                 <target>Rôles système²</target>
             </trans-unit>
+            <trans-unit id="VDU6OkxpbmtDb25zb3J0aXVt">
+                <source>T5::LinkConsortium</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
             <trans-unit id="VDVNZW1vcnk=">
                 <source>T5Memory</source>
-                <target>T5Memory</target>
+                <target>Translation Memory (translate5)</target>
             </trans-unit>
             <trans-unit id="VEJYLURhdGVp">
                 <source>TBX-Datei</source>
@@ -7086,6 +7098,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
                 <source>Ziel wiederholt wird</source>
                 <target>Cible répétée</target>
             </trans-unit>
+            <trans-unit id="WmllbHdpZWRlcmhvbHVuZ2VuIHN0YW5kYXJkbcOkw59pZyBhdXNzY2hsaWXDn2VuLCBkaWUgbmljaHQgYXVjaCBRdWVsbHdpZWRlcmhvbHVuZ2VuIHNpbmQ=">
+                <source>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g=">
                 <source>Zip-Upload ist nur als Arbeitsdatei möglich</source>
                 <target>Le téléchargement ZIP n’est possible que sous forme de fichier de travail</target>
@@ -7488,7 +7504,7 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             </trans-unit>
             <trans-unit id="ZmlsZU5hbWVfVDVNZW1vcnk=">
                 <source>fileName_T5Memory</source>
-                <target>fileName_T5Memory</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24=">
                 <source>fileName_TermCollection</source>
@@ -7697,6 +7713,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
             <trans-unit id="dGVybVBN">
                 <source>termPM</source>
                 <target>termPM</target>
+            </trans-unit>
+            <trans-unit id="dGVybVBNX2FsbENsaWVudHM=">
+                <source>termPM_allClients</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="dGVybVByb3Bvc2Vy">
                 <source>termProposer</source>

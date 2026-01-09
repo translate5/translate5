@@ -49,15 +49,15 @@ class L10nUpdater
 
     private bool $markMissing = false;
 
-    private bool $missingEmpty = false;
+    private bool $prefillMissing = false;
 
     public function __construct(
         private bool $doUpdateXliffs = false,
         private bool $doCollectData = false,
         private bool $doAmendMissing = false,
         private bool $markUntranslated = false,
-        private bool $untranslatedEmpty = false,
-        private bool $markOnlySecondary = false
+        private bool $fillUntranslated = false,
+        private ?string $markFillLocale = null,
     ) {
         $this->locale = Localization::PRIMARY_LOCALE;
         $this->basePath = L10nHelper::getBaseDir();
@@ -112,8 +112,8 @@ class L10nUpdater
      */
     private function processPrimary(): void
     {
-        $this->missingEmpty = $this->untranslatedEmpty && ! $this->markOnlySecondary;
-        $this->markMissing = ! $this->missingEmpty && $this->markUntranslated && ! $this->markOnlySecondary;
+        $this->prefillMissing = $this->fillUntranslated && $this->markFillLocale === $this->locale;
+        $this->markMissing = ! $this->prefillMissing && $this->markUntranslated && $this->markFillLocale === $this->locale;
 
         // first get all translations
         $primaryXliffs = $this->collectAllXliffs($this->locale);
@@ -159,7 +159,7 @@ class L10nUpdater
 
         // write editor / base module
         $editorXliffPath = L10nHelper::getModuleXliff('editor', $this->locale);
-        $xliffUpdater = new XliffUpdater($editorXliffPath, $this->missingEmpty, $this->markMissing);
+        $xliffUpdater = new XliffUpdater($editorXliffPath, $this->prefillMissing, $this->markMissing);
         $xliffUpdater->update($this->editorStrings, $primaryTranslations, $this->doUpdateXliffs);
         if ($this->doCollectData) {
             $xliffUpdater->saveAs($this->createXliffExportName($editorXliffPath));
@@ -173,11 +173,12 @@ class L10nUpdater
      */
     private function processSecondary(): void
     {
-        $this->missingEmpty = $this->untranslatedEmpty;
-        $this->markMissing = ! $this->missingEmpty && $this->markUntranslated;
-
         foreach (Localization::SECONDARY_LOCALES as $secondaryLocale) {
             $this->locale = $secondaryLocale;
+
+            $this->prefillMissing = $this->fillUntranslated && $this->markFillLocale === $this->locale;
+            $this->markMissing = ! $this->prefillMissing && $this->markUntranslated &&
+                $this->markFillLocale === $this->locale;
 
             // create xliff pathes
             $xliffs = [];
@@ -200,7 +201,7 @@ class L10nUpdater
 
             // now clone all the xliffs
             foreach ($xliffs as $xliff => $sourceXliff) {
-                $cloner = new XliffCloner($xliff, $sourceXliff, $this->missingEmpty, $this->markMissing);
+                $cloner = new XliffCloner($xliff, $sourceXliff, $this->prefillMissing, $this->markMissing);
                 $cloner->clone($translations, $this->doUpdateXliffs);
                 if ($this->doCollectData) {
                     $cloner->saveAs($this->createXliffExportName($xliff));
@@ -241,7 +242,7 @@ class L10nUpdater
         bool $skipEditorTranslations = false,
     ): void {
         $strings = $this->extractModuleString($modulePathes, [], $skipEditorTranslations);
-        $xliffUpdater = new XliffUpdater($xliffPath, $this->missingEmpty, $this->markMissing);
+        $xliffUpdater = new XliffUpdater($xliffPath, $this->prefillMissing, $this->markMissing);
         $xliffUpdater->update($strings, $translations, $this->doUpdateXliffs);
         if ($this->doCollectData) {
             $xliffUpdater->saveAs($this->createXliffExportName($xliffPath));

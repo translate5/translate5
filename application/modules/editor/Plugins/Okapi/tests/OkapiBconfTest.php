@@ -59,7 +59,7 @@ class OkapiBconfTest extends JsonTestAbstract
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
         }
 
-        static::$testBconf = $config->addBconf('TestBconfMinimal', 'minimal/batchConfiguration.t5.bconf');
+        self::$testBconf = $config->addBconf('TestBconfMinimal', 'minimal/batchConfiguration.t5.bconf');
         self::$xsltBconf = $config->addBconf('TestBconfXsltXlfCdata', 'xslt_xlf_cdata/XsltAndXlfWithCData.bconf');
     }
 
@@ -79,12 +79,13 @@ class OkapiBconfTest extends JsonTestAbstract
         );
 
         static::$bconf = new BconfEntity();
-        static::$bconf->load(static::$testBconf->getId());
+        static::$bconf->load(self::$testBconf->getId());
         static::assertStringStartsWith('TestBconfMinimal', static::$bconf->getName(), 'Imported bconf\'s name is not like ' . 'TestBconfMinimal' . ' but ' . static::$bconf->getName());
 
         $input = static::api()->getFile('minimal/batchConfiguration.t5.bconf');
         $output = static::$bconf->getPath();
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
+
         self::assertFileEquals($input, $output, $failureMsg);
 
         self::assertTrue($service->check());

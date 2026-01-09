@@ -33,10 +33,10 @@ class XliffCloner extends AbstractXliffProcessor
     public function __construct(
         string $absoluteFilePath,
         private readonly string $absoluteSourcePath,
-        bool $untranslatedEmpty = false,
+        bool $prefillUntranslated = false,
         bool $markUntranslated = false
     ) {
-        parent::__construct($absoluteFilePath, $untranslatedEmpty, $markUntranslated);
+        parent::__construct($absoluteFilePath, $prefillUntranslated, $markUntranslated);
     }
 
     public function clone(array $translations, bool $doWriteFile = false): void
@@ -48,8 +48,11 @@ class XliffCloner extends AbstractXliffProcessor
         foreach ($strings as $string) {
             if (array_key_exists($string, $translations)) {
                 $this->addTransUnit($string, $translations[$string]);
-            } else {
+            } elseif ($this->prefillUntranslated || $this->markUntranslated) {
+                // when marking, we add an own section for untranslated strings
                 $untranslated[] = $string;
+            } else {
+                $this->addTransUnit($string, '');
             }
         }
 

@@ -34,10 +34,10 @@ class XliffUpdater extends AbstractXliffProcessor
 
     public function __construct(
         string $absoluteFilePath,
-        bool $untranslatedEmpty = false,
+        bool $prefillUntranslated = false,
         bool $markUntranslated = false
     ) {
-        parent::__construct($absoluteFilePath, $untranslatedEmpty, $markUntranslated);
+        parent::__construct($absoluteFilePath, $prefillUntranslated, $markUntranslated);
 
         // find existing strings
         preg_replace_callback('~<trans-unit[^>]+>~', function ($matches) {

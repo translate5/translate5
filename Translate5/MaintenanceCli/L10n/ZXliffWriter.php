@@ -42,7 +42,7 @@ class ZXliffWriter extends AbstractXliffProcessor
             throw new ZfExtended_Exception('Directory does not exist ' . $this->absoluteFilePath);
         }
         $this->absoluteFilePath = rtrim($absoluteFolderPath, '/') . '/' . $locale . Localization::FILE_EXTENSION_WITH_DOT;
-        $this->untranslatedEmpty = false;
+        $this->prefillUntranslated = false;
         $this->markUntranslated = false;
 
         $sourceLocale = ($locale === Localization::PRIMARY_LOCALE) ?

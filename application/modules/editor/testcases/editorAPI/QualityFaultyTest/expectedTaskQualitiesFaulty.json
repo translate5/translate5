@@ -116,7 +116,7 @@
                     "qcategory": "num1",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Numbers source ≠ target",
+                    "text": "Numbers source segment ≠ target segment",
                     "qtooltip": "",
                     "mustBeZeroErrors": false,
                     "leaf": true
@@ -158,7 +158,7 @@
                     "qcategory": "not_defined_in_target",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Not defined in target terminology",
+                    "text": "Not defined in target language terminology",
                     "qtooltip": "",
                     "mustBeZeroErrors": false,
                     "leaf": true
@@ -196,7 +196,7 @@
             "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
             "mustBeZeroErrors": false,
             "qcountfp": 0,
-            "text": "Usage of TM-matches",
+            "text": "Usage of TM matches",
             "qtotal": 0,
             "leaf": true
         },

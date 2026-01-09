@@ -28,6 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\ZfExtended\Localization;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -78,10 +79,10 @@ class L10nExtractCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
-            'leave-untranslated-empty',
-            'l',
+            'fill-untranslated',
+            'f',
             InputOption::VALUE_NONE,
-            'All untranslated strings will have an empty target (instead of the key)'
+            'All untranslated strings will have the source as target. Only in conjunction with --locale'
         );
 
         $this->addOption(
@@ -89,14 +90,14 @@ class L10nExtractCommand extends Translate5AbstractCommand
             'm',
             InputOption::VALUE_NONE,
             'All untranslated strings will have the target "' . L10nConfiguration::UNTRANSLATED .
-            '" (instead of the key)'
+            '" (instead of the key). Only in conjunction with --locale'
         );
 
         $this->addOption(
-            'only-mark-secondary',
-            'o',
-            InputOption::VALUE_NONE,
-            'Only untranslated strings of the secondary language(s) will be marked or left empty.'
+            'locale',
+            'l',
+            InputOption::VALUE_REQUIRED,
+            'Defines the locale to mark/fill.'
         );
     }
 
@@ -114,10 +115,11 @@ class L10nExtractCommand extends Translate5AbstractCommand
 
         $isUpdate = $input->getOption('update');
         $isExport = $input->getOption('export');
+
         $doAmendMissing = $input->getOption('amend-missing');
+        $fillUntranslated = $input->getOption('fill-untranslated');
         $markUntranslated = $input->getOption('mark-untranslated');
-        $untranslatedEmpty = $input->getOption('leave-untranslated-empty');
-        $markOnlySecondary = $input->getOption('only-mark-secondary');
+        $locale = $input->getOption('locale');
 
         if (! $isUpdate && ! $isExport) {
             $this->io->error('An option is required. Use --update or --export');
@@ -125,8 +127,23 @@ class L10nExtractCommand extends Translate5AbstractCommand
             return self::FAILURE;
         }
 
-        if ($markUntranslated && $untranslatedEmpty) {
-            $this->io->error('The options --leave-untranslated-empty or --mark-untranslated contradict each other.');
+        if ($markUntranslated && $fillUntranslated) {
+            $this->io->error('The options --fill-untranslated and --mark-untranslated contradict each other.');
+
+            return self::FAILURE;
+        }
+
+        if (($markUntranslated || $fillUntranslated) && empty($locale)) {
+            $this->io->error('The options --fill-untranslated and --mark-untranslated require a locale to be given.');
+
+            return self::FAILURE;
+        }
+
+        if (($markUntranslated || $fillUntranslated) &&
+            $locale !== Localization::PRIMARY_LOCALE &&
+            ! in_array($locale, Localization::SECONDARY_LOCALES, true)
+        ) {
+            $this->io->error('The given locale is no valid primary or secondary locale.');
 
             return self::FAILURE;
         }
@@ -136,8 +153,8 @@ class L10nExtractCommand extends Translate5AbstractCommand
             $isExport,
             $doAmendMissing,
             $markUntranslated,
-            $untranslatedEmpty,
-            $markOnlySecondary
+            $fillUntranslated,
+            $locale
         );
         $extraction->process();
 

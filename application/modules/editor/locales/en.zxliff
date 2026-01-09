@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="KEdnZi4gZmVobGVyaGFmdGVyKSBUcmVubmVyIGF1cyBRdWVsbGUgdW52ZXLDpG5kZXJ0IGluIFppZWwgw7xiZXJub21tZW4=">
                 <source>(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen</source>
-                <target>(Possibly incorrect) separator from source segment found unchanged in target segment.</target>
+                <target>(Possibly incorrect) separator from source segment found unchanged in target segment</target>
             </trans-unit>
             <trans-unit id="KGFsbGUgU2VnbWVudGUga8O2bm5lbiB2b24gYWxsZW4gTnV0emVybiBlZGl0aWVydCB3ZXJkZW4p">
                 <source>(alle Segmente können von allen Nutzern editiert werden)</source>
@@ -2088,8 +2088,8 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!</source>
                 <target>The selected resource cannot process files of this type!</target>
             </trans-unit>
-            <trans-unit id="RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllIFwnQWxsZXMgRXJzZXR6ZW5cJyBGdW5rdGlvbmFsaXTDpHQgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIGVpbnplbG4genUgZmluZGVuIHVuZCB6dSBiZWFyYmVpdGVuLg==">
-                <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
+            <trans-unit id="RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllIOKAnEFsbGVzIEVyc2V0emVu4oCdIEZ1bmt0aW9uYWxpdMOkdCB1bSBkaWUgYmV0cm9mZmVuZW4gU2VnbWVudGUgZWluemVsbiB6dSBmaW5kZW4gdW5kIHp1IGJlYXJiZWl0ZW4u">
+                <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
                 <target>The automated replacements could not be applied to all found segments. This can have various causes. Please use the “Search and replace” window without using the “Replace all” function in order to find and edit the segments individually.</target>
             </trans-unit>
             <trans-unit id="RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIEF1c2dhbmd0ZXh0Ojxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u">
@@ -2212,6 +2212,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Doppeltes schließendes Anführungszeichen einfügen</source>
                 <target>Insert double closing quotation mark</target>
             </trans-unit>
+            <trans-unit id="RHJhZnQ=">
+                <source>Draft</source>
+                <target>Entwurf</target>
+            </trans-unit>
             <trans-unit id="RHJhZyBhbmQgRHJvcCBvZGVyIGFua2xpY2tlbiB6dW0gSG9jaGxhZGVuIGVpbmVyIERhdGVp">
                 <source>Drag and Drop oder anklicken zum Hochladen einer Datei</source>
                 <target>“Drag and Drop” or click to upload your file</target>
@@ -2248,9 +2252,9 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Duplication</source>
                 <target>Duplication</target>
             </trans-unit>
-            <trans-unit id="RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyBcJ3swfVw=">
-                <source>Durch das System gesperrt mit dem Status \'{0}\</source>
-                <target>Locked by the system with status \'{0}\</target>
+            <trans-unit id="RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyDigJx7MH3igJ0=">
+                <source>Durch das System gesperrt mit dem Status “{0}”</source>
+                <target>Locked by the system with status “{0}”</target>
             </trans-unit>
             <trans-unit id="RHVyY2hzY2huaXR0">
                 <source>Durchschnitt</source>
@@ -3187,6 +3191,19 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="SWdibw==">
                 <source>Igbo</source>
                 <target>Igbo</target>
+            </trans-unit>
+            <trans-unit id="SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiB7YXBwfSBuaWNodCBvZmZpemllbGwgdW50ZXJzdMO8dHp0LjxiciAvPkRpZSBBbndlbmR1bmcgd3VyZGUgaGluc2ljaHRsaWNoIEZ1bmt0aW9uYWxpdMOkdCB1bmQgUGVyZm9ybWFuY2UgaW4gZGVuIGZvbGdlbmRlbiBCcm93c2VyIG9mZml6aWVsbCBnZXRlc3RldDogPHVsPjxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPjxsaT5Nb3ppbGxhIEZpcmVmb3ggYWIgVmVyc2lvbiA0NDwvbGk+PGxpPkFwcGxlIFNhZmFyaSBhYiBWZXJzaW9uIDk8L2xpPjxsaT5NaWNyb3NvZnQgRWRnZSBhYiBWZXJzaW9uIDgwPC9saT48L3VsPlByaW56aXBpZWxsIGthbm4ge2FwcH0gYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiBIaWVyIGthbm4gZXMgYWJlciB6dSB1bnZvcmhlcmdlc2VoZW5lbiBGZWhsZXJuIGtvbW1lbi4gUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u">
+                <source>Ihr Browser oder Ihre Browser-Version wird von {app} nicht offiziell unterstützt.<br />Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet: <ul><li>Google Chrome ab Version 48</li><li>Mozilla Firefox ab Version 44</li><li>Apple Safari ab Version 9</li><li>Microsoft Edge ab Version 80</li></ul>Prinzipiell kann {app} auch mit anderen Browsern bzw. älteren Versionen funktionieren. Hier kann es aber zu unvorhergesehenen Fehlern kommen. Potentiell können auch manche Features komplett nicht funktionieren.</source>
+                <target>Your browser or your browser-version is not officially supported by {app}.
+                    <br />The application was officially tested in the following browsers regarding functionality and performance:
+                    <ul>
+                        <li>Google Chrome from version 48</li>
+                        <li>Mozilla Firefox from version 44</li>
+                        <li>Apple Safari from version 9</li>
+                        <li>Microsoft Edge from version 80</li>
+                    </ul>
+                    In general {app} should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won't work at all.
+                </target>
             </trans-unit>
             <trans-unit id="SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg==">
                 <source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source>
@@ -5968,6 +5985,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>Systemrollen²</source>
                 <target>System roles²</target>
             </trans-unit>
+            <trans-unit id="VDU6OkxpbmtDb25zb3J0aXVt">
+                <source>T5::LinkConsortium</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
             <trans-unit id="VDVNZW1vcnk=">
                 <source>T5Memory</source>
                 <target>Translation Memory (translate5)</target>
@@ -7097,6 +7118,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>Ziel wiederholt wird</source>
                 <target>Content of target segment is repeated</target>
             </trans-unit>
+            <trans-unit id="WmllbHdpZWRlcmhvbHVuZ2VuIHN0YW5kYXJkbcOkw59pZyBhdXNzY2hsaWXDn2VuLCBkaWUgbmljaHQgYXVjaCBRdWVsbHdpZWRlcmhvbHVuZ2VuIHNpbmQ=">
+                <source>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</source>
+                <target>Deselect by default target repetitions, that are not also source repetitions</target>
+            </trans-unit>
             <trans-unit id="WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g=">
                 <source>Zip-Upload ist nur als Arbeitsdatei möglich</source>
                 <target>ZIP upload is only possible for work files</target>
@@ -7729,17 +7754,21 @@ Synchronization always takes place in one direction: source data -&gt; target
                 <source>termPM</source>
                 <target>termPM</target>
             </trans-unit>
+            <trans-unit id="dGVybVBNX2FsbENsaWVudHM=">
+                <source>termPM_allClients</source>
+                <target>Term PM (all clients)</target>
+            </trans-unit>
             <trans-unit id="dGVybVByb3Bvc2Vy">
                 <source>termProposer</source>
-                <target>termProposer</target>
+                <target>Term proposer</target>
             </trans-unit>
             <trans-unit id="dGVybVJldmlld2Vy">
                 <source>termReviewer</source>
-                <target>termReviewer</target>
+                <target>Term reviewer</target>
             </trans-unit>
             <trans-unit id="dGVybVNlYXJjaA==">
                 <source>termSearch</source>
-                <target>termSearch</target>
+                <target>Term search</target>
             </trans-unit>
             <trans-unit id="dGVybV9UZXJtQ29sbGVjdGlvbg==">
                 <source>term_TermCollection</source>

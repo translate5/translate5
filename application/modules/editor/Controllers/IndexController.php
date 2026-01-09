@@ -50,6 +50,7 @@ use MittagQI\ZfExtended\CsrfProtection;
  * $translateConfig->___('runtimeOptions.segments.stateFlags', 'default');
  * $translateConfig->___('runtimeOptions.segments.autoStateFlags', 'default');
  * $translateConfig->___('runtimeOptions.extJs.theme', 'defaults');
+ * $translate->_('Nicht gesetzt');
  */
 
 /**
@@ -355,11 +356,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->setJsSegmentFlags('segments.qualityFlags', $rop->segments->qualityFlags->toArray());
         $manualStates = $rop->segments->stateFlags->toArray();
-        $manualStates[0] = $this->translate->_('Nicht gesetzt');
+        $manualStates[0] = 'Nicht gesetzt';
         $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
         $states = new editor_Models_Segment_AutoStates();
 
-        $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
+        $this->setJsSegmentFlags('segments.autoStateFlags', $states->getStateNamesMap());
         $this->view->Php2JsVars()->set('segments.autoStates', $states->getStateMap());
         $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
 
@@ -915,6 +916,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     }
 
     /**
+     * TODO FIXME: Outdated, remove
      * Provides a smart interface to generate XLF fragments for the internal translation files.
      *   Usage in the UI: Enter the german text in the form, a german XLF fragment is generated, existing
      *   translations are searched for similar texts and a english XLF fragment is generated of that. Final translation

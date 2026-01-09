@@ -188,7 +188,7 @@ Ext.define('Editor.controller.SearchReplace', {
         characterLimitError: '#UT#Der Suchstring ist zu groß',
         noIndexFound: '#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
         searchAndReplaceMenuItem: '#UT#Suchen und ersetzen',
-        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
+        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
     },
 
     initConfig: function () {

@@ -100,16 +100,16 @@ class InternalTranslationTaskTest extends JsonTestAbstract
         $pathToZip = $path . 'export.zip';
         $this->assertFileExists($pathToZip);
 
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/subdir/it.xliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/subdir/it.zxliff');
         if (static::api()->isCapturing()) {
-            file_put_contents(static::api()->getFile('export-it.xliff', null, false), rtrim($exportedFile));
+            file_put_contents(static::api()->getFile('export-it.zxliff', null, false), rtrim($exportedFile));
         }
-        $expectedResult = static::api()->getFileContent('export-it.xliff');
+        $expectedResult = static::api()->getFileContent('export-it.zxliff');
 
         $this->assertEquals(
             rtrim($expectedResult),
             rtrim($exportedFile),
-            'Exported result does not equal to export-it.xliff'
+            'Exported result does not equal to export-it.zxliff'
         );
 
         $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/subdir/test.it.json');
