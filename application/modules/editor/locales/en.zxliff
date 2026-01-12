@@ -7276,7 +7276,7 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             </trans-unit>
             <trans-unit id="YWRtaW4=">
                 <source>admin</source>
-                <target>admin</target>
+                <target>Admin</target>
             </trans-unit>
             <trans-unit id="YWxsb3dfZG93bmxvYWRfcG9wdXBfYWxlcnQ=">
                 <source>allow_download_popup_alert</source>
@@ -7308,7 +7308,7 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             </trans-unit>
             <trans-unit id="YXBp">
                 <source>api</source>
-                <target>api</target>
+                <target>Api</target>
             </trans-unit>
             <trans-unit id="YXJpYQ==">
                 <source>aria</source>
@@ -7364,7 +7364,7 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             </trans-unit>
             <trans-unit id="Y2xpZW50cG0=">
                 <source>clientpm</source>
-                <target>clientpm</target>
+                <target>PM (selected clients)</target>
             </trans-unit>
             <trans-unit id="Y2xpZW50cG1fY3VzdG9tZXJz">
                 <source>clientpm_customers</source>
@@ -7516,11 +7516,11 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="ZWRpdG9y">
                 <source>editor</source>
-                <target>editor</target>
+                <target>Editor</target>
             </trans-unit>
             <trans-unit id="ZWRpdG9yLW9ubHktb3ZlcnJpZGU=">
                 <source>editor-only-override</source>
-                <target>editor-only-override</target>
+                <target>Editor</target>
             </trans-unit>
             <trans-unit id="ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk">
                 <source>engineName_SDLLanguageCloud</source>
@@ -7588,7 +7588,7 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="am9iQ29vcmRpbmF0b3I=">
                 <source>jobCoordinator</source>
-                <target>Job coordinator</target>
+                <target>Job Coordinator</target>
             </trans-unit>
             <trans-unit id="a2VpbmUgQW5nYWJl">
                 <source>keine Angabe</source>
@@ -7688,15 +7688,15 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="cG0=">
                 <source>pm</source>
-                <target>pm</target>
+                <target>PM (all clients)</target>
             </trans-unit>
             <trans-unit id="cG1DaGVjaw==">
                 <source>pmCheck</source>
-                <target>pmCheck</target>
+                <target>PM Check</target>
             </trans-unit>
             <trans-unit id="cG1saWdodA==">
                 <source>pmlight</source>
-                <target>pmlight</target>
+                <target>PM Light</target>
             </trans-unit>
             <trans-unit id="cHJvZHVjdGlvbg==">
                 <source>production</source>
@@ -7716,11 +7716,11 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="c3lzdGVtYWRtaW4=">
                 <source>systemadmin</source>
-                <target>systemadmin</target>
+                <target>Systemadmin</target>
             </trans-unit>
             <trans-unit id="dGFza092ZXJ2aWV3">
                 <source>taskOverview</source>
-                <target>taskOverview</target>
+                <target>Task Overview</target>
             </trans-unit>
             <trans-unit id="dGFza1R5cGU6OmRlZmF1bHQ=">
                 <source>taskType::default</source>
@@ -7728,7 +7728,7 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="dGFza1R5cGU6Omluc3RhbnR0cmFuc2xhdGUtcHJlLXRyYW5zbGF0ZQ==">
                 <source>taskType::instanttranslate-pre-translate</source>
-                <target>taskType::instanttranslate-pre-translate</target>
+                <target>InstantTranslate task</target>
             </trans-unit>
             <trans-unit id="dGFza1R5cGU6OnByb2plY3Q=">
                 <source>taskType::project</source>
@@ -7736,11 +7736,11 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="dGFza1R5cGU6OnByb2plY3RUYXNr">
                 <source>taskType::projectTask</source>
-                <target>taskType::projectTask</target>
+                <target>Task</target>
             </trans-unit>
             <trans-unit id="dGVybUN1c3RvbWVyU2VhcmNo">
                 <source>termCustomerSearch</source>
-                <target>termCustomerSearch</target>
+                <target>Search terms</target>
             </trans-unit>
             <trans-unit id="dGVybUVudHJ5X1Rlcm1Db2xsZWN0aW9u">
                 <source>termEntry_TermCollection</source>
@@ -7748,11 +7748,11 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="dGVybUZpbmFsaXplcg==">
                 <source>termFinalizer</source>
-                <target>termFinalizer</target>
+                <target>Finalize terms</target>
             </trans-unit>
             <trans-unit id="dGVybVBN">
                 <source>termPM</source>
-                <target>termPM</target>
+                <target>Term PM (selected clients)</target>
             </trans-unit>
             <trans-unit id="dGVybVBNX2FsbENsaWVudHM=">
                 <source>termPM_allClients</source>
@@ -7760,15 +7760,15 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="dGVybVByb3Bvc2Vy">
                 <source>termProposer</source>
-                <target>Term proposer</target>
+                <target>Propose terms</target>
             </trans-unit>
             <trans-unit id="dGVybVJldmlld2Vy">
                 <source>termReviewer</source>
-                <target>Term reviewer</target>
+                <target>Review terms</target>
             </trans-unit>
             <trans-unit id="dGVybVNlYXJjaA==">
                 <source>termSearch</source>
-                <target>Term search</target>
+                <target>Search terms</target>
             </trans-unit>
             <trans-unit id="dGVybV9UZXJtQ29sbGVjdGlvbg==">
                 <source>term_TermCollection</source>
