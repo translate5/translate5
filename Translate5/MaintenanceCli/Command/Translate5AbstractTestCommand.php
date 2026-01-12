@@ -522,18 +522,19 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function recreateDatabase(string $host, string $username, string $password, string $dbname, bool $exists = false): bool
     {
+        // this flag prevents some scripts to be executed that are only neccessary for updates of "real" instances
+        defined('DATABASE_RECREATION') || define('DATABASE_RECREATION', true);
         $updater = new ZfExtended_Models_Installer_DbUpdater();
 
         try {
             // Get DbConfig instance
-            $dbConfig = \ZfExtended_Factory
-                ::get('ZfExtended_Models_Installer_DbConfig')
-                    ->initFromArray([
-                        'host' => $host,
-                        'username' => $username,
-                        'password' => $password,
-                        'dbname' => $dbname,
-                    ]);
+            $dbConfig = \ZfExtended_Factory::get(\ZfExtended_Models_Installer_DbConfig::class)
+                ->initFromArray([
+                    'host' => $host,
+                    'username' => $username,
+                    'password' => $password,
+                    'dbname' => $dbname,
+                ]);
 
             $updater->createDatabase($dbConfig, $exists);
             if ($exists) {

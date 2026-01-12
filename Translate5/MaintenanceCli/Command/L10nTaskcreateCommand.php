@@ -4,6 +4,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Customer_Customer;
 use editor_Models_Import_CliImportWorker;
+use MittagQI\ZfExtended\Localization;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,8 +27,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     public const WORKFILES = 'workfiles';
-
-    public const ZXLIFF = '.zxliff';
 
     public const TARGET_LANGUAGES = 'targetLanguages';
 
@@ -160,7 +159,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         }
 
         $this->io->writeln('Please remove non-wanted private Plugin XLFs manually!!!');
-        $this->io->writeln('After translating and exporting from Translate5, rename *.zxliff back to *.xliff');
 
         return self::SUCCESS;
     }
@@ -186,7 +184,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         $keepTarget = (bool) $this->input->getOption(self::KEEP_TARGET);
 
         $this->processXliffFiles($targetLanguage, keepTarget: $keepTarget);
-        $this->addJsonFile($targetLanguage);
+        $this->addJsonFiles($targetLanguage);
 
         $this->zipArchive->addFromString(
             'task-config.ini',
@@ -223,7 +221,11 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         $xliffFiles = $this->getXliffFiles($targetLanguage);
 
         foreach ($xliffFiles as $filename) {
-            $zxlfFilename = str_replace('.xliff', self::ZXLIFF, $filename);
+            $zxlfFilename = str_replace(
+                '.xliff',
+                Localization::FILE_EXTENSION_WITH_DOT,
+                $filename
+            );
             $filenameInZip = str_replace(APPLICATION_ROOT, '', $zxlfFilename);
             $filenameInZip = self::WORKFILES . $filenameInZip;
 
@@ -274,9 +276,9 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
     }
 
     /**
-     * gets the available JSON file to a given language, currently hardcoded since only one!
+     * gets the available JSON file to a given language
      */
-    private function addJsonFile(string $language): void
+    private function addJsonFiles(string $language): void
     {
         $jsonFiles = new JsonFiles(APPLICATION_ROOT);
         $source = $this->sourceLanguage . '.json$';

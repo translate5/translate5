@@ -1638,7 +1638,7 @@ class editor_TaskController extends ZfExtended_RestController
                 [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
                 [
                     'task' => $e->task,
-                    'categories' => implode('</br>', $e->categories),
+                    'categories' => implode('<br/>', $e->categories),
                 ]
             );
         }

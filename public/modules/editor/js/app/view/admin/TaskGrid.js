@@ -108,7 +108,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         locked: '#UT#in Arbeit',
         lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
         lockedMultiUser: '#UT#In Bearbeitung durch:',
-        lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
+        lockedSystem: '#UT#Durch das System gesperrt mit dem Status “{0}”',
         addProject: '#UT#Projekt hinzufügen',
         addProjectTip: '#UT#Neues Projekt hinzufügen',
         exportMetaDataBtn: '#UT#Meta-Daten exportieren',

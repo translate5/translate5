@@ -44,7 +44,7 @@ class SegParser
 
     /**
      * container to hold the results of analyze as list of
-     * editor_Services_OpenTM2_Fixer_FixArayaTmxSegAnalyzeDTO objects
+     * editor_Services_T5Memory_Fixer_FixArayaTmxSegAnalyzeDTO objects
      * @var PlaceholderDTO[]
      */
     protected array $analyzeResults = [];

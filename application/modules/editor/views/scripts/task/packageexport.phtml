@@ -21,14 +21,13 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-
 // return json in case the request is not for the transalte5 UI
-if(!isset($_REQUEST['t5ui'])){
+if (! isset($_REQUEST['t5ui'])) {
     echo json_encode([
         'taskId' => $this->taskId ?? null,
         'workerId' => $this->workerId ?? null,
@@ -116,7 +115,7 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 </div>
 
 <script>
-    var apiUrl = '/editor/taskid/<?php echo $this->taskId;?>/task/packagestatus?workerId=<?php echo $this->workerId;?>';
+    var apiUrl = '/editor/taskid/<?php echo $this->taskId; ?>/task/packagestatus?workerId=<?php echo $this->workerId; ?>';
     function checkFileAvailability() {
         fetch(apiUrl)
             .then(response => {
@@ -144,7 +143,7 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             .catch(error => {
                 document.querySelector('.loading').classList.add('hidden');
                 document.querySelector('.export-running-message').classList.add('hidden');
-                document.querySelector('.error').textContent = '<?php echo $translate->_('Es ist ein Fehler aufgetreten!').' '; ?>';
+                document.querySelector('.error').textContent = '<?php echo $translate->_('Es ist ein Fehler aufgetreten!') . ' '; ?>';
                 document.querySelector('.error').textContent += '<?php echo $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
                 document.querySelector('.error').classList.remove('hidden');
             });

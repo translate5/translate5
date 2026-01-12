@@ -89,8 +89,8 @@ class FuzzySearchServiceTest extends TestCase
         $this->languageResource = new LanguageResource();
         $this->languageResource->setLangResUuid(\ZfExtended_Utils::uuid());
         $this->languageResource->setName('FuzzySearchServiceTest');
-        $this->languageResource->setServiceType('editor_Services_OpenTM2');
-        $this->languageResource->setResourceId('editor_Services_OpenTM2_1');
+        $this->languageResource->setServiceType('editor_Services_T5Memory');
+        $this->languageResource->setResourceId('editor_Services_T5Memory_1');
         $this->languageResource->addSpecificData('memories', []);
         $this->languageResource->save();
 

@@ -59,10 +59,19 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Sanitizer as Sanitizer;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
-use ZfExtended_Sanitizer as Sanitizer;
 
-/***
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Keine Datei hochgeladen!');
+ * $translate->_('File import in language resources Error on worker init()');
+ * $translate->_('Die ausgewählte Datei war leer!');
+ * $translate->_('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
+ */
+
+/**
  * Language resource controller
  */
 class editor_LanguageresourceinstanceController extends ZfExtended_RestController
@@ -239,7 +248,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $lrData['tmConversionState'] = null;
 
-            if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
+            if (editor_Services_Manager::SERVICE_T5_MEMORY === $lrData['serviceType']) {
                 $lrData['tmConversionState'] = $tmConversionService->getConversionState($id)->value;
             }
 
@@ -808,7 +817,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * provides the uploaded file in a filebased TM as download
      *
-     * This method is very opentm2 specific. If we want more generalization:
+     * This method is very t5memory specific. If we want more generalization:
      *  - JS needs to know about the valid export types of the requested TM system
      *  - The Connector must be able to decide if a given type can be exported or not
      */
@@ -1714,7 +1723,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         unset($row);
 
-        if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
+        if (editor_Services_Manager::SERVICE_T5_MEMORY === $this->entity->getServiceType()) {
             $this->view->tmConversionState = $tmConversionService->getConversionState($languageResourceId)->value;
 
             foreach ($this->view->rows as &$row) {

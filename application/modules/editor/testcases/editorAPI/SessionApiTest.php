@@ -49,7 +49,7 @@ class SessionApiTest extends ImportTestAbstract
         $response = static::api()->post('editor/session');
 
         $this->assertEquals(422, $response->getStatus());
-        $this->assertStringContainsString('"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}]', $response->getBody());
+        $this->assertStringContainsString('"errors":[{"id":"login","msg":"No user name given."},{"id":"passwd","msg":"No password given."}]', $response->getBody());
 
         $response = static::api()->post('editor/session', [
             'login' => 'givenLogin',
@@ -61,7 +61,7 @@ class SessionApiTest extends ImportTestAbstract
             'passwd' => 'givenPasswd',
         ]);
         $this->assertEquals(422, $response->getStatus());
-        $this->assertStringContainsString('"errors":[{"id":"login","msg":"No login given."}]', $response->getBody());
+        $this->assertStringContainsString('"errors":[{"id":"login","msg":"No user name given."}]', $response->getBody());
     }
 
     /**

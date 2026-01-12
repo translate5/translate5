@@ -102,7 +102,7 @@ class Pivot
 
         $availableConnectorStatus = [
             editor_Services_Connector_Abstract::STATUS_AVAILABLE,
-            //NOT_LOADED must be also considered as AVAILABLE, since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
+            //NOT_LOADED must be also considered as AVAILABLE, since T5Memory Tms are basically not loaded and therefore we can not decide if they are usable or not
             editor_Services_Connector_Abstract::STATUS_NOT_LOADED,
         ];
 

@@ -54,15 +54,15 @@ namespace MittagQI\Translate5\Segment\Operation;
 
 use editor_Models_Segment;
 use MittagQI\ZfExtended\Logger\SimpleFileLogger;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
 use ZfExtended_Debug;
-use ZfExtended_Sanitized_HttpRequest;
 
 final class UpdateSegmentLogger
 {
     public static function fromPutRequest(
         string $process,
         editor_Models_Segment $segment,
-        ZfExtended_Sanitized_HttpRequest $request,
+        HttpRequest $request,
     ): self {
         $data = $request->getData(true);
         foreach (self::CAPTURED_FIELDS as $field) {

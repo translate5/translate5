@@ -38,4 +38,8 @@ return ECSConfig::configure()
         BlankLineAfterOpeningTagFixer::class,
         RemoveUselessDefaultCommentFixer::class,
     ])
+    ->withFileExtensions([
+        'php',
+        'phtml',
+    ])
 ;

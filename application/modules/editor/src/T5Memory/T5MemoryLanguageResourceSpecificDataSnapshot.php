@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory;
 
-use editor_Services_OpenTM2_Service as Service;
+use editor_Services_T5Memory_Service as Service;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Zend_Config;
 use Zend_Registry;
@@ -71,7 +71,7 @@ class T5MemoryLanguageResourceSpecificDataSnapshot
                 sprintf(
                     "%s; %s; %d; %s; %s\n",
                     date('Y-m-d H:i:s p'),
-                    $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix,
+                    $this->config->runtimeOptions->LanguageResources->t5memory->tmprefix,
                     $languageResource->getId(),
                     $languageResource->getName(),
                     $specificData,

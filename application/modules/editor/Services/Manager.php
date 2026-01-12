@@ -56,7 +56,7 @@ class editor_Services_Manager
 
     public const CLS_CONNECTOR = '_Connector';
 
-    public const SERVICE_OPENTM2 = 'editor_Services_OpenTM2';
+    public const SERVICE_T5_MEMORY = 'editor_Services_T5Memory';
 
     /**
      * Generates a translated error-msg to report TM-update errors to the frontend
@@ -97,7 +97,7 @@ class editor_Services_Manager
      * @var array
      */
     protected static $registeredServices = [
-        self::SERVICE_OPENTM2,
+        self::SERVICE_T5_MEMORY,
         'editor_Services_Moses',
         'editor_Services_LucyLT',
         'editor_Services_TermCollection',

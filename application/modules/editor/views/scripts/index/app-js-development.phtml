@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,38 +32,37 @@ END LICENSE AND COPYRIGHT
  * - The Translate5 Editor Application as single files, unmerged
  * - ExtJS 6.0.0, unmerged, debug
  * - For ExtJS as provided by Sencha Architect, unmerged, use the following:
-    <link rel="stylesheet" type="text/css" href="modules/erp/ERP/bootstrap.css">
-    <script src="modules/erp/ERP/ext/build/ext-all-debug.js"></script>
     <script src="modules/erp/ERP/ext/packages/ext-locale/build/ext-locale-de-debug.js"></script>
  * @see Editor_IndexController::indexAction()
  * @var Zend_View $this
  */
-$version = '?v='.$this->appVersion;
+$version = '?v=' . $this->appVersion;
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsCss; ?>"/>
-<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css<?php echo $version;?>" />
-<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/themes/<?php echo $this->userTheme;?>.css<?php echo $version;?>" />
-<link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath;?>/build/packages/ux/classic/classic/resources/ux-all.css"/>
-<?php if($this->userTheme !== 'triton'){ echo <<<FONTAWESOME_CLASSES_FROM_EXTJS
+<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css<?php echo $version; ?>" />
+<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/themes/<?php echo $this->userTheme; ?>.css<?php echo $version; ?>" />
+<link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/build/packages/ux/classic/classic/resources/ux-all.css"/>
+<?php if ($this->userTheme !== 'triton') {
+    echo <<<FONTAWESOME_CLASSES_FROM_EXTJS
 <link rel="stylesheet" type="text/css" href="$this->extJsBasepath/build/packages/font-awesome/resources/font-awesome-all.css"/>
 FONTAWESOME_CLASSES_FROM_EXTJS;
 }
 ?>
 
-<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath;?>/fontawesome/extjs.css"/>
-<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath;?>/material-design-icons/material-design-icons.css"/>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/fontawesome/extjs.css"/>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/material-design-icons/material-design-icons.css"/>
 
 <?php
 $extSuffix = '';
-if($this->appVersion == ZfExtended_Utils::VERSION_DEVELOPMENT){
+if ($this->appVersion == ZfExtended_Utils::VERSION_DEVELOPMENT) {
     $extSuffix = '-debug';
 }
 ?>
-<script src="<?php echo $this->extJsBasepath;?>/build/ext-all<?php echo $extSuffix;?>.js"></script>
-<script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-<?php echo $this->locale.$extSuffix;?>.js"></script>
-<script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js<?php echo $version;?>"></script>
+<script src="<?php echo $this->extJsBasepath; ?>/build/ext-all<?php echo $extSuffix; ?>.js"></script>
+<script src="<?php echo $this->extJsBasepath; ?>/build/classic/locale/locale-<?php echo $this->locale.$extSuffix; ?>.js"></script>
+<script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js<?php echo $version; ?>"></script>
 <script>
-<?php if($this->appVersion != ZfExtended_Utils::VERSION_DEVELOPMENT){ ?>
+<?php if ($this->appVersion != ZfExtended_Utils::VERSION_DEVELOPMENT) { ?>
 Ext.manifest = {
     loader: {
         cache: "<?php echo $this->appVersion; ?>"
@@ -71,11 +70,11 @@ Ext.manifest = {
 };
 <?php } ?>
 //register ExtJS delivered UX components as default:
-Ext.Loader.setPath('Ext.ux', '<?php echo $this->extJsBasepath;?>/packages/ux/classic/src/');
+Ext.Loader.setPath('Ext.ux', '<?php echo $this->extJsBasepath; ?>/packages/ux/classic/src/');
 
 //Register custom UXs libs (use Package paths were possible, and single files only if really needed):
-Ext.Loader.setPath('Ext.ux.DateTimeField', '<?php echo $this->publicModulePath;?>/js/ux/DateTimeField.js');
-Ext.Loader.setPath('Ext.ux.DateTimePicker', '<?php echo $this->publicModulePath;?>/js/ux/DateTimePicker.js');
+Ext.Loader.setPath('Ext.ux.DateTimeField', '<?php echo $this->publicModulePath; ?>/js/ux/DateTimeField.js');
+Ext.Loader.setPath('Ext.ux.DateTimePicker', '<?php echo $this->publicModulePath; ?>/js/ux/DateTimePicker.js');
 
 //Intercept setPath for developing systems, on production all should work with above builded code
 Ext.Loader.setPathIntercepted = Ext.Loader.setPath;
@@ -87,9 +86,9 @@ Ext.Loader.setPath = function(mod, path) {
 };
 
 </script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/overrides.js<?php echo $version;?>"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/shared.js<?php echo $version;?>"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/app.js<?php echo $version;?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/overrides.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/shared.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/app.js<?php echo $version; ?>"></script>
 
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/lib/rangy-core.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/external/log4javascript.js"></script>
@@ -98,4 +97,4 @@ Ext.Loader.setPath = function(mod, path) {
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/lib/rangy-classapplier.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/lib/rangy-serializer.js"></script>
 
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/HtmlEditor/editor.js<?php echo $version;?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/HtmlEditor/editor.js<?php echo $version; ?>"></script>

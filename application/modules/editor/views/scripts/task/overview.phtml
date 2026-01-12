@@ -68,15 +68,17 @@ use MittagQI\Translate5\Task\Overview\SegmentDataHeader;
                     }
                     if ($field->id === SegmentDataHeader::FIELD_MANUAL_QS) {
                         echo '<td>' . implode('<br />', $row[$field]) . '</td>';
+
                         continue;
                     }
                     if ($field->id === SegmentDataHeader::FIELD_COMMENTS) {
                         echo '<td>' . $this->taskCommentsEscape($row[$field]) . '</td>';
+
                         continue;
                     }
                     echo '<td>' . $row[$field] . '</td>';
                 }
-                echo '</tr>'."\n";
+                echo '</tr>' . "\n";
             }
 ?>
             </tbody>

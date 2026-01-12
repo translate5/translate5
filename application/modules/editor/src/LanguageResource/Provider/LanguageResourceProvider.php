@@ -55,7 +55,7 @@ class LanguageResourceProvider
                 $languageResource['serviceName'] = $this->serviceManager->getNameByType($languageResource['serviceType']);
                 $languageResource['isTaskTm'] = ($languageResource['isTaskTm'] ?? 0) === '1';
 
-                if (editor_Services_Manager::SERVICE_OPENTM2 === $languageResource['serviceType']) {
+                if (editor_Services_Manager::SERVICE_T5_MEMORY === $languageResource['serviceType']) {
                     $lrId = (int) $languageResource['languageResourceId'];
                     $languageResource['tmConversionState'] = $this->tmConversionService->getConversionState($lrId)->value;
                 }

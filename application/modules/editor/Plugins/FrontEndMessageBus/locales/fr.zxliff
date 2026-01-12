@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="fr" datatype="php">
+        <body>
+            <trans-unit id="QWt0dWVsbGVyIEJlYXJiZWl0ZXI=">
+                <source>Aktueller Bearbeiter</source>
+                <target>Éditeur actuel</target>
+            </trans-unit>
+            <trans-unit id="QXVmZ2FiZSBpbiBhbmRlcmVtIEZlbnN0ZXIgZ2VzY2hsb3NzZW4=">
+                <source>Aufgabe in anderem Fenster geschlossen</source>
+                <target>Tâche fermée dans une autre fenêtre</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2V3w6RobHQgdm9u">
+                <source>Ausgewählt von</source>
+                <target>Sélectionné par</target>
+            </trans-unit>
+            <trans-unit id="QmVhcmJlaXRlcjog">
+                <source>Bearbeiter: </source>
+                <target>Éditeur: </target>
+            </trans-unit>
+            <trans-unit id="RGFzIGF1c2dld8OkaGx0ZSBTZWdtZW50IHdpcmQgdm9uIGVpbmVtIGFuZGVyZW4gQmVudXR6ZXIgYmVyZWl0cyBiZWFyYmVpdGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlw7ZmZm5ldCB3ZXJkZW4u">
+                <source>Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</source>
+                <target>Le segment sélectionné est déjà édité par un autre utilisateur et ne peut donc pas être ouvert.</target>
+            </trans-unit>
+            <trans-unit id="RWluIGFuZGVyZXIgQmVudXR6ZXIgd2FyIHNjaG5lbGxlciB1bmQgaGF0IGltIE1vbWVudCBkYXMgU2VnbWVudCB6dXIgQmVhcmJlaXR1bmcgZ2VzcGVycnQu">
+                <source>Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.</source>
+                <target>Un autre utilisateur a été plus rapide et a actuellement verrouillé le segment pour modification.</target>
+            </trans-unit>
+            <trans-unit id="RXJuZXV0IMO2ZmZuZW4=">
+                <source>Erneut öffnen</source>
+                <target>Ouvrir à nouveau</target>
+            </trans-unit>
+            <trans-unit id="SWNo">
+                <source>Ich</source>
+                <target>Je</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCBiZXJlaXRzIGluIEJlYXJiZWl0dW5n">
+                <source>Segment bereits in Bearbeitung</source>
+                <target>Segment déjà en cours d’édition</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCB3dXJkZSBhdWYgZGVyIFNlcnZlcnNlaXRlIGdlw6RuZGVydA==">
+                <source>Segment wurde auf der Serverseite geändert</source>
+                <target>Le segment a été modifié côté serveur</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCB3dXJkZSBhdWYgZGVyIFNlcnZlcnNlaXRlIGdlw6RuZGVydC48YnIvPjxiPlF1ZWxsdGV4dDo8L2I+PGJyLz57c291cmNlfTxici8+PGI+WmllbHRleHQ6PC9iPjxici8+e3RhcmdldH08YnIvPk3DtmNodGVuIFNpZSBkaWUgw4RuZGVydW5nZW4gYWt6ZXB0aWVyZW4/">
+                <source>Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:</b><br/>{source}<br/><b>Zieltext:</b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?</source>
+                <target>Segment wurde auf Serverseite geändert.<br/><br/><b>Quelltext:</b><br/>{source}<br/><br/><b>Zieltext:</b><br/>{target}<br/><br/>Möchten Sie die Änderungen akzeptieren?</target>
+            </trans-unit>
+            <trans-unit id="U2llIGhhYmVuIFZlcmJpbmR1bmdzcHJvYmxlbWUgenVtIEludGVybmV0LiA8YnIgLz5CaXR0ZSBwcsO8ZmVuIFNpZSBkaWUgU3RhYmlsaXTDpHQgSWhyZXIgSW50ZXJuZXR2ZXJiaW5kdW5nLiA8YnIgLz5Tb2xsdGUgZGllc2UgTWVsZHVuZyBkYXVlcmhhZnQgenUgc2VoZW4gc2Vpbiwga2FubiBlcyBhdWNoIHNlaW4sIDxiciAvPmRhc3MgZGFzIFdlYnNvY2tldC1Qcm90b2tvbGwgd3NzOi8vIGluIElocmVyIEZpcmV3YWxsIGJsb2NraWVydCBpc3Qu">
+                <source>Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.</source>
+                <target>Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass in Ihrer Firewall das Websocket-Protokoll wss:// blockiert ist.</target>
+            </trans-unit>
+            <trans-unit id="U2llIGhhYmVuIGRpZSBBdWZnYWJlIGluIGFuZGVyZW0gRmVuc3RlciBnZXNjaGxvc3Nlbi4gU2NobGllw59lbiBTaWUgZGllc2VzIEZlbnN0ZXIgZWJlbmZhbGxzLCBvZGVyIGxhZGVuIFNpZSBkYXMgRmVuc3RlciBuZXUgdW0gZGllIEF1ZmdhYmUgZXJuZXV0IHp1IMO2ZmZuZW4u">
+                <source>Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.</source>
+                <target>Vous avez fermé la tâche dans une autre fenêtre. Fermez également cette fenêtre ou rechargez la fenêtre pour rouvrir la tâche.</target>
+            </trans-unit>
+            <trans-unit id="U2llIGvDtm5uZW4ga2VpbiBTZWdtZW50IGVkaXRpZXJlbiwgc28gbGFuZ2Uga2VpbmUgVmVyYmluZHVuZyB6dW0gU2VydmVyIGJlc3RlaHQu">
+                <source>Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.</source>
+                <target>Vous ne pouvez pas éditer un segment tant qu’il n’y a pas de connexion au serveur.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

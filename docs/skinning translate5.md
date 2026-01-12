@@ -95,7 +95,7 @@ For security reasons and to provide the posibility to deactivate default views, 
     runtimeOptions.content.viewTemplatesAllowed = ["index", "usage", "test", "source", "newsletter"]
 
 ##Translations
-You can make client-specific translations. Therefor you should place your translation-xliff-files into
+You can make client-specific translations. Therefor you should place your translation-zxliff-files into
 
     APPLICATION_ROOT/client-specific/locales
 

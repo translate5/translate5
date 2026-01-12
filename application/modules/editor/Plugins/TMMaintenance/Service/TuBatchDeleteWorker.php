@@ -84,7 +84,7 @@ class TuBatchDeleteWorker extends ZfExtended_Worker_Abstract
         $params = $this->workerModel->getParameters();
         $languageResource = LanguageResourceRepository::create()->get((int) $params['languageResourceId']);
 
-        if (editor_Services_Manager::SERVICE_OPENTM2 !== $languageResource->getServiceType()) {
+        if (editor_Services_Manager::SERVICE_T5_MEMORY !== $languageResource->getServiceType()) {
             $languageResource->setStatus(Status::AVAILABLE);
             $languageResource->save();
 

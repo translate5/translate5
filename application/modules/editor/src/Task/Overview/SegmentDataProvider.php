@@ -111,11 +111,10 @@ class SegmentDataProvider
             $state = $stateMap[$segment->getValue('autoStateId')] ?? '- not found -';
 
             foreach ($header->getFields() as $field) {
+                $statusMsg = $this->segmentUtility->convertStateId($segment->getValue('stateId'));
                 $row[$field] = match ($field->id) {
                     SegmentDataHeader::FIELD_NR => $segment->getValue('segmentNrInTask'),
-                    SegmentDataHeader::FIELD_STATUS => $this->translate->_(
-                        $this->segmentUtility->convertStateId($segment->getValue('stateId'))
-                    ),
+                    SegmentDataHeader::FIELD_STATUS => $this->translate->_($statusMsg),
                     SegmentDataHeader::FIELD_MANUAL_QS => $segment->getValue('qualities') ?? [],
                     SegmentDataHeader::FIELD_EDIT_STATUS => $state,
                     SegmentDataHeader::FIELD_MATCH_RATE => $segment->getValue('matchRate'),

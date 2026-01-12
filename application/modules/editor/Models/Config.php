@@ -26,6 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('config_overwrite_instance');
+ * $translate->_('config_overwrite_customer');
+ * $translate->_('config_overwrite_taskImport');
+ * $translate->_('config_overwrite_task');
+ * $translate->_('config_overwrite_user');
+ * $translate->_('config_overwrite_system');
+ */
+
 use MittagQI\ZfExtended\Acl\ConfigRestrictionResource;
 
 /**

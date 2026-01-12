@@ -2206,3 +2206,13 @@ Ext.override(Ext.view.BoundList, {
         return '{[Ext.String.htmlEncode(values.' + displayField + ')]}';
     },
 });
+
+Ext.override(Ext.data.request.Form, {
+    upload: function() {
+        let form = this.callParent(arguments);
+        if (this.frame && this.frame.dom) {
+            this.frame.dom.setAttribute('sandbox', 'allow-forms allow-same-origin');
+        }
+        return form;
+    }
+});

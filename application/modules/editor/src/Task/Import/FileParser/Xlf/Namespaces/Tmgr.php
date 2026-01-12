@@ -62,6 +62,6 @@ class Tmgr extends AbstractNamespace
      */
     public function useTagContentOnly(): ?bool
     {
-        return null; //For OpenTM2 we can calculate this value depending on the tag
+        return null; //For T5Memory we can calculate this value depending on the tag
     }
 }

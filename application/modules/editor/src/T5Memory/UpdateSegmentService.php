@@ -64,7 +64,7 @@ class UpdateSegmentService implements UpdateSegmentInterface
 
     public function supports(LanguageResource $languageResource): bool
     {
-        return \editor_Services_OpenTM2_Service::NAME === $languageResource->getServiceName();
+        return \editor_Services_T5Memory_Service::NAME === $languageResource->getServiceName();
     }
 
     public function update(

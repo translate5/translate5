@@ -281,7 +281,7 @@
                     "qcategory": "num1",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Numbers source ≠ target",
+                    "text": "Numbers source segment ≠ target segment",
                     "qtooltip": "",
                     "mustBeZeroErrors": false,
                     "leaf": true
@@ -320,7 +320,7 @@
                     "qcategory": "num4",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Separator(s) not localised",
+                    "text": "Separator(s) not localized",
                     "qtooltip": "",
                     "mustBeZeroErrors": false,
                     "leaf": true
@@ -372,7 +372,7 @@
             "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
             "mustBeZeroErrors": false,
             "qcountfp": 0,
-            "text": "Usage of TM-matches",
+            "text": "Usage of TM matches",
             "qtotal": 0,
             "leaf": true
         },

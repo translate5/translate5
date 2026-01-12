@@ -29,6 +29,25 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * // roles
+ * $translate->_('translator');
+ * $translate->_('reviewer');
+ * $translate->_('translatorCheck');
+ * $translate->_('visitor');
+ * $translate->_('visualApprover');
+ * // steps
+ * $translate->_('no workflow');
+ * $translate->_('pmCheck');
+ * $translate->_('workflowEnded');
+ * -- special table translations --
+ * $translateTable->__('LEK_workflow', 'label');
+ * $translateTable->__('LEK_workflow_step', 'role');
+ * $translateTable->__('LEK_workflow_step', 'label');
+ */
+
+/**
  * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the
  * handler instance Default roles are:
  * - translator

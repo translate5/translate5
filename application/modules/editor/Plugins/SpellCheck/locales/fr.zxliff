@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="fr" datatype="php">
+        <body>
+            <trans-unit id="RHLDvGNrZW4gU2llIEN0cmwrUiwgdW0gVm9yc2NobMOkZ2UgYXVzenV3w6RobGVuIG9kZXIgcmVjaHRzLWtsaWNrZW4gU2llIGF1ZiBkaWVzZXMgV29ydC4gRGVyIEN1cnNvciBtdXNzIHNpY2ggaW5uZXJoYWxiIGRlcyBGZWhsZXJzIGJlZmluZGVuLg==">
+                <source>Drücken Sie Ctrl+R, um Vorschläge auszuwählen oder rechts-klicken Sie auf dieses Wort. Der Cursor muss sich innerhalb des Fehlers befinden.</source>
+                <target>Appuyez sur Ctrl+R pour sélectionner des propositions ou faites un clic droit sur ce mot. Le curseur doit se trouver dans l’erreur.</target>
+            </trans-unit>
+            <trans-unit id="TWVociBJbmZvcm1hdGlvbmVu">
+                <source>Mehr Informationen</source>
+                <target>Plus d’informations</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -43,11 +43,13 @@ use MittagQI\Translate5\Task\FileTranslation\FileTranslation;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\ZfExtended\ApiRequestDTO;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
 
 /**
  * OKAPI file converter and segmenter plugin
  *
  * There are several debug options for this Plugin:
+ * runtimeOptions.debug.plugin.OkapiWorkers => Turns general debugging on for the Import/Export Workers
  * runtimeOptions.debug.plugin.OkapiInitEvents => Turns general debugging on for the Plugins initialisation/events
  * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging on for the packing/unpacking of bconfs
  * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging on for the processing of bconfs
@@ -68,7 +70,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    public const BCONF_VERSION_INDEX = 10;
+    public const BCONF_VERSION_INDEX = 11;
 
     /**
      * The filename of the system default import bconf
@@ -758,7 +760,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     {
         /** @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        /** @var ZfExtended_Sanitized_HttpRequest $request */
+        /** @var HttpRequest $request */
         $request = $event->getParam('request');
         $bconfId = $request->getParam('bconfId');
 

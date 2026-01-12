@@ -32,7 +32,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\L10n\XliffFile;
+use Translate5\MaintenanceCli\L10n\L10nHelper;
+use Translate5\MaintenanceCli\L10n\XliffFormatter;
 
 class L10nAddCommand extends Translate5AbstractCommand
 {
@@ -43,11 +44,11 @@ class L10nAddCommand extends Translate5AbstractCommand
     {
         $this
         // the short description shown while running "php bin/console list"
-            ->setDescription('TODO.')
+            ->setDescription('Adds a string to the localization xliff-files.')
 
         // the full command description shown when running the command with
         // the "--help" option
-            ->setHelp('TODO.');
+            ->setHelp('Adds a string to the localization xliff-files.');
 
         $this->addArgument(
             'source',
@@ -56,24 +57,11 @@ class L10nAddCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
-            'path',
-            'p',
+            'module',
+            'm',
             InputOption::VALUE_REQUIRED,
-            'The path to the xliff files, if omitted defaulting to the editor/locales files.'
-        );
-
-        $this->addOption(
-            'replace',
-            'r',
-            InputOption::VALUE_REQUIRED,
-            'Replace the trans-unit identified by --after instead of appending to it.'
-        );
-
-        $this->addOption(
-            'after',
-            'a',
-            InputOption::VALUE_REQUIRED,
-            'The source content after which the new content should be added.'
+            'The module where the string should be removed from. This can be "editor",' .
+            ' "default", "library" or a plugin-name. Defaults to "editor"'
         );
     }
 
@@ -87,44 +75,32 @@ class L10nAddCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->writeTitle('Translate5 L10n maintenance - removing translations');
+        $this->writeTitle('Translate5 L10n maintenance - adding strings');
 
-        //TODO to be loaded from XliffLocation
-        $files = [
-            'application/modules/editor/locales/de.xliff',
-            'application/modules/editor/locales/en.xliff',
-        ];
+        $source = $input->getArgument('source');
+        $module = $input->getOption('module');
+        if (empty($module)) {
+            $module = 'editor';
+        }
 
-        foreach ($files as $file) {
-            $file = new \SplFileInfo($file);
-            if (! $file->isFile()) {
-                $this->io->error('Not found: ' . $file);
+        $xliffs = L10nHelper::evaluateXliffModule($module);
+        if (empty($xliffs)) {
+            $this->io->error('No xliff files found for module or plugin ' . $module);
 
-                continue;
-            }
-            $this->io->section((string) $file);
-            $xlf = new XliffFile($file);
-            $source = $input->getArgument('source');
-            $after = $input->getOption('after');
-            if ($input->getOption('replace')) {
-                $count = $xlf->replace($after, $input->getArgument('source'));
-                $this->writeAssoc([
-                    "Source added" => $source,
-                    "Replaced" => $source,
-                    "Times" => $count,
-                ]);
-            } else {
-                $count = $xlf->add($input->getArgument('source'), null, $after);
-                $out = [
-                    "Source added" => $source,
-                    "After" => $after,
-                    "Times" => $count,
-                ];
-                if (is_null($after)) {
-                    unset($out['After']);
-                }
-                $this->writeAssoc($out);
-            }
+            return self::FAILURE;
+        }
+
+        $added = 0;
+
+        foreach ($xliffs as $xliff) {
+            $formatter = new XliffFormatter($xliff);
+            $added += $formatter->add($source);
+        }
+
+        if ($added === 0) {
+            $this->io->warning('No strings have been added');
+        } else {
+            $this->io->success('Added ' . $added . ' strings in ' . count($xliffs) . ' xliff files');
         }
 
         return 0;

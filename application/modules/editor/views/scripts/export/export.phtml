@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -145,7 +145,7 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             .catch(error => {
                 document.querySelector('.loading').classList.add('hidden');
                 document.querySelector('.export-running-message').classList.add('hidden');
-                document.querySelector('.error').textContent = '<?= $translate->_('Es ist ein Fehler aufgetreten!').' '; ?>';
+                document.querySelector('.error').textContent = '<?= $translate->_('Es ist ein Fehler aufgetreten!') . ' '; ?>';
                 document.querySelector('.error').textContent += '<?= $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
                 document.querySelector('.error').classList.remove('hidden');
             });

@@ -32,7 +32,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\L10n\XliffFile;
+use Translate5\MaintenanceCli\L10n\L10nHelper;
+use Translate5\MaintenanceCli\L10n\XliffFormatter;
 
 class L10nRemoveCommand extends Translate5AbstractCommand
 {
@@ -43,23 +44,24 @@ class L10nRemoveCommand extends Translate5AbstractCommand
     {
         $this
         // the short description shown while running "php bin/console list"
-            ->setDescription('TODO.')
+            ->setDescription('Removes a string from the localization xliff-files.')
 
         // the full command description shown when running the command with
         // the "--help" option
-            ->setHelp('TODO.');
+            ->setHelp('Removes a string from the localization xliff-files.');
 
         $this->addArgument(
             'source',
             InputArgument::REQUIRED,
-            'The text to be delete from the xliff files.'
+            'The text to be deleted from the xliff files.'
         );
 
         $this->addOption(
-            'path',
-            'p',
+            'module',
+            'm',
             InputOption::VALUE_REQUIRED,
-            'The path to the xliff files, if omitted defaulting to the editor/locales files.'
+            'The module where the string should be removed from. This can be "editor",' .
+            ' "default", "library" or a plugin-name. Defaults to "editor"'
         );
     }
 
@@ -73,29 +75,32 @@ class L10nRemoveCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->writeTitle('Translate5 L10n maintenance - removing translations');
+        $this->writeTitle('Translate5 L10n maintenance - removing strings');
 
-        //TODO to be loaded from XliffLocation
-        $files = [
-            'application/modules/editor/locales/de.xliff',
-            'application/modules/editor/locales/en.xliff',
-        ];
+        $source = $input->getArgument('source');
+        $module = $input->getOption('module');
+        if (empty($module)) {
+            $module = 'editor';
+        }
 
-        foreach ($files as $file) {
-            $file = new \SplFileInfo($file);
-            if (! $file->isFile()) {
-                $this->io->error('Not found: ' . $file);
+        $xliffs = L10nHelper::evaluateXliffModule($module);
+        if (empty($xliffs)) {
+            $this->io->error('No xliff files found for module or plugin ' . $module);
 
-                continue;
-            }
-            $this->io->section((string) $file);
-            $xlf = new XliffFile($file);
-            $source = $input->getArgument('source');
-            $count = $xlf->remove($source);
-            $this->writeAssoc([
-                "Source" => $source,
-                "Times" => $count,
-            ]);
+            return self::FAILURE;
+        }
+
+        $removed = 0;
+
+        foreach ($xliffs as $xliff) {
+            $formatter = new XliffFormatter($xliff);
+            $removed += $formatter->remove($source);
+        }
+
+        if ($removed === 0) {
+            $this->io->warning('No strings have been found and removed');
+        } else {
+            $this->io->success('Removed ' . $removed . ' strings from ' . count($xliffs) . ' xliff files');
         }
 
         return 0;

@@ -33,7 +33,8 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
     AuthTokenDeleteCommand,
     AuthTokenListCommand,
     CachePurgeCommand,
@@ -60,8 +61,16 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     FilesystemExternalCheckCommand,
     InstallerPostInstallCommand,
     L10nAddCommand,
+    L10nExtractCommand,
+    L10nFormatCommand,
+    L10nReimportCommand,
     L10nRemoveCommand,
+    L10nReplaceCommand,
     L10nTaskcreateCommand,
+    L10nUpdateCommand,
+    L10nUpgradeClientSpecificCommand,
+    LanguageDisableCommand,
+    LanguageEnableCommand,
     LogCommand,
     LogLoginCommand,
     LogPhpCommand,
@@ -154,7 +163,8 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     WorkerRunCommand,
     WorkflowCloneCommand,
     WorkflowListCommand,
-    WorkflowStepCommand};
+    WorkflowStepCommand
+};
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
@@ -172,6 +182,8 @@ $commands = [
     new DatabaseQueryCommand(),
     new FilesystemExternalCheckCommand(),
     new InstallerPostInstallCommand(),
+    new LanguageDisableCommand(),
+    new LanguageEnableCommand(),
     new LogCommand(),
     new LogPhpCommand(),
     new LogWorkerCommand(),
@@ -179,8 +191,14 @@ $commands = [
     new LogPhpCommand(),
     new LogWorkerCommand(),
     new L10nAddCommand(),
+    new L10nExtractCommand(),
+    new L10nFormatCommand(),
     new L10nRemoveCommand(),
+    new L10nReplaceCommand(),
+    new L10nReimportCommand(),
     new L10nTaskcreateCommand(),
+    new L10nUpdateCommand(),
+    new L10nUpgradeClientSpecificCommand(),
     new MaintenanceAnnounceCommand(),
     new MaintenanceNotifyCommand(),
     new MaintenanceCommand(),
@@ -297,7 +315,7 @@ if (file_exists('.git')) {
     $commands[] = new DevelopmentEcodeCommand();
     $commands[] = new DevelopmentTriggerworkflowCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
-    $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
+    $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixT5MemoryCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixArayaCommand();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();

@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
- * XLF Fileparser Add On to parse Tmgr (OpenTM2) XLF specific stuff
+ * XLF Fileparser Add On to parse Tmgr (T5Memory) XLF specific stuff
  */
 class editor_Models_Export_FileParser_Xlf_Namespaces_Tmgr extends editor_Models_Export_FileParser_Xlf_Namespaces_Abstract
 {

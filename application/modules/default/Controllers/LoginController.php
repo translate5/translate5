@@ -46,8 +46,21 @@ use MittagQI\Translate5\Task\Unlock\TaskUnlockService;
 use ZfExtended_Authentication as Auth;
 
 /**
- * Klasse der Nutzermethoden
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * These localizations appear in the zend-form and must be included in the default-module as well ...
+ * $translate->_('Benutzername');
+ * $translate->_('Bitte geben Sie ein Passwort an!');
+ * $translate->_('Bitte geben Sie einen Benutzernamen an!');
+ * $translate->_('Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.');
+ * $translate->_('Das Passwort ist zu kurz!');
+ * $translate->_('Der Benutzername enthält Zeichen, die nicht verwendet werden dürfen!');
+ * $translate->_('Der Benutzername ist zu kurz!');
+ * $translate->_('Einloggen');
+ * $translate->_('Login');
+ * $translate->_('Passwort');
  */
+
 class LoginController extends ZfExtended_Controllers_Login
 {
     public function init()

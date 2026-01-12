@@ -330,7 +330,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     {
         // FIXME This code is disabled, because:
         //  - the mid is not unique (due multiple files in the XLF) this code is buggy
-        //  - the tmgr:matchratio should only be exported for OpenTM2 XLF and not in general
+        //  - the tmgr:matchratio should only be exported for T5Memory XLF and not in general
         //  - the preg_match is leading to above problems, it would be better to use the XMLParser here to,
         //    and paste the new attributes on the parent trans-unit to one <lekSegmentPlaceholder>
         //

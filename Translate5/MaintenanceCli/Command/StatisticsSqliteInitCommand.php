@@ -31,6 +31,7 @@ namespace Translate5\MaintenanceCli\Command;
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\SQLite;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Registry;
 
@@ -47,7 +48,14 @@ class StatisticsSqliteInitCommand extends Translate5AbstractCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Create SQLite DB/tables for statistics aggregation (if missing).');
+            ->setHelp('Create SQLite DB/tables for statistics aggregation (if missing).')
+            ->addOption(
+                'aggregate',
+                null,
+                InputOption::VALUE_NONE,
+                'Display raw output (no table formatting)'
+            );
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -68,8 +76,14 @@ class StatisticsSqliteInitCommand extends Translate5AbstractCommand
             $dbFileDir = dirname($dbFileName);
             is_dir($dbFileDir) || mkdir($dbFileDir, recursive: true);
             touch($dbFileName);
+            if (! is_file($dbFileName)) {
+                $this->io->error('Create file FAILED: ' . $dbFileName);
+
+                return self::FAILURE;
+            }
             $this->io->writeln('Created writeable SQLite DB File: ' . $dbFileName);
         }
+
         chmod($dbFileName, 0666);
 
         $db = SQLite::create();
@@ -123,8 +137,40 @@ PRIMARY KEY (taskGuid,segmentId,workflowStepName)
             }
         }
 
+        if ($this->input->getOption('aggregate')) {
+            $msg = '';
+            if ($config->resources->db->statistics->enabled !== 1) {
+                $msg = 'resources.db.statistics.enabled is 0';
+            } elseif (strtolower((string) $config->resources->db->statistics->engine) !== 'sqlite') {
+                $msg = 'default statistics engine is not sqlite';
+            } else {
+                $row = $db->oneAssoc('SELECT COUNT(*) AS total FROM ' . SegmentHistoryAggregation::TABLE_NAME_LEV);
+                if ($row['total'] > 0) {
+                    $msg = 'data already exists';
+                }
+            }
+            if (! empty($msg)) {
+                $this->io->info('Statistics data aggregation skipped: ' . $msg);
+
+                return self::SUCCESS;
+            }
+            foreach (['statistics:levenshtein', 'statistics:aggregate'] as $command) {
+                passthru('./translate5.sh ' . $command . " -s 2000-01-01 --no-interaction", $resultCode);
+
+                if ($resultCode === 0) {
+                    $this->io->success('Finished successfully "' . $command . '"');
+                } else {
+                    $this->io->warning('Finished step "' . $command . '" with result code ' . $resultCode);
+
+                    return self::FAILURE; // or SUCCESS ?
+                }
+            }
+
+            return self::SUCCESS;
+        }
+
         $msg = '';
-        if ($config->resources?->db?->statistics?->enabled !== '1') {
+        if ($config->resources?->db?->statistics?->enabled !== 1) {
             $msg .= ' To enable statistics aggregation, add the following line into installation.ini:' . "\n" .
                 'resources.db.statistics.enabled = 1' . "\n\n";
         }

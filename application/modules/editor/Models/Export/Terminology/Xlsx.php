@@ -35,6 +35,16 @@ use WilsonGlasser\Spout\Writer\Common\Helper\CellHelper;
 use WilsonGlasser\Spout\Writer\XLSX\Writer;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Gesamtzahl der Termeinträge: %s');
+ * $translate->_('Beginn des Exports...');
+ * $translate->_('Fortschritt: %s');
+ * $translate->_('Vorbereiten des Downloads...');
+ * $translate->_('Erledigt in %s Sek.');
+ */
+
+/**
  * exports term data stored in translate5 to valid XLSX files
  */
 class editor_Models_Export_Terminology_Xlsx

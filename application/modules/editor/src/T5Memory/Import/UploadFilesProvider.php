@@ -66,7 +66,7 @@ class UploadFilesProvider
 
         $zip = new ZipArchive();
         if (! $zip->open($fileInfo['tmp_name'])) {
-            $this->logger->error('E1596', 'OpenTM2: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
+            $this->logger->error('E1596', 'T5Memory: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
 
             return yield from [];
         }
@@ -74,7 +74,7 @@ class UploadFilesProvider
         $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
 
         if (! $zip->extractTo($newPath)) {
-            $this->logger->error('E1597', 'OpenTM2: Content from zip file could not be extracted.');
+            $this->logger->error('E1597', 'T5Memory: Content from zip file could not be extracted.');
             $zip->close();
 
             return yield from [];

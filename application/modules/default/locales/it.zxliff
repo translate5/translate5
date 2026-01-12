@@ -1,0 +1,199 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="it" datatype="php">
+        <body>
+            <trans-unit id="LSBEaWUgRGF0ZW4gc2luZCBudXIgaW4gZGVyIEhUTUwtQW5zaWNodCBkZXIgRS1NYWlsIHZlcmbDvGdiYXIhIC0=">
+                <source>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</source>
+                <target>- I dati sono disponibili solo nella visualizzazione HTML dell’e-mail! -</target>
+            </trans-unit>
+            <trans-unit id="PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgo8Yj5RdWVsbHNwcmFjaGU6PC9iPiB7c291cmNlTGFuZ3VhZ2VUcmFuc2xhdGVkfTxiciAvPgo8Yj5aaWVsc3ByYWNoZTo8L2I+IHt0YXJnZXRMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+CntyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtOjwvYj4ge2RlYWRsaW5lRGF0ZX08YnIgLz4KPGI+V29ydGFuemFobDo8L2I+IHt3b3JkQ291bnR9PGJyIC8+">
+                <source><b>Aufgabe:</b> {task.taskName}<br />
+<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+<b>Zielsprache:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
+<b>Wortanzahl:</b> {wordCount}<br /></source>
+                <target><b>Incarico:</b> {task.taskName}<br />
+<b>Lingua di origine:</b> {sourceLanguageTranslated}<br />
+<b>Lingua di destinazione:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Data di consegna:</b> {deadlineDate}<br />
+<b>Numero di parole:</b> {wordCount}<br /></target>
+            </trans-unit>
+            <trans-unit id="PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE=">
+                <source><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+                <target><br/>
+<br/>Grazie mille e cordiali saluti,
+<br/>il team di gestione dei progetti di
+<br/>{companyName}
+<br/>
+<br/>Questa e-mail è stata generata automaticamente. Non rispondere a questa e-mail!</target>
+            </trans-unit>
+            <trans-unit id="QW5tZWxkdW5nIG1pdCBTaW5nbGUgU2lnbiBPbiBzY2hsdWcgZmVobCwgYml0dGUgdmVyc3VjaGVuIFNpZSBlcyBlcm5ldXQu">
+                <source>Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.</source>
+                <target>Login con single sign-on non riuscito. Riprovare.</target>
+            </trans-unit>
+            <trans-unit id="QW53ZW5kdW5nc2ZlaGxlcg==">
+                <source>Anwendungsfehler</source>
+                <target>Errore di utilizzo</target>
+            </trans-unit>
+            <trans-unit id="QmVudXR6ZXJuYW1l">
+                <source>Benutzername</source>
+                <target>Nome utente</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgZ2ViZW4gU2llIGVpbiBQYXNzd29ydCBhbiE=">
+                <source>Bitte geben Sie ein Passwort an!</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgZ2ViZW4gU2llIGVpbmVuIEJlbnV0emVybmFtZW4gYW4h">
+                <source>Bitte geben Sie einen Benutzernamen an!</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgbGFkZW4gU2llIGRpZSBMb2dpbi1TZWl0ZSBuZXUsIGdlYmVuIFNpZSBpaHIgUGFzc3dvcnQgZXJuZXV0IGVpbiB1bmQgc2VuZGVuIFNpZSBkYXMgRm9ybXVsYXIgZXJuZXV0IGFiIC0gSWhyIEhhc2gtV2VydCB6dXIgw5xiZXJwcsO8ZnVuZyB2b24gQ3Jvc3MtU2l0ZS1Ta3JpcHRpbmctQXR0YWNrZW4gd2FyIG5pY2h0IGtvcnJla3Qu">
+                <source>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGlzdCB6dSBrdXJ6IQ==">
+                <source>Das Passwort ist zu kurz!</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="RGVyIEJlbnV0emVybmFtZSBlbnRow6RsdCBaZWljaGVuLCBkaWUgbmljaHQgdmVyd2VuZGV0IHdlcmRlbiBkw7xyZmVuIQ==">
+                <source>Der Benutzername enthält Zeichen, die nicht verwendet werden dürfen!</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="RGVyIEJlbnV0emVybmFtZSBpc3QgenUga3VyeiE=">
+                <source>Der Benutzername ist zu kurz!</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="RWlubG9nZ2Vu">
+                <source>Einloggen</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA==">
+                <source>Ihr Webbrowser wird nicht mehr unterstützt</source>
+                <target>Questo browser non è più supportato</target>
+            </trans-unit>
+            <trans-unit id="TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg==">
+                <source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source>
+                <target>Purtroppo translate5 non supporta più Microsoft Internet Explorer. Utilizzare un altro browser come ad es. Google Chrome, Mozilla FireFox, Apple Safari o Microsoft Edge.</target>
+            </trans-unit>
+            <trans-unit id="TG9naW4=">
+                <source>Login</source>
+                <target>Login</target>
+            </trans-unit>
+            <trans-unit id="UGFzc3dvcnQ=">
+                <source>Passwort</source>
+                <target>Password</target>
+            </trans-unit>
+            <trans-unit id="UmVkaXJlY3QgdG8gbG9naW4uLi4=">
+                <source>Redirect to login...</source>
+                <target>Reindirizzamento al login…</target>
+            </trans-unit>
+            <trans-unit id="U2VociBnZWVocnRlKHIp">
+                <source>Sehr geehrte(r)</source>
+                <target>Gentile</target>
+            </trans-unit>
+            <trans-unit id="U2VociBnZWVocnRlIEZyYXU=">
+                <source>Sehr geehrte Frau</source>
+                <target>Gentile signora</target>
+            </trans-unit>
+            <trans-unit id="U2VociBnZWVocnRlciBIZXJy">
+                <source>Sehr geehrter Herr</source>
+                <target>Gentile signor</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkNsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::CliYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OkNsaVlvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::CliYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OkN1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnQ=">
+                <source>T5::CustomerYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OkN1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmw=">
+                <source>T5::CustomerYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OkVkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::EditorYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OkVkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::EditorYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6Okluc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudA==">
+                <source>T5::InstantTranslateYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6Okluc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZVVybA==">
+                <source>T5::InstantTranslateYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OkxpbmtDb25zb3J0aXVt">
+                <source>T5::LinkConsortium</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnQ=">
+                <source>T5::PreferencesYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmw=">
+                <source>T5::PreferencesYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::ProjectOverviewYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::ProjectOverviewYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlJlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::ResourcesYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlJlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::ResourcesYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::TaskOverviewYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::TaskOverviewYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudA==">
+                <source>T5::TermPortalYoutubeVideoGuideDescriptionContent</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZVVybA==">
+                <source>T5::TermPortalYoutubeVideoGuideUrl</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4=">
+                <source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source>
+                <target>I nostri amministratori verranno informati automaticamente dell’errore. In caso di ulteriori domande o dubbi, rivolgersi al servizio di supporto.</target>
+            </trans-unit>
+            <trans-unit id="V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch">
+                <source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source>
+                <target>Ci scusiamo per il disturbo!</target>
+            </trans-unit>
+            <trans-unit id="e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg==">
+                <source>{salutation} {surName},<br/>
+<br/></source>
+                <target>{salutation} {surName},<br/>
+<br/></target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

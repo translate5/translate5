@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Test\Fixtures;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LanguageResourceLanguage;
-use editor_Services_OpenTM2_Service;
+use editor_Services_T5Memory_Service;
 use MittagQI\Translate5\Repository\LanguageRepository;
 
 /**
@@ -60,10 +60,10 @@ class LanguageResourceFixtures
         $className = explode('\\', static::class);
         $className = array_pop($className);
         $languageResource->setName($className . '-' . $sourceLangRfc . '-' . $targetLangRfc . '-' . (new \DateTime())->format('Y-m-d H:i:s'));
-        $languageResource->setResourceId('editor_Services_OpenTM2_1');
+        $languageResource->setResourceId('editor_Services_T5Memory_1');
         $languageResource->setResourceType('tm');
-        $languageResource->setServiceType('editor_Services_OpenTM2');
-        $languageResource->setServiceName(editor_Services_OpenTM2_Service::NAME);
+        $languageResource->setServiceType('editor_Services_T5Memory');
+        $languageResource->setServiceName(editor_Services_T5Memory_Service::NAME);
         $languageResource->setLangResUuid(\ZfExtended_Utils::uuid());
 
         $languageResource->save();

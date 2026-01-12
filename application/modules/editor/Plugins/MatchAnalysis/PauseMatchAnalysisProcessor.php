@@ -59,7 +59,7 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
         $languageResourceIds = array_column(
             (new LanguageResource())->loadByAssociatedTaskGuidListAndServiceTypes(
                 [$task->getTaskGuid()],
-                [Manager::SERVICE_OPENTM2]
+                [Manager::SERVICE_T5_MEMORY]
             ),
             'id'
         );

@@ -2,5 +2,12 @@
 /**
  * This is only an "alias-file" of the original header-consortium-logos.phtml
  */
-include(APPLICATION_PATH.'/modules/default/views/scripts/fragments/header-consortium-logos.phtml');
-?>
+
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * Since the localization is organized in modules we need to manually include the string used in the included file from the other module ...
+ * $translate->_('T5::LinkConsortium');
+ */
+
+include(APPLICATION_PATH . '/modules/default/views/scripts/fragments/header-consortium-logos.phtml');

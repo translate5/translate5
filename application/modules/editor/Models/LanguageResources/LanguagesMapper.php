@@ -70,6 +70,9 @@ class editor_Models_LanguageResources_LanguagesMapper
             $lowerCode = strtolower($code);
             if (isset($this->languageCollection[$lowerCode])) {
                 $lang = $this->languageCollection[$lowerCode];
+                if (! empty($lang['hidden'])) {
+                    continue;
+                }
                 $name = $this->translate->_($lang['langName']);
                 $result[$name] = [
                     'id' => $lang['id'],

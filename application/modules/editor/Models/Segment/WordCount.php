@@ -93,7 +93,7 @@ class editor_Models_Segment_WordCount
 
     /**
      * Dummy connector used to get the qeury string
-     * @var editor_Services_OpenTM2_Connector
+     * @var editor_Services_T5Memory_Connector
      */
     protected $connector;
 
@@ -111,7 +111,7 @@ class editor_Models_Segment_WordCount
     {
         $this->rfcLanguage = $rfcLanguage;
         $this->utilityBroker = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
-        $this->connector = ZfExtended_Factory::get(editor_Services_OpenTM2_Connector::class);
+        $this->connector = ZfExtended_Factory::get(editor_Services_T5Memory_Connector::class);
         $config = Zend_Registry::get('config');
         $this->regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
         $this->contentProtector = ContentProtector::create($this->utilityBroker->whitespace);

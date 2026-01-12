@@ -674,7 +674,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if (!value || value.length < 1) {
             return '';
         }
-        meta.tdAttr = 'data-qtip="' + this.getCustomersNames(value, true, true).join('</br>') + '"';
+        meta.tdAttr = 'data-qtip="' + this.getCustomersNames(value, true, true).join('<br/>') + '"';
+
         return value.length;
     },
 
@@ -685,6 +686,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if (!value || value.length < 1) {
             return '';
         }
+
         return this.getCustomersNames(value).join(',');
     },
 

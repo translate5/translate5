@@ -1,0 +1,279 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="en" datatype="php">
+        <body>
+            <trans-unit id="QW5hbHlzZQ==">
+                <source>Analyse</source>
+                <target>Analysis</target>
+            </trans-unit>
+            <trans-unit id="QW5hbHlzZSAmYW1wOyBWb3LDvGJlcnNldHp1bmdlbiBzdGFydGVu">
+                <source>Analyse &amp; Vorübersetzungen starten</source>
+                <target>Start analysis &amp; pre-translation</target>
+            </trans-unit>
+            <trans-unit id="QW5hbHlzZSBTdGFydGVu">
+                <source>Analyse Starten</source>
+                <target>Start analysis</target>
+            </trans-unit>
+            <trans-unit id="QW5hbHlzZSBsw6R1ZnQ=">
+                <source>Analyse läuft</source>
+                <target>Analysis in progress</target>
+            </trans-unit>
+            <trans-unit id="QXVzIGltcG9ydGllcnRlciBEYXRlaQ==">
+                <source>Aus importierter Datei</source>
+                <target>From imported file</target>
+            </trans-unit>
+            <trans-unit id="QmFzaWVydCBhdWY=">
+                <source>Basiert auf</source>
+                <target>Based on</target>
+            </trans-unit>
+            <trans-unit id="QmVlbmRlbg==">
+                <source>Beenden</source>
+                <target>Finish</target>
+            </trans-unit>
+            <trans-unit id="QmVpIGRlciBBbmFseXNlIHNpbmQgezB9IEZlaGxlciBpbiBkZXIgS29tbXVuaWthdGlvbiBtaXQgZGVuIFNwcmFjaHJlc3NvdXJjZW4gYXVmZ2V0cmV0ZW4uIDxiciAvPkRpZSBBbmFseXNlIGthbm4gZGFoZXIgdW52b2xsc3TDpG5kaWcgc2Vpbi4gQml0dGUgcHLDvGZlbiBTaWUgZGllIEVyZWlnbmlzc2UgZGVyIEF1ZmdhYmUgdW5kIGRhcyBTeXN0ZW0gTG9nIHVuZCBlcnN0ZWxsZW4gZ2dmLiBkaWUgQW5hbHlzZSBlcm5ldXQu">
+                <source>Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.</source>
+                <target>During the analysis, {0} error(s) occurred while communicating with the language resources. <br />As a result, the analysis may be incomplete. Please check the task events and system log, and re-run the analysis if necessary.</target>
+            </trans-unit>
+            <trans-unit id="QmVyZWljaCBlZGl0aWVyZW4=">
+                <source>Bereich editieren</source>
+                <target>Edit range</target>
+            </trans-unit>
+            <trans-unit id="QmVyZWljaGUgbMO2c2NoZW4=">
+                <source>Bereiche löschen</source>
+                <target>Delete range</target>
+            </trans-unit>
+            <trans-unit id="QmV0cmFn">
+                <source>Betrag</source>
+                <target>Amount</target>
+            </trans-unit>
+            <trans-unit id="Qmlz">
+                <source>Bis</source>
+                <target>To</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgenUgbMO2c2NoZW5kZW4gQmVyZWljaCBhdXN3w6RobGVu">
+                <source>Bitte zu löschenden Bereich auswählen</source>
+                <target>Select ranges to be deleted</target>
+            </trans-unit>
+            <trans-unit id="RGF0dW0gZGVyIEFuYWx5c2U=">
+                <source>Datum der Analyse</source>
+                <target>Date of the analysis</target>
+            </trans-unit>
+            <trans-unit id="RGVyIEVuZHdlcnQgbXVzcyBncsO2w59lciBvZGVyIGdsZWljaCBkZW0gU3RhcnR3ZXJ0IHNlaW4h">
+                <source>Der Endwert muss größer oder gleich dem Startwert sein!</source>
+                <target>End value must be bigger or equal to start value!</target>
+            </trans-unit>
+            <trans-unit id="RGVyIFN0YXJ0d2VydCBtdXNzIGtsZWluZXIgb2RlciBnbGVpY2ggZGVtIEVuZHdlcnQgc2VpbiE=">
+                <source>Der Startwert muss kleiner oder gleich dem Endwert sein!</source>
+                <target>Start value must be lesser or equal to end value!</target>
+            </trans-unit>
+            <trans-unit id="RGllIEFuYWx5c2UgbXVzcyBlcm5ldXQgZHVyY2hnZWbDvGhydCB3ZXJkZW4sIGRhbWl0IGRpZSBNYXRjaC1SYXRlLUFiesO8Z2UgZ2VzcGVpY2hlcnQgd2VyZGVuIHVuZCB3aXJrc2FtIHdlcmRlbg==">
+                <source>Die Analyse muss erneut durchgeführt werden, damit die Match-Rate-Abzüge gespeichert werden und wirksam werden</source>
+                <target>Analysis should be re-run for penalties to be saved and take effect</target>
+            </trans-unit>
+            <trans-unit id="RGllIE1hdGNoLUFuYWx5c2UgdW5kIGRpZSBWb3LDvGJlcnNldHp1bmcgc2luZCBhYmdlc2NobG9zc2VuLg==">
+                <source>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</source>
+                <target>The Match analysis and pre-translation have been completed.</target>
+            </trans-unit>
+            <trans-unit id="RGllIFZvcsO8YmVyc2V0enVuZyBsw7ZzdCBhdWNoIGVpbmUgbmV1ZSBBbmFseXNlIGF1cw==">
+                <source>Die Vorübersetzung löst auch eine neue Analyse aus</source>
+                <target>A pre-translation also triggers a new analysis</target>
+            </trans-unit>
+            <trans-unit id="RGllc2VyIFdlcnQgw7xiZXJsYXBwdCBkZW4gQmVyZWljaA==">
+                <source>Dieser Wert überlappt den Bereich</source>
+                <target>This value overlaps the range</target>
+            </trans-unit>
+            <trans-unit id="RW5kZ8O8bHRpZ2VyIEJldHJhZw==">
+                <source>Endgültiger Betrag</source>
+                <target>Final amount</target>
+            </trans-unit>
+            <trans-unit id="RXMgd3VyZGUgYmlzaGVyIGtlaW5lIEFuYWx5c2UgZXJzdGVsbHQuIFN0YXJ0ZW4gU2llIGVpbmUgQW5hbHlzZSBpbSBUYWIg4oCcU3ByYWNocmVzc291cmNlbiB6dXdlaXNlbuKAnA==">
+                <source>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</source>
+                <target>No analysis has been created yet. Please start an analysis in the “Language resources” tab</target>
+            </trans-unit>
+            <trans-unit id="RXhwb3J0IFRyYWRvcy1saWtlIFhNTA==">
+                <source>Export Trados-like XML</source>
+                <target>Export in Trados-style XML</target>
+            </trans-unit>
+            <trans-unit id="RXhwb3J0IGFscyBFeGNlbA==">
+                <source>Export als Excel</source>
+                <target>Export as Excel</target>
+            </trans-unit>
+            <trans-unit id="R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu">
+                <source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source>
+                <target>Locked 100% matches are not part of the analysis.</target>
+            </trans-unit>
+            <trans-unit id="SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ=">
+                <source>Interne Fuzzy verwendet</source>
+                <target>Internal fuzzy matches used</target>
+            </trans-unit>
+            <trans-unit id="S2VpbiBQcmVpcyBmw7xyIGRpZSBLb21iaW5hdGlvbiB2b24gQXVzZ2FuZ3MtIHVuZCBaaWVsc3ByYWNoZSBmZXN0Z2VsZWd0">
+                <source>Kein Preis für die Kombination von Ausgangs- und Zielsprache festgelegt</source>
+                <target>No pricing set for this language pair</target>
+            </trans-unit>
+            <trans-unit id="S2VpbmUgVHJlZmZlcg==">
+                <source>Keine Treffer</source>
+                <target>No matches</target>
+            </trans-unit>
+            <trans-unit id="S2xvbmVu">
+                <source>Klonen</source>
+                <target>Clone</target>
+            </trans-unit>
+            <trans-unit id="S2xvbmVuIGRlciBQcmVpc2UgZsO8cg==">
+                <source>Klonen der Preise für</source>
+                <target>Clone prices for</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVuc3RhbmRhcmQ=">
+                <source>Kundenstandard</source>
+                <target>Client default</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2gtQW5hbHlzZQ==">
+                <source>Match-Analyse</source>
+                <target>Match analysis</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2gtQW5hbHlzZSB1bmQgVm9yw7xiZXJzZXR6dW5nZW4gd2VyZGVuIGF1c2dlZsO8aHJ0Lg==">
+                <source>Match-Analyse und Vorübersetzungen werden ausgeführt.</source>
+                <target>Match analysis and pre-translations in progress.</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2gtQmVyZWljaGUgJmFtcDsgUHJlaXNl">
+                <source>Match-Bereiche &amp; Preise</source>
+                <target>Match ranges &amp; pricing</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2gtQmVyZWljaGUgJmFtcDsgUHJlaXNlIGluIFZvcmxhZ2U=">
+                <source>Match-Bereiche &amp; Preise in Vorlage</source>
+                <target>Match ranges &amp; prices in preset</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2gtQmVyZWljaGUgJmFtcDsgUHJlaXNlIGtvbmZpZ3VyaWVyZW4=">
+                <source>Match-Bereiche &amp; Preise konfigurieren</source>
+                <target>Configure match ranges &amp; prices</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2gtUmF0ZQ==">
+                <source>Match-Rate</source>
+                <target>Match rate</target>
+            </trans-unit>
+            <trans-unit id="TmFjaCBQcmVpcyBvZGVyIFNwcmFjaGUgc3VjaGVu">
+                <source>Nach Preis oder Sprache suchen</source>
+                <target>Search for price or language</target>
+            </trans-unit>
+            <trans-unit id="TmV1IEFubGVnZW4gZGVyIFByZWlzZSBmw7xy">
+                <source>Neu Anlegen der Preise für</source>
+                <target>Create prices for</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZSBWb3JsYWdlIGVyc3RlbGxlbg==">
+                <source>Neue Vorlage erstellen</source>
+                <target>Create new preset</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZW4gQmVyZWljaCBhbmxlZ2Vu">
+                <source>Neuen Bereich anlegen</source>
+                <target>Create new range</target>
+            </trans-unit>
+            <trans-unit id="UHJlaXNhbnBhc3N1bmc=">
+                <source>Preisanpassung</source>
+                <target>Adjust price by</target>
+            </trans-unit>
+            <trans-unit id="UHJlaXNlIGbDvHIgbmV1ZSBTcHJhY2hrb21iaW5hdGlvbmVuIGFubGVnZW4=">
+                <source>Preise für neue Sprachkombinationen anlegen</source>
+                <target>Create prices for new language pair</target>
+            </trans-unit>
+            <trans-unit id="UHJlaXN2b3JsYWdl">
+                <source>Preisvorlage</source>
+                <target>Pricing preset</target>
+            </trans-unit>
+            <trans-unit id="UHJpY2Vz">
+                <source>Prices</source>
+                <target>Prices</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGxzcHJhY2hlIGF1c3fDpGhsZW4=">
+                <source>Quellsprache auswählen</source>
+                <target>Select source languages</target>
+            </trans-unit>
+            <trans-unit id="U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg==">
+                <source>Sprachressourcen zuweisen</source>
+                <target>Associate language resources</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmQ=">
+                <source>Standard</source>
+                <target>Default</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGFubGFnZSBhdXNnZXfDpGhsdGUgVm9ybGFnZSwgZmFsbHMgbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu">
+                <source>Standardmäßig bei der Projektanlage ausgewählte Vorlage, falls nicht auf Kundenebene überschrieben</source>
+                <target>Pricing preset selected by default on project creation if not overwritten on client-level</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmRtw6TDn2lnIGbDvHIgZGllc2VuIEt1bmRlbiBiZWkgZGVyIFByb2pla3RhbmxhZ2UgYXVzZ2V3w6RobHRlIFZvcmxhZ2U=">
+                <source>Standardmäßig für diesen Kunden bei der Projektanlage ausgewählte Vorlage</source>
+                <target>Pricing preset selected by default on project creation for this client</target>
+            </trans-unit>
+            <trans-unit id="U3VtbWU6">
+                <source>Summe:</source>
+                <target>Sum:</target>
+            </trans-unit>
+            <trans-unit id="VE0gVm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl">
+                <source>TM Vorübersetzungs Match-Rate</source>
+                <target>TM pre-translation match rate</target>
+            </trans-unit>
+            <trans-unit id="VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu">
+                <source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source>
+                <target>Terminology matches are prioritized in pre-translation</target>
+            </trans-unit>
+            <trans-unit id="VW1iZW5lbm5lbg==">
+                <source>Umbenennen</source>
+                <target>Rename</target>
+            </trans-unit>
+            <trans-unit id="VW1mYXNzdCBlaW5lIFFTIHVuZCBUZXJtaW5vbG9naWUgUHLDvGZ1bmc=">
+                <source>Umfasst eine QS und Terminologie Prüfung</source>
+                <target>Includes a QA and terminology check</target>
+            </trans-unit>
+            <trans-unit id="Vm9u">
+                <source>Von</source>
+                <target>From</target>
+            </trans-unit>
+            <trans-unit id="Vm9ybGFnZW5uYW1l">
+                <source>Vorlagenname</source>
+                <target>Preset name</target>
+            </trans-unit>
+            <trans-unit id="Vm9yw7xiZXJzZXR6ZW4gKE1UKQ==">
+                <source>Vorübersetzen (MT)</source>
+                <target>Pre-translate (MT)</target>
+            </trans-unit>
+            <trans-unit id="Vm9yw7xiZXJzZXR6ZW4gKFRNICZhbXA7IFRlcm1lKQ==">
+                <source>Vorübersetzen (TM &amp; Terme)</source>
+                <target>Pre-translate (TM &amp; terminology)</target>
+            </trans-unit>
+            <trans-unit id="Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0">
+                <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
+                <target>Use TM matches at or above the selected threshold for pre-translation</target>
+            </trans-unit>
+            <trans-unit id="V2VubiBkaWVzZSBPcHRpb24gYWt0aXZpZXJ0IGlzdCwgd2VyZGVuIGFsbGUgVHJlZmZlciwgZGllIG5pY2h0IGF1cyBkZW0gVE0gdm9yw7xiZXJzZXR6dCBzaW5kLCB2b24gZGVyIE1UIHZvcsO8YmVyc2V0enQu">
+                <source>Wenn diese Option aktiviert ist, werden alle Treffer, die nicht aus dem TM vorübersetzt sind, von der MT vorübersetzt.</source>
+                <target>If this option is activated, the segments not pre-translated with the TM will be pre-translated with the MT.</target>
+            </trans-unit>
+            <trans-unit id="V2llZGVyaG9sdW5nZW46">
+                <source>Wiederholungen:</source>
+                <target>Repetitions:</target>
+            </trans-unit>
+            <trans-unit id="V29ydGJhc2llcnQ=">
+                <source>Wortbasiert</source>
+                <target>word-based</target>
+            </trans-unit>
+            <trans-unit id="V8OkaHJ1bmc=">
+                <source>Währung</source>
+                <target>Currency</target>
+            </trans-unit>
+            <trans-unit id="WmVpY2hlbmJhc2llcnQ=">
+                <source>Zeichenbasiert</source>
+                <target>character-based</target>
+            </trans-unit>
+            <trans-unit id="WmllbHNwcmFjaGUgYXVzd8OkaGxlbg==">
+                <source>Zielsprache auswählen</source>
+                <target>Select target language</target>
+            </trans-unit>
+            <trans-unit id="WnVtIEJlYXJiZWl0ZW4gZGVyIE1hdGNoLUJlcmVpY2hlIGtsaWNrZW4gU2llIGF1ZiBkaWUgU3BhbHRlbsO8YmVyc2NocmlmdGVu">
+                <source>Zum Bearbeiten der Match-Bereiche klicken Sie auf die Spaltenüberschriften</source>
+                <target>Click on the column headings to edit the match ranges</target>
+            </trans-unit>
+            <trans-unit id="WsOkaGxlIGludGVybmUgRnV6enk=">
+                <source>Zähle interne Fuzzy</source>
+                <target>With internal fuzzy matches</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

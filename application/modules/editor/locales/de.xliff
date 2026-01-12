@@ -4,8 +4,8 @@
     <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
     <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
         <body>
-            <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='>
-                <source>{LinkConsortium}</source>
+            <trans-unit id='VDU6OkxpbmtDb25zb3J0aXVt'>
+                <source>T5::LinkConsortium</source>
                 <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
             </trans-unit>
             <trans-unit id='UnVzc2lzY2g='>
@@ -202,19 +202,19 @@
             </trans-unit>
             <trans-unit id='UE0gbGVrdG9yaWVydA=='>
                 <source>PM lektoriert</source>
-                <target>PM lektoriert</target>
+                <target>PM-lektoriert</target>
             </trans-unit>
             <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='>
                 <source>PM lektoriert, auto</source>
-                <target>PM lektoriert, auto</target>
+                <target>PM-lektoriert, auto</target>
             </trans-unit>
             <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'>
                 <source>PM lektoriert, unverändert</source>
-                <target>PM lektoriert, unverändert</target>
+                <target>PM-lektoriert, unverändert</target>
             </trans-unit>
             <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'>
                 <source>PM lektoriert, unverändert, auto</source>
-                <target>PM lektoriert, unverändert, auto</target>
+                <target>PM-lektoriert, unverändert, auto</target>
             </trans-unit>
             <trans-unit id='Vm9yw7xiZXJzZXR6dA=='>
                 <source>Vorübersetzt</source>
@@ -2860,9 +2860,9 @@
                     </b>
                 </target>
             </trans-unit>
-            <trans-unit id='RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyAnezB9Jw=='>
-                <source>Durch das System gesperrt mit dem Status '{0}'</source>
-                <target>Durch das System gesperrt mit dem Status '{0}'</target>
+            <trans-unit id='RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyDigJx7MH3igJ0='>
+                <source>Durch das System gesperrt mit dem Status “{0}”</source>
+                <target>Durch das System gesperrt mit dem Status “{0}”</target>
             </trans-unit>
             <trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0'>
                 <source>Die Aufgabe ist durch einen Benutzer gesperrt</source>
@@ -3513,24 +3513,16 @@
                     <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.
                 </target>
             </trans-unit>
-            <trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgRWRnZSBhYiBWZXJzaW9uIDgwPC9saT4gICAgPC91bD4gICAgUHJpbnppcGllbGwga2FubiAlMSRzIGF1Y2ggbWl0IGFuZGVyZW4gQnJvd3Nlcm4gYnp3LiDDpGx0ZXJlbiBWZXJzaW9uZW4gZnVua3Rpb25pZXJlbi4gICAgIEhpZXIga2FubiBlcyBhYmVyIHp1IHVudm9yaGVyZ2VzZWhlbmVuIEZlaGxlcm4ga29tbWVuLiAgICAgUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u'>
-                <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.
-                    <br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    
+            <trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiB7YXBwfSBuaWNodCBvZmZpemllbGwgdW50ZXJzdMO8dHp0LjxiciAvPkRpZSBBbndlbmR1bmcgd3VyZGUgaGluc2ljaHRsaWNoIEZ1bmt0aW9uYWxpdMOkdCB1bmQgUGVyZm9ybWFuY2UgaW4gZGVuIGZvbGdlbmRlbiBCcm93c2VyIG9mZml6aWVsbCBnZXRlc3RldDogPHVsPjxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPjxsaT5Nb3ppbGxhIEZpcmVmb3ggYWIgVmVyc2lvbiA0NDwvbGk+PGxpPk1pY3Jvc29mdCBFZGdlIGFiIFZlcnNpb24gODA8L2xpPjwvdWw+UHJpbnppcGllbGwga2FubiB7YXBwfSBhdWNoIG1pdCBhbmRlcmVuIEJyb3dzZXJuIGJ6dy4gw6RsdGVyZW4gVmVyc2lvbmVuIGZ1bmt0aW9uaWVyZW4uIEhpZXIga2FubiBlcyBhYmVyIHp1IHVudm9yaGVyZ2VzZWhlbmVuIEZlaGxlcm4ga29tbWVuLiBQb3RlbnRpZWxsIGvDtm5uZW4gYXVjaCBtYW5jaGUgRmVhdHVyZXMga29tcGxldHQgbmljaHQgZnVua3Rpb25pZXJlbi4='>
+                <source>Ihr Browser oder Ihre Browser-Version wird von {app} nicht offiziell unterstützt.<br />Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet: <ul><li>Google Chrome ab Version 48</li><li>Mozilla Firefox ab Version 44</li><li>Apple Safari ab Version 9</li><li>Microsoft Edge ab Version 80</li></ul>Prinzipiell kann {app} auch mit anderen Browsern bzw. älteren Versionen funktionieren. Hier kann es aber zu unvorhergesehenen Fehlern kommen. Potentiell können auch manche Features komplett nicht funktionieren.</source>
+                <target>Ihr Browser oder Ihre Browser-Version wird von {app} nicht offiziell unterstützt.
+                    <br />Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:
                     <ul>
                         <li>Google Chrome ab Version 48</li>
                         <li>Mozilla Firefox ab Version 44</li>
-                        <li>Apple Safari ab Version 9</li>
                         <li>Microsoft Edge ab Version 80</li>
-                    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.
-                </source>
-                <target>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.
-                    <br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    
-                    <ul>
-                        <li>Google Chrome ab Version 48</li>
-                        <li>Mozilla Firefox ab Version 44</li>
-                        <li>Apple Safari ab Version 9</li>
-                        <li>Microsoft Edge ab Version 80</li>
-                    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.
+                    </ul>
+                    Prinzipiell kann {app} auch mit anderen Browsern bzw. älteren Versionen funktionieren. Hier kann es aber zu unvorhergesehenen Fehlern kommen. Potentiell können auch manche Features komplett nicht funktionieren.
                 </target>
             </trans-unit>
             <trans-unit id='TmljaHQgdW50ZXJzdMO8dHp0ZSBCcm93c2VyLVZlcnNpb24='>
@@ -4721,40 +4713,6 @@
                 <source>Sprache</source>
                 <target>Sprache</target>
             </trans-unit>
-            <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='>
-                <source>{salutation} {surName},
-                    <br/>
-                    <br/>
-                </source>
-                <target>{salutation} {surName},
-                    <br/>
-                    <br/>
-                </target>
-            </trans-unit>
-            <trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='>
-                <source>
-                    <br/>
-                    <br/>Vielen Dank und viele Grüße,
-
-                    <br/>Ihr Projektmanagement Team
-
-                    <br/>{companyName}
-
-                    <br/>
-                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-                </source>
-                <target>
-                    <br/>
-                    <br/>Vielen Dank und viele Grüße,
-
-                    <br/>Ihr Projektmanagement Team
-
-                    <br/>{companyName}
-
-                    <br/>
-                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-                </target>
-            </trans-unit>
             <trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYge3BvcnRhbFVybH0gbmV1IGFuZ2VsZWd0IG9kZXIgSWhyIFBhc3N3b3J0IHp1csO8Y2tnZXNldHp0IHd1cmRlLiAKCklociBCZW51dHplcm5hbWU6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQp7bG9naW59Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKV2VubiBTaWUgSWhyIEtvbnRvIGvDvG5mdGlnIG51dHplbiBtw7ZjaHRlbiwgZGFubiBmb3JkZXJuIFNpZSB1bnRlciBkZXIgZm9sZ2VuZGVuCkFkcmVzc2UgZWluZSBMaW5rIGFuLCB1bSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiB6dSBrw7ZubmVuLgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e3Jlc2V0dXJsfQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'>
                 <source>{header}
 Sie erhalten diese Email, weil Ihr Konto auf {portalUrl} neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
@@ -5243,9 +5201,9 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Seg.: {siblings}</source>
                 <target>Seg.: {siblings}</target>
             </trans-unit>
-            <trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllICdBbGxlcyBFcnNldHplbicgRnVua3Rpb25hbGl0w6R0IHVtIGRpZSBiZXRyb2ZmZW5lbiBTZWdtZW50ZSBlaW56ZWxuIHp1IGZpbmRlbiB1bmQgenUgYmVhcmJlaXRlbi4='>
-                <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
-                <target>Es konnten nicht in allen gefundenen Segmente der Inhalt automatisch ersetzt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</target>
+            <trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllIOKAnEFsbGVzIEVyc2V0emVu4oCdIEZ1bmt0aW9uYWxpdMOkdCB1bSBkaWUgYmV0cm9mZmVuZW4gU2VnbWVudGUgZWluemVsbiB6dSBmaW5kZW4gdW5kIHp1IGJlYXJiZWl0ZW4u'>
+                <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
+                <target>Es konnten nicht in allen gefundenen Segmente der Inhalt automatisch ersetzt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</target>
             </trans-unit>
             <trans-unit id='T3JpZ2luYWxmb3JtYXQsIHswfQ=='>
                 <source>Originalformat, {0}</source>
@@ -5658,10 +5616,6 @@ Im Projektportal {portalLink} wurde die Aufgabe
             <trans-unit id='SW1wb3J0IGzDpHVmdA=='>
                 <source>Import läuft</source>
                 <target>Import läuft</target>
-            </trans-unit>
-            <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
-                <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
-                <target>Die angefragte OpenTM2 Instanz ist nicht erreichbar</target>
             </trans-unit>
             <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
                 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
@@ -7398,24 +7352,16 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Aufgabenmenü anzeigen</source>
                 <target>Aufgabenmenü anzeigen</target>
             </trans-unit>
-            <trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgIERpZSBBbndlbmR1bmcgd3VyZGUgaGluc2ljaHRsaWNoIEZ1bmt0aW9uYWxpdMOkdCB1bmQgUGVyZm9ybWFuY2UgaW4gZGVuIGZvbGdlbmRlbiBCcm93c2VyIG9mZml6aWVsbCBnZXRlc3RldDogICAgPHVsPiAgICAgICAgPGxpPkdvb2dsZSBDaHJvbWUgYWIgVmVyc2lvbiA0ODwvbGk+ICAgICAgICA8bGk+TW96aWxsYSBGaXJlZm94IGFiIFZlcnNpb24gNDQ8L2xpPiAgICAgICAgPGxpPkFwcGxlIFNhZmFyaSBhYiBWZXJzaW9uIDk8L2xpPiAgICAgICAgPGxpPk1pY3Jvc29mdCBFZGdlIGFiIFZlcnNpb24gODA8L2xpPiAgICA8L3VsPiAgICBQcmluemlwaWVsbCBrYW5uICUxJHMgYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiAgICBIaWVyIGthbm4gZXMgYWJlciB6dSB1bnZvcmhlcmdlc2VoZW5lbiBGZWhsZXJuIGtvbW1lbi4gICAgUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u'>
-                <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.
-                    <br />    Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    
+            <trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiB7YXBwfSBuaWNodCBvZmZpemllbGwgdW50ZXJzdMO8dHp0LjxiciAvPkRpZSBBbndlbmR1bmcgd3VyZGUgaGluc2ljaHRsaWNoIEZ1bmt0aW9uYWxpdMOkdCB1bmQgUGVyZm9ybWFuY2UgaW4gZGVuIGZvbGdlbmRlbiBCcm93c2VyIG9mZml6aWVsbCBnZXRlc3RldDogPHVsPjxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPjxsaT5Nb3ppbGxhIEZpcmVmb3ggYWIgVmVyc2lvbiA0NDwvbGk+PGxpPk1pY3Jvc29mdCBFZGdlIGFiIFZlcnNpb24gODA8L2xpPjwvdWw+UHJpbnppcGllbGwga2FubiB7YXBwfSBhdWNoIG1pdCBhbmRlcmVuIEJyb3dzZXJuIGJ6dy4gw6RsdGVyZW4gVmVyc2lvbmVuIGZ1bmt0aW9uaWVyZW4uIEhpZXIga2FubiBlcyBhYmVyIHp1IHVudm9yaGVyZ2VzZWhlbmVuIEZlaGxlcm4ga29tbWVuLiBQb3RlbnRpZWxsIGvDtm5uZW4gYXVjaCBtYW5jaGUgRmVhdHVyZXMga29tcGxldHQgbmljaHQgZnVua3Rpb25pZXJlbi4='>
+                <source>Ihr Browser oder Ihre Browser-Version wird von {app} nicht offiziell unterstützt.<br />Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet: <ul><li>Google Chrome ab Version 48</li><li>Mozilla Firefox ab Version 44</li><li>Microsoft Edge ab Version 80</li></ul>Prinzipiell kann {app} auch mit anderen Browsern bzw. älteren Versionen funktionieren. Hier kann es aber zu unvorhergesehenen Fehlern kommen. Potentiell können auch manche Features komplett nicht funktionieren.</source>
+                <target>Ihr Browser oder Ihre Browser-Version wird von {app} nicht offiziell unterstützt.
+                    <br />Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:
                     <ul>
                         <li>Google Chrome ab Version 48</li>
                         <li>Mozilla Firefox ab Version 44</li>
-                        <li>Apple Safari ab Version 9</li>
                         <li>Microsoft Edge ab Version 80</li>
-                    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.    Hier kann es aber zu unvorhergesehenen Fehlern kommen.    Potentiell können auch manche Features komplett nicht funktionieren.
-                </source>
-                <target>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.
-                    <br />    Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    
-                    <ul>
-                        <li>Google Chrome ab Version 48</li>
-                        <li>Mozilla Firefox ab Version 44</li>
-                        <li>Apple Safari ab Version 9</li>
-                        <li>Microsoft Edge ab Version 80</li>
-                    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.    Hier kann es aber zu unvorhergesehenen Fehlern kommen.    Potentiell können auch manche Features komplett nicht funktionieren.
+                    </ul>
+                    Prinzipiell kann {app} auch mit anderen Browsern bzw. älteren Versionen funktionieren. Hier kann es aber zu unvorhergesehenen Fehlern kommen. Potentiell können auch manche Features komplett nicht funktionieren.
                 </target>
             </trans-unit>
             <trans-unit id='UHJvamVrdG1lbsO8IGFuemVpZ2Vu'>
@@ -7754,7 +7700,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='RmxpZcOfZW5kZXMgUHJvYmxlbQ=='>
                 <source>Fließendes Problem</source>
-                <target>Fließendes Problem</target>
+                <target>Textfluss-Problem</target>
             </trans-unit>
             <trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='>
                 <source>Manueller Demo Status 1</source>
@@ -8212,7 +8158,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ='>
                 <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>
-                <target>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</target>
+                <target>Status wurde allen Ereignissen innerhalb dieser Aufgabe zugewiesen</target>
             </trans-unit>
             <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
                 <source>Rechtsklick um Fehler zu ignorieren</source>
@@ -8706,8 +8652,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Andere Aufgaben-TM ausblenden</source>
                 <target>Andere Aufgaben-TMs ausblenden</target>
             </trans-unit>
-            <trans-unit id='ZmlsZU5hbWVfT3BlblRNMg=='>
-                <source>fileName_OpenTM2</source>
+            <trans-unit id='ZmlsZU5hbWVfVDVNZW1vcnk='>
+                <source>fileName_T5Memory</source>
                 <target>Datenbankname</target>
             </trans-unit>
             <trans-unit id='ZmlsZU5hbWVfVGVybUNvbGxlY3Rpb24='>
@@ -9860,7 +9806,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='T3J0ZSBkZXIgQXVzc3RlbGx1bmc='>
                 <source>Orte der Ausstellung</source>
-                <target>Orte der Ausstellung</target>
+                <target>Wird wo angezeigt</target>
             </trans-unit>
             <trans-unit id='UHJvamVrdC1Bc3Npc3RlbnQ='>
                 <source>Projekt-Assistent</source>

@@ -49,6 +49,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('taskType::instanttranslate-pre-translate');
+ */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\FileTranslation;

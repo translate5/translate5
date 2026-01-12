@@ -46,8 +46,8 @@ $availableTranslations = $translate->getAvailableTranslations();
 asort($availableTranslations);
 $languageSelector = [];
 
-//translated strings // TODO FIXME: cleanup, lots of them are outdated!
-$this->translations = array(
+// translated strings // TODO FIXME: cleanup, lots of them are outdated!
+$this->translations = [
     'clearText' => $translate->_('Text zurücksetzen'),
     'copy' => $translate->_('Kopieren'),
     'enterText' => $translate->_('Geben Sie Text ein'),
@@ -81,7 +81,7 @@ $this->translations = array(
     'errorOccurredDuringTranslation' => $translate->_('Ein oder mehrere Fehler traten während der Übersetzung auf'),
     'languageresourceNames' => [
         'TermCollection' => $translate->_('TermCollection'),
-        'OpenTM2' => $translate->_('OpenTM2'),
+        'T5Memory' => $translate->_('T5Memory'),
         'GroupShare' => $translate->_('GroupShare'),
     ],
     'languagesAreSame' => $translate->_('<b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.'),
@@ -105,6 +105,7 @@ $this->translations = array(
         'descriptionLabel' => $translate->_('Projektbeschreibung'),
         'workflowLabel' => $translate->_('Workflow'),
         'customFieldsLabel' => $translate->_('Benutzerdefinierte Felder für Aufgaben'),
+        'requiredFieldMessage' => $translate->_('Dieses Feld ist ein Pflichtfeld.')
     ],
     'inHumanRevision' => $translate->_('In menschlicher Revision'),
     'humanRevisionFinished' => $translate->_('Menschliche revision fertiggestellt'),
@@ -116,7 +117,8 @@ $this->translations = array(
     'mtResourcesComboPrefix' => $translate->_('Verwendete MT-Resource:'),
     'customerComboPrefix' => $translate->_('mit Einstellungen für:'),
     'autoDetectLanguage' => $translate->_('Sprache erkennen'),
-);
+];
+
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
 $this->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);

@@ -101,7 +101,7 @@ class RolesDataProvider
             if ($this->rolesValidator->hasAclPermissionToSetRole($viewer, $role)) {
                 $roles[] = [
                     'role' => $role,
-                    'label' => $this->translate->_($capitalizeRole ? ucfirst($role) : $role),
+                    'label' => $capitalizeRole ? mb_ucfirst($this->translate->_($role)) : $this->translate->_($role),
                 ];
             }
         }

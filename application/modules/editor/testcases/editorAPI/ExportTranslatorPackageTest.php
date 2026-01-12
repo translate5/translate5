@@ -42,12 +42,12 @@ class ExportTranslatorPackageTest extends JsonTestAbstract
         $customerId = self::$ownCustomer->id;
 
         $config
-            ->addLanguageResource('opentm2', null, $customerId, $sourceLanguage, $targetLanguage)
+            ->addLanguageResource('t5memory', null, $customerId, $sourceLanguage, $targetLanguage)
             ->setProperty('name', 'Some resource name')
         ;
 
         $config
-            ->addLanguageResource('opentm2', null, $customerId, $sourceLanguage, $targetLanguage)
+            ->addLanguageResource('t5memory', null, $customerId, $sourceLanguage, $targetLanguage)
             ->setProperty('name', 'Resource containing special characters en > de ~`!@#$%^&*()_-+={[}]|\\:;"\'<,>.?/')
         ;
 

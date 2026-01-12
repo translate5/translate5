@@ -51,6 +51,11 @@ SQL
 
 $ruleId = $db->fetchOne('SELECT id FROM `LEK_content_protection_content_recognition` WHERE type = "integer" and name = "default simple"');
 
+// workers shall not run in API-tests
+if ($this->isTestOrInstallEnvironment()) { // @phpstan-ignore-line
+    return;
+}
+
 $worker = new \MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker();
 $worker->init(parameters: [
     'recognitionId' => (int) $ruleId,

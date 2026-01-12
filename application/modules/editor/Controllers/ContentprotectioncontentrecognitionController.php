@@ -31,6 +31,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
+use MittagQI\ZfExtended\Sanitizer\Type;
 
 /**
  * Part of Content protection feature. Number protection part
@@ -49,7 +50,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     protected $postBlacklist = ['id'];
 
     protected array $dataSanitizationMap = [
-        'regex' => ZfExtended_Sanitizer::UNSANITIZED,
+        'regex' => Type::Unsanitized,
     ];
 
     public function indexAction()

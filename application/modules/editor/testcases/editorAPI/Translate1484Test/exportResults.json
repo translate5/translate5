@@ -8,8 +8,8 @@
             "totalCharacters": "498"
         },
         {
-            "langageResourceName": "OpenTm2-Translate1484Test-1",
-            "langageResourceServiceName": "OpenTM2",
+            "langageResourceName": "T5Memory-Translate1484Test-1",
+            "langageResourceServiceName": "T5Memory",
             "sourceLang": "en",
             "targetLang": "de",
             "totalCharacters": "75"
@@ -73,32 +73,32 @@
             "charactersPerCustomer": "77"
         },
         {
-            "langageResourceName": "OpenTm2-Translate1484Test-1",
-            "langageResourceServiceName": "OpenTM2",
+            "langageResourceName": "T5Memory-Translate1484Test-1",
+            "langageResourceServiceName": "T5Memory",
             "sourceLang": "en",
             "targetLang": "de",
             "repetition": "0",
             "charactersPerCustomer": "35"
         },
         {
-            "langageResourceName": "OpenTm2-Translate1484Test-1",
-            "langageResourceServiceName": "OpenTM2",
+            "langageResourceName": "T5Memory-Translate1484Test-1",
+            "langageResourceServiceName": "T5Memory",
             "sourceLang": "en",
             "targetLang": "de",
             "repetition": "0",
             "charactersPerCustomer": "30"
         },
         {
-            "langageResourceName": "OpenTm2-Translate1484Test-1",
-            "langageResourceServiceName": "OpenTM2",
+            "langageResourceName": "T5Memory-Translate1484Test-1",
+            "langageResourceServiceName": "T5Memory",
             "sourceLang": "en",
             "targetLang": "de",
             "repetition": "0",
             "charactersPerCustomer": "5"
         },
         {
-            "langageResourceName": "OpenTm2-Translate1484Test-1",
-            "langageResourceServiceName": "OpenTM2",
+            "langageResourceName": "T5Memory-Translate1484Test-1",
+            "langageResourceServiceName": "T5Memory",
             "sourceLang": "en",
             "targetLang": "de",
             "repetition": "1",

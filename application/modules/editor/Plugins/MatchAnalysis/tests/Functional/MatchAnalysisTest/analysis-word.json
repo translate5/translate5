@@ -19,7 +19,7 @@
         "penaltyTotal": 0
     },
     {
-        "resourceName": "Internal fuzzies (OpenTM2 1)",
+        "resourceName": "Internal fuzzy matches (T5Memory 1)",
         "resourceColor": "",
         "resourceType": "tm",
         "internalFuzzy": "Yes",

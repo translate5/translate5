@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Task\Export\Package\Source;
 
 use editor_Models_LanguageResources_LanguageResource;
 use editor_Services_Manager;
-use editor_Services_OpenTM2_Service;
+use editor_Services_T5Memory_Service;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
@@ -45,7 +45,7 @@ class Memory extends Base
 
     public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        $service = ZfExtended_Factory::get(editor_Services_OpenTM2_Service::class);
+        $service = ZfExtended_Factory::get(editor_Services_T5Memory_Service::class);
         /** @var TaskAssociation $assoc */
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 

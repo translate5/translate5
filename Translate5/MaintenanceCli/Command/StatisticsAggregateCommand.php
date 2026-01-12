@@ -103,10 +103,12 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
             return $this->purgeAggregatedData($statDB);
         }
 
+        $isInteractive = $this->input->isInteractive();
         $this->io->warning(
-            'The existing segments history data will be aggregated into Statistics DB. Make sure Statistics Database status is OK in System Check.'
+            'The existing segments history data will be aggregated into Statistics DB.' .
+            ($isInteractive ? ' Make sure Statistics Database status is OK in System Check.' : '')
         );
-        if ($this->input->isInteractive() && ! $this->io->confirm('Do you really want to proceed?', false)) {
+        if ($isInteractive && ! $this->io->confirm('Do you really want to proceed?', false)) {
             return self::SUCCESS;
         }
 

@@ -1,0 +1,327 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="fr" datatype="php">
+        <body>
+            <trans-unit id="LURhdGVp">
+                <source>-Datei</source>
+                <target>-Fichier</target>
+            </trans-unit>
+            <trans-unit id="QWt6ZXB0aWVyZW4=">
+                <source>Akzeptieren</source>
+                <target>Accepter</target>
+            </trans-unit>
+            <trans-unit id="QW5wYXNzZW4gdm9uIERhdGVpZmlsdGVybiBpbiBkaWVzZW0gRmlsdGVyc2V0">
+                <source>Anpassen von Dateifiltern in diesem Filterset</source>
+                <target>Personnaliser les filtres de fichiers dans cet ensemble de filtres</target>
+            </trans-unit>
+            <trans-unit id="QmNvbmYtRGF0ZWkgYmVhcmJlaXRlbg==">
+                <source>Bconf-Datei bearbeiten</source>
+                <target>Modifier le fichier bconf</target>
+            </trans-unit>
+            <trans-unit id="QmNvbmYtRGF0ZWkgZ2Vsw7ZzY2h0">
+                <source>Bconf-Datei gelöscht</source>
+                <target>Fichier bconf supprimé</target>
+            </trans-unit>
+            <trans-unit id="QmNvbmYgaGluenVmw7xnZW4=">
+                <source>Bconf hinzufügen</source>
+                <target>Ajouter fichier bconf</target>
+            </trans-unit>
+            <trans-unit id="QmNvbmYgaG9jaGxhZGVu">
+                <source>Bconf hochladen</source>
+                <target>Télécharger fichier bconf</target>
+            </trans-unit>
+            <trans-unit id="QmNvbmYgbMO2c2NoZW4=">
+                <source>Bconf löschen</source>
+                <target>Supprimer fichier bconf</target>
+            </trans-unit>
+            <trans-unit id="QmVhcmJlaXRlIEZpbHRlciBUeXAgezB9IHZvbiBCY29uZiB7MX0=">
+                <source>Bearbeite Filter Typ {0} von Bconf {1}</source>
+                <target>Modifier le filtre type {0} de bconf {1}</target>
+            </trans-unit>
+            <trans-unit id="QmVhcmJlaXR1bmcgZmVobGVyaGFmdA==">
+                <source>Bearbeitung fehlerhaft</source>
+                <target>Traitement incorrect</target>
+            </trans-unit>
+            <trans-unit id="Qm9vbHNjaGVyIFdlcnQ=">
+                <source>Boolscher Wert</source>
+                <target>Valeur booléenne</target>
+            </trans-unit>
+            <trans-unit id="Q29kZWZpbmRlciB2ZXJ3ZW5kZW4=">
+                <source>Codefinder verwenden</source>
+                <target>Utiliser le Code Finder</target>
+            </trans-unit>
+            <trans-unit id="RGFzIE9rYXBpIEZyYW1ld29yayB3aXJkIGF1ZiBkZXIgU2VydmVyc2VpdGUgZsO8ciBEYXRlaWtvbnZlcnRpZXJ1bmdlbiB2ZXJ3ZW5kZXQ=">
+                <source>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet</source>
+                <target>Le framework Okapi est utilisé côté serveur pour les conversions de fichiers</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWlmb3JtYXQtIHVuZCBTZWdtZW50aWVydW5nc2VpbnN0ZWxsdW5nZW4=">
+                <source>Dateiformat- und Segmentierungseinstellungen</source>
+                <target>Paramètres de format de fichier et de segmentation</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWl0eXBlbg==">
+                <source>Dateitypen</source>
+                <target>Types de fichiers</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWl0eXBlbiwgZsO8ciBkaWUgRmlsdGVyIGFuZ2VwYXNzdCB3dXJkZW4=">
+                <source>Dateitypen, für die Filter angepasst wurden</source>
+                <target>Types de fichiers pour lesquels des filtres ont été modifiés</target>
+            </trans-unit>
+            <trans-unit id="RGVyIE5hbWUgZGFyZiBuaWNodCBkZW4gQmVncmlmZiAidHJhbnNsYXRlNSIgZW50aGFsdGVu">
+                <source>Der Name darf nicht den Begriff "translate5" enthalten</source>
+                <target>Le nom ne doit pas contenir le terme «translate5»</target>
+            </trans-unit>
+            <trans-unit id="RGVyIHVyc3Byw7xuZ2xpY2hlIE5hbWUgbXVzcyB2ZXLDpG5kZXJ0IHdlcmRlbg==">
+                <source>Der ursprüngliche Name muss verändert werden</source>
+                <target>Le nom d’origine doit être modifié</target>
+            </trans-unit>
+            <trans-unit id="RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2UgezB9LURhdGVpLg==">
+                <source>Die hochgeladene Datei ist keine gültige {0}-Datei.</source>
+                <target>Le fichier téléchargé n’est pas un fichier {0} valide.</target>
+            </trans-unit>
+            <trans-unit id="RGllc2VyIE5hbWUgaXN0IHNjaG9uIHZlcmdlYmVu">
+                <source>Dieser Name ist schon vergeben</source>
+                <target>Ce nom est déjà attribué</target>
+            </trans-unit>
+            <trans-unit id="RG9wcGVsa2xpY2tlbiB6dW0gYmVhcmJlaXRlbg==">
+                <source>Doppelklicken zum bearbeiten</source>
+                <target>Double-cliquer pour modifier</target>
+            </trans-unit>
+            <trans-unit id="RHVyY2hzdWNoZW4uLi4=">
+                <source>Durchsuchen...</source>
+                <target>Parcourir…</target>
+            </trans-unit>
+            <trans-unit id="RWluZGV1dGlnZXIgTmFtZQ==">
+                <source>Eindeutiger Name</source>
+                <target>Nom unique</target>
+            </trans-unit>
+            <trans-unit id="RW50aXRpZXM=">
+                <source>Entities</source>
+                <target>Entités</target>
+            </trans-unit>
+            <trans-unit id="RXMgbXVzcyBlaW4gZW5kZXV0aWdlciBOYW1lIGFuZ2VnZWJlbiB3ZXJkZW4=">
+                <source>Es muss ein endeutiger Name angegeben werden</source>
+                <target>Un nom unique doit être renseigné</target>
+            </trans-unit>
+            <trans-unit id="RXMgbXVzcyBtaW5kZXN0ZW5zIGVpbiBEYXRlaXR5cCBhbmdlZ2ViZW4gd2VyZGVu">
+                <source>Es muss mindestens ein Dateityp angegeben werden</source>
+                <target>Au moins un type de fichier doit être renseigné</target>
+            </trans-unit>
+            <trans-unit id="RmVsZCAiezB9IiB2b20gVHlwICJ7MX0iIGlzdCBuaWNodCB2YWxpZGU=">
+                <source>Feld "{0}" vom Typ "{1}" ist nicht valide</source>
+                <target>Le champ «{0}» de type «{1}» n’est pas valide</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyL0ZQUk0gYWxzIERhdGVpIGhlcnVudGVybGFkZW4=">
+                <source>Filter/FPRM als Datei herunterladen</source>
+                <target>Télécharger les filtres/FPRM sous forme de fichier</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyL0ZQUk0gYXVzIERhdGVpIGhvY2hsYWRlbg==">
+                <source>Filter/FPRM aus Datei hochladen</source>
+                <target>Charger les filtres/FPRM à partir d’un fichier</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyIGlu">
+                <source>Filter in</source>
+                <target>Filtrer dans</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyIGtsb25lbg==">
+                <source>Filter klonen</source>
+                <target>Cloner le filtre</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyIGtvbmZpZ3VyaWVyZW4=">
+                <source>Filter konfigurieren</source>
+                <target>Configurer le filtre</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVybmFtZW4sIHp1Z2Vow7ZyaWdlIERhdGVpZXJ3ZWl0ZXJ1bmdlbiwgTUlNRS1UeXAgdW5kIEJlc2NocmVpYnVuZyBiZWFyYmVpdGVu">
+                <source>Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten</source>
+                <target>Modifier le nom du filtre, les extensions de fichier associées, le type MIME et la description</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyc2V0IGFscyBiY29uZi1EYXRlaSBoZXJ1bnRlcmxhZGVu">
+                <source>Filterset als bconf-Datei herunterladen</source>
+                <target>Télécharger l’ensemble de filtres en tant que fichier bconf</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyc2V0IGtsb25lbg==">
+                <source>Filterset klonen</source>
+                <target>Cloner l’ensemble de filtres</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyc2V0IGzDtnNjaGVu">
+                <source>Filterset löschen</source>
+                <target>Supprimer l’ensemble de filtres</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyIHN1Y2hlbg==">
+                <source>Filter suchen</source>
+                <target>Rechercher un filtre</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyIHd1cmRlIGVyZm9sZ3JlaWNoIGdlc3BlaWNoZXJ0">
+                <source>Filter wurde erfolgreich gespeichert</source>
+                <target>Le filtre a été enregistré avec succès</target>
+            </trans-unit>
+            <trans-unit id="R2FuenphaGw=">
+                <source>Ganzzahl</source>
+                <target>Nombre entier</target>
+            </trans-unit>
+            <trans-unit id="R2XDpG5kZXJ0ZSBGaWx0ZXI=">
+                <source>Geänderte Filter</source>
+                <target>Filtre modifié</target>
+            </trans-unit>
+            <trans-unit id="R2xlaXRrb21tYXphaGw=">
+                <source>Gleitkommazahl</source>
+                <target>Nombre à virgule flottante</target>
+            </trans-unit>
+            <trans-unit id="SGVydW50ZXJsYWRlbiBkZXIgdGFyZ2V0LVNSWC1EYXRlaQ==">
+                <source>Herunterladen der target-SRX-Datei</source>
+                <target>Téléchargement du fichier SRX cible</target>
+            </trans-unit>
+            <trans-unit id="SG9jaGxhZGVu">
+                <source>Hochladen</source>
+                <target>Télécharger</target>
+            </trans-unit>
+            <trans-unit id="SG9jaGxhZGVuIGRlciB0YXJnZXQtU1JYLURhdGVp">
+                <source>Hochladen der target-SRX-Datei</source>
+                <target>Chargement du fichier SRX cible</target>
+            </trans-unit>
+            <trans-unit id="SG9jaHNjaGllYmVu">
+                <source>Hochschieben</source>
+                <target>Déplacer vers le haut</target>
+            </trans-unit>
+            <trans-unit id="SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZQ==">
+                <source>Ihre Änderungen sind nicht valide</source>
+                <target>Les modifications ne sont pas valides</target>
+            </trans-unit>
+            <trans-unit id="SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu">
+                <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
+                <target>Les modifications ne sont pas valides, le filtre n’a donc pas pu être enregistré</target>
+            </trans-unit>
+            <trans-unit id="SW5mb3JtYXRpb25lbiBmZWhsZW4=">
+                <source>Informationen fehlen</source>
+                <target>Informations manquantes</target>
+            </trans-unit>
+            <trans-unit id="S2VubnVuZw==">
+                <source>Kennung</source>
+                <target>Identifiant</target>
+            </trans-unit>
+            <trans-unit id="S2xvbmVu">
+                <source>Klonen</source>
+                <target>Clonage</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVuc3RhbmRhcmQ=">
+                <source>Kundenstandard</source>
+                <target>Standard client</target>
+            </trans-unit>
+            <trans-unit id="TGFkZW4gU2llIGRpZSBRdWVsbCBTUlgtRGF0ZWkgaGVydW50ZXI=">
+                <source>Laden Sie die Quell SRX-Datei herunter</source>
+                <target>Téléchargez le fichier SRX source</target>
+            </trans-unit>
+            <trans-unit id="TUlNRS1UeXA=">
+                <source>MIME-Typ</source>
+                <target>Type MIME</target>
+            </trans-unit>
+            <trans-unit id="TXVzdGVy">
+                <source>Muster</source>
+                <target>Modèle</target>
+            </trans-unit>
+            <trans-unit id="TcO2Y2h0ZW4gU2llIGRpZXNlIEJjb25mLURhdGVpIHdpcmtsaWNoIGzDtnNjaGVuPw==">
+                <source>Möchten Sie diese Bconf-Datei wirklich löschen?</source>
+                <target>Souhaitez-vous vraiment supprimer ce fichier bconf?</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZSBCY29uZi1EYXRlaQ==">
+                <source>Neue Bconf-Datei</source>
+                <target>Nouveau fichier bconf</target>
+            </trans-unit>
+            <trans-unit id="T0tBUEkgSGlsZmU=">
+                <source>OKAPI Hilfe</source>
+                <target>Aide OKAPI</target>
+            </trans-unit>
+            <trans-unit id="UGlwZWxpbmU=">
+                <source>Pipeline</source>
+                <target>Pipeline</target>
+            </trans-unit>
+            <trans-unit id="UGlwZWxpbmUgYWxzIERhdGVpIGhlcnVudGVybGFkZW4=">
+                <source>Pipeline als Datei herunterladen</source>
+                <target>Télécharger le pipeline sous forme de fichier</target>
+            </trans-unit>
+            <trans-unit id="UGlwZWxpbmUgYXVzIERhdGVpIGhvY2hsYWRlbg==">
+                <source>Pipeline aus Datei hochladen</source>
+                <target>Charger le pipeline à partir du fichier</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGwgU1JYLURhdGVpIGhvY2hsYWRlbiB1bmQgU1JYLVJlZ2VsbiBkaWVzZXMgRmlsdGVyc2F0emVzIGVyc2V0emVu">
+                <source>Quell SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen</source>
+                <target>Télécharger le fichier SRX source et remplacer les règles SRX de cet ensemble de filtres</target>
+            </trans-unit>
+            <trans-unit id="U1JYLURhdGVp">
+                <source>SRX-Datei</source>
+                <target>Fichier SRX</target>
+            </trans-unit>
+            <trans-unit id="U1JYLURhdGVpLCBkaWUgU2VnbWVudGllcnVuZ3NyZWdlbG4gZW50aMOkbHQsIGRpZSB6dXIgd2VpdGVyZW4gU2VnbWVudGllcnVuZyBkZXMgdGFyZ2V0cyB2b24geGxpZmYtRGF0ZWllbiB2ZXJ3ZW5kZXQgd2VyZGVuIGvDtm5uZW4=">
+                <source>SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können</source>
+                <target>Fichier SRX contenant des règles de segmentation qui peuvent être utilisées pour segmenter ultérieurement la cible des fichiers xliff</target>
+            </trans-unit>
+            <trans-unit id="U1JYLURhdGVpLCBkaWUgZGllIFNlZ21lbnRpZXJ1bmdzcmVnZWxuIGbDvHIgZGllIFF1ZWxsZSBlbnRow6RsdA==">
+                <source>SRX-Datei, die die Segmentierungsregeln für die Quelle enthält</source>
+                <target>Fichier SRX contenant les règles de segmentation pour la source</target>
+            </trans-unit>
+            <trans-unit id="U291cmNlIFNSWA==">
+                <source>Source SRX</source>
+                <target>Source SRX</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmQ=">
+                <source>Standard</source>
+                <target>Standard</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmQgRmlsdGVyIGFuemVpZ2Vu">
+                <source>Standard Filter anzeigen</source>
+                <target>Afficher les filtres par défaut</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmQgRmlsdGVyIHZlcnN0ZWNrZW4=">
+                <source>Standard Filter verstecken</source>
+                <target>Masquer les filtres par défaut</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgaW5zb2Zlcm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu">
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</source>
+                <target>Ensemble de filtres sélectionné par défaut lors de la création du projet dans la mesure où il n’est pas écrasé au niveau du client</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgdW5kIGluIEluc3RhbnRUcmFuc2xhdGUgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu">
+                <source>Standardmäßig bei der Projekterstellung und in InstantTranslate ausgewähltes Filterset für diesen Kunden</source>
+                <target>Standardmäßig bei der Projekterstellung und in InstantTranslate ausgewähltes Filterset für diesen Kunden</target>
+            </trans-unit>
+            <trans-unit id="VGFyZ2V0IFNSWA==">
+                <source>Target SRX</source>
+                <target>SRX cible</target>
+            </trans-unit>
+            <trans-unit id="VGVzdCBtaXQgYWxsZW4gUmVnZWxu">
+                <source>Test mit allen Regeln</source>
+                <target>Test avec toutes les règles</target>
+            </trans-unit>
+            <trans-unit id="VW5nw7xsdGlnZSB7MH0tRGF0ZWk=">
+                <source>Ungültige {0}-Datei</source>
+                <target>Fichier {0} invalide</target>
+            </trans-unit>
+            <trans-unit id="VW50ZW5zY2hpZWJlbg==">
+                <source>Untenschieben</source>
+                <target>Déplacer vers le bas</target>
+            </trans-unit>
+            <trans-unit id="VW50ZXJzdMO8dHp0ZSBEYXRlaWZvcm1hdGU=">
+                <source>Unterstützte Dateiformate</source>
+                <target>Formats de fichiers pris en charge</target>
+            </trans-unit>
+            <trans-unit id="V2VubiBuaWNodC1zdGFuZGFyZGlzaWVydGUgRW50aXRpZXMgaW4gaW1wb3J0aWVydGVuIFhNTC1EYXRlaWVuIHZvcmhhbmRlbiBzaW5kLCBtw7xzc2VuIGRpZXNlIGRla2xhcmllcnQgd2VyZGVuLCBkYW1pdCBkaWUgdmVyYXJiZWl0dW5nIG1pdCBPS0FQSSBmdW5rdGlvbmllcnQuIERpZSBTdGFuZGFyZC1FbnRpdGllcyBzaW5kOiBsdCwgZ3QsIGFtcCwgcXVvdCwgYXBvcy4gQml0dGUgZ2ViZW4gc2llIGFsbCBhbmRlcmVuIGluIGRpZXNlbSBGZWxkIGFuLg==">
+                <source>Wenn nicht-standardisierte Entities in importierten XML-Dateien vorhanden sind, müssen diese deklariert werden, damit die verarbeitung mit OKAPI funktioniert. Die Standard-Entities sind: lt, gt, amp, quot, apos. Bitte geben sie all anderen in diesem Feld an.</source>
+                <target>Si les fichiers XML importés contiennent des entités non standard, celles-ci doivent être déclarées pour que le traitement fonctionne avec OKAPI. Les entités par défaut sont: lt, gt, amp, quot, apos. Veuillez renseigner tous les autres dans ce champ.</target>
+            </trans-unit>
+            <trans-unit id="d2lyZCBiZW7DtnRpZ3Q=">
+                <source>wird benötigt</source>
+                <target>est nécessaire</target>
+            </trans-unit>
+            <trans-unit id="ezB9LURhdGVpIGVyZm9sZ3JlaWNoIGhvY2hnZWxhZGVuLg==">
+                <source>{0}-Datei erfolgreich hochgeladen.</source>
+                <target>{0}-Fichier chargé avec succès.</target>
+            </trans-unit>
+            <trans-unit id="w4RuZGVybg==">
+                <source>Ändern</source>
+                <target>Modifier</target>
+            </trans-unit>
+            <trans-unit id="w4RuZGVydW5nZW4genVyw7xja3NldHplbg==">
+                <source>Änderungen zurücksetzen</source>
+                <target>Réinitialiser les modifications</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

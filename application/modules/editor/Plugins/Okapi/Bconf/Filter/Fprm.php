@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\PropertiesParser;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
+use MittagQI\ZfExtended\Localization;
 use stdClass;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -94,12 +95,6 @@ final class Fprm extends ResourceFile
      * @var array
      */
     public const PLAIN_TYPES = ['okf_wiki'];
-
-    /**
-     * This contradicts the translate5 standard "de" but "en" is the rainbow default language
-     * @var string
-     */
-    public const DEFAULT_GUI_LANGUAGE = 'en';
 
     /**
      * Can be: "properties" | "xml" | "plain" | "yaml"
@@ -250,17 +245,13 @@ final class Fprm extends ResourceFile
             // FPRM editor localzation in user's langage if available
             $userLocale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
             $userLocaleFile = $userLocale ? $translationsDir . $guiName . '.' . $userLocale . '.json' : null;
-            // otherwise FPRM editor localzation in source code locale
-            $codeLocaleFile = $translationsDir . $guiName . '.' . $translate->getSourceCodeLocale() . '.json';
-            // or in the default locale as fallback
-            $defaultLocaleFile = $translationsDir . $guiName . '.' . self::DEFAULT_GUI_LANGUAGE . '.json';
+            // otherwise FPRM editor localzation in the default localization language
+            $codeLocaleFile = $translationsDir . $guiName . '.' . Localization::FALLBACK_LOCALE . '.json';
 
             if ($userLocaleFile && file_exists($userLocaleFile)) {
                 $json = file_get_contents($userLocaleFile);
             } elseif (file_exists($codeLocaleFile)) {
                 $json = file_get_contents($codeLocaleFile);
-            } elseif (file_exists($defaultLocaleFile)) {
-                $json = file_get_contents($defaultLocaleFile);
             }
         }
         if (! empty($json)) {

@@ -62,10 +62,10 @@ if (! defined('ACL_ROLE_PM')) {
     define('ACL_ROLE_PM', 'pm');
 }
 
-$db       = Zend_Db_Table::getDefaultAdapter();
-$task     = ZfExtended_Factory::get(editor_Models_Task::class);
+$db = Zend_Db_Table::getDefaultAdapter();
+$task = ZfExtended_Factory::get(editor_Models_Task::class);
 $progress = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
-$segment  = ZfExtended_Factory::get(editor_Models_Segment::class);
+$segment = ZfExtended_Factory::get(editor_Models_Segment::class);
 
 $allTasks = $task->loadAll();
 //update task segmentCount and segmentFinishCount for all available tasks

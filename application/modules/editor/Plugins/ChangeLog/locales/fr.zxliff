@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" target-language="fr" datatype="php">
+        <body>
+            <trans-unit id="QWt0dWVsbGUgw4RuZGVydW5nZW4gYW4gZGVyIEFud2VuZHVuZw==">
+                <source>Aktuelle Änderungen an der Anwendung</source>
+                <target>Modifications actuelles apportées à l’application</target>
+            </trans-unit>
+            <trans-unit id="QnVnZml4">
+                <source>Bugfix</source>
+                <target>Bugfix</target>
+            </trans-unit>
+            <trans-unit id="Q2hhbmdl">
+                <source>Change</source>
+                <target>Modification</target>
+            </trans-unit>
+            <trans-unit id="RGF0dW0=">
+                <source>Datum</source>
+                <target>Date</target>
+            </trans-unit>
+            <trans-unit id="RmVhdHVyZQ==">
+                <source>Feature</source>
+                <target>Fonctionnalité</target>
+            </trans-unit>
+            <trans-unit id="w4RuZGVydW5nc25yLg==">
+                <source>Änderungsnr.</source>
+                <target>Modification n°</target>
+            </trans-unit>
+            <trans-unit id="w4RuZGVydW5nc3Byb3Rva29sbCBkZXIgVmVyc2lvbiA=">
+                <source>Änderungsprotokoll der Version </source>
+                <target>Journal des modifications de la version </target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+
+
+
+

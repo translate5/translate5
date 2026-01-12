@@ -27,6 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * -- special config-translations --
+ * $translateConfig->___('runtimeOptions.segments.qualityFlags', 'value');
+ */
+
+/**
  * Adds the Segment Quality Entries for the QM tags that are referenscing he whole segment and are set completely outside of the segment processing
  * This class just provides the translations for the filter backend
  */

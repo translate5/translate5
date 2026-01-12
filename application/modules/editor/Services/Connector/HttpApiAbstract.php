@@ -116,7 +116,7 @@ abstract class editor_Services_Connector_HttpApiAbstract
 
     /**
      * FIXME must be removed by using ZfExtended_Zendoverwrites_Http_JsonClient instead!
-     * parses and processes the response of OpenTM2, and handles the errors
+     * parses and processes the response of T5Memory, and handles the errors
      * @return boolean
      */
     protected function processResponse(Zend_Http_Response $response): bool

@@ -69,6 +69,7 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $config->import(
             $config
                 ->addTask('en', 'de')
+                ->setMaxWaitTime(100)
                 ->setImportBconfId(self::$bconf2->getId())
                 ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
                 ->setToEditAfterImport()

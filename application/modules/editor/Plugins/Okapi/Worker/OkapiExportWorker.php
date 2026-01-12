@@ -49,6 +49,12 @@ class OkapiExportWorker extends editor_Models_Task_AbstractWorker
 
     private ZfExtended_Logger $logger;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->doDebug = $this->doDebug || ZfExtended_Debug::hasLevel('plugin', 'OkapiWorkers');
+    }
+
     protected function validateParameters(array $parameters): bool
     {
         return true;
@@ -96,8 +102,24 @@ class OkapiExportWorker extends editor_Models_Task_AbstractWorker
         $result = false;
 
         try {
+            $exportBconf = editor_Plugins_Okapi_Init::getExportBconfPath($this->task);
+            if ($this->doDebug) {
+                $message = 'Okapi Plug-In: File "{fileName}" (id: {fileId}) will be exported with Okapi "{okapi}"';
+                $extra = [
+                    'task' => $this->task,
+                    'okapi' => $taskConfig->runtimeOptions->plugins->Okapi->serverUsed ?? 'not set',
+                    'fileId' => $fileId,
+                    'fileName' => $workFile->getBasename(),
+                    'usedBconf' => basename($exportBconf),
+                ];
+                error_log(
+                    "\n=====\n" .
+                    ZfExtended_Logger::renderMessageExtra($message, $extra) . ', task: ' . $this->task->getId() .
+                    ', used BCONF: ' . $extra['usedBconf'] . ', used server: ' . $extra['okapi']
+                );
+            }
             $api->createProject();
-            $api->uploadOkapiConfig(editor_Plugins_Okapi_Init::getExportBconfPath($this->task), false);
+            $api->uploadOkapiConfig($exportBconf, false);
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
             $api->uploadOriginalFile($originalFile, new SplFileInfo($this->okapiDataDir . '/' . $originalFile));
@@ -138,13 +160,22 @@ class OkapiExportWorker extends editor_Models_Task_AbstractWorker
 
             $result = true;
         } catch (Throwable $e) {
-            $this->logger->error('E1151', 'Okapi Plug-In: Error in converting file "{file}" on export: {message}', [
+            $message = 'Okapi Plug-In: Error in converting file "{file}" on export: {message}';
+            $extra = [
                 'task' => $this->task,
                 'message' => $e->getMessage(),
                 'fileId' => $fileId,
                 'file' => basename($workFile->__toString()),
-            ]);
+            ];
+            $this->logger->error('E1151', $message, $extra);
 
+            if ($this->doDebug) {
+                error_log(
+                    "\n=====\n" .
+                    ZfExtended_Logger::renderMessageExtra($message, $extra) .
+                    ', task: ' . $this->task->getId() . ', fileId: ' . $fileId
+                );
+            }
             $event = $this->logger->exception($e, [
                 'extra' => [
                     'task' => $this->task,
@@ -197,6 +228,13 @@ class OkapiExportWorker extends editor_Models_Task_AbstractWorker
                 'task' => $this->task,
             ]);
         }
+        if ($this->doDebug) {
+            error_log(
+                "\n=====\n" .
+                'Okapi Plug-In: Original file could not be found, task: ' . $this->task->getId() .
+                ', file: ' . OkapiWorkerHelper::createOriginalFileName($fileId, '*')
+            );
+        }
 
         return (string) $file;
     }
@@ -214,16 +252,21 @@ class OkapiExportWorker extends editor_Models_Task_AbstractWorker
     private function logEmptyTargets(mixed $fileId, SplFileInfo $workFile): void
     {
         if ($this->hadEmptyTargets) {
-            $this->logger->warn(
-                'E1150',
-                'Okapi Plug-In: The exported XLIFF "{file}" contains empty targets,' .
-                    ' the Okapi process will probably fail then.',
-                [
-                    'task' => $this->task,
-                    'fileId' => $fileId,
-                    'file' => basename($workFile),
-                ]
-            );
+            $message = 'Okapi Plug-In: The exported XLIFF "{file}" contains empty targets,' .
+                ' the Okapi process will probably fail then.';
+            $extra = [
+                'task' => $this->task,
+                'fileId' => $fileId,
+                'file' => basename($workFile),
+            ];
+            $this->logger->warn('E1150', $message, $extra);
+            if ($this->doDebug) {
+                error_log(
+                    "\n=====\n" .
+                    ZfExtended_Logger::renderMessageExtra($message, $extra) .
+                    ', task: ' . $this->task->getId() . ', fileId: ' . $fileId
+                );
+            }
         }
     }
 

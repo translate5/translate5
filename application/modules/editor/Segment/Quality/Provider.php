@@ -31,8 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProviderInterface
 {
-    public const CATEGORY_CRITICAL_ERROR_TOOLTIP = 'Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden';
-
     /**
      * Retrieves our type
      * @return string
@@ -147,7 +145,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
 
     public function translateTypeTooltipCriticalSuffix(ZfExtended_Zendoverwrites_Translate $translate): string
     {
-        return $translate->_(self::CATEGORY_CRITICAL_ERROR_TOOLTIP);
+        return $translate->_('Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden');
     }
 
     /**
@@ -176,7 +174,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         string $category,
         editor_Models_Task $task
     ): string {
-        return $translate->_(self::CATEGORY_CRITICAL_ERROR_TOOLTIP);
+        return $translate->_('Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden');
     }
 
     /* *************** REST view API *************** */

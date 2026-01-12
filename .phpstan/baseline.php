@@ -15499,82 +15499,82 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$NewSearchPosition\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$error\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:error\\(\\) invoked with 3 parameters, 0 required\\.$#',
 	'count' => 4,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:warn\\(\\) invoked with 3 parameters, 0 required\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Models_LanguageResources_LanguageResource\\:\\:setName\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method editor_Services_OpenTM2_Connector\\:\\:getMetaData\\(\\) should return stdClass but returns array\\<int\\<0, max\\>, stdClass\\>\\.$#',
+	'message' => '#^Method editor_Services_T5Memory_Connector\\:\\:getMetaData\\(\\) should return stdClass but returns array\\<int\\<0, max\\>, stdClass\\>\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method editor_Services_OpenTM2_Connector\\:\\:getTm\\(\\) should return string but return statement is missing\\.$#',
+	'message' => '#^Method editor_Services_T5Memory_Connector\\:\\:getTm\\(\\) should return string but return statement is missing\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$metaData of method editor_Services_ServiceResult\\:\\:addResult\\(\\) expects array\\|null, stdClass given\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property editor_Services_Connector_Abstract\\:\\:\\$languageResource \\(editor_Models_LanguageResources_LanguageResource\\) in empty\\(\\) is not falsy\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property editor_Services_Connector_Abstract\\:\\:\\$languageResource \\(editor_Models_LanguageResources_LanguageResource\\) on left side of \\?\\? is not nullable\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property editor_Services_OpenTM2_Connector\\:\\:\\$parentApi is never read, only written\\.$#',
+	'message' => '#^Property editor_Services_T5Memory_Connector\\:\\:\\$parentApi is never read, only written\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Connector.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Connector.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$httpMethod$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/HttpApi.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/HttpApi.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$memory$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/HttpApi.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/HttpApi.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property editor_Services_OpenTM2_HttpApi\\:\\:\\$languageResource \\(editor_Models_LanguageResources_LanguageResource\\) in empty\\(\\) is not falsy\\.$#',
+	'message' => '#^Property editor_Services_T5Memory_HttpApi\\:\\:\\$languageResource \\(editor_Models_LanguageResources_LanguageResource\\) in empty\\(\\) is not falsy\\.$#',
 	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/HttpApi.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/HttpApi.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Result of && is always false\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/HttpApi.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/HttpApi.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Services/OpenTM2/Service.php',
+	'path' => __DIR__ . '/../application/modules/editor/Services/T5Memory/Service.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Services_SDLLanguageCloud_Connector\\:\\:querySdlApi\\(\\) should return string but returns editor_Services_ServiceResult\\.$#',
@@ -19662,16 +19662,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Models_LoginLog\\:\\:setUserGuid\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method ZfExtended_Sanitized_HttpRequest\\:\\:getData\\(\\) should return array\\|stdClass\\|string but returns mixed\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method ZfExtended_Sanitized_HttpRequest\\:\\:getData\\(\\) should return array\\|stdClass\\|string but returns null\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$_GET in isset\\(\\) always exists and is not nullable\\.$#',

@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
-use editor_Services_OpenTM2_Connector as Connector;
+use editor_Services_T5Memory_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
@@ -66,7 +66,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     public function __construct()
     {
         parent::__construct();
-        $this->log = \Zend_Registry::get('logger')->cloneMe('editor.content-protection.opentm2.conversion');
+        $this->log = \Zend_Registry::get('logger')->cloneMe('editor.content-protection.t5memory.conversion');
         $this->tmConversionService = TmConversionService::create();
         $this->languageResourceRepository = new LanguageResourceRepository();
         $this->exportService = ExportService::create();
@@ -93,7 +93,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        if (editor_Services_Manager::SERVICE_OPENTM2 !== $this->languageResource->getServiceType()) {
+        if (editor_Services_Manager::SERVICE_T5_MEMORY !== $this->languageResource->getServiceType()) {
             return false;
         }
 

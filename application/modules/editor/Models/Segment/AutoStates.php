@@ -30,6 +30,31 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Übersetzt');
+ * $translate->_('Übersetzt, auto');
+ * $translate->_('Nicht übersetzt');
+ * $translate->_('Lektoriert');
+ * $translate->_('Lektoriert, auto');
+ * $translate->_('Dauerhaft gesperrt');
+ * $translate->_('Gesperrt');
+ * $translate->_('Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss');
+ * $translate->_('Lektoriert, unverändert');
+ * $translate->_('Lektoriert, unverändert, auto');
+ * $translate->_('2. Lektorat');
+ * $translate->_('2. Lektorat, auto');
+ * $translate->_('PM lektoriert');
+ * $translate->_('PM lektoriert, auto');
+ * $translate->_('PM lektoriert, unverändert');
+ * $translate->_('PM lektoriert, unverändert, auto');
+ * $translate->_('Vorübersetzt');
+ * $translate->_('Draft');
+ * $translate->_('wird ermittelt...');
+ * $translate->_('In Bearbeitung');
+ */
+
+/**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
  *
@@ -204,23 +229,33 @@ class editor_Models_Segment_AutoStates
     #region Getters
 
     /**
-     * returns a map with state as index and translated text as value
+     * Retrieves the untranslated state-map: state-id => state-name
+     * @return string[]
      */
-    public function getLabelMap(ZfExtended_Zendoverwrites_Translate $translate = null): array
+    public function getStateNamesMap(): array
     {
-        if ($translate === null) {
-            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        }
-        //no json_encode because later on passed to php2js, which does json-encoding
         $states = $this->states;
 
         //only needed in frontend:
         $states[self::PENDING] = 'wird ermittelt...';
         $states[self::EDITING_BY_USER] = 'In Bearbeitung';
 
+        return $states;
+    }
+
+    /**
+     * Retrieves the translated state-map: state-id => state-name (translated)
+     * @return string[]
+     */
+    public function getLabelMap(ZfExtended_Zendoverwrites_Translate $translate = null): array
+    {
+        if ($translate === null) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        }
+
         return array_map(function ($value) use ($translate) {
             return $translate->_($value);
-        }, $states);
+        }, $this->getStateNamesMap());
     }
 
     /**

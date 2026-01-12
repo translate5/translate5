@@ -54,6 +54,7 @@ namespace MittagQI\Translate5\Segment\SearchAndReplace;
 
 use editor_Models_Segment;
 use MittagQI\Translate5\Segment\SearchAndReplace\DTO\SearchQueryDto;
+use MittagQI\ZfExtended\Sanitizer\HttpRequest;
 use Zend_Controller_Request_Abstract;
 use ZfExtended_ValidateException;
 use ZfExtended_Zendoverwrites_Translate;
@@ -80,7 +81,7 @@ class SearchQueryDtoFactory
 
         $this->checkSearchStringLength($searchField);
 
-        $filter = $request instanceof \ZfExtended_Sanitized_HttpRequest
+        $filter = $request instanceof HttpRequest
             ? $request->getRawParam('filter')
             : $request->getParam('filter');
 

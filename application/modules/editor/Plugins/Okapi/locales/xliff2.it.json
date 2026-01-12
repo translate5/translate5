@@ -1,0 +1,14 @@
+{
+  "helpLink": "http://okapiframework.org/wiki/index.php/XLIFF-2_Filter",
+  "tabOptions": "Opzioni",
+  "tabCodeFinder": "Code Finder",
+  "maxValidation": "Eseguire il parsing massimo durante l’analisi",
+  "forceUniqueIds": "Assicurarsi che gli ID dei tag siano univoci all’interno delle unità",
+  "ignoreTagTypeMatch": "Ignorare i tipi di tag che non corrispondono tra il segmento di origine e quello di destinazione",
+  "discardInvalidTargets": "Rifiutare i segmenti di destinazione non validi invece di rifiutare il file",
+  "writeOriginalData": "L’output contiene dati originali, se disponibili",
+  "subfilter": "Sottofiltro",
+  "subfilterTooltip": "Nome del sottofiltro da utilizzare per i contenuti incorporati",
+  "subfilterOverwriteTarget": "Sottofiltro: sovrascrivere il contenuto del segmento di destinazione?",
+  "subfilterOverwriteTargetTooltip": "Writer deve sempre sovrascrivere i segmenti target esistenti, anche se il loro stato è definitivo?"
+}

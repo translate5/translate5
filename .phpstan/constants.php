@@ -5,3 +5,4 @@ const APPLICATION_ROOT = 'path';
 const APPLICATION_PATH = 'path';
 const APPLICATION_DATA = 'path';
 const APPLICATION_RUNDIR = 'path';
+const FEATURE_TRANSLATE_4673_ENABLE = false;

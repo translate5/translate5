@@ -1,0 +1,121 @@
+{
+  "logout": "Esci",
+  "localeStore": [
+    {
+      "locale": "en",
+      "name": "Inglese"
+    },
+    {
+      "locale": "de",
+      "name": "Tedesco"
+    }
+  ],
+  "modeCombo": [
+    {
+      "name": "contiene",
+      "value": "contiene"
+    },
+    {
+      "name": "corrispondenza esatta",
+      "value": "esattamente"
+    }
+  ],
+  "modeComboSourceTarget": [
+    {
+      "name": "contiene",
+      "value": "contiene"
+    },
+    {
+      "name": "solo interi segmenti",
+      "value": "esattamente"
+    }
+  ],
+  "selectTm": {
+    "title": "Selezionare la TM",
+    "name": "Nome",
+    "sourceLanguage": "Lingua di origine",
+    "targetLanguage": "Lingua di destinazione",
+    "clients": "Cliente",
+    "taskTm": "TM di progetto",
+    "select": "Seleziona",
+    "close": "Chiudi",
+    "emptyText": "Nessun record di dati disponibile."
+  },
+  "searchForm": {
+    "tm": "TM",
+    "mode": "Modalità",
+    "source": "Segmento di origine",
+    "target": "Segmento target",
+    "author": "Creato da",
+    "additionalInfo": "Informazioni aggiuntive",
+    "document": "Nome del documento",
+    "creationDateFrom": "Creato dopo",
+    "creationDateTo": "Creato prima di",
+    "search": "Cerca",
+    "deleteAll": "Elimina tutti",
+    "deleteAllTooltip": "Tutti i segmenti che corrispondono alle attuali impostazioni di ricerca verranno eliminati.",
+    "deleteAllDisabledTooltip": "Tutti i segmenti che corrispondono alle attuali impostazioni di ricerca verranno eliminati. <Br> Questa funzione è disponibile solo a partire da 20 risultati, poiché l’opzione «Elimina tutto» comporta una riorganizzazione della TM <br>che può richiedere del tempo, durante la quale la TM non è disponibile.",
+    "sourceLanguage": "Lingua di origine",
+    "targetLanguage": "Lingua di destinazione",
+    "caseSensitive": "Tieni conto di maiuscole e minuscole"
+  },
+  "createForm": {
+    "title": "Crea nuova unità di traduzione",
+    "sourceText": "Segmento di origine",
+    "targetText": "Segmento target",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "deleteBatch": {
+    "no": "Annulla",
+    "yes": "Elimina tutti",
+    "warningText": "Tutti i segmenti dell’elenco attualmente visualizzato verranno eliminati e la TM verrà riorganizzata. L’operazione può richiedere un po’ di tempo. Si desidera comunque eliminare tutti i segmenti?",
+    "warningTextOneByOne": "Ogni segmento della ricerca attuale viene eliminato singolarmente. L’operazione può richiedere un po’ di tempo. L’interfaccia utente viene bloccata fino al completamento del processo. Se si desidera utilizzare TM Maintenance durante questo periodo, aprire una nuova scheda."
+  },
+  "list": {
+    "title": "Segmenti",
+    "totalAmount": "Numero totale di segmenti trovati: ",
+    "calculating": "Calcolo in corso…",
+    "loadingSegmentPlaceholder": "Caricamento in corso…",
+    "loadingSegmentNumber": "Carica segmento #",
+    "loadedSoFar": "{0} segmenti caricati finora",
+    "saving": "Salvataggio in corso.",
+    "columns": {
+      "sourceText": "Segmento di origine",
+      "targetText": "Segmento target",
+      "author": "Creato da",
+      "additionalInfo": "Informazioni aggiuntive",
+      "document": "Nome del documento",
+      "creationDate": "Data di creazione",
+      "actions": "Azioni",
+      "sourceLanguage": "Lingua di origine",
+      "targetLanguage": "Lingua di destinazione"
+    },
+    "edit": "Modifica",
+    "editSource": "Modifica segmento di origine",
+    "editTarget": "Modifica destinazione",
+    "delete": "Elimina",
+    "create": "Crea nuovo",
+    "save": "Salva (CTRL + S)",
+    "cancel": "Annulla (ESC)",
+    "saveGoToPrevious": "Salvare e aprire il segmento modificabile precedente (CTRL + ALT + MAIUSC + INVIO)",
+    "saveGoToNext": "Salvare e aprire il segmento modificabile successivo (CTRL + ALT + INVIO)",
+    "closeGoToPrevious": "Non salvare e aprire il segmento modificabile precedente (CTRL + ALT + ↑)",
+    "closeGoToNext": "Non salvare e aprire il segmento modificabile successivo (CTRL + ALT + ↓)"
+  },
+  "error": {
+    "title": "Si è verificato un errore",
+    "infoTitle": "Info",
+    "couldNotProcessRequest": "Errore durante il salvataggio o la lettura dei dati. Rivolgersi al nostro servizio di supporto!",
+    "close": "Chiudi",
+    "responseFromServer": "Messaggio dal server",
+    "messageFromServer": "Messaggio dal server",
+    "wrongTagsOrdering": "Alcuni dei tag utilizzati nel segmento sono nell’ordine sbagliato (tag di chiusura prima di quello di apertura o tag associato completamente assente). Correggere il segmento e riprovare."
+  },
+  "deleteSegment": {
+    "title": "Elimina",
+    "text": "Si desidera veramente eliminare il segmento?",
+    "yes": "Sì",
+    "no": "No"
+  }
+}

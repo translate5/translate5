@@ -113,7 +113,7 @@ class PersistenceService
     {
         //CRUCIAL: the prefix (if any) must be added on usage, and may not be stored in the specificName
         // that is relevant for security on a multi hosting environment
-        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        $prefix = $this->config->runtimeOptions->LanguageResources->t5memory->tmprefix;
         if (! empty($prefix) && ! str_starts_with($tmName, $prefix . '-')) {
             $tmName = $prefix . '-' . $tmName;
         }
@@ -123,7 +123,7 @@ class PersistenceService
 
     private function removeTmPrefix(string $tmName): string
     {
-        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        $prefix = $this->config->runtimeOptions->LanguageResources->t5memory->tmprefix;
 
         if (! empty($prefix) && str_contains($tmName, $prefix)) {
             //remove the prefix from being stored into the TM

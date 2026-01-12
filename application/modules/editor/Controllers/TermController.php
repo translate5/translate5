@@ -302,9 +302,7 @@ class editor_TermController extends ZfExtended_RestController
 
                     // Else flush a message to indicate confirmation is needed to proceed
                 } elseif ($this->getParam('answer') !== 'yes') {
-                    $this->confirm($this->_translate->_(
-                        'Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?'
-                    ));
+                    $this->confirm($this->_translate->_('Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?'));
                 }
 
                 // Else if at least one termEntryId found for source term

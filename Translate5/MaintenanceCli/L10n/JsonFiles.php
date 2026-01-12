@@ -36,7 +36,7 @@ class JsonFiles
     ) {
     }
 
-    public function findFiles(string $language): array
+    public function findFiles(string $language, bool $asAbsolutePath = false): array
     {
         $cwd = getcwd();
         chdir($this->rootPath);
@@ -48,6 +48,18 @@ class JsonFiles
         $files = shell_exec($find);
         chdir($cwd);
 
-        return explode("\n", trim($files));
+        if (empty($files)) {
+            return [];
+        }
+
+        $files = explode("\n", trim($files));
+
+        if ($asAbsolutePath) {
+            foreach ($files as &$file) {
+                $file = $this->rootPath . '/' . ltrim($file, './');
+            }
+        }
+
+        return $files;
     }
 }

@@ -50,6 +50,11 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
+// no need to run this in database recreations
+if ($this->isTestOrInstallEnvironment()) { // @phpstan-ignore-line
+    return;
+}
+
 // Get array of TermCollections ids existing in db
 $existingIdA = Zend_Db_Table
     ::getDefaultAdapter()

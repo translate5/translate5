@@ -43,6 +43,17 @@ use MittagQI\Translate5\User\FilterPreset;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * -- special config-translations --
+ * $translateConfig->___('runtimeOptions.segments.qualityFlags', 'default');
+ * $translateConfig->___('runtimeOptions.segments.stateFlags', 'default');
+ * $translateConfig->___('runtimeOptions.segments.autoStateFlags', 'default');
+ * $translateConfig->___('runtimeOptions.extJs.theme', 'defaults');
+ * $translate->_('Nicht gesetzt');
+ */
+
+/**
  * Dummy Index Controller
  */
 class Editor_IndexController extends ZfExtended_Controllers_Action
@@ -270,8 +281,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (! empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
-            $msg = 'Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
-            $msgBoxConf->initialMessages[] = sprintf($this->translate->_($msg), $onlineVersion, $currentVersion);
+            $msg = $this->translate->_('Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.');
+            $msgBoxConf->initialMessages[] = sprintf($msg, $onlineVersion, $currentVersion);
         }
     }
 
@@ -345,11 +356,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->setJsSegmentFlags('segments.qualityFlags', $rop->segments->qualityFlags->toArray());
         $manualStates = $rop->segments->stateFlags->toArray();
-        $manualStates[0] = $this->translate->_('Nicht gesetzt');
+        $manualStates[0] = 'Nicht gesetzt';
         $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
         $states = new editor_Models_Segment_AutoStates();
 
-        $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
+        $this->setJsSegmentFlags('segments.autoStateFlags', $states->getStateNamesMap());
         $this->view->Php2JsVars()->set('segments.autoStates', $states->getStateMap());
         $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
 
@@ -905,6 +916,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     }
 
     /**
+     * TODO FIXME: Outdated, remove
      * Provides a smart interface to generate XLF fragments for the internal translation files.
      *   Usage in the UI: Enter the german text in the form, a german XLF fragment is generated, existing
      *   translations are searched for similar texts and a english XLF fragment is generated of that. Final translation

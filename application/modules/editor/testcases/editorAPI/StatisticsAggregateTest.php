@@ -547,7 +547,7 @@ class StatisticsAggregateTest extends JsonTestAbstract
         $stat = self::$aggregation->getStatistics($taskGuids, $filters);
         $result = [];
         foreach (['levenshteinPrevious', 'levenshteinOriginal', 'levenshteinStart', 'levenshteinEnd'] as $key) {
-            $result[$key] = $stat["{$key}Avg"] ?: '-';
+            $result[$key] = $stat["{$key}Avg"] ?? '-';
         }
 
         return $result;

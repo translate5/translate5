@@ -66,7 +66,7 @@ class MatchAnalysisTest extends ImportTestAbstract
         ]);
 
         $config
-            ->addLanguageResource('opentm2', 'MatchAnalysisTest_TM.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('t5memory', 'MatchAnalysisTest_TM.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
             ->setProperty('name', 'MatchAnalysisTest_TM');
         $config
             ->addLanguageResource('termcollection', 'MatchAnalysisTest_Collection.tbx', $customerId)

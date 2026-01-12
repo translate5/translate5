@@ -27,6 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('taskType::projectTask');
+ */
+
+/**
  * The ProjectTask task type represents a task inside a project
  */
 class editor_Task_Type_ProjectTask extends editor_Task_Type_Abstract

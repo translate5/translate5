@@ -1,0 +1,9 @@
+{
+  "helpLink": "http://okapiframework.org/wiki/index.php/ICML_Filter",
+  "extractNotes": "Extraire les notes",
+  "simplifyCodes": "Simplifier le code HTML inline, si possible",
+  "extractMasterSpreads": "Extraire les modèles de page",
+  "skipThreshold": "Taille maximale des modèles de page",
+  "skipThresholdTooltip": "Ignorer les modèles de page supérieurs à cette valeur (en Ko)",
+  "newTuOnBr": "Créer une nouvelle section de texte avec des sauts de ligne forcés<br/>(&lt;br/&gt; elements) [BETA]"
+}

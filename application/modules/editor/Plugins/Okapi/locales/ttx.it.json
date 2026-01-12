@@ -1,0 +1,7 @@
+{
+  "segmentMode": "Modalità di estrazione",
+  "segmentMode0": "Rilevare ed estrarre automaticamente i segmenti. (Se pertinente quelli selezionati, altrimenti tutti.)",
+  "segmentMode1": "Estrarre solo i segmenti già esistenti.",
+  "segmentMode2": "Estrarre tutti (segmenti esistenti e sezioni di testo non segmentate).",
+  "escapeGT": "Proteggere i caratteri «maggiore di» nell’output"
+}

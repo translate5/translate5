@@ -373,8 +373,8 @@ final class Config
             return new $type($type, $nextIndex);
         }
         switch (strtolower($type)) {
-            case LanguageResource::OPEN_TM2:
-                return new OpenTm2($this->testClass, $nextIndex);
+            case LanguageResource::T5_MEMORY:
+                return new T5Memory($this->testClass, $nextIndex);
 
             case LanguageResource::DEEPL:
                 return new DeepL($this->testClass, $nextIndex);

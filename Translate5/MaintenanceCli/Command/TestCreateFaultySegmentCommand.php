@@ -83,14 +83,23 @@ class TestCreateFaultySegmentCommand extends Translate5AbstractCommand
         }
 
         $task = \editor_ModelInstances::taskByGuid($segment->getTaskGuid());
-        $tagCheckEnabled = \editor_Segment_Quality_Manager::instance()->isFullyCheckedType(\editor_Segment_Tag::TYPE_INTERNAL, $task->getConfig());
+        $tagCheckEnabled = \editor_Segment_Quality_Manager::instance()->isFullyCheckedType(
+            \editor_Segment_Tag::TYPE_INTERNAL,
+            $task->getConfig()
+        );
 
         // check, if the segment is already faulty
         $qualityTable = new \editor_Models_Db_SegmentQuality();
 
         // check if the segment already is faulty
         if ($tagCheckEnabled) {
-            $existingFaults = $qualityTable->fetchFiltered(null, (int) $segment->getId(), \editor_Segment_Tag::TYPE_INTERNAL, false, \editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY);
+            $existingFaults = $qualityTable->fetchFiltered(
+                null,
+                (int) $segment->getId(),
+                \editor_Segment_Tag::TYPE_INTERNAL,
+                false,
+                \editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY
+            );
             if ($existingFaults->count() > 0) {
                 $this->io->warning('Segment ' . $segment->getId() . ' is already faulty.');
 
@@ -107,7 +116,8 @@ class TestCreateFaultySegmentCommand extends Translate5AbstractCommand
         }
 
         // create internal tag error
-        $pattern = '#<div class="close.+class="short"[^>]*>&lt;/([0-9]+)&gt;</span>.+</div>#U'; // see \editor_Models_Segment_InternalTag::REGEX_ENDTAG;
+        // see \editor_Models_Segment_InternalTag::REGEX_ENDTAG
+        $pattern = '#<div class="close.+class="short"[^>]*>&lt;/([0-9]+)&gt;</span>.+</div>#U';
         $target = $segment->getTargetEdit();
         $numEndTags = preg_match_all($pattern, $target);
         // if we have an internal tag, we remove one opener, otherwise we simply add a invalid one
@@ -119,7 +129,12 @@ class TestCreateFaultySegmentCommand extends Translate5AbstractCommand
             $msg = 'Removed first closing internal tag from segment "' . \editor_Segment_Tag::strip($target) . '".';
         } else {
             // adds an unclosed internal tag to the front
-            $target = trim('<div class="open 672069643d223122 internal-tag ownttip"><span class="short" title="<g id=&quot;1&quot;>" id="ext-element-848">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;g id="1"&gt;</span></div> ' . trim($target));
+            $target = trim(
+                '<div class="open 672069643d223122 internal-tag ownttip">' .
+                '<span class="short" title="<g id=&quot;1&quot;>" id="ext-element-848">&lt;1&gt;</span>' .
+                '<span class="full" data-originalid="1" data-length="-1">&lt;g id="1"&gt;</span></div> ' .
+                trim($target)
+            );
             $msg = 'Added unclosed internal tag to segment "' . \editor_Segment_Tag::strip($target) . '".';
         }
 

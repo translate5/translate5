@@ -97,7 +97,7 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        if (editor_Services_Manager::SERVICE_OPENTM2 !== $this->languageResource->getServiceType()) {
+        if (editor_Services_Manager::SERVICE_T5_MEMORY !== $this->languageResource->getServiceType()) {
             return false;
         }
 

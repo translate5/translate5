@@ -22,7 +22,7 @@
             </trans-unit>
             <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
                 <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
-                <target>Mit translate5 können Sie SDLXLIFF-, openTM2-XLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</target>
+                <target>Mit translate5 können Sie SDLXLIFF-, t5memory-XLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</target>
             </trans-unit>
             <trans-unit id='dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu'>
                 <source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source>
@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIG9wZW5UTTItWExJRkYgdW5kIC8gb2RlciBDU1YtRGF0ZWllbiBpbiBlaW5lciBiZWxpZWJpZ2VuIFZlcnplaWNobmlzc3RydWt0dXIgYmVpbmhhbHRlbiBrYW5uLiBDU1YtLCBvcGVuVE0yLVhMSUZGLSB1bmQgU0RMWExJRkYtRGF0ZWllbiBrw7ZubmVuIGJlbGllYmlnIGdlbWlzY2h0IHdlcmRlbi4gRGllIFN0cnVrdHVyIHdpcmQgaW0gTGVrdG9yYXQgYWJnZWJpbGRldC4='>
                 <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
-                <target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target>
+                <target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder t5memory-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, t5memory-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target>
             </trans-unit>
             <trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='>
                 <source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source>
@@ -422,11 +422,11 @@
             </trans-unit>
             <trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='>
                 <source>Import von einzelnen SDLXLIFF oder CSV Dateien</source>
-                <target>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</target>
+                <target>Import von einzelnen SDLXLIFF, t5memory-XLIFF oder CSV Dateien</target>
             </trans-unit>
             <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='>
                 <source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
-                <target>Soll nur eine einzelne CSV, openTM2-XLIFF  oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target>
+                <target>Soll nur eine einzelne CSV, t5memory-XLIFF  oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target>
             </trans-unit>
             <trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'>
                 <source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source>
@@ -601,20 +601,20 @@
                 <target>/ Aufruf erfolgte durch IP: </target>
             </trans-unit>
             <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiwgb3BlblRNMi1YTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0sIG9wZW5UTTItWExJRkYtIHVuZCBTRExYTElGRi1EYXRlaWVuIGvDtm5uZW4gYmVsaWViaWcgZ2VtaXNjaHQgd2VyZGVuLiBEaWUgU3RydWt0dXIgd2lyZCBpbSBMZWt0b3JhdCBhYmdlYmlsZGV0Lg=='>
-                <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
-                <target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target>
+                <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, t5memory-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, t5memory-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
+                <target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, t5memory-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, t5memory-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target>
             </trans-unit>
             <trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBtaW5kZXN0ZW5zIGRyZWkgU3BhbHRlbiBlbnRoYWx0ZW4uIEVpbmUgU3BhbHRlIG11c3MgZGVuIFNwYWx0ZW5rb3BmICJtaWQiIGVudGhhbHRlbiB1bmQgZWluZSBlaW5kZXV0aWdlIElEIGplIENTVi1aZWlsZSBlbnRoYWx0ZW4uIEVpbmUgd2VpdGVyZSBTcGFsdGUgbXVzcyBkZW4gU3BhbHRlbmtvcGYgInF1ZWxsZSIgZW50aGFsdGVuIHVuZCBkaWUgUXVlbGxzcHJhY2hlIGVudGhhbHRlbi4gQWxsZSB3ZWl0ZXJlbiBTcGFsdGVuIG1pdCBTcGFsdGVua8O2cGZlbiB3ZXJkZW4gYWxzIFppZWxzcHJhY2hlbnNwYWx0ZW4gYmVoYW5kZWx0IHVuZCBpbXBvcnRpZXJ0LiBEYWJlaSBpc3QgZGVyIFNwYWx0ZW5rb3BmbmFtZSBmcmVpIHfDpGhsYmFyLiBTcGFsdGVuIG9obmUgYmVmw7xsbHRlbiBTcGFsdGVua29wZiBpbiBkZXIgQ1NWLURhdGVpIHdlcmRlbiBiZWltIEltcG9ydCBpZ25vcmllcnQuIFNwYWx0ZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBLb21tYSAmcXVvdDssJnF1b3Q7LCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gJnF1b3Q7JmFwb3M7JnF1b3Q7LiBEaWUgU3BhbHRlbmtvcGZuYW1lbiBkZXIgSUQtU3BhbHRlIChwZXIgZGVmYXVsdCBtaWQpIHVuZCBkZXIgUXVlbGxzcHJhY2hlbi1TcGFsdGUgKHBlciBkZWZhdWx0IHF1ZWxsZSkgc293aWUgZGVyIFNwYWx0ZW50cmVubmVyIHVuZCBkYXMgVGV4dGVya2VubnVuZ3N6ZWljaGVuIGvDtm5uZW4gaW4gZGVyIFN5c3RlbWtvbmZpZ3VyYXRpb24gdm9uIHRyYW5zbGF0ZTUgaW5zdGFsbGF0aW9uc3NwZXppZmlzY2ggw7xiZXJzY2hyaWViZW4gd2VyZGVuLiBaZWlsZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBMaW51eC0sIE1hYy0gb2RlciBXaW5kb3dzemVpbGVudW1icnVjaC4gQ29kaWVydW5nIGRlciBDU1YtRGF0ZWkga2FubiB1dGYtOCwgaXNvLTg4NTktMSBvZGVyIHdpbmRvd3MtMTI1MSBzZWluLiBEaWUgQ1NWLURhdGVpIHdpcmQgaW4gZGVyIHNlbGJlbiBDb2RpZXJ1bmcgZXhwb3J0aWVydCwgaW4gZGVyIHNpZSBiZWltIEltcG9ydCB2b3JsYWcgKEFjaHR1bmc6IEJlaSBlaW5lciDDnGJlcnNldHp1bmcgaW4gTmljaHQtV2VzdGV1cm9ww6Rpc2NoZSBTcHJhY2hlbiBzb2xsdGUgZGFoZXIgdXRmLTggYmVyZWl0cyBhbHMgSW1wb3J0Y29kaWVydW5nIGdld8OkaGx0IHdlcmRlbiku'>
                 <source>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen &quot;&apos;&quot;. Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source>
                 <target>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen &quot;&apos;&quot;. Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target>
             </trans-unit>
             <trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYsIG9wZW5UTTItWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='>
-                <source>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</source>
-                <target>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</target>
+                <source>Import von einzelnen SDLXLIFF, t5memory-XLIFF oder CSV Dateien</source>
+                <target>Import von einzelnen SDLXLIFF, t5memory-XLIFF oder CSV Dateien</target>
             </trans-unit>
             <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1YsIG9wZW5UTTItWExJRkYgb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='>
-                <source>Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
-                <target>Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target>
+                <source>Soll nur eine einzelne CSV, t5memory-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
+                <target>Soll nur eine einzelne CSV, t5memory-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target>
             </trans-unit>
             <trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBtaW5kZXN0ZW5zIGRyZWkgU3BhbHRlbiBlbnRoYWx0ZW4uIEVpbmUgU3BhbHRlIG11c3MgZGVuIFNwYWx0ZW5rb3BmICJtaWQiIGVudGhhbHRlbiB1bmQgZWluZSBlaW5kZXV0aWdlIElEIGplIENTVi1aZWlsZSBlbnRoYWx0ZW4uIEVpbmUgd2VpdGVyZSBTcGFsdGUgbXVzcyBkZW4gU3BhbHRlbmtvcGYgInF1ZWxsZSIgZW50aGFsdGVuIHVuZCBkaWUgUXVlbGxzcHJhY2hlIGVudGhhbHRlbi4gQWxsZSB3ZWl0ZXJlbiBTcGFsdGVuIG1pdCBTcGFsdGVua8O2cGZlbiB3ZXJkZW4gYWxzIFppZWxzcHJhY2hlbnNwYWx0ZW4gYmVoYW5kZWx0IHVuZCBpbXBvcnRpZXJ0LiBEYWJlaSBpc3QgZGVyIFNwYWx0ZW5rb3BmbmFtZSBmcmVpIHfDpGhsYmFyLiBTcGFsdGVuIG9obmUgYmVmw7xsbHRlbiBTcGFsdGVua29wZiBpbiBkZXIgQ1NWLURhdGVpIHdlcmRlbiBiZWltIEltcG9ydCBpZ25vcmllcnQuIFNwYWx0ZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBLb21tYSAmcXVvdDssJnF1b3Q7LCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gKCZxdW90OykuIERpZSBTcGFsdGVua29wZm5hbWVuIGRlciBJRC1TcGFsdGUgKHBlciBkZWZhdWx0IG1pZCkgdW5kIGRlciBRdWVsbHNwcmFjaGVuLVNwYWx0ZSAocGVyIGRlZmF1bHQgcXVlbGxlKSBzb3dpZSBkZXIgU3BhbHRlbnRyZW5uZXIgdW5kIGRhcyBUZXh0ZXJrZW5udW5nc3plaWNoZW4ga8O2bm5lbiBpbiBkZXIgU3lzdGVta29uZmlndXJhdGlvbiB2b24gdHJhbnNsYXRlNSBpbnN0YWxsYXRpb25zc3BlemlmaXNjaCDDvGJlcnNjaHJpZWJlbiB3ZXJkZW4uIFplaWxlbnRyZW5uZXIgZGVyIENTViBpc3QgZWluIExpbnV4LSwgTWFjLSBvZGVyIFdpbmRvd3N6ZWlsZW51bWJydWNoLiBDb2RpZXJ1bmcgZGVyIENTVi1EYXRlaSBrYW5uIHV0Zi04LCBpc28tODg1OS0xIG9kZXIgd2luZG93cy0xMjUyIHNlaW4uIERpZSBDU1YtRGF0ZWkgd2lyZCBpbiBkZXIgc2VsYmVuIENvZGllcnVuZyBleHBvcnRpZXJ0LCBpbiBkZXIgc2llIGJlaW0gSW1wb3J0IHZvcmxhZyAoQWNodHVuZzogQmVpIGVpbmVyIMOcYmVyc2V0enVuZyBpbiBOaWNodC1XZXN0ZXVyb3DDpGlzY2hlIFNwcmFjaGVuIHNvbGx0ZSBkYWhlciB1dGYtOCBiZXJlaXRzIGFscyBJbXBvcnRjb2RpZXJ1bmcgZ2V3w6RobHQgd2VyZGVuKS4='>
                 <source>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen (&quot;). Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1252 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source>
@@ -742,40 +742,6 @@
                 <source>Source</source>
                 <target>Source</target>
             </trans-unit>
-            <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='>
-                <source>{salutation} {surName},
-                    <br/>
-                    <br/>
-                </source>
-                <target>{salutation} {surName},
-                    <br/>
-                    <br/>
-                </target>
-            </trans-unit>
-            <trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='>
-                <source>
-                    <br/>
-                    <br/>Vielen Dank und viele Grüße,
-
-                    <br/>Ihr Projektmanagement Team
-
-                    <br/>{companyName}
-
-                    <br/>
-                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-                </source>
-                <target>
-                    <br/>
-                    <br/>Vielen Dank und viele Grüße,
-
-                    <br/>Ihr Projektmanagement Team
-
-                    <br/>{companyName}
-
-                    <br/>
-                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-                </target>
-            </trans-unit>
             <trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIHdpciBlaW5lIEFuZnJhZ2UgenVyIMOEbmRlcnVuZyBkZXMgUGFzc3dvcnRlcyBmw7xyIElociBLb250byBhdWYge3BvcnRhbFVybH0gZXJoYWx0ZW4gaGFiZW4uIAoKV2VubiBTaWUgSWhyIFBhc3N3b3J0IMOkbmRlcm4gbcO2Y2h0ZW4sIGRhbm4gYmVmb2xnZW4gU2llIGJpdHRlIGZvbGdlbmRlIEFud2Vpc3VuZ2VuOgoKRGVyIGZvbGdlbmRlIExpbmsgZW50aMOkbHQgZWluZW4gZsO8ciAzMCBNaW51dGVuIGfDvGx0aWdlbiBTY2hsw7xzc2VsLCBtaXQgd2VsY2hlbSBTaWUgSWhyIFBhc3N3b3J0IG5ldSBzZXR6ZW4ga8O2bm5lbi4gQXVzIFNpY2hlcmhlaXRzZ3LDvG5kZW4gZnVua3Rpb25pZXJ0IGRpZXMgbnVyLCB3ZW5uIFNpZSBkZW4gZm9sZ2VuZGVuIExpbmsgaW0gc2VsYmVuIEJyb3dzZXIgaW4gZGVtIFNpZSBkaWUgw4RuZGVydW5nIElocmVzIFBhc3N3b3J0IGFuZ2Vmb3JkZXJ0IGhhYmVuIMO2ZmZuZW4gdW5kIHp1ZGVtIG5hY2ggWnVyw7xja3NldHplbiBkZXMgUGFzc3dvcnRzIElocmVuIEJyb3dzZXIgbmljaHQgbmV1IGdlc3RhcnRldCBoYWJlbi4KCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpMaW5rIHVtIFBhc3N3b3J0IG5ldSB6dSBzZXR6ZW4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e2hhc2h1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgdW50ZXIgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke3BvcnRhbFVybH17cmVzZXR1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKU29sbHRlbiBTaWUgZGllIEFuZnJhZ2UgbmljaHQgc2VsYnN0IGF1c2dlbMO2c3QgaGFiZW4sIGJpdHRlbiB3aXIgU2llIHVucyBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4KCntmb290ZXJ9'>
                 <source>{header}
 Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf {portalUrl} erhalten haben. 
@@ -892,12 +858,180 @@ Ihr neuer Login-Name:
                 <source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source>
                 <target>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</target>
             </trans-unit>
-            <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
-                <source>{ProjectOverviewYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/1TkBCfo9ovw</target>
+            <trans-unit id='VDU6OkxpbmtDb25zb3J0aXVt'>
+                <source>T5::LinkConsortium</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
             </trans-unit>
-            <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
-                <source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source>
+            <trans-unit id="VDU6OkNsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::CliYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=28&amp;autoplay=1" dir="auto">0:28</a> Befehlsübersicht
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=34&amp;autoplay=1" dir="auto">0:34</a> Hilfe zu einem Befehl
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=41&amp;autoplay=1" dir="auto">0:41</a> Einstellungsmöglichkeiten
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=82&amp;autoplay=1" dir="auto">1:22</a> Pluginübersicht
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OkNsaVlvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::CliYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/oUhUakQFmVw</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkN1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnQ=">
+                <source>T5::CustomerYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=19&amp;autoplay=1" dir="auto">0:19</a> Standard-Benutzerzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=188&amp;autoplay=1" dir="auto">3:08</a> Benutzerverwaltung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=206&amp;autoplay=1" dir="auto">3:26</a> Automatisierte Benutzerzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OkN1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmw=">
+                <source>T5::CustomerYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/Z-RPoxq64cI</target>
+            </trans-unit>
+            <trans-unit id="VDU6OkVkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::EditorYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=9&amp;autoplay=1" dir="auto">0:09</a> Interface
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=66&amp;autoplay=1" dir="auto">1:06</a> Ansicht ändern
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=85&amp;autoplay=1" dir="auto">1:25</a> Bearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=108&amp;autoplay=1" dir="auto">1:48</a> Konkordanzsuche
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=121&amp;autoplay=1" dir="auto">2:01</a> Schaltflächen für die Segmentbearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=138&amp;autoplay=1" dir="auto">2:18</a> Lesezeichen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=154&amp;autoplay=1" dir="auto">2:34</a> Tastenkürzel
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=175&amp;autoplay=1" dir="auto">2:55</a> Segmentscrollen und TrackChanges-Funktion
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=210&amp;autoplay=1" dir="auto">3:30</a> Wiederholungseditor
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=224&amp;autoplay=1" dir="auto">3:44</a> Farbliche Markierung von Wörtern
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=267&amp;autoplay=1" dir="auto">4:27</a> Tags
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=289&amp;autoplay=1" dir="auto">4:49</a> Bearbeitungsstatus
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=308&amp;autoplay=1" dir="auto">5:08</a> Suchen und Ersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=323&amp;autoplay=1" dir="auto">5:23</a> Segment-Metadaten
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=341&amp;autoplay=1" dir="auto">5:41</a> Dateinbaum
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=369&amp;autoplay=1" dir="auto">6:09</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OkVkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::EditorYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/fERwuq1yXUM</target>
+            </trans-unit>
+            <trans-unit id="VDU6Okluc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudA==">
+                <source>T5::InstantTranslateYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=10&amp;autoplay=1" dir="auto">0:10</a> InstantTranslate aufrufen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=23&amp;autoplay=1" dir="auto">0:23</a> Text übersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=60&amp;autoplay=1" dir="auto">1:00</a> Datei übersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=99&amp;autoplay=1" dir="auto">1:39</a> Übersetzungsquellen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=105&amp;autoplay=1" dir="auto">1:45</a> TM-Matches
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=145&amp;autoplay=1" dir="auto">2:25</a> Fuzzy-Match Einstellung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=171&amp;autoplay=1" dir="auto">2:51</a> Anbindung TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=203&amp;autoplay=1" dir="auto">3:23</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6Okluc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZVVybA==">
+                <source>T5::InstantTranslateYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/6h8vBsRbpjk</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnQ=">
+                <source>T5::PreferencesYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=11&amp;autoplay=1" dir="auto">0:11</a> Systemkonfigurationen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=83&amp;autoplay=1" dir="auto">1:23</a> Konfigurationen - Kunde
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=105&amp;autoplay=1" dir="auto">1:45</a> Konfigurationen - Aufgabe
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=127&amp;autoplay=1" dir="auto">2:07</a> Konfigurationen - Import
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=141&amp;autoplay=1" dir="auto">2:21</a> In-Context Schriften
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=218&amp;autoplay=1" dir="auto">3:38</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmw=">
+                <source>T5::PreferencesYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/O2Z8wlzC-oo</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlByb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::ProjectOverviewYoutubeVideoGuideDescriptionContent</source>
                 <target>
                     <br/>
                     <figure>
@@ -925,12 +1059,61 @@ Ihr neuer Login-Name:
                     </figure>
                 </target>
             </trans-unit>
-            <trans-unit id='e1Rlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZVVybH0='>
-                <source>{TermPortalYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/zwby0cMDdKM</target>
+            <trans-unit id="VDU6OlByb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::ProjectOverviewYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/1TkBCfo9ovw</target>
             </trans-unit>
-            <trans-unit id='e1Rlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
-                <source>{TermPortalYoutubeVideoGuideDescriptionContent}</source>
+            <trans-unit id="VDU6OlJlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::ResourcesYoutubeVideoGuideDescriptionContent</source>
+                <target><br/>
+                    <figure>
+                    <figcaption><b>Übersicht:</b></figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=15&amp;autoplay=1" dir="auto">0:15</a> Sprachressourcenverwaltung<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=37&amp;autoplay=1" dir="auto">0:37</a> Sprachressource hinzufügen<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=127&amp;autoplay=1" dir="auto">2:07</a> Zugewiesene Aufgaben<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=146&amp;autoplay=1" dir="auto">2:26</a> Aufgaben reimportieren<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=200&amp;autoplay=1" dir="auto">2:40</a> Freigabeworkflow<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=212&amp;autoplay=1" dir="auto">3:32</a> Sprachressourcen im Projektfenster<br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
+                </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlJlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::ResourcesYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/fgSm2Ygw0uk</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50">
+                <source>T5::TaskOverviewYoutubeVideoGuideDescriptionContent</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=10&amp;autoplay=1" dir="auto">0:10</a> Aufgabenübersicht
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=22&amp;autoplay=1" dir="auto">0:22</a> Status-Kopfzeile
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=34&amp;autoplay=1" dir="auto">0:34</a> Aktueller Workflow-Kopfzeile
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=57&amp;autoplay=1" dir="auto">0:57</a> Erweiterte Filter
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=81&amp;autoplay=1" dir="auto">1:21</a> Auswertungen anzeigen (KPIs)
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJs">
+                <source>T5::TaskOverviewYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/iZHRx6vpjCU</target>
+            </trans-unit>
+            <trans-unit id="VDU6OlRlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudA==">
+                <source>T5::TermPortalYoutubeVideoGuideDescriptionContent</source>
                 <target>
                     <br/>
                     <br/>
@@ -975,121 +1158,13 @@ Ihr neuer Login-Name:
                     </figure>
                 </target>
             </trans-unit>
-            <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZVVybH0='>
-                <source>{InstantTranslateYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/6h8vBsRbpjk</target>
-            </trans-unit>
-            <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
-                <source>{InstantTranslateYoutubeVideoGuideDescriptionContent}</source>
-                <target>
-                    <br/>
-                    <br/>
-                    <figure>
-                        <figcaption>
-                            <b>Übersicht:</b>
-                        </figcaption>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=10&amp;autoplay=1" dir="auto">0:10</a> InstantTranslate aufrufen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=23&amp;autoplay=1" dir="auto">0:23</a> Text übersetzen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=60&amp;autoplay=1" dir="auto">1:00</a> Datei übersetzen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=99&amp;autoplay=1" dir="auto">1:39</a> Übersetzungsquellen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=105&amp;autoplay=1" dir="auto">1:45</a> TM-Matches
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=145&amp;autoplay=1" dir="auto">2:25</a> Fuzzy-Match Einstellung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=171&amp;autoplay=1" dir="auto">2:51</a> Anbindung TermPortal
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=203&amp;autoplay=1" dir="auto">3:23</a> Kontaktinformationen
-                        <br/>
-                    </figure>
-                </target>
-             </trans-unit>
-            <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
-                <source>{EditorYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/fERwuq1yXUM</target>
-            </trans-unit>
-            <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
-                <source>{EditorYoutubeVideoGuideDescriptionContent}</source>
-                <target>
-                    <br/>
-                    <figure>
-                        <figcaption>
-                            <b>Übersicht:</b>
-                        </figcaption>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=9&amp;autoplay=1" dir="auto">0:09</a> Interface
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=66&amp;autoplay=1" dir="auto">1:06</a> Ansicht ändern
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=85&amp;autoplay=1" dir="auto">1:25</a> Bearbeitung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=108&amp;autoplay=1" dir="auto">1:48</a> Konkordanzsuche
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=121&amp;autoplay=1" dir="auto">2:01</a> Schaltflächen für die Segmentbearbeitung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=138&amp;autoplay=1" dir="auto">2:18</a> Lesezeichen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=154&amp;autoplay=1" dir="auto">2:34</a> Tastenkürzel
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=175&amp;autoplay=1" dir="auto">2:55</a> Segmentscrollen und TrackChanges-Funktion
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=210&amp;autoplay=1" dir="auto">3:30</a> Wiederholungseditor
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=224&amp;autoplay=1" dir="auto">3:44</a> Farbliche Markierung von Wörtern
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=267&amp;autoplay=1" dir="auto">4:27</a> Tags
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=289&amp;autoplay=1" dir="auto">4:49</a> Bearbeitungsstatus
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=308&amp;autoplay=1" dir="auto">5:08</a> Suchen und Ersetzen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=323&amp;autoplay=1" dir="auto">5:23</a> Segment-Metadaten
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=341&amp;autoplay=1" dir="auto">5:41</a> Dateinbaum
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=369&amp;autoplay=1" dir="auto">6:09</a> Kontaktinformationen
-                        <br/>
-                    </figure>
-                </target>
+            <trans-unit id="VDU6OlRlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZVVybA==">
+                <source>T5::TermPortalYoutubeVideoGuideUrl</source>
+                <target>https://www.youtube.com/embed/zwby0cMDdKM</target>
             </trans-unit>
             <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'>
                 <source>'%value%' does not match the expected structure for a DNS hostname</source>
                 <target>'%value%' does not match the expected structure for a DNS hostname</target>
-            </trans-unit>
-            <trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmx9'>
-                <source>{PreferencesYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/O2Z8wlzC-oo</target>
-            </trans-unit>
-            <trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'>
-                <source>{PreferencesYoutubeVideoGuideDescriptionContent}</source>
-                <target>
-                    <br/>
-                    <figure>
-                        <figcaption>
-                            <b>Übersicht:</b>
-                        </figcaption>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=11&amp;autoplay=1" dir="auto">0:11</a> Systemkonfigurationen
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=83&amp;autoplay=1" dir="auto">1:23</a> Konfigurationen - Kunde
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=105&amp;autoplay=1" dir="auto">1:45</a> Konfigurationen - Aufgabe
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=127&amp;autoplay=1" dir="auto">2:07</a> Konfigurationen - Import
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=141&amp;autoplay=1" dir="auto">2:21</a> In-Context Schriften
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=218&amp;autoplay=1" dir="auto">3:38</a> Kontaktinformationen
-                        <br/>
-                    </figure>
-                </target>
             </trans-unit>
             <trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'>
                 <source>The two given tokens do not match</source>
@@ -1099,91 +1174,6 @@ Ihr neuer Login-Name:
                 <source>Pmlight</source>
                 <target>PM Light</target>
             </trans-unit>
-            <trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
-                <source>{CliYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/oUhUakQFmVw</target>
-            </trans-unit>
-            <trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
-                <source>{CliYoutubeVideoGuideDescriptionContent}</source>
-                <target>
-                    <br/>
-                    <figure>
-                        <figcaption>
-                            <b>Übersicht:</b>
-                        </figcaption>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
-                        <br/>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=28&amp;autoplay=1" dir="auto">0:28</a> Befehlsübersicht
-                        <br/>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=34&amp;autoplay=1" dir="auto">0:34</a> Hilfe zu einem Befehl
-                        <br/>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=41&amp;autoplay=1" dir="auto">0:41</a> Einstellungsmöglichkeiten
-                        <br/>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=82&amp;autoplay=1" dir="auto">1:22</a> Pluginübersicht
-                        <br/>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log
-                        <br/>
-                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation
-                        <br/>
-                    </figure>
-                </target>
-            </trans-unit>
-            <trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
-                <source>{TaskOverviewYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/iZHRx6vpjCU</target>
-            </trans-unit>
-            <trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
-                <source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
-                <target>
-                    <br/>
-                    <figure>
-                        <figcaption>
-                            <b>Übersicht:</b>
-                        </figcaption>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=10&amp;autoplay=1" dir="auto">0:10</a> Aufgabenübersicht
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=22&amp;autoplay=1" dir="auto">0:22</a> Status-Kopfzeile
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=34&amp;autoplay=1" dir="auto">0:34</a> Aktueller Workflow-Kopfzeile
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=57&amp;autoplay=1" dir="auto">0:57</a> Erweiterte Filter
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=81&amp;autoplay=1" dir="auto">1:21</a> Auswertungen anzeigen (KPIs)
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen
-                        <br/>
-                    </figure>
-                </target>
-            </trans-unit>
-            <trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmx9'>
-                <source>{CustomerYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/Z-RPoxq64cI</target>
-            </trans-unit>
-            <trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'>
-                <source>{CustomerYoutubeVideoGuideDescriptionContent}</source>
-                <target>
-                    <br/>
-                    <figure>
-                        <figcaption>
-                            <b>Übersicht:</b>
-                        </figcaption>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=19&amp;autoplay=1" dir="auto">0:19</a> Standard-Benutzerzuweisung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=188&amp;autoplay=1" dir="auto">3:08</a> Benutzerverwaltung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=206&amp;autoplay=1" dir="auto">3:26</a> Automatisierte Benutzerzuweisung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung
-                        <br/>
-                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen
-                        <br/>
-                    </figure>
-                </target>
-            </trans-unit>
             <trans-unit id='UmVkaXJlY3QgdG8gbG9naW4uLi4='>
                 <source>Redirect to login...</source>
                 <target>Redirect to login...</target>
@@ -1191,30 +1181,6 @@ Ihr neuer Login-Name:
             <trans-unit id='U2VociBnZWVocnRlKHIp'>
                 <source>Sehr geehrte(r)</source>
                 <target>Sehr geehrte(r)</target>
-            </trans-unit>
-            <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='>
-                <source>{LinkConsortium}</source>
-                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
-            </trans-unit>
-            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
-                <source>{ResourcesYoutubeVideoGuideUrl}</source>
-                <target>https://www.youtube.com/embed/fgSm2Ygw0uk</target>
-            </trans-unit>
-            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
-                <source>{ResourcesYoutubeVideoGuideDescriptionContent}</source>
-                <target><br/>
-                <figure>
-                    <figcaption><b>Übersicht:</b></figcaption>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=15&amp;autoplay=1" dir="auto">0:15</a> Sprachressourcenverwaltung<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=37&amp;autoplay=1" dir="auto">0:37</a> Sprachressource hinzufügen<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=127&amp;autoplay=1" dir="auto">2:07</a> Zugewiesene Aufgaben<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=146&amp;autoplay=1" dir="auto">2:26</a> Aufgaben reimportieren<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=200&amp;autoplay=1" dir="auto">2:40</a> Freigabeworkflow<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=212&amp;autoplay=1" dir="auto">3:32</a> Sprachressourcen im Projektfenster<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
-                </figure>
-                </target>
             </trans-unit>
             <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
               <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>

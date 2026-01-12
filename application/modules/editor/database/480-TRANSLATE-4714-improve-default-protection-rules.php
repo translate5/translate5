@@ -44,7 +44,6 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-
 $db->query(
     <<<SQL
 UPDATE `LEK_content_protection_content_recognition`
@@ -104,6 +103,11 @@ SQL
 )->execute();
 
 $ruleIds = $db->fetchCol('SELECT id FROM `LEK_content_protection_content_recognition` WHERE type IN ("integer") and isDefault = 1');
+
+// workers shall not run in API-tests
+if ($this->isTestOrInstallEnvironment()) { // @phpstan-ignore-line
+    return;
+}
 
 foreach ($ruleIds as $ruleId) {
     $worker = new RecalculateRulesHashWorker();

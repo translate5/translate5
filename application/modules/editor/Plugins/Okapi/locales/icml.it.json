@@ -1,0 +1,9 @@
+{
+  "helpLink": "http://okapiframework.org/wiki/index.php/ICML_Filter",
+  "extractNotes": "Estrarre le note",
+  "simplifyCodes": "Semplificare l’HTML inline se possibile",
+  "extractMasterSpreads": "Estrarre le pagine modello",
+  "skipThreshold": "Dimensioni massime pagine modello",
+  "skipThresholdTooltip": "Ignorare le pagine modello più grandi di questo valore (in KB)",
+  "newTuOnBr": "Creare un nuovo paragrafo di testo in caso di a capo automatico<br/>(&lt;br/&gt; elements) [BETA]"
+}

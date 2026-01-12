@@ -53,6 +53,11 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
+// no need to run this in tests or installs
+if ($this->isTestOrInstallEnvironment()) { // @phpstan-ignore-line
+    return;
+}
+
 $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
 
 $s = $db->select()
@@ -296,7 +301,7 @@ function checkWhitespaces(array $tags, string $target): array
         $matches = null;
         preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $tag, $matches);
 
-        if (! empty($matches)) {
+        if (! empty($matches)) { // @phpstan-ignore-line
             $class = $matches[2][0];
             $type = $matches[3][0];
             $decoded = pack('H*', $class);

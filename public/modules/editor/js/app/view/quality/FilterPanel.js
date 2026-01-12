@@ -105,7 +105,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
                     if (record.get('qtooltip') || record.hasCriticalErrors()) {
                         let tooltip = record.get('qtooltip');
                         if (record.hasCriticalErrors()) {
-                            tooltip = tooltip ? tooltip + '</br>' : '';
+                            tooltip = tooltip ? tooltip + '<br/>' : '';
                             tooltip += record.get('qtooltipCriticalSuffix');
                         }
                         meta.tdAttr = 'data-qtip="' + tooltip + '"';

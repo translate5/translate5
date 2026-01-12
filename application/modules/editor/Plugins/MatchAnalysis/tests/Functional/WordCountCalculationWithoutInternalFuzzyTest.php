@@ -52,7 +52,7 @@ class WordCountCalculationWithoutInternalFuzzyTest extends ImportTestAbstract
 
         $config
             ->addLanguageResource(
-                'opentm2',
+                't5memory',
                 'WordCountCalculationWithoutInternalFuzzyTest_TM.tmx',
                 $customerId,
                 $sourceLangRfc,

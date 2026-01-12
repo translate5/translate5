@@ -31,7 +31,7 @@ namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_Config;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_OpenTM2_Service as Service;
+use editor_Services_T5Memory_Service as Service;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
@@ -109,8 +109,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         parent::configure();
 
         $this
-            ->setDescription('Migrates all existing OpenTM2 language resources to t5memory')
-            ->setHelp('Tool exports OpenTM2 language resources one by one and '
+            ->setDescription('Migrates all existing T5Memory language resources to t5memory')
+            ->setHelp('Tool exports T5Memory language resources one by one and '
                 . 'imports data to the t5memory provided as endpoint argument')
             ->addArgument(
                 self::ARGUMENT_SOURCE_URL,
@@ -366,7 +366,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private function addUrlToConfig(Uri $url): void
     {
         $config = ZfExtended_Factory::get(editor_Models_Config::class);
-        $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
+        $config->loadByName('runtimeOptions.LanguageResources.t5memory.server');
         $value = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
         $value[] = (string) $url;
         $config->setValue(json_encode($value, JSON_THROW_ON_ERROR));
@@ -390,7 +390,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $namespace = $service->getServiceNamespace();
 
         $config = ZfExtended_Factory::get(editor_Models_Config::class);
-        $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
+        $config->loadByName('runtimeOptions.LanguageResources.t5memory.server');
         $value = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
 
         array_splice($value, array_search($sourceUrl, $value, true), 1);

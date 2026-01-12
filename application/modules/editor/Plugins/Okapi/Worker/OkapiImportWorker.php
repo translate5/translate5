@@ -40,12 +40,19 @@ use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfAssocRepository;
 use SplFileInfo;
 use Throwable;
 use Zend_Registry;
+use ZfExtended_Debug;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
 
 class OkapiImportWorker extends editor_Models_Task_AbstractWorker
 {
     private ZfExtended_Logger $logger;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->doDebug = $this->doDebug || ZfExtended_Debug::hasLevel('plugin', 'OkapiWorkers');
+    }
 
     protected function validateParameters(array $parameters): bool
     {
@@ -81,8 +88,7 @@ class OkapiImportWorker extends editor_Models_Task_AbstractWorker
         $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
 
         $taskConfig = $this->task->getConfig();
-        $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
-        $serverUsed = $okapiConfig->serverUsed ?? 'not set';
+        $serverUsed = $taskConfig->runtimeOptions->plugins->Okapi->serverUsed ?? 'not set';
         $api = new OkapiAdapter($taskConfig);
 
         $tbAssoc = TaskBconfAssocRepository::create()->findForTask($this->task->getTaskGuid());
@@ -90,20 +96,23 @@ class OkapiImportWorker extends editor_Models_Task_AbstractWorker
         XmlEntitiesPatcher::patchBeforeImport($tbAssoc->getBconfId(), $file);
 
         try {
-            $this->logger->info(
-                'E1444',
-                'Okapi Plug-In: File "{fileName}" (id: {fileId}) will be imported with Okapi "{okapi}"',
-                [
-                    'task' => $this->task,
-                    'okapi' => $serverUsed,
-                    'fileId' => $fileId,
-                    'fileName' => $file->getBasename(),
-                    'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
-                    'usedBconf' => $params['bconfName'],
-                ],
-                ['tasklog', 'ecode']
-            );
+            $message = 'Okapi Plug-In: File "{fileName}" (id: {fileId}) will be imported with Okapi "{okapi}"';
+            $extra = [
+                'task' => $this->task,
+                'okapi' => $serverUsed,
+                'fileId' => $fileId,
+                'fileName' => $file->getBasename(),
+                'usedBconf' => $params['bconfName'],
+            ];
+            $this->logger->info('E1444', $message, $extra, ['tasklog', 'ecode']);
 
+            if ($this->doDebug) {
+                error_log(
+                    "\n=====\n" .
+                    ZfExtended_Logger::renderMessageExtra($message, $extra) . ', task: ' . $this->task->getId() .
+                    ', used BCONF: ' . $extra['usedBconf'] . ', used server: ' . $extra['okapi']
+                );
+            }
             $api->createProject();
             // upload the BCONF set by worker-params
             $api->uploadOkapiConfig($params['bconfFilePath'], true);
@@ -142,6 +151,13 @@ class OkapiImportWorker extends editor_Models_Task_AbstractWorker
                     'file' => basename($file->__toString()),
                 ],
             ];
+            if ($this->doDebug) {
+                error_log(
+                    "\n=====\n" .
+                    ZfExtended_Logger::renderMessageExtra($params['errorMsg'], $params['errorExtra']) .
+                    ', task: ' . $this->task->getId() . ', fileId: ' . $fileId
+                );
+            }
             // this will trigger an exception when the filter
             // is resolved in the main application on import finish
             $filterManager = ZfExtended_Factory::get(Manager::class);

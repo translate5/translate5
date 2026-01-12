@@ -315,7 +315,7 @@ class editor_Services_SDLLanguageCloud_HttpApi
     }
 
     /**
-     * parses and processes the response of OpenTM2, and handles the errors
+     * parses and processes the response of T5Memory, and handles the errors
      * @return boolean
      */
     protected function processResponse(Zend_Http_Response $response)
@@ -366,7 +366,7 @@ class editor_Services_SDLLanguageCloud_HttpApi
     }
 
     /**
-     * returns the current time stamp in the expected format for OpenTM2
+     * returns the current time stamp in the expected format for T5Memory
      */
     protected function nowDate()
     {

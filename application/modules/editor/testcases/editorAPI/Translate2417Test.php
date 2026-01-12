@@ -33,7 +33,7 @@ use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * This test will test the customerWriteAsDefaultIds flag in the languageresources-customer assoc.
- * The used tm memory is OpenTm2.
+ * The used tm memory is T5Memory.
  */
 class Translate2417Test extends JsonTestAbstract
 {
@@ -49,7 +49,7 @@ class Translate2417Test extends JsonTestAbstract
         $targetLangRfc = 'en';
         $customerId = static::getTestCustomerId();
         static::$translationMemory = $config
-            ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('t5memory', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
             ->addDefaultCustomerId($customerId, true);
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)

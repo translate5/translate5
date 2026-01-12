@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,7 +31,7 @@ $this->render('general.phtml');
 
 // Setup subject
 $this->subject = $this->translate->_('Menschliche revision fertiggestellt')
-    .' - ' . $this->project->getTaskName() . '"';
+    . ' - ' . $this->project->getTaskName() . '"';
 
 $url = $this->data['portalUrl'] . '/' . $this->url;
 
@@ -55,8 +55,7 @@ $data['body'] = $this->templateApply(
 $mailBody = $this->templateApply('
 {header}
 {body}
-{footer}'
-, $data);
+{footer}', $data);
 
 // Prepare text version
 $this->textbody = strip_tags($mailBody);

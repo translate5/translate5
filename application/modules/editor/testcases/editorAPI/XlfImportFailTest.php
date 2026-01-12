@@ -42,7 +42,7 @@ class XlfImportFailTest extends ImportTestAbstract
     protected static function setupImport(Config $config): void
     {
         $config
-            ->addTask('en', 'de', -1, 'ibm-opentm2-fail3.xlf')
+            ->addTask('en', 'de', -1, 'ibm-t5memory-fail3.xlf')
             ->setNotToFailOnError();
     }
 

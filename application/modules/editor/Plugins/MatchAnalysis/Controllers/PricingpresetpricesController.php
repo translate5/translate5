@@ -26,6 +26,12 @@
  END LICENSE AND COPYRIGHT
  */
 
+/**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * $translate->_('Are you sure you want to delete prices for this language combination?');
+ */
+
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
 use MittagQI\ZfExtended\MismatchException;

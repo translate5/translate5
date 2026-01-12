@@ -1,0 +1,7 @@
+{
+  "segmentMode": "Mode d’extraction",
+  "segmentMode0": "Détecter et extraire automatiquement les segments. (Extraire cette sélection de segments si cela est pertinent, sinon extraire tous les segment)",
+  "segmentMode1": "Extraire uniquement les segments existants.",
+  "segmentMode2": "Tout extraire (segments existants et passages non segmentés).",
+  "escapeGT": "Protection des caractères «plus grands que» dans l’output"
+}

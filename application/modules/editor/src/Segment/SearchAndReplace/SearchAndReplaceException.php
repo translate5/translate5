@@ -41,6 +41,6 @@ class SearchAndReplaceException extends \ZfExtended_ErrorCodeException
     protected $domain = 'editor.searchandreplace';
 
     protected static $localErrorCodes = [
-        'E1192' => 'Replace all can not be used for task with usageMode "simultaneous"',
+        'E1192' => 'Replace all can not be used for task with usageMode “simultaneous”',
     ];
 }

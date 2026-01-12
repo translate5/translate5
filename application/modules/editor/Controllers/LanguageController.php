@@ -27,6 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
+ * ============================================
+ * -- special table translations --
+ * $translateTable->__('LEK_languages', 'langName');
+ */
+
+/**
  * LanguageController
  */
 class editor_LanguageController extends ZfExtended_RestController

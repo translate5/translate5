@@ -165,7 +165,7 @@ class JobExceptionTransformer
                 [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
                 [
                     'task' => $e->task,
-                    'categories' => implode('</br>', $e->categories),
+                    'categories' => implode('<br/>', $e->categories),
                 ]
             ),
             AttemptToRemoveJobInUseException::class => EntityConflictException::createResponse(
