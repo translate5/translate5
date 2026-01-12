@@ -15,6 +15,66 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.33.0] - 2026-01-12
+
+### Important Notes:
+#### [TRANSLATE-5125](https://jira.translate5.net/browse/TRANSLATE-5125)
+KPI statistics for Levenshtein distance and post-editing time will be enabled now by default. This may require significant processing time on large databases on activation. The calculations can run automatically during an update or be triggered manually alongside the active installation.
+To skip automatic statistics generation during update, set:
+resources.db.statistics.enabled = 0 
+in installation.ini before starting the update.
+To generate statistics manually after the update, set the flag to 1 and run:
+statistics:sqlite:init --aggregate.
+
+Note for installations with statistics already enabled (resources.db.statistics.enabled = 1):
+Starting with this release, the default statistics engine has been changed to sqlite. If you want to continue using the previous default (mariadb), add the following to your installation.ini:
+resources.db.statistics.engine = "mariadb"
+ 
+
+
+### Changed
+**[TRANSLATE-5191](https://jira.translate5.net/browse/TRANSLATE-5191): t5memory - Rename from OpenTM2 to t5memory in UI** <br>
+Rename OpenTM2 to T5Memory
+
+**[TRANSLATE-5175](https://jira.translate5.net/browse/TRANSLATE-5175): Editor general - Rework internal localization of translate5 texts and add FR and IT** <br>
+Rework of localization: Cleanup of existing localization XLIFFs and introduce IT and FR as new translations of the application.
+
+
+**[TRANSLATE-5160](https://jira.translate5.net/browse/TRANSLATE-5160): Okapi integration - Modify default okapi MIF settings** <br>
+Introduced modified default okapi MIF settings as t5 default Adobe FrameMaker MIF documents' settings
+
+**[TRANSLATE-5125](https://jira.translate5.net/browse/TRANSLATE-5125): Installation & Update, Workflows - Activate KPI statistics feature for on-premise clients** <br>
+Enabled KPI statistics for Levenshtein distance and post-editing time across all installations
+
+**[TRANSLATE-5115](https://jira.translate5.net/browse/TRANSLATE-5115): Test framework - Solve failing test "OkapiExportBconfTest" in local test-runs** <br>
+FIX: Test-suite was not running properly
+
+**[TRANSLATE-5101](https://jira.translate5.net/browse/TRANSLATE-5101): InstantTranslate - InstantTranslate form make use of project description a config** <br>
+Task description field can be configured if visible or not in human revision popup.
+
+**[TRANSLATE-5089](https://jira.translate5.net/browse/TRANSLATE-5089): t5memory - Set mock context for segments on update** <br>
+Set mock context for segments on update
+
+**[TRANSLATE-5077](https://jira.translate5.net/browse/TRANSLATE-5077): Editor general - Introduce info icon and tooltip with segment meta data in concordance search analogous to fuzzy panel** <br>
+Concordance search results now display a popup with meta data, just like in the "Matches" tab
+
+**[TRANSLATE-4950](https://jira.translate5.net/browse/TRANSLATE-4950): Editor general - Implement a helper to find XSS vulnerabilities in translate5 and fix found vulnerabilities** <br>
+7.33.0: Fix a place in termportal what was not working anymore due the XSS fixes + additional XSS preventions
+7.29.2: In order to be save against XSS attacks a helper tool to find them while implementation is introduced, so found vulnerabilities are fixed too.
+
+**[TRANSLATE-4872](https://jira.translate5.net/browse/TRANSLATE-4872): Editor general - Add possibility to hide languages to be used as source or target language** <br>
+[🆕 Feature] Added possibility to hide languages via CLI command in the front-end selection fields
+
+
+### Bugfixes
+**[TRANSLATE-5068](https://jira.translate5.net/browse/TRANSLATE-5068): InstantTranslate - custom field "required" not met for send to human revision pop-up** <br>
+Required flag will be respected in human revision popup for custom fields
+
+**[TRANSLATE-5058](https://jira.translate5.net/browse/TRANSLATE-5058): Editor general - Improve segment content sanitation to prevent XSS attacks (finding  H1.1)** <br>
+Solve an XSS attack vector in segment content.
+
+
 ## [7.32.10] - 2026-01-08
 
 ### Important Notes:
