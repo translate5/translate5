@@ -39,6 +39,7 @@ use Zend_Exception;
 class InstallerPostInstallCommand extends Translate5AbstractCommand
 {
     private const string SKIPPED = 'skipped';
+
     private const string PROCESSED = 'processed';
 
     // the name of the command (the part after "bin/console")
@@ -114,9 +115,9 @@ this is controlled by the --update option'
                 $table->addRow([$id, $file]);
             }
             $table->render();
+
             return;
         }
-
 
         foreach (new DirectoryIterator($postScriptDir) as $fileInfo) {
             $filename = $fileInfo->getFilename();
@@ -191,8 +192,8 @@ this is controlled by the --update option'
         foreach ($executedFiles as $file) {
             $line = explode('#', $file);
             $result[$line[1]] = $line[0];
-            if(array_key_exists(2, $line)) {
-                $result[$line[1]] .= ': '.$line[2];
+            if (array_key_exists(2, $line)) {
+                $result[$line[1]] .= ': ' . $line[2];
             }
         }
 
