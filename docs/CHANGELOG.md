@@ -16,6 +16,20 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.33.1] - 2026-01-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5175](https://jira.translate5.net/browse/TRANSLATE-5175): Editor general - Rework internal localization of translate5 texts and add FR and IT** <br>
+7.33.1: Fix so that client specific texts are working again
+7.33.0: Rework of localization: Cleanup of existing localization XLIFFs and introduce IT and FR as new translations of the application.
+
+
+
 ## [7.33.0] - 2026-01-12
 
 ### Important Notes:
