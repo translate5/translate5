@@ -51,4 +51,4 @@ if ($fixedContent === null || $fixedContent === $content) {
     return;
 }
 
-file_put_contents($logFile, $fixedContent);
+file_put_contents($logFile, trim($fixedContent).PHP_EOL);
