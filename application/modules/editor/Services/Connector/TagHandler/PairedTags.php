@@ -44,12 +44,11 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
     {
         $options['gTagPairing'] = false;
         parent::__construct($options);
-        $protectors = [];
 
-        if ($this->keepWhitespaceTags === false) {
-            $protectors[] = new WhitespaceProtector($this->utilities->whitespace);
-        }
-        $this->contentProtector = new ContentProtector($protectors, [ProtectionTagsFilter::create()]);
+        $this->contentProtector = new ContentProtector(
+            [new WhitespaceProtector($this->utilities->whitespace)],
+            [ProtectionTagsFilter::create()]
+        );
         $this->translationTagConverter = new TranslationTagConverter($this->logger);
     }
 
@@ -91,7 +90,7 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
             $repairer = new XliffTagRepairer();
             $repairedText = $repairer->repairTranslation($this->getQuerySegment(), $convertedString);
 
-            $restoredString = parent::restoreInResult($repairedText);
+            $restoredString = parent::restoreInResult($repairedText, $isSource);
 
             return $restoredString;
         } catch (Exception $e) {
@@ -113,17 +112,29 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
 
     protected function convertQueryContent(string $queryString, bool $isSource = true): string
     {
+        $this->highestShortcutNumber = 0;
+        $this->shortcutNumberMap = [];
+
+        $queryString = $this->trackChange->removeTrackChanges($queryString);
+
         if ($this->keepWhitespaceTags) {
+            $tags = $this->utilities->internalTag->get($queryString);
+            if (! empty($tags)) {
+                $numbers = array_filter($this->utilities->internalTag->getTagNumbers($tags));
+                if (! empty($numbers)) {
+                    $this->highestShortcutNumber = max($numbers);
+                }
+            }
+
             return $queryString;
         }
         $queryString = $this->utilities->internalTag->restore(
-            $this->trackChange->removeTrackChanges($queryString),
+            $queryString,
             $this->getTagsForRestore(),
             $this->highestShortcutNumber,
             $this->shortcutNumberMap
         );
-        $whitespace = WhitespaceProtector::create();
 
-        return $whitespace->unprotect($queryString, false);
+        return $this->contentProtector->unprotect($queryString, $isSource);
     }
 }
