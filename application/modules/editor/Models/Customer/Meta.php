@@ -36,6 +36,8 @@ END LICENSE AND COPYRIGHT
  * @method void setDefaultBconfId(integer $id)
  * @method string getDefaultPricingPresetId()
  * @method void setDefaultPricingPresetId(integer $id)
+ * @method string getDefaultTqePricingPresetId()
+ * @method void setDefaultTqePricingPresetId(integer $id)
  */
 class editor_Models_Customer_Meta extends ZfExtended_Models_Entity_MetaAbstract
 {

@@ -52,17 +52,30 @@ final class AssociationFormValues
      */
     public readonly array $pivotAsDefaultCustomers;
 
+    /**
+     * @var int[]
+     */
+    public readonly array $useTqeAsDefaultCustomers;
+
+    /**
+     * @var int[]
+     */
+    public readonly array $useTqeInstantTranslateAsDefaultCustomers;
+
     public function __construct(
         public readonly int $languageResourceId,
         array $customers,
         array $useAsDefaultCustomers,
         array $writeAsDefaultCustomers,
         array $pivotAsDefaultCustomers,
+        array $useTqeAsDefaultCustomers = [],
+        array $useTqeInstantTranslateAsDefaultCustomers = [],
     ) {
         $this->customers = array_map(fn ($i) => (int) $i, $customers);
         $useAsDefaultCustomers = array_map(fn ($i) => (int) $i, $useAsDefaultCustomers);
         $writeAsDefaultCustomers = array_map(fn ($i) => (int) $i, $writeAsDefaultCustomers);
         $pivotAsDefaultCustomers = array_map(fn ($i) => (int) $i, $pivotAsDefaultCustomers);
+        $useTqeAsDefaultCustomers = array_map(fn ($i) => (int) $i, $useTqeAsDefaultCustomers);
 
         // ensure that only useAsDefault customers are used, which are added also as customers
         $this->useAsDefaultCustomers = array_intersect($useAsDefaultCustomers, $customers);
@@ -72,6 +85,12 @@ final class AssociationFormValues
 
         // ensure that only pivotAsDefault customers are used, which are added also as customers
         $this->pivotAsDefaultCustomers = array_intersect($pivotAsDefaultCustomers, $customers);
+
+        // ensure that only useTqeAsDefault customers are used, which are added also as customers
+        $this->useTqeAsDefaultCustomers = array_intersect($useTqeAsDefaultCustomers, $customers);
+
+        // ensure that only useTqeInstantTranslateAsDefault customers are used, which are added also as customers
+        $this->useTqeInstantTranslateAsDefaultCustomers = array_intersect($useTqeInstantTranslateAsDefaultCustomers, $customers);
     }
 
     public static function fromArray(int $languageResourceId, array $data): self
@@ -81,7 +100,9 @@ final class AssociationFormValues
             $data['customerIds'] ?? [],
             $data['customerUseAsDefaultIds'] ?? [],
             $data['customerWriteAsDefaultIds'] ?? [],
-            $data['customerPivotAsDefaultIds'] ?? []
+            $data['customerPivotAsDefaultIds'] ?? [],
+            $data['customerTqeAsDefaultIds'] ?? [],
+            $data['customerTqeInstantTranslateAsDefaultIds'] ?? [],
         );
     }
 }

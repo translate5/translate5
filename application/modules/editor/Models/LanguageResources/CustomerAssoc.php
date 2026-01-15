@@ -45,6 +45,12 @@ END LICENSE AND COPYRIGHT
  * @method string getPivotAsDefault()
  * @method void setPivotAsDefault(bool $pivotAsDefault)
  *
+ * @method string getTqeAsDefault()
+ * @method void setTqeAsDefault(bool $tqeAsDefault)
+ *
+ * @method string getTqeInstantTranslateAsDefault()
+ * @method void setTqeInstantTranslateAsDefault(bool $tqeInstantTranslateAsDefault)
+ *
  * @method string getLanguageResourceServiceName()
  * @method void setLanguageResourceServiceName(string $serviceName)
  *
@@ -174,6 +180,30 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         return $this->db->fetchAll($s)->toArray();
     }
 
+    /**
+     * Get all tqeAsDefault customer assocs for given customer ids.
+     * If no $customerIds is provided, all results where tqeAsDefault is set to 1 will be returned.
+     */
+    public function loadByCustomerIdsUseTqeAsDefault(array $customerIds = []): array
+    {
+        $s = $this->getCustomerIdsSelect($customerIds);
+        $s->where('tqeAsDefault=1');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    /**
+     * Get all tqeInstantTranslateAsDefault customer assocs for given customer ids.
+     * If no $customerIds is provided, all results where tqeInstantTranslateAsDefault is set to 1 will be returned.
+     */
+    public function loadByCustomerIdsUseTqeInstantTranslateAsDefault(array $customerIds = []): array
+    {
+        $s = $this->getCustomerIdsSelect($customerIds);
+        $s->where('tqeInstantTranslateAsDefault=1');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
     /***
      * Get all customers for $languageResourceId (languageResourceId)
      * @param int $languageResourceId
@@ -281,5 +311,20 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         $s->where('languageResourceId = ?', $resourceId);
 
         return $this->row = $this->db->fetchRow($s);
+    }
+
+    /**
+     * Load all customer associations for the provided language resource ids.
+     */
+    public function loadByLanguageResourceIds(array $languageResourceIds): array
+    {
+        if (empty($languageResourceIds)) {
+            return [];
+        }
+
+        $s = $this->db->select();
+        $s->where('languageResourceId IN(?)', $languageResourceIds);
+
+        return $this->db->fetchAll($s)->toArray();
     }
 }

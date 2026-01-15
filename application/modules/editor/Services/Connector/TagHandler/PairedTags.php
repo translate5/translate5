@@ -40,6 +40,13 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
      */
     private TranslationTagConverter $translationTagConverter;
 
+    /**
+     * Maps XLIFF tag IDs to their whitespace original content.
+     * E.g., [3 => '<softReturn/>', 5 => '<tab ts="09" length="1"/>']
+     * This is populated during prepareQuery by looking at the tag map.
+     */
+    private array $whitespaceIdMap = [];
+
     public function __construct(array $options = [])
     {
         $options['gTagPairing'] = false;
@@ -59,10 +66,24 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
         $preparedQuery = '';
 
         try {
+            // reset whitespace tracking for each query
+            $this->whitespaceIdMap = [];
+
             $preparedQuery = parent::prepareQuery($queryString, $isSource);
-            $convertedString = $this->translationTagConverter->convertToServiceFormat(
-                $preparedQuery,
-            );
+
+            // Build whitespace ID map from the tag map. This identifies which XLIFF IDs correspond to whitespace tags
+            if (! $this->keepWhitespaceTags) {
+                $this->buildWhitespaceIdMap();
+            }
+
+            // Convert to service format (e.g., <x id="1"/> -> <t5x_1 />)
+            $convertedString = $this->translationTagConverter->convertToServiceFormat($preparedQuery);
+
+            // Convert whitespace XLIFF tags (now in service format) to actual whitespace
+            // This is what gets sent to the translation service
+            if (! $this->keepWhitespaceTags) {
+                $convertedString = $this->convertWhitespaceServiceFormatToActual($convertedString);
+            }
 
             return $convertedString;
         } catch (Exception $e) {
@@ -84,16 +105,25 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
     public function restoreInResult(string $resultString, bool $isSource = true): ?string
     {
         $convertedString = '';
-        $restoredString = '';
 
         try {
             $convertedString = $this->translationTagConverter->convertToOriginalFormat($resultString);
+
+            // Convert actual whitespace back to XLIFF tags BEFORE the repairer runs.
+            // This prevents the repairer from seeing whitespace as "missing" and adding duplicates.
+            // The whitespace was converted to actual characters in prepareQuery(), and the MT/LLM
+            // typically returns them as-is, so we need to restore them to XLIFF format first.
+            if (! $this->keepWhitespaceTags) {
+                $convertedString = $this->convertActualWhitespaceToXliff($convertedString);
+            }
+
             $repairer = new XliffTagRepairer();
+
             $repairedText = $repairer->repairTranslation($this->getQuerySegment(), $convertedString);
 
-            $restoredString = parent::restoreInResult($repairedText);
-
-            return $restoredString;
+            // do not convert whitespace XLIFF to actual characters here.
+            // let parent::restoreInResult() convert XLIFF tags back to internal tags so whitespace is preserved as internal tags
+            return parent::restoreInResult($repairedText, $isSource);
         } catch (Exception $e) {
             $this->logger->warn(
                 'E1302',
@@ -101,7 +131,6 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
                 [
                     'receivedString' => $resultString,
                     'convertedContent' => $convertedString,
-                    'resultString' => $restoredString,
                     'querySegment' => $this->getQuerySegment(),
                     'exception' => $e->getMessage(),
                 ]
@@ -113,17 +142,127 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
 
     protected function convertQueryContent(string $queryString, bool $isSource = true): string
     {
-        if ($this->keepWhitespaceTags) {
-            return $queryString;
-        }
-        $queryString = $this->utilities->internalTag->restore(
-            $this->trackChange->removeTrackChanges($queryString),
-            $this->getTagsForRestore(),
-            $this->highestShortcutNumber,
-            $this->shortcutNumberMap
-        );
-        $whitespace = WhitespaceProtector::create();
+        $queryString = $this->trackChange->removeTrackChanges($queryString);
 
-        return $whitespace->unprotect($queryString, false);
+        return $queryString;
+    }
+
+    /**
+     * Builds the whitespace ID map from the tag map. This identifies which XLIFF IDs correspond to whitespace internal tags.
+     */
+    private function buildWhitespaceIdMap(): void
+    {
+        $tagMap = $this->getTagMap();
+        $whitespaceTags = editor_Models_Segment_Whitespace::WHITESPACE_TAGS;
+
+        foreach ($tagMap as $xliffTag => $tagInfo) {
+            $internalTag = $tagInfo[1] ?? '';
+
+            // Use InternalTag helper to parse the internal tag and get match data
+            $matches = $this->utilities->internalTag->getMatches($internalTag);
+            if (empty($matches)) {
+                continue;
+            }
+
+            $match = $matches[0];
+            // $match[3] is the data-originalid value (e.g., 'softReturn', 'char', 'tab')
+            $originalId = $match[3] ?? '';
+
+            if (in_array($originalId, $whitespaceTags, true)
+                && preg_match('/<x\s+id="(\d+)"\s*\/>/', $xliffTag, $idMatch) // Extract the ID from the XLIFF tag
+            ) {
+                $id = (int) $idMatch[1];
+                $decodedTag = editor_Models_Segment_InternalTag::decodeTagContent($match);
+
+                // Fallback for tags without hex-encoded content (test/mock tags return '<>')
+                if ($decodedTag === '<>') {
+                    $decodedTag = '<' . $originalId . '/>';
+                }
+
+                $this->whitespaceIdMap[$id] = $decodedTag;
+            }
+        }
+    }
+
+    /**
+     * Converts whitespace in service format (<t5x_N />) to actual whitespace characters.
+     */
+    private function convertWhitespaceServiceFormatToActual(string $content): string
+    {
+        if (empty($this->whitespaceIdMap)) {
+            return $content;
+        }
+
+        // match service format single tags
+        $pattern = '#<t5x_(\d+)\s*/>#';
+
+        return preg_replace_callback($pattern, function ($match) {
+            $id = (int) $match[1];
+
+            if (isset($this->whitespaceIdMap[$id])) {
+                $xmlTag = $this->whitespaceIdMap[$id];
+
+                return $this->utilities->whitespace->unprotectWhitespace($xmlTag);
+            }
+
+            // Not a whitespace tag, keep as is
+            return $match[0];
+        }, $content);
+    }
+
+    /**
+     * Converts actual whitespace characters back to XLIFF format tags.
+     * This is the reverse of convertWhitespaceServiceFormatToActual().
+     * Used to restore whitespace as XLIFF tags before the repairer runs,
+     * so the repairer doesn't see them as "missing" and add duplicates.
+     */
+    private function convertActualWhitespaceToXliff(string $content): string
+    {
+        if (empty($this->whitespaceIdMap)) {
+            return $content;
+        }
+
+        // Build mapping from actual whitespace characters to their XLIFF IDs (in source order)
+        // Since we may have multiple whitespace of the same type, we track IDs in order
+        $whitespaceToIds = [];
+        foreach ($this->whitespaceIdMap as $id => $xmlTag) {
+            $actualWhitespace = $this->utilities->whitespace->unprotectWhitespace($xmlTag);
+            if (! isset($whitespaceToIds[$actualWhitespace])) {
+                $whitespaceToIds[$actualWhitespace] = [];
+            }
+            $whitespaceToIds[$actualWhitespace][] = $id;
+        }
+
+        // For each whitespace type, replace occurrences with their XLIFF tags in order
+        foreach ($whitespaceToIds as $actualWhitespace => $ids) {
+            foreach ($ids as $id) {
+                // Replace the first occurrence of the actual whitespace with the XLIFF tag
+                $xliffTag = '<x id="' . $id . '"/>';
+                $pos = strpos($content, $actualWhitespace);
+                if ($pos !== false) {
+                    $content = substr_replace($content, $xliffTag, $pos, strlen($actualWhitespace));
+                }
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * Returns the whitespace ID map for batch processing.
+     * This allows BatchTrait to store the map per segment.
+     */
+    public function getWhitespaceIdMap(): array
+    {
+        return $this->whitespaceIdMap;
+    }
+
+    /**
+     * Sets the whitespace ID map for batch processing.
+     * This allows BatchTrait to restore the map per segment before calling restoreInResult.
+     */
+    public function setWhitespaceIdMap(array $whitespaceIdMap): void
+    {
+        $this->whitespaceIdMap = $whitespaceIdMap;
     }
 }

@@ -93,8 +93,8 @@ Ext.define('Editor.model.Config', {
     },{
         name:'defaults',
         type:'string',
-        convert:function(value,record){
-            if(value == undefined ){
+        convert: function(value, record){
+            if(value === undefined){
                 return "";
             }
             if(value === "" || value == null) {

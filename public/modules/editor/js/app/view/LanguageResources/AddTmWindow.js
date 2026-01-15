@@ -336,7 +336,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         {
                             xtype: 'tagfield',
                             name: 'categories',
-                            id: 'categories',
                             store: Ext.create('Editor.store.Categories').load(),
                             fieldLabel: me.strings.categories,
                             disabled: true,

@@ -89,6 +89,17 @@ abstract class Base
             $taskNames = array_column($taskPivotAssocs, 'taskName');
             $this->throwException($taskNames);
         }
+
+        $classes = \Zend_Registry::get('languageresource.conflicted_association')->collect();
+
+        // Check conflicts for all registered entity classes from plugins
+        foreach ($classes as $entityClass) {
+            $taskAssocs = $this->getConflictByEntity($entityClass);
+            if (! empty($taskAssocs)) {
+                $taskNames = array_column($taskAssocs, 'taskName');
+                $this->throwException($taskNames);
+            }
+        }
     }
 
     /***
@@ -110,6 +121,18 @@ abstract class Base
             $ids = array_column($taskPivotAssocs, 'id');
             $taskAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
             $taskAssoc->deleteByIds($ids);
+        }
+
+        $classes = \Zend_Registry::get('languageresource.conflicted_association')->collect();
+
+        // Clean conflicts for all registered entity classes from plugins
+        foreach ($classes as $entityClass) {
+            $taskAssocs = $this->getConflictByEntity($entityClass);
+            if (! empty($taskAssocs)) {
+                $ids = array_column($taskAssocs, 'id');
+                $entity = ZfExtended_Factory::get($entityClass);
+                $entity->deleteByIds($ids);
+            }
         }
     }
 

@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2026 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -26,17 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TaskMeta extends ZfExtended_Models_Validator_Abstract
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\LanguageResource\CleanupAssociation;
+
+interface CollectConflictedAssociationsInterface
 {
-    protected function defineValidators()
-    {
-        // TODO FIXME: validators seem to be unmaintained, check & add
-        // $this->addValidator('mappingType', 'inArray', ['source', 'target', null]);
-        $this->addValidator('bconfInZip', 'stringLength', [
-            'min' => 5,
-            'max' => 255,
-        ]);
-        $this->addValidator('pricingPresetId', 'int');
-        $this->addValidator('tqePricingPresetId', 'int');
-    }
+    public static function create(): self;
+
+    public function getEntityClass(): string;
 }

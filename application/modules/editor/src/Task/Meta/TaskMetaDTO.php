@@ -40,6 +40,7 @@ class TaskMetaDTO
         public ?string $mappingType = null,
         public ?int $pricingPresetId = null,
         public bool $perTaskExport = false,
+        public ?int $tqePricingPresetId = null,
         //synchronize fields manually to TaskMetaImmutableDTO!
     ) {
     }
@@ -51,6 +52,7 @@ class TaskMetaDTO
             $this->mappingType,
             $this->pricingPresetId,
             $this->perTaskExport,
+            $this->tqePricingPresetId,
         );
     }
 }

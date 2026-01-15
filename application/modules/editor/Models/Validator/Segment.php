@@ -128,6 +128,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('autoStateId', 'inArray', [$states->getStates()]);
         $this->addValidator('levenshteinOriginal', 'int');
         $this->addValidator('levenshteinPrevious', 'int');
+        $this->addValidator('qualityScore', 'stringLength', [
+            'min' => 0,
+            'max' => 2000,
+        ]);
+        $this->addValidator('qualityScoreReasoning', 'stringLength');
     }
 
     /**

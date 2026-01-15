@@ -41,6 +41,7 @@ class TaskMetaImmutableDTO
         public readonly ?string $mappingType = null,
         public readonly ?int $pricingPresetId = null,
         public readonly bool $perTaskExport = false,
+        public readonly ?int $tqePricingPresetId = null,
     ) {
     }
 }

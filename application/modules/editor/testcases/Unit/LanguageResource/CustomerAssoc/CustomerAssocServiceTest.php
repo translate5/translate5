@@ -74,6 +74,8 @@ class CustomerAssocServiceTest extends TestCase
                         'setUseAsDefault',
                         'setWriteAsDefault',
                         'setPivotAsDefault',
+                        'setTqeAsDefault',
+                        'setTqeInstantTranslateAsDefault',
                     ]);
                 }),
                 self::callback(function ($value) use (&$calledMethod) {
@@ -125,6 +127,8 @@ class CustomerAssocServiceTest extends TestCase
                     self::assertTrue((bool) $value->getUseAsDefault(), 'useAsDefault');
                     self::assertTrue((bool) $value->getWriteAsDefault(), 'writeAsDefault');
                     self::assertTrue((bool) $value->getPivotAsDefault(), 'pivotAsDefault');
+                    self::assertTrue((bool) $value->getTqeAsDefault(), 'tqeAsDefault');
+                    self::assertFalse((bool) $value->getTqeInstantTranslateAsDefault(), 'tqeInstantTranslateAsDefault');
 
                     return true;
                 })
@@ -153,6 +157,9 @@ class CustomerAssocServiceTest extends TestCase
             ],
             [
                 (int) $assoc->getCustomerId(),
+                $newCustomerId,
+            ],
+            [
                 $newCustomerId,
             ],
             [
@@ -195,6 +202,8 @@ class CustomerAssocServiceTest extends TestCase
         $assoc->setUseAsDefault(true);
         $assoc->setWriteAsDefault(true);
         $assoc->setPivotAsDefault(true);
+        $assoc->setTqeAsDefault(true);
+        $assoc->setTqeInstantTranslateAsDefault(true);
 
         $assocRepository
             ->expects(self::once())
@@ -211,7 +220,9 @@ class CustomerAssocServiceTest extends TestCase
             (int) $assoc->getCustomerId(),
             true,
             true,
-            true
+            true,
+            true,
+            true,
         );
     }
 
@@ -244,6 +255,8 @@ class CustomerAssocServiceTest extends TestCase
         $assoc->setUseAsDefault(false);
         $assoc->setWriteAsDefault(false);
         $assoc->setPivotAsDefault(false);
+        $assoc->setTqeAsDefault(false);
+        $assoc->setTqeInstantTranslateAsDefault(false);
 
         $assocRepository
             ->expects(self::once())

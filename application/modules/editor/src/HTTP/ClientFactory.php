@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\HTTP;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
@@ -42,7 +43,7 @@ use Psr\Http\Client\ClientInterface;
 class ClientFactory
 {
     public function __construct(
-        private readonly CommunicationLogger $logger
+        private readonly CommunicationLogger $logger,
     ) {
     }
 
@@ -71,6 +72,30 @@ class ClientFactory
     public function createClientForceExceptions(array $options): ClientInterface & \GuzzleHttp\ClientInterface
     {
         $stack = HandlerStack::create();
+        $stack->remove('http_errors');
+        $stack->push(ThrowExceptionOnErrorMiddleware::create());
+        $stack->unshift($this->createRequestLoggingMiddleware());
+        $stack->unshift($this->createResponseLoggingMiddleware());
+        $stack->unshift(RewindResponseMiddleware::create());
+
+        return new Client(
+            $options +
+            [
+                'handler' => $stack,
+            ]
+        );
+    }
+
+    public function createClientMultiHandler(array $options): Client
+    {
+        if (function_exists('curl_multi_init')) {
+            $multiHandler = new CurlMultiHandler();
+            $stack = HandlerStack::create($multiHandler);
+            $options['handler'] = $stack;
+        } else {
+            //TODO: log if not supported ?
+            $stack = HandlerStack::create();
+        }
         $stack->remove('http_errors');
         $stack->push(ThrowExceptionOnErrorMiddleware::create());
         $stack->unshift($this->createRequestLoggingMiddleware());

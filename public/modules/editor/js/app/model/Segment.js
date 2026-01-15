@@ -89,7 +89,9 @@ Ext.define('Editor.model.Segment', {
         }, persist: false},
         {name: 'isWatched', type: 'boolean', persist: false},
         {name: 'isRepeated', type: 'int', persist: false},
-        {name: 'segmentUserAssocId', type: 'int', persist: false}
+        {name: 'segmentUserAssocId', type: 'int', persist: false},
+        {name: 'qualityScore', type: 'string'},
+        {name: 'qualityScoreReasoning', type: 'string'},
     ],
     idProperty: 'id',
     // this is a flag needed when processing taken over matches, which causes the target to be updated in alike segments as well

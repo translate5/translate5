@@ -93,7 +93,8 @@ Ext.define('Editor.controller.TmOverview', {
     listen: {
         component: {
             '#tmOverviewPanel': {
-                celldblclick: 'onTmOverviewPanelCellDblClick'
+                celldblclick: 'onTmOverviewPanelCellDblClick',
+                beforecelldblclick: 'onTmOverviewPanelBeforeCellDblClick'
             },
             '#btnAddTm': {
                 click: 'handleOnAddTmClick'
@@ -144,7 +145,9 @@ Ext.define('Editor.controller.TmOverview', {
         controller: {
             '#ServerException': {
                 serverExceptionE1447: 'onServerExceptionE1447Handler',
-                serverExceptionE1473: 'onServerExceptionE1473Handler'
+                serverExceptionE1473: 'onServerExceptionE1473Handler',
+                serverExceptionE1500: 'onServerExceptionE1500Handler',
+                serverExceptionE1501: 'onServerExceptionE1501Handler'
             }
         }
     },
@@ -202,8 +205,29 @@ Ext.define('Editor.controller.TmOverview', {
             grid = view.up('tmOverviewPanel');
         // call the selection row handler. This will also fetch fresh record version
         grid.onGridRowSelect(grid, [record], function (newRecord) {
-            me.handleEditTm(view, cell, cellIndex, newRecord);
+                me.handleEditTm(view, cell, cellIndex, newRecord);
         });
+    },
+
+    /**
+     * This is implemented only to prevent double clicking on the action column. This produces multiple problems
+     * with the record loading and setting in the form.
+     * @param cell
+     * @param td
+     * @param cellIndex
+     * @param record
+     * @param tr
+     * @param rowIndex
+     * @param e
+     * @param eOpts
+     * @returns {boolean}
+     */
+    onTmOverviewPanelBeforeCellDblClick: function (cell, td, cellIndex, record, tr, rowIndex, e, eOpts ){
+        // Check if double click happened on action column
+        var column = cell.getHeaderByCell(e.getTarget(cell.cellSelector));
+        if (column && column.xtype === 'actioncolumn') {
+            return false; // stops the dblclick event
+        }
     },
 
     handleOnAddTmClick: function () {
@@ -413,12 +437,15 @@ Ext.define('Editor.controller.TmOverview', {
         win.load();
     },
     handleEditTm: function (view, cell, cellIdx, rec) {
-        const win = Ext.widget('editTmWindow');
+        let editWindow = Ext.ComponentQuery.query('#editTmWindow')[0];
+        if(!editWindow) {
+            editWindow = Ext.widget('editTmWindow');
+        }
         rec.load({
             callback: () => {
-                win.getViewModel().getStore('customers').load(function () {
-                    win.loadRecord(rec);
-                    win.show();
+                editWindow.getViewModel().getStore('customers').load(function () {
+                    editWindow.loadRecord(rec);
+                    editWindow.show();
                 });
             }
         });
@@ -459,10 +486,12 @@ Ext.define('Editor.controller.TmOverview', {
         win.loadRecord(rec);
         win.show();
     },
+
     handleTmGridActionColumnClick: function (view, cell, row, col, ev, record) {
         var me = this,
             grid = view.up('tmOverviewPanel'),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
+
         // call the selection row handler. This will also fetch fresh record version
         grid.onGridRowSelect(grid, [record], function (newRecord) {
             switch (f && f[1]) {
@@ -826,6 +855,185 @@ Ext.define('Editor.controller.TmOverview', {
         return this.showConflictWindowEventHandler(responseText, ecode, response);
     },
 
+    onServerExceptionE1500Handler: function (responseText, ecode, response) {
+        return this.showTqeConflictWindowHandler(responseText, ecode, response);
+    },
+
+    onServerExceptionE1501Handler: function (responseText, ecode, response) {
+        return this.showTqeConflictWindowHandler(responseText, ecode, response);
+    },
+
+    /***
+     * TQE/TQE instant-translate conflict error handler when customer is already assigned as default to another resource
+     * Handles language resources overview context only (edit/add window)
+     * @param responseText
+     * @param ecode
+     * @param response
+     * @returns {boolean}
+     */
+    showTqeConflictWindowHandler: function (responseText, ecode, response) {
+        var me = this,
+            resourcesWindow = Ext.ComponentQuery.query('#editTmWindow')[0] || Ext.ComponentQuery.query('#addTmWindow')[0];
+
+        // Only handle if we're in the language resources overview context (edit/add window exists)
+        // Don't return false - that would stop event propagation to other controllers
+        if (!resourcesWindow) {
+            return; // Let other controllers (e.g. CustomerTmAssocController) handle it
+        }
+
+        var translated = responseText.errorsTranslated,
+            extraData = responseText.extraData ? responseText.extraData : null,
+            conflicts = extraData ? extraData.conflicts : [],
+            request = response ? response.request : false,
+            record = (request && request.records) ? request.records[0] : false;
+
+        // If the conflict comes from the customer-language-resource association grid,
+        // let CustomerTmAssocController handle it
+        if (record && !resourcesWindow.isVisible()) {
+            return;
+        }
+
+        var conflictList = conflicts.map(function (conflict) {
+            return '<li>' + Ext.String.htmlEncode(conflict.resourceName) +
+                   ' (' + Ext.String.htmlEncode(conflict.serviceName) + ')' +
+                   ' - ' + Ext.String.htmlEncode(conflict.languagePairs) + '</li>';
+        });
+
+        var title = (ecode === 'E1500')
+            ? (Editor.data.l10n.languageResources.editLanguageResource.tqeConflictTitle || 'TQE Conflict')
+            : (Editor.data.l10n.languageResources.editLanguageResource.tqeInstantTranslateConflictTitle || 'TQE Instant-translate Conflict');
+
+        Ext.create('Ext.window.MessageBox').show({
+            title: title,
+            msg: Ext.String.format('{0} <ul>{1}</ul> {2}',
+                translated.errorMessages[0],
+                conflictList.join(''),
+                translated.errorMessages[1]
+            ),
+            buttons: Ext.Msg.YESNO,
+            fn: function (button) {
+                if (button === "yes") {
+                    // Language resources overview context
+                    if (resourcesWindow && resourcesWindow.xtype === 'editTmWindow') {
+                        me.editLanguageResourceWithTqeResolve(true);
+                    } else if (resourcesWindow) {
+                        me.createLanguageResourceWithTqeResolve(resourcesWindow);
+                    }
+                    return true;
+                } else {
+                    // If user clicked "No", revert the record changes
+                    if (record) {
+                        record.reject();
+                    }
+                }
+                return false;
+            },
+            scope: me,
+            defaultFocus: 'no',
+            icon: Ext.MessageBox.QUESTION
+        });
+
+        return false;
+    },
+
+    /***
+     * Edit language resource with TQE/TQE Instant-translate conflict resolution
+     * Reloads the record first to avoid 409 Conflict errors due to entity versioning
+     * @param resolveTqeConflicts
+     */
+    editLanguageResourceWithTqeResolve: function (resolveTqeConflicts) {
+        var me = this,
+            editTmWindow = Ext.ComponentQuery.query('#editTmWindow')[0],
+            form = editTmWindow.down('form'),
+            record = form.getRecord();
+
+        if (!form.isValid()) {
+            return;
+        }
+
+        editTmWindow.setLoading(true);
+
+        // Reload the record to get the latest version to avoid 409 Conflict
+        record.load({
+            callback: function(loadedRecord, operation, success) {
+                if (!success) {
+                    editTmWindow.setLoading(false);
+                    Editor.app.getController('ServerException').handleException(operation.error.response);
+                    return;
+                }
+
+                // Now apply the form changes to the reloaded record
+                loadedRecord.reject();
+                form.updateRecord(loadedRecord);
+
+                // Save with conflict resolution
+                loadedRecord.save({
+                    preventDefaultHandler: true,
+                    params: {
+                        resolveTqeConflicts: resolveTqeConflicts ? 1 : 0
+                    },
+                    failure: function (records, op) {
+                        editTmWindow.setLoading(false);
+                        Editor.app.getController('ServerException').handleException(op.error.response);
+                    },
+                    success: function () {
+                        var msg = Ext.String.format(me.strings.edited, loadedRecord.getName());
+                        me.getTmOverviewPanel().getStore().load();
+                        editTmWindow.setLoading(false);
+                        editTmWindow.close();
+                        Editor.MessageBox.addSuccess(msg);
+                    }
+                });
+            }
+        });
+    },
+
+    /***
+     * Create language resource with TQE conflict resolution
+     * @param addResourcesWindow
+     */
+    createLanguageResourceWithTqeResolve: function (addResourcesWindow) {
+        var me = this,
+            form = addResourcesWindow.down('form'),
+            resourceField = form.down('combo[name="resourceId"]'),
+            selectedResource = resourceField.getSelection();
+
+        if (!form.isValid() || !selectedResource) {
+            return;
+        }
+
+        addResourcesWindow.setLoading(true);
+
+        form.submit({
+            timeout: 3600,
+            params: {
+                format: 'jsontext',
+                resolveTqeConflicts: 1
+            },
+            url: Editor.data.restpath + 'languageresourceinstance',
+            scope: me,
+            success: function (form, submit) {
+                var msg = Ext.String.format(me.strings.created, Ext.String.htmlEncode(submit.result.rows.name));
+                me.getTmOverviewPanel().getStore().load();
+                addResourcesWindow.setLoading(false);
+                addResourcesWindow.close();
+                Editor.MessageBox.addSuccess(msg);
+            },
+            failure: function (form, submit) {
+                var res = submit.result;
+                addResourcesWindow.setLoading(false);
+                if (!res || res.success || !Ext.isArray(res.errors)) {
+                    Editor.app.getController('ServerException').handleException(submit.response);
+                    return;
+                }
+                if (Ext.isArray(res.errors)) {
+                    form.markInvalid(res.errors);
+                    me.showGeneralErrors(res.errors);
+                }
+            }
+        });
+    },
+
     /***
      * Conflict error handler when resource is deleted or modified. This is custom function for E1473 and E1447 events
      * @param responseText
@@ -864,7 +1072,7 @@ Ext.define('Editor.controller.TmOverview', {
                         } else {
                             me.editLangaugeResource(true);
                         }
-                        return true
+                        return true;
                     }
 
                     if (record) {

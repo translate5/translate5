@@ -52,7 +52,8 @@ Ext.define('Editor.model.admin.Task', {
             MATCHANALYSIS: 'matchanalysis',
             PIVOTPRETRANSLATION: 'pivotpretranslation',
             TAGTERMS: 'tagterms',
-            VISUALEXCHANGE: 'visualexchange'
+            VISUALEXCHANGE: 'visualexchange',
+            TQE: 'TranslationQualityEstimate'
         },
         usageModes: {
             COMPETITIVE: 'competitive',
@@ -326,7 +327,10 @@ Ext.define('Editor.model.admin.Task', {
      * @returns {boolean}
      */
     isAnalysis: function () {
-        return (this.get('state') === Editor.model.admin.Task.operations.MATCHANALYSIS);
+        return [
+            Editor.model.admin.Task.operations.MATCHANALYSIS,
+            Editor.model.admin.Task.operations.TQE
+        ].includes(this.get('state'));
     },
 
     /**
@@ -463,7 +467,7 @@ Ext.define('Editor.model.admin.Task', {
      */
     getTaskName: function () {
         var nr = this.get('taskNr'),
-            taskName = Ext.String.htmlEncode(this.get('taskName'))
+            taskName = Ext.String.htmlEncode(this.get('taskName'));
         if (nr) {
             return taskName + ' (' + nr + ')';
         }
@@ -476,6 +480,49 @@ Ext.define('Editor.model.admin.Task', {
      */
     isNoWorkflowStep: function () {
         return Editor.data.app.workflow.CONST.STEP_NO_WORKFLOW === this.get('workflowStepName');
+    },
+
+    /**
+     * Retrieves, if the task has score colorization
+     * This method is part of the task-model to enable inter-plugin communication of private plugins
+     * @returns {boolean}
+     */
+    hasQualityScoreColorization: function () {
+       return this.getQualityScoreColorizationMap().length > 0;
+    },
+
+    /**
+     * retrieves the quality score colorization map
+     * This method is part of the task-model to enable inter-plugin communication of private plugins
+     * @returns {Array}
+     */
+    getQualityScoreColorizationMap: function () {
+        if (! this.qualityScoreColorization) {
+            this.qualityScoreColorization = [];
+            let controller = Editor.data.plugins.OpenAI ?
+                Editor.app.getController('Editor.plugins.OpenAI.controller.OpenAI') : null;
+            this.qualityScoreColorization = controller ? controller.getCurrentTaskColorizationMap() : [];
+        }
+        return this.qualityScoreColorization;
+    },
+
+    /**
+     * Retrieves a matching color out of a colorization map for score
+     * This method is part of the task-model to enable inter-plugin communication of private plugins
+     * @param {string} score
+     * @returns {string}
+     */
+    getQualityColorForScore: function(score) {
+        if (/^\d+$/.test(score) && this.hasQualityScoreColorization()) {
+            let i, colorizationMap = this.getQualityScoreColorizationMap();
+            score = parseInt(score);
+            for(i = 0; i < colorizationMap.length; i++){
+                if(score >= colorizationMap[i].min && score <= colorizationMap[i].max){
+                    return colorizationMap[i].color;
+                }
+            }
+        }
+        return '';
     },
 
     /**

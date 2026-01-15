@@ -17,6 +17,8 @@ namespace PHPSTORM_META {
             'cache' => \Zend_Cache_Core::class,
             'integration.segment.update' => \MittagQI\Translate5\Integration\UpdateSegmentService::class,
             'integration.segment.update.dto_factory' => \MittagQI\Translate5\Integration\SegmentUpdateDtoFactory::class,
+            'languageresource.conflicted_association' => MittagQI\Translate5\LanguageResource\CleanupAssociation\CollectConflictedAssociations::class,
+            'task.file_translation.data_collector' => MittagQI\Translate5\Task\FileTranslation\FileTranslationDataCollector::class,
         ])
     );
 }

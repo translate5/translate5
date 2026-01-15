@@ -344,4 +344,33 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         // Set current preset to be default, and get id of the one that was default
         $this->view->wasDefault = $this->entity->setAsDefaultPreset();
     }
+
+    /**
+     * Sets the non-customer/common TQE default preset
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function settqedefaultAction()
+    {
+        // Check params
+        try {
+            $this->jcheck([
+                'presetId' => [
+                    'req' => true,
+                    'rex' => 'int11',
+                    'key' => $this->entity,
+                ],
+            ]);
+
+            // Catch mismatch-exception and flush msg
+        } catch (MismatchException $e) {
+            $this->jflush(false, $e->getMessage());
+        }
+
+        // Set current preset to be TQE default, and get id of the one that was TQE default
+        $this->view->wasDefault = $this->entity->setAsTqeDefaultPreset();
+    }
 }

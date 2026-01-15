@@ -195,9 +195,11 @@ Ext.define('Editor.view.segments.Grid', {
             firstTargetFound = false,
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
+            // colorization is depending on if OpenAI plugin is active ...
+            colorizeScores = Editor.data.plugins.OpenAI,
             fieldList = [];
 
-        if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
+        if (Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
             me.addCls('comments-for-locked-segments');
         } 
         
@@ -215,7 +217,8 @@ Ext.define('Editor.view.segments.Grid', {
             stateId: 'segmentNrInTaskColumn',
             editor: false,
             width: 50
-        },{
+        },
+        {
             xtype: 'workflowStepColumn',
             itemId: 'workflowStepColumn',
             stateId: 'workflowStepColumn',
@@ -331,6 +334,36 @@ Ext.define('Editor.view.segments.Grid', {
                 columns.push(col2push);
             }
         });
+
+        columns.push.apply(columns, [
+            {
+                xtype: 'gridcolumn',
+                itemId: 'qualityScore',
+                dataIndex: 'qualityScore',
+                text: Editor.data.l10n.segmentGrid.column.qualityScore,
+                renderer: colorizeScores ?
+                    function(value, metaData, record) {
+                        if (Editor.data.task.hasQualityScoreColorization()) {
+                            let color = Editor.data.task.getQualityColorForScore(record.get('qualityScore'));
+                            if (color !== '') {
+                                metaData.style = ('background-color: #' + color + '; ' + metaData.style).trim();
+                            }
+                            metaData.tdAttr = 'data-qtip="' + record.get('qualityScoreReasoning') + '"';
+                        }
+                        return value;
+                    } : null,
+                width: 50,
+            },
+            {
+                xtype: 'gridcolumn',
+                itemId: 'qualityScoreReasoning',
+                dataIndex: 'qualityScoreReasoning',
+                text: Editor.data.l10n.segmentGrid.column.qualityScoreReasoning,
+                width: 250,
+                hidden: true,
+            },
+        ]);
+
         columns.push.apply(columns, [{
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
@@ -397,7 +430,7 @@ Ext.define('Editor.view.segments.Grid', {
                     getRowClass: function(record, rowIndex, rowParams, store){
                         var newClass = ['segment-font-sizable'],
                             // only on non sorted list we mark last file segments
-                            isDefaultSort = (store.sorters && store.sorters.length == 0);
+                            isDefaultSort = (store.sorters && store.sorters.length === 0);
                         
                         if (isDefaultSort && record.get('isFirstofFile')){
                             newClass.push('first-in-file');

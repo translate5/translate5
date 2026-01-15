@@ -37,6 +37,10 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
         controller: {
             '#LanguageResources': {
                 customerchange: 'onCustomerChange'
+            },
+            '#ServerException': {
+                serverExceptionE1500: 'onServerExceptionE1500Handler',
+                serverExceptionE1501: 'onServerExceptionE1501Handler'
             }
         },
         store: {
@@ -51,7 +55,7 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
             'checkcolumn[dataIndex=hasClientAssoc]': {
                 checkchange: 'onToggleClientAssoc'
             },
-            'checkcolumn[dataIndex/="has(Read|Write|Pivot)Access"]': {
+            'checkcolumn[dataIndex/="has(Read|Write|Pivot|Tqe|TqeInstantTranslate)Access"]': {
                 checkchange: 'onToggleClientAccess'
             }
         }
@@ -92,6 +96,10 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
      * Handler for event of selection change in customers grid
      */
     onCustomerChange: function(customerId) {
+        this.reloadForCustomer(customerId);
+    },
+
+    reloadForCustomer: function (customerId){
         var me = this,
             penaltyDefined = {},
             penaltyDefault = {
@@ -152,64 +160,91 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
     onToggleClientAssoc: function(column, rowIndex, checked, record, e) {
         var me = this,
             view = me.getView(),
-            customerId = view.up('[viewModel]').getViewModel().get('record').getId(),
-            customerIds = Ext.clone(record.get('customerIds'));
+            customerId = view.up('[viewModel]').getViewModel().get('record').getId();
 
-        // Prepare new value for customerIds-field
-        checked
-            ? customerIds.push(customerId)
-            : customerIds = customerIds.filter(id => parseInt(id) !== parseInt(customerId));
+        view.setLoading(true);
 
-        // If assoc is going to be removed - uncheck other checkboxes
-        if (checked === false) {
-            record.set({
-                hasReadAccess : false,
-                hasWriteAccess: false,
-                hasPivotAccess: false,
-                penaltyGeneral: 0,
-                penaltySublang: Editor.data.segments.matchratemaxvalue
-            });
-        }
-
-        // Update value
-        record.set('customerIds', customerIds);
-
-        // Save record
-        record.save({
-            preventDefaultHandler: true,
-            params: {
-                // Here we do this check to distinguish between cases when onToggleClientAssoc is called as a handler
-                // for checkchange-event with Ext.event.Event as 5th argument, and cases when onToggleClientAssoc
-                // is called by ourselves with 1 as 5th argument to be used as forced-param for PUT request
-                forced: e === true ? 1 : 0
-            },
-            failure: (rec, op) => {
-
-                // Reject changes for now, because at this point we don't know whether user will press Yes-button in
-                // task <-> langres unassign confirmation dialog that will be shown if current langres is assigned to
-                // at least a single task.
-                record.reject();
-                record.refreshFlags(customerId);
-
-                // But if such a confirmation dialog will be surely shown
-                // - set up a retry() function to be called if Yes-button is pressed
-                if (~['E1447', 'E1473'].indexOf(op.error.response.responseJson?.errorCode)) {
-                    op.error.response.retry = forced => {
-                        me.onToggleClientAssoc(column, rowIndex, checked, record, forced);
-                    }
+        // Reload record to get latest entity version
+        record.load({
+            callback: function(loadedRecord, operation, success) {
+                if (!success) {
+                    view.setLoading(false);
+                    return;
                 }
 
-                // Handle exception
-                Editor.app.getController('ServerException').handleException(op.error.response)
-            },
-            success: () => {
-                record.refreshFlags(customerId);
-                Editor.MessageBox.addSuccess(
-                    Ext.String.format(
-                        Editor.controller.TmOverview.prototype.strings.edited,
-                        record.getName()
-                    )
-                );
+                var customerIds = Ext.clone(loadedRecord.get('customerIds'));
+                var state = me.captureCustomerAssocState(loadedRecord);
+
+                // Prepare new value for customerIds-field
+                checked
+                    ? customerIds.push(customerId)
+                    : customerIds = customerIds.filter(id => parseInt(id) !== parseInt(customerId));
+
+                // If assoc is going to be removed - uncheck other checkboxes
+                if (checked === false) {
+                    // Also remove the customer from all default-access lists so refreshFlags can't re-check them
+                    state.customerUseAsDefaultIds = state.customerUseAsDefaultIds.filter(id => parseInt(id) !== parseInt(customerId));
+                    state.customerWriteAsDefaultIds = state.customerWriteAsDefaultIds.filter(id => parseInt(id) !== parseInt(customerId));
+                    state.customerPivotAsDefaultIds = state.customerPivotAsDefaultIds.filter(id => parseInt(id) !== parseInt(customerId));
+                    state.customerTqeAsDefaultIds = state.customerTqeAsDefaultIds.filter(id => parseInt(id) !== parseInt(customerId));
+                    state.customerTqeInstantTranslateAsDefaultIds = state.customerTqeInstantTranslateAsDefaultIds.filter(id => parseInt(id) !== parseInt(customerId));
+
+                    loadedRecord.set({
+                        hasReadAccess : false,
+                        hasWriteAccess: false,
+                        hasPivotAccess: false,
+                        hasTqeAccess: false,
+                        hasTqeInstantTranslateAccess: false,
+                        penaltyGeneral: 0,
+                        penaltySublang: Editor.data.segments.matchratemaxvalue
+                    });
+                }
+
+                // Update value
+                state.customerIds = Ext.Array.clone(customerIds);
+                me.applyCustomerAssocState(loadedRecord, state);
+
+                // Save record
+                loadedRecord.save({
+                    params: {
+                        // Here we do this check to distinguish between cases when onToggleClientAssoc is called as a handler
+                        // for checkchange-event with Ext.event.Event as 5th argument, and cases when onToggleClientAssoc
+                        // is called by ourselves with 1 as 5th argument to be used as forced-param for PUT request
+                        forced: e === true ? 1 : 0
+                    },
+                    failure: (rec, op) => {
+
+                        // Reject changes for now, because at this point we don't know whether user will press Yes-button in
+                        // task <-> langres unassign confirmation dialog that will be shown if current langres is assigned to
+                        // at least a single task.
+                        record.reject();
+                        record.refreshFlags(customerId);
+
+                        // But if such a confirmation dialog will be surely shown
+                        // - set up a retry() function to be called if Yes-button is pressed
+                        if (~['E1447', 'E1473'].indexOf(op.error.response.responseJson?.errorCode)) {
+                            op.error.response.retry = forced => {
+                                me.onToggleClientAssoc(column, rowIndex, checked, record, forced);
+                            }
+                        }
+
+                        // Handle exception
+                        Editor.app.getController('ServerException').handleException(op.error.response)
+                    },
+                    callback: function(record, operation, success) {
+                        view.setLoading(false);
+
+                        if (success) {
+                            loadedRecord.refreshFlags(customerId);
+                            Editor.MessageBox.addSuccess(
+                                Ext.String.format(
+                                    Editor.controller.TmOverview.prototype.strings.edited,
+                                    loadedRecord.getName()
+                                )
+                            );
+                        }
+                    }
+                });
             }
         });
     },
@@ -229,66 +264,82 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
             idsField = {
                 hasReadAccess : 'customerUseAsDefaultIds',
                 hasWriteAccess: 'customerWriteAsDefaultIds',
-                hasPivotAccess: 'customerPivotAsDefaultIds'
+                hasPivotAccess: 'customerPivotAsDefaultIds',
+                hasTqeAccess: 'customerTqeAsDefaultIds',
+                hasTqeInstantTranslateAccess: 'customerTqeInstantTranslateAsDefaultIds'
             }[column.dataIndex];
 
-        // Update access
-        record.set(idsField, checked
-            ? record.get(idsField).concat([customerId])
-            : record.get(idsField).filter(id => parseInt(id) !== parseInt(customerId)));
+        view.setLoading(true);
 
-        // If access is going to be added
-        if (checked) {
+        // Reload record to get latest entity version
+        record.load({
+            callback: function(loadedRecord, operation, success) {
+                if (!success) {
+                    view.setLoading(false);
+                    return;
+                }
 
-            // But assoc is missing
-            if (!record.get('customerIds').some(id => parseInt(id) === customerId)) {
+                // Build full next-state and reapply it so we always send consistent arrays to backend
+                // (ExtJS may omit unchanged fields otherwise, which can lead to stale defaults on backend).
+                var state = me.captureCustomerAssocState(loadedRecord);
 
-                // Append assoc
-                record.set({
-                    customerIds: record.get('customerIds').concat([customerId]),
-                    hasClientAssoc: true
+                var addCustomer = function(list) {
+                    list = Ext.Array.clone(list || []);
+                    if (!list.some(id => parseInt(id) === parseInt(customerId))) {
+                        list.push(customerId);
+                    }
+                    return list;
+                };
+                var removeCustomer = function(list) {
+                    return Ext.Array.clone(list || []).filter(id => parseInt(id) !== parseInt(customerId));
+                };
+
+                state[idsField] = checked ? addCustomer(state[idsField]) : removeCustomer(state[idsField]);
+
+                // If access is going to be added
+                if (checked) {
+
+                    // But assoc is missing
+                    state.customerIds = addCustomer(state.customerIds);
+                    loadedRecord.set({ hasClientAssoc: true });
+
+                    // If write access is going to be added, but read-access is missing
+                    if (column.dataIndex === 'hasWriteAccess'
+                        && !state.customerUseAsDefaultIds.some(id => parseInt(id) === parseInt(customerId))) {
+                        state.customerUseAsDefaultIds = addCustomer(state.customerUseAsDefaultIds);
+                        loadedRecord.set({ hasReadAccess: true });
+                    }
+
+                // Else if access is going to be removed, and it's a read-access
+                } else if (column.dataIndex === 'hasReadAccess') {
+
+                    // Remove check for write-access as well
+                    loadedRecord.set({
+                        hasWriteAccess: false
+                    });
+                    state.customerWriteAsDefaultIds = removeCustomer(state.customerWriteAsDefaultIds);
+                }
+
+                me.applyCustomerAssocState(loadedRecord, state);
+
+                loadedRecord.save({
+                    params: {
+                        forced: 0
+                    },
+                    callback: function(record, operation, success) {
+                        view.setLoading(false);
+
+                        if (success) {
+                            loadedRecord.refreshFlags(customerId);
+                            Editor.MessageBox.addSuccess(
+                                Ext.String.format(
+                                    Editor.controller.TmOverview.prototype.strings.edited,
+                                    loadedRecord.getName()
+                                )
+                            );
+                        }
+                    }
                 });
-            }
-
-            // If write access is going to be added, but read-access is missing
-            if (column.dataIndex === 'hasWriteAccess'
-                && !record.get('customerUseAsDefaultIds').some(id => parseInt(id) === customerId)) {
-
-                // Append read-access
-                record.set({
-                    customerUseAsDefaultIds: record.get('customerUseAsDefaultIds').concat([customerId]),
-                    hasReadAccess: true
-                });
-            }
-
-        // Else if access is going to be removed, and it's a read-access
-        } else if (column.dataIndex === 'hasReadAccess') {
-
-            // Remove check for write-access as well
-            record.set({
-                hasWriteAccess: false
-            });
-        }
-
-        // Save record
-        record.save({
-            preventDefaultHandler: true,
-            params: {
-                forced: 0
-            },
-            failure: (records, op) => {
-                Editor.app.getController('ServerException').handleException(
-                    op.error.response
-                )
-            },
-            success: () => {
-                record.refreshFlags(customerId);
-                Editor.MessageBox.addSuccess(
-                    Ext.String.format(
-                        Editor.controller.TmOverview.prototype.strings.edited,
-                        record.getName()
-                    )
-                );
             }
         });
     },
@@ -297,10 +348,16 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
      * Make sure current penalty value won't be shown until loaded
      *
      * @param value
+     * @param meta
+     * @param record
      * @returns {string|*}
      */
-    penaltyRenderer: function(value) {
-        return value === undefined ?  '<img src="/modules/editor/images/loading-spinner.gif" width="13">' : value;
+    penaltyRenderer: function(value, meta, record) {
+        // do not render any value for mt resources
+        if(Editor.util.LanguageResources.resourceType.MT === record.get('resourceType')){
+            return '';
+        }
+        return value === undefined ? '<img src="/modules/editor/images/loading-spinner.gif" width="13">' : value;
     },
 
     /**
@@ -362,7 +419,143 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssocController', {
             customer = this.getView().up('[viewModel]').getViewModel().get('record');
 
         if (customer) {
-            me.onCustomerChange(customer.getId());
+            me.reloadForCustomer(customer.getId());
         }
+    },
+
+    onServerExceptionE1500Handler: function (responseText, ecode, response) {
+        return this.handleTqeConflict(responseText, ecode, response);
+    },
+
+    onServerExceptionE1501Handler: function (responseText, ecode, response) {
+        return this.handleTqeConflict(responseText, ecode, response);
+    },
+
+    handleTqeConflict: function (responseText, ecode, response) {
+        var request = response ? response.request : null,
+            record = (request && request.records) ? request.records[0] : null,
+            view = this.getView();
+
+        if (!record || !view || !view.isVisible()) {
+            return;
+        }
+
+        view.setLoading(false);
+        this.showTqeConflictDialog(responseText, ecode, response);
+        return false;
+    },
+
+    captureCustomerAssocState: function(record) {
+        return {
+            customerIds: Ext.Array.clone(record.get('customerIds') || []),
+            customerUseAsDefaultIds: Ext.Array.clone(record.get('customerUseAsDefaultIds') || []),
+            customerWriteAsDefaultIds: Ext.Array.clone(record.get('customerWriteAsDefaultIds') || []),
+            customerPivotAsDefaultIds: Ext.Array.clone(record.get('customerPivotAsDefaultIds') || []),
+            customerTqeAsDefaultIds: Ext.Array.clone(record.get('customerTqeAsDefaultIds') || []),
+            customerTqeInstantTranslateAsDefaultIds: Ext.Array.clone(record.get('customerTqeInstantTranslateAsDefaultIds') || [])
+        };
+    },
+
+    applyCustomerAssocState: function(record, state) {
+        Object.keys(state || {}).forEach(function(field) {
+            record.set(field, Ext.Array.clone(state[field] || []));
+        });
+    },
+
+    /**
+     * Show TQE/TQE instant-translate conflict dialog
+     * @param responseText
+     * @param ecode
+     * @param response
+     * @returns {boolean}
+     */
+    showTqeConflictDialog: function (responseText, ecode, response) {
+        var me = this,
+            translated = responseText.errorsTranslated,
+            extraData = responseText.extraData ? responseText.extraData : null,
+            conflicts = extraData ? extraData.conflicts : [],
+            request = response ? response.request : false,
+            record = (request && request.records) ? request.records[0] : false;
+
+        if (!record) {
+            return;
+        }
+
+        // we need to get the last entityVersion from the last failed save request.
+        if(responseText.rows){
+            record.set('entityVersion', responseText.rows.entityVersion);
+        }
+
+        var conflictList = conflicts.map(function (conflict) {
+            return '<li>' + Ext.String.htmlEncode(conflict.resourceName) +
+                   ' (' + Ext.String.htmlEncode(conflict.serviceName) + ')' +
+                   ' - ' + Ext.String.htmlEncode(conflict.languagePairs) + '</li>';
+        });
+
+        var title = (ecode === 'E1500')
+            ? Editor.data.l10n.languageResources.editLanguageResource.tqeConflictTitle
+            : Editor.data.l10n.languageResources.editLanguageResource.tqeInstantTranslateConflictTitle;
+
+        Ext.create('Ext.window.MessageBox').show({
+            title: title,
+            msg: Ext.String.format('{0} <ul>{1}</ul> {2}',
+                translated.errorMessages[0],
+                conflictList.join(''),
+                translated.errorMessages[1]
+            ),
+            buttons: Ext.Msg.YESNO,
+            fn: function (button) {
+                if (button === "yes") {
+                    me.saveLanguageResourceWithTqeResolve(record);
+                    return true;
+                }
+                me.reloadForCustomer(record.get('customerId'));
+                return false;
+            },
+            scope: me,
+            defaultFocus: 'no',
+            icon: Ext.MessageBox.QUESTION
+        });
+
+        return false;
+    },
+
+    /**
+     * Save language resource with TQE/TQA conflict resolution
+     * Reloads the record first to avoid 409 Conflict errors due to entity versioning
+     * @param record
+     */
+    saveLanguageResourceWithTqeResolve: function (record) {
+        var me = this,
+            view = me.getView(),
+            customerId = view.up('[viewModel]').getViewModel().get('record').getId();
+
+        if (!record) {
+            return;
+        }
+
+        view.setLoading(true);
+
+        record.save({
+            params: {
+                resolveTqeConflicts: 1,
+                forced: 0
+            },
+            callback: function(rec, op, ok) {
+                view.setLoading(false);
+                if (!ok) {
+                    return;
+                }
+
+                me.getView().getStore().getSource().reload();
+
+                Editor.MessageBox.addSuccess(
+                    Ext.String.format(
+                        Editor.controller.TmOverview.prototype.strings.edited,
+                        record.getName()
+                    )
+                );
+            }
+        });
     }
 });

@@ -26,17 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TaskMeta extends ZfExtended_Models_Validator_Abstract
+namespace MittagQI\Translate5\Task\Import\Defaults;
+
+use editor_Models_Task;
+
+class TaskDefaultRegisteredEvent
 {
-    protected function defineValidators()
+    public function __construct(
+        private \editor_Models_Task $task,
+        private bool $importWizardUsed
+    ) {
+    }
+
+    public function getTask(): editor_Models_Task
     {
-        // TODO FIXME: validators seem to be unmaintained, check & add
-        // $this->addValidator('mappingType', 'inArray', ['source', 'target', null]);
-        $this->addValidator('bconfInZip', 'stringLength', [
-            'min' => 5,
-            'max' => 255,
-        ]);
-        $this->addValidator('pricingPresetId', 'int');
-        $this->addValidator('tqePricingPresetId', 'int');
+        return $this->task;
+    }
+
+    public function isImportWizardUsed(): bool
+    {
+        return $this->importWizardUsed;
     }
 }

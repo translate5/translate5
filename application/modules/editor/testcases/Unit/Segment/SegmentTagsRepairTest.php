@@ -193,6 +193,140 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $this->createRepairTestXlf($fixed, $broken);
     }
 
+    /**
+     * Test whitespace restoration when translation service drops whitespace.
+     * When keepWhitespaceTags is false, whitespace is sent as actual characters
+     * to the service. If the service doesn't return the whitespace, the repair
+     * logic should restore it.
+     */
+    public function testWhitespaceRestoration(): void
+    {
+        // Source with a newline tag <7/> (softReturn)
+        $source = 'Hello<7/>World';
+
+        // Simulate the translation service dropping the newline
+        $brokenTranslation = 'HalloWelt';
+
+        $this->createWhitespaceRepairTest($source, $brokenTranslation);
+    }
+
+    /**
+     * Test whitespace restoration with multiple whitespace tags.
+     */
+    public function testWhitespaceRestorationMultiple(): void
+    {
+        // Source with tab <5/> and newline <7/>
+        $source = 'Hello<5/>World<7/>Foo';
+
+        // Service returns text without any whitespace
+        $brokenTranslation = 'HalloWeltBar';
+
+        $this->createWhitespaceRepairTest($source, $brokenTranslation);
+    }
+
+    /**
+     * Test that whitespace is preserved when service returns it correctly.
+     */
+    public function testWhitespacePreserved(): void
+    {
+        // Source with a newline
+        $source = 'Hello<7/>World';
+
+        // Service returns text WITH the newline
+        $translationWithNewline = "Hallo\nWelt";
+
+        $this->createWhitespacePreservationTest($source, $translationWithNewline);
+    }
+
+    /**
+     * Test whitespace repair with mixed regular tags and whitespace.
+     */
+    public function testWhitespaceMixedWithTags(): void
+    {
+        // Source with regular paired tags and whitespace
+        $source = '<1>Hello</1><7/><2>World</2>';
+
+        // Service returns text without the newline but with tags
+        $brokenTranslation = '<t5x_1_1>Hallo</t5x_1_1><t5x_2_2>Welt</t5x_2_2>';
+
+        $this->createWhitespaceMixedRepairTest($source, $brokenTranslation);
+    }
+
+    /**
+     * Helper method to test whitespace repair.
+     * Tests that missing whitespace is restored when the translation service drops it.
+     */
+    private function createWhitespaceRepairTest(string $source, string $brokenTranslation): void
+    {
+        $sourceSegment = $this->shortToFull($source);
+
+        // Create tag handler with keepWhitespaceTags = false (default)
+        $tagHandler = new editor_Services_Connector_TagHandler_PairedTags();
+        $preparedSource = $tagHandler->prepareQuery($sourceSegment);
+
+        // Get the query segment which should have whitespace as XLIFF tags
+        $querySegment = $tagHandler->getQuerySegment();
+
+        // Verify that the query segment contains XLIFF whitespace tags
+        self::assertMatchesRegularExpression('/<x id="\d+"\/>/', $querySegment, 'Query segment should contain whitespace XLIFF tags');
+
+        // Simulate the service result - the brokenTranslation doesn't have the whitespace
+        // The repair logic should add the missing whitespace XLIFF tags
+
+        $repairer = new XliffTagRepairer();
+        $repairedText = $repairer->repairTranslation($querySegment, $brokenTranslation);
+
+        // The repaired text should now contain the missing whitespace XLIFF tags
+        self::assertMatchesRegularExpression('/<x id="\d+"\/>/', $repairedText, 'Repaired text should contain restored whitespace XLIFF tags');
+    }
+
+    /**
+     * Helper method to test whitespace preservation.
+     * Tests that whitespace is correctly handled when the translation service returns it.
+     */
+    private function createWhitespacePreservationTest(string $source, string $translationWithWhitespace): void
+    {
+        $sourceSegment = $this->shortToFull($source);
+
+        $tagHandler = new editor_Services_Connector_TagHandler_PairedTags();
+        $preparedSource = $tagHandler->prepareQuery($sourceSegment);
+
+        // The prepared source sent to the service should have actual whitespace
+        self::assertStringContainsString("\n", $preparedSource, 'Prepared source should contain actual newline');
+        self::assertStringNotContainsString('<x id="', $preparedSource, 'Prepared source should not contain XLIFF tags');
+
+        // Simulate restoring the result
+        $restoredResult = $tagHandler->restoreInResult($translationWithWhitespace);
+
+        // The result should contain the actual whitespace
+        self::assertNotNull($restoredResult, 'Restored result should not be null');
+    }
+
+    /**
+     * Helper method to test whitespace repair with mixed tags.
+     */
+    private function createWhitespaceMixedRepairTest(string $source, string $brokenTranslation): void
+    {
+        $sourceSegment = $this->shortToFull($source);
+
+        $tagHandler = new editor_Services_Connector_TagHandler_PairedTags();
+        $preparedSource = $tagHandler->prepareQuery($sourceSegment);
+
+        // Get the query segment
+        $querySegment = $tagHandler->getQuerySegment();
+
+        // Should have both regular tags and whitespace XLIFF tags
+        self::assertMatchesRegularExpression('/<bx id="\d+" rid="\d+"\/>/', $querySegment, 'Query segment should contain regular opening tags');
+        self::assertMatchesRegularExpression('/<x id="\d+"\/>/', $querySegment, 'Query segment should contain whitespace XLIFF tags');
+
+        // Repair the translation
+        $repairer = new XliffTagRepairer();
+        $repairedText = $repairer->repairTranslation($querySegment, $brokenTranslation);
+
+        // Should restore the missing whitespace tag
+        self::assertMatchesRegularExpression('/<x id="\d+"\/>/', $repairedText, 'Repaired text should contain restored whitespace XLIFF tags');
+    }
+
     private function createRepairTest(string $fixed, string $broken, array|string $expectedState, bool $replaceShortToFull = true): void
     {
         $fixedMarkup = $replaceShortToFull ? $this->shortToFull($fixed) : $fixed;

@@ -473,6 +473,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1714"></a>E1714 | Language Resources: Reimport              | Task reimport finished with failed segments, trying to reimport them                                                                         | Used to identify if there were failed segments during reimport                                                                                                                           |
 | <a id="E1739"></a>E1739 | Language Resources: Azure cloud           | The Azure model "{modelname}" is invalid an can not be used, maybe it is not yet deployed: {error}                                           | Check back in the Azure cloud, if the model-name is correct and the model properly deployed                                                                                              |
 | <a id="E1742"></a>E1742 | Language Resources: t5memory              | Segment too long for queries in t5memory                                                                                                     | t5memory has limits for segments length. Segments with more then 2024 characters will be skipped by our system                                                                           |
+| <a id="E1760"></a>E1760 | Language Resources: FineTune              | Validation error on Finetuning mandatory parameters.                                                                                        | There was an validation error on fine-tuning involving the mandatory parameters and requirements.                                                                                        |
 
 ### Terminology
 
@@ -566,6 +567,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1391"></a>E1391 | Quality processing on Task Import or Segment editing | Two non-splittable tags interleave each other.                                                                                      | Create a ticket for this issue with the event added.          |
 | <a id="E1392"></a>E1392 | Quality processing on Task Import or Segment editing | SNC lib (which stands behind AutoQA Numbers Check) detected an error of a kind previously unknown to translate5 app                 | Create a ticket for this issue with the event added.          |
 | <a id="E1432"></a>E1432 | Quality processing on Task Import                    | AutoQA-step of the import process - is deactivated                                                                                  | Check 'runtimeOptions.autoQA.autoStartOnImport' config option |
+
+### TQE - translation quality estimate
+
+| EventCode               | Context               | EventMessage                                            | Description/Solution                                                                                                         |
+|:------------------------|:----------------------|:--------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------|
+| <a id="E1765"></a>E1765 | TQE resource          | Failed to assign resource to task.                      | When resource to task assignment was requested the backend did respond with exception. Check log for more info               |
+| <a id="E1766"></a>E1766 | TQE resource          | Unable to unassign the resource.                        | When resource to task un-assignment was requested the backend did respond with exception. Check log for more info            |
+| <a id="E1767"></a>E1767 | TQE resource          | The resource is not available for the given task.       | The resource validation failed because the provided resource is not available for the provided task. Check log for more info |
+| <a id="E1768"></a>E1768 | TQE resource          | Failed to reset existing resource assignments for task. | Error happend when removing or clearing assigned TQE resources to a task. Check log for more info                            |
 
 ### Excel Ex-Import
 
@@ -993,6 +1003,17 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1672"></a>E1672 | Private Plugin Plunet Connector | Failed ending task                                                                                |                      |
 | <a id="E1673"></a>E1673 | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Quotes |                      |
 | <a id="E1674"></a>E1674 | Private Plugin Plunet Connector | Textmodule for project state does not exist or is invisible to the Plunet SOAP API user in Orders |                      |
+
+#### Translation quality estimate
+
+| EventCode               | Context | EventMessage                                                         | Description/Solution                                                                                                                  |
+|:------------------------|:--------|:---------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
+| <a id="E1754"></a>E1754 | TQE     | Failed to create quality estimate analysis.                          | On TQE trigger there was an error when new analysis was created                                                                       |
+| <a id="E1755"></a>E1755 | TQE     | Failed to persist quality estimate analysis result.                  | Error on saving analysis results.                                                                                                     |
+| <a id="E1756"></a>E1756 | TQE     | Analysis does not exist                                              | The provided analysis does not exis.                                                                                                  |
+| <a id="E1757"></a>E1757 | TQE     | The requested quality estimate analysis does not belong to the task. | The given analysis is not for the given task.                                                                                         |
+| <a id="E1758"></a>E1758 | TQE     | Request to get quality score failed                                  | The request to the LLM for retrieving quality estimation failed because LLM did not respond at all or responded with the wrong format |
+| <a id="E1759"></a>E1759 | TQE     | Failed to get scores for a segment after {retries} retries           | It was not possible to get a score from the LLM after the given number of retries                                                     |
 
 ## EventCode Design rules / decisions
 

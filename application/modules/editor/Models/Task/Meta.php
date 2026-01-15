@@ -39,6 +39,7 @@ use MittagQI\Translate5\Task\Meta\TaskMetaDTO;
  * @method null|string getMappingType()
  * @method void setMappingType(string $mappingType)
  * @method void setPricingPresetId(int $pricingPresetId)
+ * @method void setTqePricingPresetId(int $tqePricingPresetId)
  * @method string getVisualPdfWorkfile()
  * @method void setVisualPdfWorkfile(string $visualPdfWorkfile)
  */
@@ -135,6 +136,17 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
     }
 
     /**
+     * Get id of a pricing preset to be used for TQE pricing calculation for current task.
+     * Returns null if not set - caller should handle fallback to default.
+     */
+    public function getTqePricingPresetId(): ?int
+    {
+        $value = $this->row->tqePricingPresetId ?? null; // @phpstan-ignore-line
+
+        return $value === null || $value === '' ? null : (int) $value;
+    }
+
+    /**
      * Retrieves if a visual PDF-workfile is set
      */
     public function hasVisualPdfWorkfile(): bool
@@ -155,7 +167,8 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
             $this->getTaskGuid(),
             $this->row->mappingType, // @phpstan-ignore-line
             editor_Utils::parseNullableInt($this->row->pricingPresetId), // @phpstan-ignore-line
-            $this->getPerTaskExport()
+            $this->getPerTaskExport(),
+            editor_Utils::parseNullableInt($this->row->tqePricingPresetId) // @phpstan-ignore-line
         );
     }
 
@@ -181,6 +194,9 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract
         // the other fields have null as default ...
         $this->setPricingPresetId($dto->pricingPresetId);
         $this->setPerTaskExport($dto->perTaskExport);
+        if ($dto->tqePricingPresetId !== null) {
+            $this->setTqePricingPresetId($dto->tqePricingPresetId);
+        }
     }
 
     public function debug(): string

@@ -185,7 +185,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->workflowManager = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->config = Zend_Registry::get('config');
-        $this->defaults = new TaskDefaults();
+        $this->defaults = TaskDefaults::create();
         $this->taskUsageLogger = ZfExtended_Factory::get(
             TaskUsageLogger::class,
             [ZfExtended_Factory::get(editor_Models_TaskUsageLog::class)]

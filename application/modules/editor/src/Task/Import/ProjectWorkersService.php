@@ -70,7 +70,8 @@ class ProjectWorkersService
     public function queueImportWorkers(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
-        editor_Models_Import_Configuration $importConfig
+        editor_Models_Import_Configuration $importConfig,
+        bool $importWizardUsed,
     ): void {
         $taskGuid = $task->getTaskGuid();
         $params = [
@@ -116,7 +117,7 @@ class ProjectWorkersService
 
         // sometimes it is not possbile for additional import workers to be invoked in afterImport,
         // for that reason this event exists:
-        $this->eventTrigger->triggerImportWorkerQueued($task, $parentId);
+        $this->eventTrigger->triggerImportWorkerQueued($task, $parentId, $importWizardUsed);
     }
 
     /**

@@ -104,8 +104,10 @@ final class TerminologyProvider
 
     /**
      * Retrieves terminology in the form source => target
+     * @return array<string, string>
+     * @throws Zend_Exception
      * @throws ZfExtended_Exception
-     * @throws \Zend_Exception
+     * @throws \ZfExtended_Models_Entity_NotFoundException
      */
     public function getTerms(editor_Models_Task $task, editor_Models_Segment $segment): array
     {

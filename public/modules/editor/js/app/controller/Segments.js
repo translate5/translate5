@@ -187,6 +187,23 @@ Ext.define('Editor.controller.Segments', {
     },
 
     /**
+     * Can be used to refresh a segment. The fields should mark the fields expected to change
+     * Other components may listen to this ...
+     * @param {Editor.model.Segment} segment
+     * @param {array} fields
+     */
+    refreshSegment: function (segment, fields) {
+        var oldData = segment.data; // capture data before reload
+        segment.load({
+            scope: this,
+            success: function(record) {
+                // may others need to know when we refreshed a segment ...
+                this.fireEvent('segmentRefreshed', record, fields, oldData);
+            }
+        });
+    },
+
+    /**
      * @param {Editor.$application} app
      * @param {Editor.model.admin.Task} task
      * @param {Ext.data.operation.Update} operation
@@ -744,8 +761,8 @@ Ext.define('Editor.controller.Segments', {
         //fire event to process things after save call is started, like change alike handling
         //parameters are the callback to the final save chain call,
         //for later usage in ChangeAlike Handling and the saved record
-        me.fireEvent('afterSaveCall', function () {
-            me.saveChainEnd(record);
+        me.fireEvent('afterSaveCall', function (extraParams) {
+            me.saveChainEnd(record, extraParams);
         }, record, ed.editor.columnToEdit);
     },
     /**
@@ -831,18 +848,19 @@ Ext.define('Editor.controller.Segments', {
      * End of the save chain.
      * fires event "segmentEditSaved".
      */
-    saveChainEnd: function (record) {
+    saveChainEnd: function (record,extraParams) {
         var me = this;
         me.delLoadMask();
         me.saveChainMutex = false;
         me.onSegmentUsageFinished();
         // crucial: reset the trigger flag indicating a original target update when save chain ended
         record.wasOriginalTargetUpdated = false;
-        me.fireEvent('segmentEditSaved', me, record);
+
+        me.fireEvent('segmentEditSaved', me, record, extraParams);
     },
     addLoadMask: function () {
         var me = this;
-        if (me.loadingMaskRequests == 0) {
+        if (me.loadingMaskRequests === 0) {
             me.getViewport().setLoading(true);
         }
         me.loadingMaskRequests++;
@@ -852,7 +870,7 @@ Ext.define('Editor.controller.Segments', {
         if (me.loadingMaskRequests > 0) {
             me.loadingMaskRequests--;
         }
-        if (me.loadingMaskRequests == 0) {
+        if (me.loadingMaskRequests === 0) {
             me.getViewport().setLoading(false);
         }
     },

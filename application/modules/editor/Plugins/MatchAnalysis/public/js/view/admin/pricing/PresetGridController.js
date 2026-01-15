@@ -500,6 +500,55 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGridController
     },
 
     /**
+     * Handler when a global TQE preset default checkbox is changed
+     *
+     * @param {Object} col
+     * @param {Integer} recordIndex
+     * @param {Boolean} checked: the status of the checkbox
+     * @param {Editor.model.admin.pricing.PresetModel} record: the record whose row was clicked
+     * @returns {boolean}
+     */
+    onBeforeGlobalTqeCheckChange: function(col, recordIndex, checked, record) {
+        var wasDefault;
+
+        // Firings of this event without record what in theory must not happen.
+        // Also not-checked events must be dismissed
+        if (!record || !checked) {
+            return false;
+        }
+
+        // Make request
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'plugins_matchanalysis_pricingpreset/settqedefault',
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json'
+            },
+            params: {
+                presetId: record.get('id')
+            },
+            success: xhr => {
+
+                // Get response json
+                var json = Ext.JSON.decode(xhr.responseText, true);
+
+                // Apply isTqeDefault-flag
+                record.set('isTqeDefault', true, {commit: true});
+
+                // If some other preset was TQE default - clear isTqeDefault flag from there
+                if (json.wasDefault) {
+                    if (wasDefault = record.store.getById(json.wasDefault)) {
+                        wasDefault.set('isTqeDefault', false, {commit: true});
+                    }
+                }
+            }
+        });
+
+        // Return false as isTqeDefault-flag is applied inside success-callback above
+        return false;
+    },
+
+    /**
      * Handler when a customer-specific preset default checkbox is changed
      * There is always a row to be highlighted and one to be unhighlighted
      * The exception is, when system default is (de)selected as customer default - then don't refresh old
@@ -538,6 +587,62 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGridController
                     sCustomer = (store) ? store.getById(customerId) : null;
                     if(sCustomer){
                         sCustomer.set('defaultPricingPresetId', newPresetId, { commit: true, silent: true });
+                    }
+                }
+                // refresh the grid for the changed record
+                gridView.refreshNode(record);
+                if(oldPresetId !== null){
+                    // if there was a old record, refresh the grid for the old record
+                    var preset = gridView.getStore().getById(oldPresetId);
+                    if(preset){
+                        gridView.refreshNode(preset);
+                    }
+                }
+            },
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+        return false; // checked state handled manually via view.refresh
+    },
+
+    /**
+     * Handler when a customer-specific TQE preset default checkbox is changed
+     * @param {Object} col
+     * @param {Integer} recordIndex
+     * @param {Boolean} checked: the status of the checkbox
+     * @param {Editor.model.admin.pricing.PresetModel} record: the record whose row was clicked
+     * @returns {boolean}
+     */
+    onBeforeTqeCheckChange: function(col, recordIndex, checked, record){
+        // at times extJs fires this event without record what in theory must not happen
+        if(!record){
+            return;
+        }
+        var gridView = col.getView(),
+            customer = gridView.grid.getCustomer(),
+            customerId = customer.id,
+            oldPresetId = customer.get('defaultTqePricingPresetId'),
+            newChecked = (oldPresetId !== record.id),
+            newPresetId = newChecked ? record.id : null;
+        gridView.select(record);
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'customermeta',
+            method: 'PUT',
+            params: {
+                id: customerId,
+                data: Ext.encode({
+                    defaultTqePricingPresetId: newPresetId
+                })
+            },
+            success: function() {
+                var storeId, store, sCustomer;
+                // unfortunately there are two customer stores, which both act as source for the TaskImport customer selector, so we have to update them both
+                for(storeId of ['customersStore', 'userCustomers']){
+                    store = Ext.getStore(storeId);
+                    sCustomer = (store) ? store.getById(customerId) : null;
+                    if(sCustomer){
+                        sCustomer.set('defaultTqePricingPresetId', newPresetId, { commit: true, silent: true });
                     }
                 }
                 // refresh the grid for the changed record

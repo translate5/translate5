@@ -38,57 +38,48 @@ Ext.define('Editor.store.admin.Config', {
     groupField: 'guiGroup',
     RUNTIMEOPTIONS_CONFIG_PREFIX: 'runtimeOptions.',
     
-    /***
-     * Get the config value from given record. Here also custom value convert is applied.
+    /**
+     * Get the config value from given record.
      */
-    getRecordValue:function(record){
-        if(!record){
+    getRecordValue: function(record){
+        if (! record){
             return null;
-        }
-        //Convert the map types to object (this is not done by the model instance). 
-        if(record.get('type') === 'map'){
-            return Ext.JSON.decode(record.get('value'));
         }
         return record.get('value');
     },
     
-    /***
+    /**
      * Search for config value by given name
      */
-    getConfig:function(name){
-        var me=this,
-            hasFilters = me.filters && me.filters.length > 0;
-            
-         if(hasFilters){
-             return me.searchFiltered(name);
+    getConfig: function(name){
+         if (this.filters && this.filters.length > 0){
+             return this.searchFiltered(name);
          }   
             
-        var pos = me.findExact('name',me.RUNTIMEOPTIONS_CONFIG_PREFIX+name);
+        let pos = this.findExact('name', this.RUNTIMEOPTIONS_CONFIG_PREFIX + name);
 
         if (pos < 0) {
             return null;
         }
-        return me.getRecordValue(me.getAt(pos));
+        return this.getRecordValue(this.getAt(pos));
     },
 
-    /***
+    /**
      * Search the config by name including the filtered rows
      */
-    searchFiltered:function(name){
-        var me=this,
-            data = me.getData().getSource(),
-            record = data && data.getByKey(me.RUNTIMEOPTIONS_CONFIG_PREFIX+name);
-        return me.getRecordValue(record);
+    searchFiltered: function(name){
+        var data = this.getData().getSource(),
+            record = data ? data.getByKey(this.RUNTIMEOPTIONS_CONFIG_PREFIX + name) : null;
+        return record ? this.getRecordValue(record) : null;
     },
     
-    /***
+    /**
      * Add additional params to the store proxy. The newExtra params will be merged into 
      * the existing proxy extra params
      */
-    setExtraParams:function(newExtra){
-        var me=this,
-            existing = me.getProxy().getExtraParams(),
+    setExtraParams: function(newExtra){
+        var existing = this.getProxy().getExtraParams(),
             merged = Ext.Object.merge(existing, newExtra);
-        me.getProxy().setExtraParams(merged);
+        this.getProxy().setExtraParams(merged);
     }
 });

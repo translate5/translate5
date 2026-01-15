@@ -325,7 +325,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     fields: ['id', 'value'],
                     data : storeData
                 }),
-                value:Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMatchRate'),
+                value: Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMatchRate'),
                 displayField: 'value',
                 valueField: 'id',
                 queryMode: 'local'

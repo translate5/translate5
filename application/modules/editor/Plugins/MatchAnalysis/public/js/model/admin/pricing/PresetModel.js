@@ -73,6 +73,10 @@ Ext.define('Editor.plugins.MatchAnalysis.model.admin.pricing.PresetModel', {
     }, {
         name: 'isDefault', // global setting
         type: 'boolean'
+    }, {
+        name: 'isTqeDefault', // global TQE setting
+        type: 'boolean',
+        defaultValue: false
     }],
     toUrl: function(){
         return Ext.util.History.getToken().replace(/pricingPresets\/?\d*.*$/, 'pricingPresets/' + this.id)
