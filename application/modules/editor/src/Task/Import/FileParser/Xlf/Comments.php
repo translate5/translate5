@@ -35,9 +35,11 @@ use editor_Models_Segment;
 use editor_Models_Task;
 use ReflectionException;
 use Zend_Db_Statement_Exception;
+use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * encapsulates the XLF comment import
@@ -71,37 +73,41 @@ class Comments
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
     public function importComments(int $segmentId): void
     {
+        $comment = null;
+
         foreach ($this->resnameComments as $comment) {
             $comment->setTaskGuid($this->task->getTaskGuid());
             $comment->setSegmentId($segmentId);
             $comment->save();
         }
+
         //reset internal resname collector
         $this->resnameComments = [];
 
-        $config = $this->task->getConfig();
-        if (! $config->runtimeOptions->import->xliff->importComments || empty($this->comments)) {
-            return;
+        $importComments = (bool) ($this->task->getConfig()->runtimeOptions->import->xliff->importComments ?? false);
+        if ($importComments && ! empty($this->comments)) {
+            foreach ($this->comments as $comment) {
+                $comment->setTaskGuid($this->task->getTaskGuid());
+                $comment->setSegmentId($segmentId);
+                $comment->save();
+            }
+
+            //reset internal collector
+            $this->comments = [];
         }
-        $comment = null;
-        foreach ($this->comments as $comment) {
-            $comment->setTaskGuid($this->task->getTaskGuid());
-            $comment->setSegmentId($segmentId);
-            $comment->save();
-        }
+
         //if there was at least one processed comment, we have to sync the comment contents to the segment
         if (! is_null($comment)) {
             $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
             $segment->load($segmentId);
             $comment->updateSegment($segment, $this->task->getTaskGuid());
         }
-
-        //reset internal collector
-        $this->comments = [];
     }
 
     /**

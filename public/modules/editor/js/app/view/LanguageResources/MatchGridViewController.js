@@ -118,7 +118,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     calculateRows: function(controller){
         var me = this,
             maxSegments = Editor.data.LanguageResources.preloadedSegments;
-        me.nextSegment = controller.next.editableNext;
+        me.nextSegment = controller.next?.editableNext;
         if(me.nextSegment){
             var retval = controller.findNextRows(controller.next.editableNext.idx, maxSegments);
             me.cacheSegmentIndex = me.cacheSegmentIndex.concat(retval);
