@@ -5,7 +5,13 @@ if [ -f "windows-installer-config.ini" ]; then
   source <(grep INSTALL_PHP_PATH windows-installer-config.ini | sed "s/\\\/\//g")
   CMD_PHP=$INSTALL_PHP_PATH
 else
-  CMD_PHP="${CMD_PHP:-/usr/bin/php}"
+  if [ -n "$CMD_PHP" ]; then
+    CMD_PHP="$CMD_PHP"
+  elif [ -x "/usr/local/bin/php" ]; then
+    CMD_PHP="/usr/local/bin/php"
+  else
+    CMD_PHP="/usr/bin/php"
+  fi
 fi
 
 # make sure PHP and MySQL binary exist; else die with an error message
