@@ -17,6 +17,38 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.33.2] - 2026-01-15
+
+### Important Notes:
+#### [TRANSLATE-5191](https://jira.translate5.net/browse/TRANSLATE-5191)
+For API using clients: When creating T5memory language resources via API from now on the serviceType must be editor_Services_T5Memory. Same for the resourceId. Currently opentm2 values are converted automatically to t5memory and warning is logged - so old styled calls should still work
+ 
+
+
+### Changed
+**[TRANSLATE-5191](https://jira.translate5.net/browse/TRANSLATE-5191): t5memory - Rename from OpenTM2 to t5memory in UI** <br>
+7.33.2: convert the serviceType OpenTM2 automatically to T5Memory and create deprecation warning into the log when creating language resources via API and use old serviceType name
+7.33.0: Rename OpenTM2 to T5Memory
+
+
+### Bugfixes
+**[TRANSLATE-5204](https://jira.translate5.net/browse/TRANSLATE-5204): Comments, Import/Export - Comments produced by XLF resname field are not imported properly** <br>
+The resname information of segments in XLF are imported as comments but they were not shown as comment in the segment grid.
+
+**[TRANSLATE-5203](https://jira.translate5.net/browse/TRANSLATE-5203): Editor general - RootCause: Cannot read properties of null (reading 'editableNext')** <br>
+FIXED: handled case when where is no next segment
+
+**[TRANSLATE-5201](https://jira.translate5.net/browse/TRANSLATE-5201): Editor general - RootCause: can't access property "unmask" of null** <br>
+FIXED: added handling for cases when prompt details window is closed before request callback received
+
+**[TRANSLATE-5130](https://jira.translate5.net/browse/TRANSLATE-5130): VisualReview / VisualTranslation - Visual exchange: window shrinks** <br>
+Fixed window shrinking when adding or exchanging a file for visual
+
+**[TRANSLATE-5035](https://jira.translate5.net/browse/TRANSLATE-5035): Configuration - changed company name not respected for email sender** <br>
+The variable {companyName} is now replaced in the configured from name of the sender e-mail
+
+
 ## [7.33.1] - 2026-01-13
 
 ### Important Notes:
