@@ -72,6 +72,14 @@ class LocalizationExample
 * Typographical quotes: ‘, ’, “, ”, “quoted”
 * The strings in the code need to be single, unconcatenated strings preferrably wrapped in single quotes
 
+### How Localization strings look like
+* The localization generally is made in english
+* The strings preferrably should be as showing up in the english localization
+* Please no fancy "variables" like "what.this.string.is.for"
+* Please do use typographical quotes, no real quotes like " or '
+* Typographical quotes: ‘, ’, “, ”, “quoted”
+* The strings in the code need to be single, unconcatenated strings preferrably wrapped in single quotes
+
 ### Updating the ZXLIFF files with new translations
 * Normally developers provide only proper english localization sources, the `t5 l10n:update` update is done in the release process
 * To extract the ZXLIFF-translations from the code, use `t5 l10n:update`. This will extract all modules & add new strings with empty targets to the ZXLIFFs
