@@ -34,9 +34,14 @@ use SplFileInfo;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
 
 class InstallerPostInstallCommand extends Translate5AbstractCommand
 {
+    private const string SKIPPED = 'skipped';
+
+    private const string PROCESSED = 'processed';
+
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'installer:post-install';
 
@@ -45,10 +50,14 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
         $this
             ->setDescription('Executes post installation scripts from application/post-installation-scripts')
             ->setHelp(
-                'Executes post installation / update scripts from application/post-installation-scripts. '
-                . ' Files have to end on .update.t5cli or .installation.t5cli and may contain only t5 CLI commands.'
-                . ' .update.t5cli files are called only on updates, .installation.t5cli on installations only, '
-                . ' this is controlled by the --update option'
+                'Executes post installation / update scripts from application/post-installation-scripts.
+
+Files have to end on .update.t5cli or .installation.t5cli and may contain only t5 CLI commands!
+
+    .update.t5cli files are called only on updates,
+    .installation.t5cli on installations only
+
+this is controlled by the --update option'
             );
 
         $this->addOption(
@@ -64,12 +73,19 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Do not log the files as executed in data/logs/post-installation-scripts-executed.log'
         );
+
+        $this->addOption(
+            'list-executed',
+            'l',
+            InputOption::VALUE_NONE,
+            'List the executed scripts as logged in the log'
+        );
     }
 
     /**
      * Execute the command
      * {@inheritDoc}
-     * @throws \Zend_Exception
+     * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -92,6 +108,17 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
         $executedFilesLog = APPLICATION_DATA . '/logs/post-installation-scripts-executed.log';
         $loadedFiles = $this->loadExecutedFiles($executedFilesLog);
 
+        if ($this->input->getOption('list-executed')) {
+            $table = $this->io->createTable();
+            $table->setHeaders(['File', 'Timestamp and status']);
+            foreach ($loadedFiles as $id => $file) {
+                $table->addRow([$id, $file]);
+            }
+            $table->render();
+
+            return;
+        }
+
         foreach (new DirectoryIterator($postScriptDir) as $fileInfo) {
             $filename = $fileInfo->getFilename();
             if ($fileInfo->isDot()
@@ -108,7 +135,7 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
 
             if (! $this->isTypeToProcess($fileInfo)) {
                 $this->io->info('Skipped ' . $filename);
-                $this->logAsProcessed($executedFilesLog, $filename);
+                $this->logAsProcessed($executedFilesLog, $filename, self::SKIPPED);
 
                 continue;
             }
@@ -127,11 +154,13 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
                 if ($result_code === 0) {
                     $this->io->success('Finished successful step ' . $step . ' of ' . $filename . '.');
                 } else {
-                    $this->io->warning('Finished step ' . $step . ' of ' . $filename . ' with result code ' . $result_code);
+                    $this->io->warning(
+                        'Finished step ' . $step . ' of ' . $filename . ' with result code ' . $result_code
+                    );
                 }
             }
 
-            $this->logAsProcessed($executedFilesLog, $filename);
+            $this->logAsProcessed($executedFilesLog, $filename, self::PROCESSED);
         }
     }
 
@@ -163,15 +192,18 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
         foreach ($executedFiles as $file) {
             $line = explode('#', $file);
             $result[$line[1]] = $line[0];
+            if (array_key_exists(2, $line)) {
+                $result[$line[1]] .= ': ' . $line[2];
+            }
         }
 
         return $result;
     }
 
-    private function logAsProcessed(string $executedFilesLog, $filename): void
+    private function logAsProcessed(string $executedFilesLog, $filename, string $type): void
     {
         if (! $this->input->getOption('not-done')) {
-            file_put_contents($executedFilesLog, date('Y-m-d H:i:s') . '#' . $filename, FILE_APPEND);
+            error_log(date('Y-m-d H:i:s') . '#' . $filename . '#' . $type . PHP_EOL, 3, $executedFilesLog);
         }
     }
 }
