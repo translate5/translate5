@@ -8,28 +8,19 @@
     </trans-unit>
     <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGltIFRNIGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgdmVyc3VjaGVuIFNpZSBlcyBlcm5ldXQu'>
         <source>Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.</source>
-        <target>The segment could not be saved to the TM.<br />
-            Please try again later.<br />
-            If this message persists, please try to refresh your search.<br />
-            If message still persists, please notify the system support.</target>
+        <target>The segment could not be saved to the TM. <br />Please try again later.<br />If this message persists, please try to refresh your search. <br />If the message still persists, please notify the system support.</target>
     </trans-unit>
     <trans-unit id='RGllIGdlZnVuZGVuZSBTZWdtZW50LUlEIHdlaWNodCB2b24gZGVyIGdlc3VjaHRlbiBhYiwgd2FocnNjaGVpbmxpY2ggd3VyZGUgc2llIGluendpc2NoZW4gZ2Vsw7ZzY2h0IG9kZXIgYmVhcmJlaXRldC4gU2llIG3DvHNzZW4gSWhyZSBTdWNoZSBha3R1YWxpc2llcmVuLg=='>
         <source>Die gefundene Segment-ID weicht von der gesuchten ab, wahrscheinlich wurde sie inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.</source>
-        <target> Segment can not be saved.<br />
-            Try to refresh your search.<br />
-            Found segment id on the server differs from the requested one.<br />
-            Probably the segment index changed on the server due to other operations.</target>
+        <target>The segment could not be saved. <br />Please try to refresh your search. <br />The found segment-id on the server differs from the requested one. <br />Probably the segment index changed on the server due to other operations.</target>
     </trans-unit>
     <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIHdhaHJzY2hlaW5saWNoIHd1cmRlIGVzIGluendpc2NoZW4gZ2Vsw7ZzY2h0IG9kZXIgYmVhcmJlaXRldC4gU2llIG3DvHNzZW4gSWhyZSBTdWNoZSBha3R1YWxpc2llcmVuLg=='>
         <source>Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.</source>
-        <target>Could not delete segment.<br />
-            Please refresh your search and try again.<br />
-            Found segment id differs from the requested one.<br />
-            Probably the segment index changed on the server due to other operations.</target>
+        <target>Could not delete segment. <br />Please refresh your search and try again. <br />Found segment id differs from the requested one. <br />Probably the segment index changed on the server due to other operations.</target>
     </trans-unit>
     <trans-unit id='QW5nZWZvcmRlcnRlcyBTZWdtZW50IG5pY2h0IGdlZnVuZGVuLiBXYWhyc2NoZWlubGljaCB3dXJkZSBlcyBnZWzDtnNjaHQu'>
         <source>Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.</source>
-        <target>The segment, you want to save, has already deleted by another process.</target>
+        <target>The segment you are trying to save has already been deleted by another process.</target>
     </trans-unit>
   </body>
  </file>

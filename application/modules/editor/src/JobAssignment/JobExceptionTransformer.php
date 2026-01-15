@@ -55,6 +55,7 @@ use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Exception\InexistentTaskException;
 use MittagQI\Translate5\Task\Exception\TaskHasCriticalQualityErrorsException;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\ZfExtended\Localization;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_ErrorCodeException;
@@ -69,7 +70,7 @@ class JobExceptionTransformer
     ) {
         UnprocessableEntity::addCodes([
             'E1012' => 'Multi Purpose Code logging in the context of jobs (task user association)',
-            'E1280' => 'The format of the segmentrange that is assigned to the user is not valid.',
+            'E1280' => 'The format of the segment range assigned to the user is not valid.',
         ]);
 
         EntityConflictException::addCodes([
@@ -96,7 +97,7 @@ class JobExceptionTransformer
      */
     public function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
-        $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
+        $invalidValueProvidedMessage = Localization::trans('Ungültiger Wert bereitgestellt');
 
         return match ($e::class) {
             InvalidTypeProvidedException::class => UnprocessableEntity::createResponse(
@@ -142,27 +143,31 @@ class JobExceptionTransformer
             UserHasAlreadyOpenedTheTaskForEditingException::class => EntityConflictException::createResponse(
                 'E1161',
                 [
-                    'id' => 'Sie können den Job zur Zeit nicht bearbeiten,'
-                        . ' der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
+                    'id' => Localization::trans(
+                        'Sie können den Job zur Zeit nicht bearbeiten, ' .
+                        'der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.'
+                    ),
                 ]
             ),
             InvalidSegmentRangeFormatException::class => UnprocessableEntity::createResponse(
                 'E1280',
                 [
-                    'id' => 'Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
+                    'id' => Localization::trans('Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9'),
                 ]
             ),
             InvalidSegmentRangeSemanticException::class => UnprocessableEntity::createResponse(
                 'E1280',
                 [
-                    'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide.'
-                        . ' Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen,'
-                        . ' weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
+                    'id' => Localization::trans(
+                        'Der Inhalt für die editierbaren Segmente ist nicht valide. Die Zahlen müssen in der ' .
+                        'richtigen Reihenfolge angegeben sein und dürfen nicht überlappen, weder innerhalb der ' .
+                        'Eingabe noch mit anderen Usern von derselben Rolle.'
+                    ),
                 ]
             ),
             TaskHasCriticalQualityErrorsException::class => EntityConflictException::createResponse(
                 'E1542',
-                [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
+                [Localization::trans(QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS)],
                 [
                     'task' => $e->task,
                     'categories' => implode('<br/>', $e->categories),
@@ -171,7 +176,10 @@ class JobExceptionTransformer
             AttemptToRemoveJobInUseException::class => EntityConflictException::createResponse(
                 'E1061',
                 [
-                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.',
+                    Localization::trans(
+                        'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, ' .
+                        'da der Benutzer diese aktuell benutzt.'
+                    ),
                 ],
                 [
                     'job' => $e->job,
@@ -180,7 +188,10 @@ class JobExceptionTransformer
             AttemptToRemoveJobWhichTaskIsLockedByUserException::class => EntityConflictException::createResponse(
                 'E1062',
                 [
-                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.',
+                    Localization::trans(
+                        'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, ' .
+                        'da die Aufgabe durch den Benutzer gesperrt ist.'
+                    ),
                 ],
                 [
                     'job' => $e->job,
@@ -190,7 +201,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        'job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job',
+                        Localization::trans('job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job'),
                     ],
                 ],
             ),
@@ -198,7 +209,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        'job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job',
+                        Localization::trans('job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job'),
                     ],
                 ],
             ),
@@ -206,7 +217,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        'not-coordinator-group-customer-task',
+                        Localization::trans('not-coordinator-group-customer-task'),
                     ],
                 ],
             ),
@@ -214,7 +225,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        'coordinator-dont-belong-to-coordinator-group',
+                        Localization::trans('coordinator-dont-belong-to-coordinator-group'),
                     ],
                 ],
             ),
@@ -222,7 +233,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        'job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job',
+                        Localization::trans('job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job'),
                     ],
                 ],
             ),
@@ -230,7 +241,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        'job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job',
+                        Localization::trans('job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job'),
                     ],
                 ],
             ),
@@ -238,7 +249,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'permission' => [
-                        'job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job',
+                        Localization::trans('job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job'),
                     ],
                 ],
             ),
@@ -246,7 +257,7 @@ class JobExceptionTransformer
                 'E1162',
                 [
                     'id' => [
-                        'job-assignment.delete.there-is-un-deletable-bound-job',
+                        Localization::trans('job-assignment.delete.there-is-un-deletable-bound-job'),
                     ],
                 ],
             ),
@@ -267,7 +278,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        'Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe',
+                        Localization::trans('Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe'),
                     ],
                 ],
             ),
@@ -275,7 +286,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        'job-assignment.create.coordinator-group-job-already-exists',
+                        Localization::trans('job-assignment.create.coordinator-group-job-already-exists'),
                     ],
                 ],
             ),
@@ -283,7 +294,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        'coordinator-has-not-yet-confirmed-the-coordinator-group-job',
+                        Localization::trans('coordinator-has-not-yet-confirmed-the-coordinator-group-job'),
                     ],
                 ],
             ),
@@ -291,7 +302,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        'coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job',
+                        Localization::trans('coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job'),
                     ],
                 ],
             ),

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
+
 /**
  * Plugin Bootstrap for ManualStatusCheck Plugin
  * This Plugin checks if all segments has a manual status set. If not, the task can not be finished.
@@ -66,7 +68,10 @@ class editor_Plugins_ManualStatusCheck_Bootstrap extends ZfExtended_Plugin_Abstr
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1045', [
-                'Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.',
+                Localization::trans(
+                    'Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt ' .
+                     'haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.'
+                ),
             ], [
                 'task' => $event->getParam('task'),
             ]);

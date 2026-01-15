@@ -26,15 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('taskType::default');
- */
+declare(strict_types=1);
 
 /**
  * The default task type is a mixture of project and task!
+ *
+ * TODO FIXME: find better solution for composite localization below ...
  */
+#[\MittagQI\ZfExtended\Localization\LocalizableString('taskType::default')]
 class editor_Task_Type_Default extends editor_Task_Type_Abstract
 {
     public const ID = 'default';

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Worker\Queue;
 
 class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestController
@@ -61,7 +62,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         $taskGuid = $this->getParam('taskGuid');
         if (empty($taskGuid)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1403', [
-                'taskGuid' => 'The taskGuid field is empty',
+                'taskGuid' => Localization::trans('The taskGuid field is empty'),
             ]);
         }
         $this->view->rows = $this->entity->loadAllAvailableForTask(
@@ -91,7 +92,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         if ($task->isProject()) {
             $projects = ZfExtended_Factory::get('editor_Models_Task');
             /* @var editor_Models_Task $projects */
-            $projects = $projects->loadProjectTasks($task->getProjectId(), true);
+            $projects = $projects->loadProjectTasks((int) $task->getProjectId(), true);
             $taskGuids = array_column($projects, 'taskGuid');
         }
 

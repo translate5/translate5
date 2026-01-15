@@ -39,6 +39,7 @@ use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
+use MittagQI\ZfExtended\Localization;
 
 /**
  * Encapsulates the Default Actions triggered by the Workflow.
@@ -150,13 +151,14 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
             );
         } catch (CompetitiveJobAlreadyTakenException) {
             ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1160' => 'The competitive users can not be removed, '
-                    . 'probably some other user was faster and you are not assigned anymore to that task.',
+                'E1160' => 'The competitive users can not be removed, probably some other user was faster and you are not assigned anymore to that task.',
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
-                'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, '
-                    . 'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
+                'noField' => Localization::trans(
+                    'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, ' .
+                    'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.'
+                ),
             ]);
         }
     }

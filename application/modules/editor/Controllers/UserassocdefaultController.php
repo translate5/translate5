@@ -54,6 +54,7 @@ use MittagQI\Translate5\Repository\DefaultCoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\DefaultUserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\ZfExtended\Localization;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
 class Editor_UserassocdefaultController extends ZfExtended_RestController
@@ -270,7 +271,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
      */
     private function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
-        $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
+        $invalidValueProvidedMessage = Localization::trans('Ungültiger Wert bereitgestellt');
 
         return match ($e::class) {
             InvalidTypeProvidedException::class => UnprocessableEntity::createResponse(
@@ -301,7 +302,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                 'E1682',
                 [
                     'userGuid' => [
-                        'Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden',
+                        Localization::trans('Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden'),
                     ],
                 ],
             ),
@@ -309,7 +310,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                 'E1682',
                 [
                     'userGuid' => [
-                        'Kunde ist nicht mit der Benutzergruppe Koordinator verbunden',
+                        Localization::trans('Kunde ist nicht mit der Benutzergruppe Koordinator verbunden'),
                     ],
                 ],
             ),
@@ -317,7 +318,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                 'E1682',
                 [
                     'userGuid' => [
-                        'coordinator-dont-belong-to-coordinator-group',
+                        Localization::trans('coordinator-dont-belong-to-coordinator-group'),
                     ],
                 ],
             ),

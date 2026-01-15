@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource\CleanupAssociation;
 
+use MittagQI\ZfExtended\Localization;
 use ZfExtended_Factory;
 use ZfExtended_UnprocessableEntity;
 
@@ -42,6 +43,7 @@ class Task extends Base
     protected function getConflictByEntity(string $entityClass): array
     {
         $taskAssoc = ZfExtended_Factory::get($entityClass);
+        /** @var \MittagQI\Translate5\LanguageResource\AssociationAbstract $taskAssoc */
 
         return $taskAssoc->getAssociatedByResource($this->languageResourceId);
     }
@@ -54,8 +56,11 @@ class Task extends Base
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1473', [
             'errorMessages' => [
-                'Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:',
-                'Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?',
+                Localization::trans('Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:'),
+                Localization::trans(
+                    'Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. ' .
+                    'Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?'
+                ),
             ],
         ], extraData: [
             'taskList' => $taskNames,

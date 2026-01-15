@@ -26,65 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * hint: these are the qmSubsegmentFlags & severities encoded in QM_Subsegment_Issues.xml
- * TODO FIXME: we have them in german in the translations ...
- * $translate->_('Accuracy');
- * $translate->_('Mistranslation');
- * $translate->_('Terminology');
- * $translate->_('Omission');
- * $translate->_('Addition');
- * $translate->_('Untranslated');
- * $translate->_('Fluency');
- * $translate->_('Register');
- * $translate->_('Style');
- * $translate->_('Inconsistency');
- * $translate->_('Spelling');
- * $translate->_('Typography');
- * $translate->_('Grammar');
- * $translate->_('Locale violation');
- * $translate->_('Unintelligible');
- * $translate->_('Verity');
- * $translate->_('Completeness');
- * $translate->_('Legal requirements');
- * $translate->_('Locale applicability');
- * $translate->_('Critical');
- * $translate->_('Major');
- * $translate->_('Minor');
- * task-grid textcols
- * $translate->_('Endkunde');
- * $translate->_('100%-Treffer editierbar');
- * $translate->_('Übersetzungsaufgabe (kein Review)');
- * $translate->_('Quellsprache bearbeitbar');
- * $translate->_('Dateien');
- * $translate->_('Unveränderte 100% TM Matches sind editierbar');
- * $translate->_('Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt');
- * $translate->_('Bestelldatum');
- * $translate->_('Enddatum');
- * $translate->_('Projektmanager');
- * $translate->_('Projektmanager');
- * $translate->_('Referenzdateien');
- * $translate->_('Relaissprache');
- * $translate->_('Quellsprache');
- * $translate->_('Status');
- * $translate->_('Zielsprache');
- * $translate->_('Aktionen');
- * $translate->_('Anzahl zugewiesene Sprachressourcen');
- * $translate->_('Aufgabenname');
- * $translate->_('Auftragsnr.');
- * $translate->_('Terminologie');
- * $translate->_('Benutzer');
- * $translate->_('Wörter');
- * $translate->_('Anzahl Wörter');
- * $translate->_('Workflow');
- * $translate->_('Zahl zugewiesener Benutzer');
- */
-
 use editor_Models_Segment_AutoStates as AutoStates;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
@@ -167,7 +112,32 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setReimportable(string|int $reimportable)
  * @method string getCreated()
  * @method string getModified()
+ *
+ * HINT: These localizations are the qmSubsegmentFlags & severities encoded in QM_Subsegment_Issues.xml
+ * TODO FIXME: we have them in german in the translations ...
  */
+#[MittagQI\ZfExtended\Localization\LocalizableString('Accuracy')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Mistranslation')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Terminology')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Omission')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Addition')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Untranslated')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Fluency')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Register')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Style')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Inconsistency')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spelling')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Typography')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Grammar')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Locale violation')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Unintelligible')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Verity')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Completeness')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Legal requirements')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Locale applicability')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Critical')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Major')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Minor')]
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 {
     public const STATE_OPEN = 'open';
@@ -212,6 +182,39 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     public const NON_EXCLUSIVE_STATES = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
 
     /**
+     * the matching of col-names as set in Editor.view.admin.TaskGrid
+     */
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    public const TASKGRID_TEXTCOLS = [
+        'customerId' => 'Endkunde',
+        'edit100PercentMatch' => '100%-Treffer editierbar',
+        'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
+        'enableSourceEditing' => 'Quellsprache bearbeitbar',
+        'fileCount' => 'Dateien',
+        'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
+        'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
+        'orderdate' => 'Bestelldatum',
+        'enddate' => 'Enddatum',
+        'pmGuid' => 'Projektmanager',
+        'pmName' => 'Projektmanager',
+        'referenceFiles' => 'Referenzdateien',
+        'relaisLang' => 'Relaissprache',
+        'sourceLang' => 'Quellsprache',
+        'state' => 'Status',
+        'targetLang' => 'Zielsprache',
+        'taskActions' => 'Aktionen',
+        'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
+        'taskName' => 'Aufgabenname',
+        'taskNr' => 'Auftragsnr.',
+        'terminologie' => 'Terminologie',
+        'users' => 'Benutzer',
+        'wordCount' => 'Wörter',
+        'wordCountTT' => 'Anzahl Wörter',
+        'workflow' => 'Workflow',
+        'userCount' => 'Zahl zugewiesener Benutzer',
+    ];
+
+    /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
      */
     protected static $customerCache = [];
@@ -230,43 +233,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             self::STATE_END,
             self::STATE_UNCONFIRMED,
             self::STATE_ERROR, //to cancel import only, validated on usage
-        ];
-    }
-
-    /**
-     * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
-     * @return array
-     */
-    public static function getTaskGridTextCols()
-    {
-        return [
-            // A-Z
-            'customerId' => 'Endkunde',
-            'edit100PercentMatch' => '100%-Treffer editierbar',
-            'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
-            'enableSourceEditing' => 'Quellsprache bearbeitbar',
-            'fileCount' => 'Dateien',
-            'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
-            'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
-            'orderdate' => 'Bestelldatum',
-            'enddate' => 'Enddatum',
-            'pmGuid' => 'Projektmanager',
-            'pmName' => 'Projektmanager',
-            'referenceFiles' => 'Referenzdateien',
-            'relaisLang' => 'Relaissprache',
-            'sourceLang' => 'Quellsprache',
-            'state' => 'Status',
-            'targetLang' => 'Zielsprache',
-            'taskActions' => 'Aktionen',
-            'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
-            'taskName' => 'Aufgabenname',
-            'taskNr' => 'Auftragsnr.',
-            'terminologie' => 'Terminologie',
-            'users' => 'Benutzer',
-            'wordCount' => 'Wörter',
-            'wordCountTT' => 'Anzahl Wörter',
-            'workflow' => 'Workflow',
-            'userCount' => 'Zahl zugewiesener Benutzer',
         ];
     }
 
@@ -1203,7 +1169,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
-                'Der aktuelle Status der Aufgabe verbietet diese Aktion!',
+                Localization::trans('Der aktuelle Status der Aufgabe verbietet diese Aktion!'),
             ], [
                 'task' => $this,
                 'isLocked' => $this->isLocked($this->getTaskGuid()),
@@ -1232,7 +1198,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1538', [
-                'Task export: the task already contains running or pending exports. Try again later',
+                Localization::trans('Task export: the task already contains running or pending exports. Try again later'),
             ], [
                 'task' => $this,
             ]);

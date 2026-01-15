@@ -198,20 +198,6 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             return [];
         }
 
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $config = $resource->getStrippingFramingTagsConfig();
-
-        if (empty($config[editor_Models_LanguageResources_Resource::STRIP_FRAMING_TAGS_VALUES])) {
-            return $config;
-        }
-
-        array_walk(
-            $config[editor_Models_LanguageResources_Resource::STRIP_FRAMING_TAGS_VALUES],
-            static function (&$value) use ($translate) {
-                $value[1] = $translate->_($value[1]);
-            }
-        );
-
-        return $config;
+        return $resource->getStrippingFramingTagsConfig();
     }
 }

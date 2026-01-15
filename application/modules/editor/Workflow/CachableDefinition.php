@@ -27,29 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('import');
- * $translate->_('wartend');
- * $translate->_('unbestätigt');
- * $translate->_('abgeschlossen');
- * $translate->_('automatisch abgeschlossen');
- * $translate->_('offen');
- * $translate->_('selbst in Arbeit');
- * $translate->_('selbst geöffnet');
- * $translate->_('Übersetzer');
- * $translate->_('Lektor');
- * $translate->_('Zweiter Lektor');
- * $translate->_('Besucher');
- * $translate->_('Visual Approver');
- * $translate->_('Kein Workflow');
- * $translate->_('PM Prüfung');
- * $translate->_('Workflow abgeschlossen');
- * $translate->_('Lektorat');
- * $translate->_('Zweites Lektorat');
- */
-
-/**
  * Cachable definition of the workflow
  */
 class editor_Workflow_CachableDefinition
@@ -70,6 +47,7 @@ class editor_Workflow_CachableDefinition
      * labels of the states, roles and steps. Can be changed / added in constructor
      * @var array
      */
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
     public $labels = [
         'STATE_IMPORT' => 'import',
         'STATE_WAITING' => 'wartend',

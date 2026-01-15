@@ -54,7 +54,7 @@ trait editor_Controllers_Traits_ControllerTrait
      * @param string|null $cancelMsg Msg, that will be shown in case if 'Cancel'
      *                    button was pressed or confirmation window was closed
      */
-    public function confirm(string|array $msg, $buttons = 'OKCANCEL', $cancelMsg = null): string
+    public function confirm(string|array $msg, $buttons = 'OKCANCEL', $cancelMsg = ''): string
     {
         // If current request is not a XMLHttpRequest - imitate the answer=ok to be given on
         // confirmation prompt so there will be no need to add '?answer=ok' into query string to proceed
@@ -70,9 +70,6 @@ trait editor_Controllers_Traits_ControllerTrait
         // Get answer
         $answer = $this->getParam('answer' . $answerIdx);
 
-        // Get translate instance
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-
         // If no answer, flush confirmation prompt
         if (! $answer) {
             // If $msg arg is not array - convert
@@ -80,18 +77,13 @@ trait editor_Controllers_Traits_ControllerTrait
                 $msg = [$msg];
             }
 
-            // Foreach phrase in $msg - translate
-            foreach ($msg as &$phrase) {
-                $phrase = $translate->_($phrase);
-            }
-
             // Show confirmation prompt
             editor_Utils::jconfirm(join('<br>', $msg), $buttons);
         }
 
         // If answer is 'cancel' - stop request processing
-        elseif ($answer == 'cancel') {
-            $this->jflush(false, $translate->_($cancelMsg));
+        elseif ($answer === 'cancel') {
+            $this->jflush(false, $cancelMsg);
         }
 
         // Return answer

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
+
 class editor_WorkflowuserprefController extends ZfExtended_RestController
 {
     protected $entityClass = 'editor_Models_Workflow_Userpref';
@@ -38,7 +40,7 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController
     public function init()
     {
         ZfExtended_UnprocessableEntity::addCodes([
-            'E1172' => 'The referenced user is not associated to the task or does event not exist anymore.',
+            'E1172' => 'The referenced user is not associated to the task or even does not exist anymore.',
             'E1205' => 'Missing workflow step in given data.',
             'E1206' => 'Missing workflow step in given data.',
         ], 'editor.workflow.userprefs');
@@ -111,7 +113,7 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController
         }
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1172', [
-            'userGuid' => 'Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.',
+            'userGuid' => Localization::trans('Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.'),
         ], [], $e);
     }
 

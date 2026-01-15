@@ -29,32 +29,60 @@ declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\L10n;
 
-use Zend_Db_Adapter_Abstract;
-use Zend_Db_Table;
-use Zend_Registry;
-
+/**
+ * Extract string-arguments from known translation-functions
+ * Will extract single strings or concatenated strings that need to have an identical quote
+ * so it wil find '...' . '...' but not '...' . "..."
+ */
 class PhpExtractor
 {
     /**
+     * Extractor for argument delimited by single quotes
      * see https://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
      */
     private string $regexSingleQuoted = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
 
     /**
+     * Extractor for argument delimited by single quotes
      * see https://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
      */
     private string $regexDoubleQuoted = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
 
-    private array $brokenMatches = [];
+    /**
+     * Defines the function-signatures we are searching for
+     */
+    private array $signatures = [
+        // calls like Localization::trans(...)
+        [
+            'before' => 'Localization\s*::\s*trans\s*\(',
+            'after' => '[,)]{1}',
+            'replacement' => 'Test::test()',
+        ],
+        // calls like translate->_(...)
+        [
+            'before' => '->\s*_\s*\(',
+            'after' => '[,)]{1}',
+            'replacement' => '->test()',
+        ],
+        // calls like view->templateApply(...)
+        [
+            'before' => '->\s*templateApply\s*\(',
+            'after' => '[,)]{1}',
+            'replacement' => '->testApply()',
+        ],
+    ];
 
-    private Zend_Db_Adapter_Abstract $db;
+    private array $brokenMatches = [];
 
     public function __construct(
         private readonly string $absoluteFilePath
     ) {
-        $this->db = Zend_Db_Table::getDefaultAdapter();
     }
 
+    /**
+     * Extracts the localized source-strings from a PHP or PHTML file
+     * @throws \ZfExtended_Exception
+     */
     public function extract(): array
     {
         $strings = [];
@@ -64,121 +92,72 @@ class PhpExtractor
             throw new \ZfExtended_Exception('Could not read file ' . $this->absoluteFilePath);
         }
 
-        // find calls like $translate->~_('something'); (note: "~" prevents extraction ;-)
-        $content = preg_replace_callback(
-            '~->\s*_\s*\(\s*(' . $this->regexSingleQuoted . ')\s*\)~s',
-            function ($matches) use (&$strings) {
-                if (count($matches) > 1) {
-                    $string = $this->prepareMatch($matches[1], "'");
-                    if ($string !== null) {
-                        $strings[] = $string;
+        // first, extract PHP localization attributes - only in php files
+        if (str_ends_with($this->absoluteFilePath, '.php')) {
+            $attributeExtractor = new PhpAttributeExtractor($content, $this->absoluteFilePath);
+            $strings = $attributeExtractor->extract();
+            $this->brokenMatches = $attributeExtractor->getBrokenMatches();
+        }
+
+        // find matches for the known translation-function signatures
+        $regexes = [
+            "'" => $this->regexSingleQuoted,
+            '"' => $this->regexDoubleQuoted,
+        ];
+        foreach ($this->signatures as $signature) {
+            foreach ($regexes as $quote => $regex) {
+                $content = preg_replace_callback(
+                    // find the function-signature with the current regex or a concatenated repitition
+                    // of the curret regex as argument
+                    '~' . $signature['before'] . '\s*(' . $regex . ')(\s*\.\s*' . $regex . ')*\s*' . $signature['after'] . '~s',
+                    function ($matches) use (&$strings, $signature, $quote, $regex) {
+                        $numMatches = count($matches);
+                        $string = null;
+                        if ($numMatches > 2) {
+                            // since we capture only the first and last match, we need to recapture
+                            // PREG_SET_ORDER -> result will be an array of arrays with the parts of the string
+                            $string = '';
+                            $innerMatches = [];
+                            preg_match_all('~' . $regex . '~s', $matches[0], $innerMatches, PREG_SET_ORDER);
+                            foreach ($innerMatches as $match) {
+                                $string .= $this->prepareMatch($match[0], $quote);
+                            }
+                        } elseif ($numMatches > 1) {
+                            // simple single argument
+                            $string = $this->prepareMatch($matches[1], $quote);
+                        }
+                        if ($string !== null) {
+                            $strings[] = $string;
+                        }
+
+                        return $signature['replacement'];
+                    },
+                    $content
+                );
+            }
+        }
+
+        // find misconfigured (= not yet catched) matches for the known translation-function signatures
+        foreach ($this->signatures as $signature) {
+            preg_replace_callback(
+                '~' . $signature['before'] . '\s*(.*?)\s*' . $signature['after'] . '~s',
+                function ($matches) {
+                    if ($matches[1] !== '...') { // ignoring comments in definition of signatures ;-)
+                        $this->brokenMatches[] = $matches[0] . ' in file ' . $this->absoluteFilePath;
                     }
-                }
 
-                return '->test();';
-            },
-            $content
-        );
-        // find calls like $translate->~_("something"); (note: "~" prevents extraction ;-)
-        $content = preg_replace_callback(
-            '~->\s*_\s*\(\s*(' . $this->regexDoubleQuoted . ')\s*\)~s',
-            function ($matches) use (&$strings) {
-                if (count($matches) > 1) {
-                    $string = $this->prepareMatch($matches[1], '"');
-                    if ($string !== null) {
-                        $strings[] = $string;
-                    }
-                }
-
-                return '->test();';
-            },
-            $content
-        );
-
-        // find calls like $view->template~Apply('something'); (note: "~" prevents extraction ;-)
-        $content = preg_replace_callback(
-            '~->\s*templateApply\s*\(\s*(' . $this->regexSingleQuoted . ')\s*[,)]{1}~s',
-            function ($matches) use (&$strings) {
-                if (count($matches) > 1) {
-                    $string = $this->prepareMatch($matches[1], "'");
-                    if ($string !== null) {
-                        $strings[] = $string;
-                    }
-                }
-
-                return '->testApply(\'test\'' . substr($matches[0], -1);
-            },
-            $content
-        );
-        // find calls like $view->template~Apply("something"); (note: "~" prevents extraction ;-)
-        $content = preg_replace_callback(
-            '~->\s*templateApply\s*\(\s*(' . $this->regexDoubleQuoted . ')\s*[,)]{1}~s',
-            function ($matches) use (&$strings) {
-                if (count($matches) > 1) {
-                    $string = $this->prepareMatch($matches[1], '"');
-                    if ($string !== null) {
-                        $strings[] = $string;
-                    }
-                }
-
-                return '->testApply(\'test\'' . substr($matches[0], -1);
-            },
-            $content
-        );
-
-        // parse artificial programmatic includes of table columns
-        // $translateTable->~__('LEK_languages', 'langName');  (note: "~" prevents extraction ;-)
-        $content = preg_replace_callback(
-            '~translateTable\s*->\s*__\s*\(\s*["\']{1}([^"\']+)["\']{1}\s*,\s*["\']{1}([^"\']+)["\']{1}\s*\)~',
-            function ($matches) use (&$strings) {
-                if (count($matches) > 2) { // @phpstan-ignore-line
-                    $this->addTableMatches($matches[1], $matches[2], $strings);
-                }
-
-                return '->testTable();';
-            },
-            $content
-        );
-
-        // parse artificial programmatic includes of configs
-        // $translateConfig->~___('runtimeOptions.segments.qualityFlags', 'default'); (note: "~" prevents extraction ;-)
-        $content = preg_replace_callback(
-            '~translateConfig\s*->\s*___\s*\(\s*["\']{1}([^"\']+)["\']{1}\s*,\s*["\']{1}([^"\']+)["\']{1}\s*\)~',
-            function ($matches) use (&$strings) {
-                if (count($matches) > 2) { // @phpstan-ignore-line
-                    $this->addConfigMatches($matches[1], $matches[2], $strings);
-                }
-
-                return '->testConfig();';
-            },
-            $content
-        );
-
-        // find misconfigured calls on ->_
-        preg_replace_callback(
-            '~->\s*_\s*\(\s*(.*?)\s*\)~s',
-            function ($matches) {
-                $this->brokenMatches[] = $matches[0] . ' in file ' . $this->absoluteFilePath;
-
-                return '->test();';
-            },
-            $content
-        );
-        // find misconfigured calls on ->templateApply
-        preg_replace_callback(
-            '~->\s*templateApply\s*\(\s*(.*?)\s*[,)]{1}~s',
-            function ($matches) {
-                $this->brokenMatches[] = str_replace(["\n", "\r", "\t"], ['\n', '\r', '\t'], $matches[0]) .
-                    ' in file ' . $this->absoluteFilePath;
-
-                return '->testApply(\'test\'' . substr($matches[0], -1);
-            },
-            $content
-        );
+                    return 'misconfigured()';
+                },
+                $content
+            );
+        }
 
         return array_values(array_unique($strings));
     }
 
+    /**
+     * Retrieves files where matches were found that contained no strings - but presumably variables or other stuff
+     */
     public function getBrokenMatches(): array
     {
         return $this->brokenMatches;
@@ -197,54 +176,5 @@ class PhpExtractor
         }
 
         return $string;
-    }
-
-    private function addTableMatches(string $tableName, string $columnName, array &$strings): void
-    {
-        $sql = 'SELECT DISTINCT `' . $columnName . '` FROM `' . $tableName . '`';
-        $result = $this->db->fetchAll($sql);
-        foreach ($result as $row) {
-            $strings[] = $row[$columnName];
-        }
-    }
-
-    private function addConfigMatches(string $configName, string $columnName, array &$strings): void
-    {
-        if ($columnName !== 'value' && $columnName !== 'default' && $columnName !== 'defaults') {
-            throw new \ZfExtended_Exception(
-                'Wrong translation annotation for $translateConfig->___()' .
-                ', allowed are only "value" and "default" but got " ' . $columnName . '" in ' . $this->absoluteFilePath
-            );
-        }
-
-        $sql = 'SELECT `' . $columnName . '`, `type`, `typeClass` FROM `Zf_configuration` WHERE `name` = \'' . $configName . '\'';
-        $row = $this->db->fetchRow($sql);
-
-        if (! empty($row)) {
-            $typeManager = Zend_Registry::get('configTypeManager');
-            /* @var $typeManager \ZfExtended_DbConfig_Type_Manager */
-            $type = $typeManager->getType($row['typeClass']);
-
-            if ($columnName === 'defaults') {
-                $list = $type->getDefaultList($row['defaults']);
-                $value = empty($list) ? [] : explode(',', $list);
-            } else {
-                $value = $type->convertValue($row['type'], $row[$columnName]);
-            }
-            if (! empty($value)) {
-                if (is_array($value) || is_object($value)) {
-                    if (is_object($value)) {
-                        $value = get_object_vars($value);
-                    }
-                    foreach ($value as $item) {
-                        $strings[] = $item;
-                    }
-                } else {
-                    $strings[] = (string) $value;
-                }
-            }
-        } else {
-            error_log('Outdated translation annotation for $translateConfig->___(): ' . $configName);
-        }
     }
 }

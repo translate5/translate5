@@ -59,17 +59,9 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Sanitizer as Sanitizer;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
-
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Keine Datei hochgeladen!');
- * $translate->_('File import in language resources Error on worker init()');
- * $translate->_('Die ausgewählte Datei war leer!');
- * $translate->_('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
- */
 
 /**
  * Language resource controller
@@ -885,7 +877,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         if ($resource && ! $resource->getCreatable()) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1041', [
-                'Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.',
+                Localization::trans('Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.'),
             ]);
         }
 
@@ -1377,7 +1369,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if (! $connector->ping($this->entity->getResource(), $this->getConfig())) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1282',
-                ['Server für den angefragten Dienst ist nicht erreichbar.']
+                [Localization::trans('Server für den angefragten Dienst ist nicht erreichbar.')]
             );
         }
 
@@ -1415,7 +1407,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $importInfo = $this->handleFileUpload($connector);
 
         if (empty($importInfo)) {
-            $this->uploadErrors[] = 'Keine Datei hochgeladen!';
+            $this->uploadErrors[] = Localization::trans('Keine Datei hochgeladen!');
 
             return;
         }
@@ -1505,18 +1497,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         if ($errorNr !== UPLOAD_ERR_OK) {
-            $this->uploadErrors[] = ZfExtended_FileUploadException::getUploadErrorMessage($errorNr);
+            $this->uploadErrors[] = Localization::trans(ZfExtended_FileUploadException::getUploadErrorMessage($errorNr));
 
             return $importInfo;
         }
 
         //currently, an error means wrong filetype
         if ($upload->hasErrors()) {
-            $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
+            $this->uploadErrors[] = Localization::trans('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
         }
 
         if (empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
-            $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
+            $this->uploadErrors[] = Localization::trans('Die ausgewählte Datei war leer!');
         }
 
         return $importInfo;
@@ -1545,7 +1537,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $params['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
 
         if (! $worker->init(null, $params)) {
-            $this->uploadErrors[] = 'File import in language resources Error on worker init()';
+            $this->uploadErrors[] = Localization::trans('File import in language resources Error on worker init()');
 
             return;
         }
@@ -1592,15 +1584,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if (empty($this->uploadErrors)) {
             return true;
         }
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $errors = [
-            self::FILE_UPLOAD_NAME => [],
-        ];
 
-        foreach ($this->uploadErrors as $error) {
-            $errors[self::FILE_UPLOAD_NAME][] = $translate->_($error);
-        }
+        $errors = [
+            self::FILE_UPLOAD_NAME => $this->uploadErrors,
+        ];
 
         $e = new ZfExtended_ValidateException(print_r($errors, 1));
         $e->setErrors($errors);
