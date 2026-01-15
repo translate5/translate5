@@ -877,6 +877,23 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     {
         $this->entity->init();
         $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
+
+        if (
+            str_contains(strtolower($this->data['serviceType'] ?? ''), 'opentm2')
+            || str_contains(strtolower($this->data['resourceId'] ?? ''), 'opentm2')
+        ) {
+            $this->log->warn(
+                'E1769',
+                'DEPRECATION: Usage of {resourceName} resource (type or id) is deprecated and will cause error in future versions',
+                [
+                    'resourceName' => 'OpenTM2',
+                ],
+            );
+
+            $this->data['serviceType'] = str_ireplace('opentm2', 'T5Memory', $this->data['serviceType'] ?? '');
+            $this->data['resourceId'] = str_ireplace('opentm2', 'T5Memory', $this->data['resourceId'] ?? '');
+        }
+
         $this->setDataInEntity($this->postBlacklist);
         $this->entity->createLangResUuid();
 
