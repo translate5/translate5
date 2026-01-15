@@ -26,17 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('config_overwrite_instance');
- * $translate->_('config_overwrite_customer');
- * $translate->_('config_overwrite_taskImport');
- * $translate->_('config_overwrite_task');
- * $translate->_('config_overwrite_user');
- * $translate->_('config_overwrite_system');
- */
-
 use MittagQI\ZfExtended\Acl\ConfigRestrictionResource;
 
 /**
@@ -101,6 +90,16 @@ class editor_Models_Config extends ZfExtended_Models_Config
         self::CONFIG_LEVEL_TASKIMPORT => 'taskImport',
         self::CONFIG_LEVEL_TASK => 'task',
         self::CONFIG_LEVEL_USER => 'user',
+    ];
+
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    protected $configLabelMap = [
+        self::CONFIG_LEVEL_SYSTEM => 'config_overwrite_system',
+        self::CONFIG_LEVEL_INSTANCE => 'config_overwrite_instance',
+        self::CONFIG_LEVEL_CUSTOMER => 'config_overwrite_customer',
+        self::CONFIG_LEVEL_TASKIMPORT => 'config_overwrite_taskImport',
+        self::CONFIG_LEVEL_TASK => 'config_overwrite_task',
+        self::CONFIG_LEVEL_USER => 'config_overwrite_user',
     ];
 
     /**
@@ -511,13 +510,13 @@ class editor_Models_Config extends ZfExtended_Models_Config
      */
     public function getLabelMap()
     {
+        /** @var ZfExtended_Zendoverwrites_Translate $translate */
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */
         return array_map(function ($value) use ($translate) {
             //prefix is requred so we do not overwrite the original translation
-            return $translate->_('config_overwrite_' . $value);
-        }, $this->configLabel);
+            return $translate->_($value);
+        }, $this->configLabelMap);
     }
 
     /**

@@ -38,6 +38,7 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskUnlockPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\User\Model\User;
+use MittagQI\ZfExtended\Localization;
 use ZfExtended_EventManager;
 use ZfExtended_Logger;
 use ZfExtended_Models_Entity_Conflict;
@@ -50,7 +51,7 @@ use ZfExtended_ValidateException;
  */
 final class TaskUnlockService
 {
-    private TaskUnlockPermissionAssert $taskActionPermissionAssert;
+    private TaskUnlockPermissionAssert $taskActionPermissionAssert; // @phpstan-ignore-line
 
     private function __construct(
         TaskUnlockPermissionAssert $taskActionPermissionAssert,
@@ -73,8 +74,8 @@ final class TaskUnlockService
         ZfExtended_EventManager $events,
         bool $isEditAllTasks,
     ): void {
-        return; //FIXME disabled since buggy
-
+        //FIXME disabled since buggy
+        /*
         $this->assertTaskIsNotProject($task);
 
         $data = $this->sanitizeUnlockPayload($payload);
@@ -92,9 +93,10 @@ final class TaskUnlockService
 
         $this->updateUserState($task, $data, $user, $log, $isEditAllTasks);
         $this->closeAndUnlock($task, $data, $user, $log, $events);
+        */
     }
 
-    private function assertTaskIsNotProject(editor_Models_Task $task): void
+    private function assertTaskIsNotProject(editor_Models_Task $task): void // @phpstan-ignore-line
     {
         if (! $task->isProject()) {
             return;
@@ -106,11 +108,11 @@ final class TaskUnlockService
         ]);
 
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1284', [
-            'Projekte können nicht bearbeitet werden.',
+            Localization::trans('Projekte können nicht bearbeitet werden.'),
         ]);
     }
 
-    private function sanitizeUnlockPayload(object $data): object
+    private function sanitizeUnlockPayload(object $data): object // @phpstan-ignore-line
     {
         $payload = (array) $data;
 
@@ -121,7 +123,7 @@ final class TaskUnlockService
         ];
     }
 
-    private function assertUnlockStateIsOpen(object $data): void
+    private function assertUnlockStateIsOpen(object $data): void // @phpstan-ignore-line
     {
         if ($data->userState !== editor_Workflow_Default::STATE_OPEN) {
             throw new ZfExtended_ValidateException('Unlock requests must set userState to "open".');
@@ -132,7 +134,7 @@ final class TaskUnlockService
      * Unlocks the current task if it's a request that closes the task (set state to open, end, finish)
      * removes the task from session
      */
-    private function closeAndUnlock(
+    private function closeAndUnlock(// @phpstan-ignore-line
         editor_Models_Task $task,
         object $data,
         User $user,

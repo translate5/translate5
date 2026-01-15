@@ -27,14 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 use editor_Models_UserConfig as UserConfig;
 use MittagQI\Translate5\User\FilterPreset as FilterPreset;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\MismatchException;
 use ZfExtended_Factory as Factory;
-
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Sind Sie sicher?');
- */
 
 class editor_UserfilterpresetController extends ZfExtended_RestController
 {
@@ -147,7 +142,7 @@ class editor_UserfilterpresetController extends ZfExtended_RestController
     public function deleteAction()
     {
         // Show confirmation prompt, but for XHR-requests only
-        $this->confirm('Sind Sie sicher?');
+        $this->confirm(Localization::trans('Sind Sie sicher?'));
 
         // Load entity
         $this->entityLoad();

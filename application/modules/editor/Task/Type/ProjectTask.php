@@ -26,15 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('taskType::projectTask');
- */
+declare(strict_types=1);
 
 /**
  * The ProjectTask task type represents a task inside a project
+ * TODO FIXME: find better solution for composite localization below ...
  */
+#[\MittagQI\ZfExtended\Localization\LocalizableString('taskType::projectTask')]
 class editor_Task_Type_ProjectTask extends editor_Task_Type_Abstract
 {
     public const ID = 'projectTask';

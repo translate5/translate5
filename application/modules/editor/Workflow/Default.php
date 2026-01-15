@@ -29,26 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * // roles
- * $translate->_('translator');
- * $translate->_('reviewer');
- * $translate->_('translatorCheck');
- * $translate->_('visitor');
- * $translate->_('visualApprover');
- * // steps
- * $translate->_('no workflow');
- * $translate->_('pmCheck');
- * $translate->_('workflowEnded');
- * -- special table translations --
- * $translateTable->__('LEK_workflow', 'label');
- * $translateTable->__('LEK_workflow_step', 'role');
- * $translateTable->__('LEK_workflow_step', 'label');
- */
-
-/**
- * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the
+ * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc. are in the
  * handler instance Default roles are:
  * - translator
  * - reviewer
@@ -61,6 +42,10 @@ use MittagQI\Translate5\Acl\Rights;
  * - workflowEnded as final step
  * All other steps are loaded from the database step configuration list
  */
+
+#[MittagQI\ZfExtended\Localization\LocalizableTableColumn('LEK_workflow', 'label')]
+#[MittagQI\ZfExtended\Localization\LocalizableTableColumn('LEK_workflow_step', 'role')]
+#[MittagQI\ZfExtended\Localization\LocalizableTableColumn('LEK_workflow_step', 'label')]
 class editor_Workflow_Default
 {
     /**
@@ -90,23 +75,31 @@ class editor_Workflow_Default
     //the user can access the task readable, must confirm it before usage
     public const STATE_UNCONFIRMED = 'unconfirmed';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ROLE_TRANSLATOR = 'translator';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ROLE_REVIEWER = 'reviewer';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ROLE_TRANSLATORCHECK = 'translatorCheck';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ROLE_VISITOR = 'visitor';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ROLE_VISUALAPPROVER = 'visualApprover';
 
-    /*
-     ** The following hard coded steps are always needed / or are out of workflow:
+    /**
+     * The following hard coded steps are always needed / or are out of workflow:
      */
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const STEP_NO_WORKFLOW = 'no workflow';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const STEP_PM_CHECK = 'pmCheck';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const STEP_WORKFLOW_ENDED = 'workflowEnded';
 
     public const CACHE_KEY = 'workflow_definitions_';

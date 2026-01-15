@@ -26,13 +26,6 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**#@+
- * @author Marc Mittag
- * @package translate5
- * @version 1.0
- *
- */
-
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Authentication\OpenId\{
     Client as OpenIdClient,
@@ -46,21 +39,18 @@ use MittagQI\Translate5\Task\Unlock\TaskUnlockService;
 use ZfExtended_Authentication as Auth;
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * These localizations appear in the zend-form and must be included in the default-module as well ...
- * $translate->_('Benutzername');
- * $translate->_('Bitte geben Sie ein Passwort an!');
- * $translate->_('Bitte geben Sie einen Benutzernamen an!');
- * $translate->_('Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.');
- * $translate->_('Das Passwort ist zu kurz!');
- * $translate->_('Der Benutzername enthält Zeichen, die nicht verwendet werden dürfen!');
- * $translate->_('Der Benutzername ist zu kurz!');
- * $translate->_('Einloggen');
- * $translate->_('Login');
- * $translate->_('Passwort');
+ * The localizations below originate from the Zend_Form stuff and must be included in the default-module as well ...
  */
-
+#[MittagQI\ZfExtended\Localization\LocalizableString('Benutzername')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Bitte geben Sie ein Passwort an!')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Bitte geben Sie einen Benutzernamen an!')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Das Passwort ist zu kurz!')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Der Benutzername enthält Zeichen, die nicht verwendet werden dürfen!')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Der Benutzername ist zu kurz!')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Einloggen')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Login')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Passwort')]
 class LoginController extends ZfExtended_Controllers_Login
 {
     public function init()

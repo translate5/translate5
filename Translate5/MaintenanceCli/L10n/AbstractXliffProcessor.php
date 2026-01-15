@@ -42,6 +42,8 @@ abstract class AbstractXliffProcessor
 
     protected array $existing = [];
 
+    protected int $numUntranslated = 0;
+
     /**
      * @throws ZfExtended_Exception
      */
@@ -76,6 +78,11 @@ abstract class AbstractXliffProcessor
         $this->footer = "\n" . '        </body>' . $parts[1];
     }
 
+    public function getNumUntranslated(): int
+    {
+        return $this->numUntranslated;
+    }
+
     public function saveAs(string $absolutePath): void
     {
         $content = $this->header . $this->body . $this->footer;
@@ -101,17 +108,29 @@ abstract class AbstractXliffProcessor
      */
     protected function assemble(array $strings, array $translations): int
     {
+        $this->numUntranslated = 0;
         $untranslated = [];
         sort($strings, SORT_NATURAL);
         // add all translations
         foreach ($strings as $string) {
+            if (! is_string($string)) {
+                throw new \Exception(
+                    'AbstarctXliffProcessor::assemble: no string provided but ' .
+                    gettype($string) . '(' . print_r($string, true) . ')'
+                );
+            }
             if (array_key_exists($string, $translations)) {
                 $this->addTransUnit($string, $translations[$string]);
+                if (empty($translations[$string])) {
+                    $this->numUntranslated++;
+                }
             } elseif ($this->prefillUntranslated || $this->markUntranslated) {
                 // when marking, we add an own section for untranslated strings
                 $untranslated[] = $string;
+                $this->numUntranslated++;
             } else {
                 $this->addTransUnit($string, '');
+                $this->numUntranslated++;
             }
         }
         if (count($untranslated) > 0) {
@@ -122,7 +141,7 @@ abstract class AbstractXliffProcessor
             }
         }
 
-        return count($untranslated);
+        return $this->numUntranslated;
     }
 
     protected function flush(): void

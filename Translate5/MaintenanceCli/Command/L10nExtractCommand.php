@@ -29,6 +29,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\ZfExtended\Localization;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -166,11 +167,26 @@ class L10nExtractCommand extends Translate5AbstractCommand
             $this->io->success('Created an export-package in /data/' . L10nConfiguration::DATA_DIR . '.');
         }
 
+        $missing = $extraction->getMissingData();
+        if ($missing['count'] > 0) {
+            $this->io->warning($missing['count'] . ' translations are missing in the ZXLIFFs');
+            $table = new Table($this->output);
+            $table
+                ->setHeaders(['LOCALE', 'MISSING', 'MISSING IN MODULES'])
+                ->setRows($missing['data'])
+                ->setColumnWidths([10, 10, 90])
+                ->setColumnMaxWidth(2, 90);
+            $table->render();
+        } else {
+            $this->io->success('No translations are missing in the ZXLIFFs');
+        }
+
         if ($extraction->hasBrokenMatches()) {
             $rows = [];
             foreach ($extraction->getBrokenMatches() as $match) {
                 $rows[] = [$match];
             }
+            $this->io->newLine(3);
             $this->io->table(['Some translations could not be properly extracted'], $rows);
         }
 

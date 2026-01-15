@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment;
@@ -62,8 +63,8 @@ use ZfExtended_Factory;
 
 class QualityService
 {
-    public const ERROR_MASSAGE_PLEASE_SOLVE_ERRORS = 'Bitte lösen Sie alle Fehler der folgenden Kategorie ' .
-    'ODER setzen Sie sie auf “falscher Fehler”:<br/>{categories}';
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
+    public const ERROR_MASSAGE_PLEASE_SOLVE_ERRORS = 'Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”:<br/>{categories}';
 
     private editor_Segment_Quality_Manager $manager;
 

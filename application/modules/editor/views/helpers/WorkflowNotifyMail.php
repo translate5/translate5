@@ -27,23 +27,22 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Nachname');
- * $translate->_('Vorname');
- * $translate->_('E-Mail Adresse');
- * $translate->_('Rolle');
- * $translate->_('Status');
- * $translate->_('Deadline Datum');
- */
-
-/**
  * Utility functions usable in workflow notification E-Mails.
  *
  * @property ZfExtended_View $view
  */
 class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
 {
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    private array $columnHeads = [
+        'surName' => 'Nachname',
+        'firstName' => 'Vorname',
+        'email' => 'E-Mail Adresse',
+        'role' => 'Rolle',
+        'state' => 'Status',
+        'deadlineDate' => 'Deadline Datum',
+    ];
+
     public function workflowNotifyMail()
     {
         return $this;
@@ -91,15 +90,6 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
         $th = '<th align="left">';
         $result[] = '<tr>';
 
-        $colHeads = [
-            'surName' => 'Nachname',
-            'firstName' => 'Vorname',
-            'email' => 'E-Mail Adresse',
-            'role' => 'Rolle',
-            'state' => 'Status',
-            'deadlineDate' => 'Deadline Datum',
-        ];
-
         if (! $hasRole) {
             //remove 'role' from $columns;
             $columns = array_diff($columns, ['role']);
@@ -110,7 +100,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
         }
 
         foreach ($columns as $col) {
-            $result[] = $th . $t->_($colHeads[$col]) . '</th>';
+            $result[] = $th . $t->_($this->columnHeads[$col]) . '</th>';
         }
         $result[] = '</tr>';
 

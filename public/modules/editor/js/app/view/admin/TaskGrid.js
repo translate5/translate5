@@ -50,7 +50,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     layout: {
         type: 'fit'
     },
-    text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
+    text_cols: { // in case of any changes, pls also update TASKGRID_TEXTCOLS in editor_Models_Task
         // sorted by appearance
         workflow: '#UT#Workflow',
         taskActions: '#UT#Aktionen',

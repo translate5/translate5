@@ -27,15 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * -- special table translations --
- * $translateTable->__('LEK_languages', 'langName');
- */
-
-/**
  * LanguageController
  */
+#[MittagQI\ZfExtended\Localization\LocalizableTableColumn('LEK_languages', 'langName')]
 class editor_LanguageController extends ZfExtended_RestController
 {
     protected $entityClass = 'editor_Models_Languages';

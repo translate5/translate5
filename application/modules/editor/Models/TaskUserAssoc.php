@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Workflow_Default as Workflow;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Logger\CustomFileLogger;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
@@ -327,7 +328,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
 
         if ($this->isUsed()) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1061', [
-                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.',
+                Localization::trans(
+                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, ' .
+                    'da der Benutzer diese aktuell benutzt.'
+                ),
             ], [
                 'job' => $this,
             ]);
@@ -336,16 +340,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         /* @var $task editor_Models_Task */
         if ($task->isLocked($taskGuid, $this->getUserGuid())) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1062', [
-                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.',
+                Localization::trans(
+                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden,' .
+                    ' da die Aufgabe durch den Benutzer gesperrt ist.'
+                ),
             ], [
                 'job' => $this,
             ]);
         }
 
-        $result = parent::delete();
+        parent::delete();
         $this->updateTask($taskGuid);
-
-        return $result;
     }
 
     /**

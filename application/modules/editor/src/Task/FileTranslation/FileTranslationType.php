@@ -49,12 +49,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('taskType::instanttranslate-pre-translate');
- */
-
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\FileTranslation;
@@ -62,7 +56,10 @@ namespace MittagQI\Translate5\Task\FileTranslation;
 /**
  * An internal task to represent file translations for instant translate
  * Legacy task type for single target file translations.
+ *
+ * TODO FIXME: find better solution for composite localization below ...
  */
+#[\MittagQI\ZfExtended\Localization\LocalizableString('taskType::instanttranslate-pre-translate')]
 class FileTranslationType extends FileTranslationTypeAbstract
 {
     // must match the acl_rule of the role 'instantTranslate' for the resource 'initial_tasktype'!

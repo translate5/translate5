@@ -38,6 +38,7 @@ use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
 use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\User\Exception\CustomerDoesNotBelongToUserException;
+use MittagQI\ZfExtended\Localization;
 use ZfExtended_Models_Entity_Conflict as EntityConflictException;
 
 class editor_CoordinatorgroupcustomerController extends ZfExtended_RestController
@@ -101,7 +102,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2000',
                 [
                     'customer' => [
-                        'Kunde nicht angegeben',
+                        Localization::trans('Kunde nicht angegeben'),
                     ],
                 ],
                 [
@@ -121,7 +122,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2002',
                 [
                     'customer' => [
-                        'Der referenzierte Kunde existiert nicht (mehr).',
+                        Localization::trans('Der referenzierte Kunde existiert nicht (mehr).'),
                     ],
                 ],
                 [
@@ -134,7 +135,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2003',
                 [
                     'customer' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
+                        Localization::trans('Sie können den Kunden "{id}" hier nicht angeben'),
                     ],
                 ],
                 [
@@ -146,7 +147,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2003',
                 [
                     'customer' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
+                        Localization::trans('Sie können den Kunden "{id}" hier nicht angeben'),
                     ],
                 ],
                 [
@@ -181,7 +182,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E1676',
                 [
                     'id' => [
-                        'job-assignment.delete.there-is-un-deletable-bound-job',
+                        Localization::trans('job-assignment.delete.there-is-un-deletable-bound-job'),
                     ],
                 ],
             ),

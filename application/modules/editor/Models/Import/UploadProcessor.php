@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
+
 /**
  * Processes uploaded files on task creation and prepares a data provider for further processing
  */
@@ -193,15 +195,18 @@ final class editor_Models_Import_UploadProcessor
         }
         switch ($errorType) {
             case self::ERROR_INVALID_FILE:
-                $msg = $msg ?? 'Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.';
+                $msg = $msg ?? Localization::trans('Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.');
 
                 break;
             case self::ERROR_EMPTY_FILE:
-                $msg = $msg ?? 'Die ausgewählte Datei war leer!';
+                $msg = $msg ?? Localization::trans('Die ausgewählte Datei war leer!');
 
                 break;
             case self::ERROR_NO_WORKFILES:
-                $msg = 'Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.';
+                $msg = Localization::trans(
+                    'Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien ' .
+                    'überschreiten die maximal zulässige Größe.'
+                );
 
                 break;
             default:

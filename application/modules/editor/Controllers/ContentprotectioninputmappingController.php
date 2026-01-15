@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
+use MittagQI\ZfExtended\Localization;
 
 /**
  * Part of Content protection feature. Number protection part
@@ -71,7 +72,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
                     'E1591',
                     [
                         'contentRecognitionId' => [
-                            'Sie verwenden diese Regel bereits für diese Sprache',
+                            Localization::trans('Sie verwenden diese Regel bereits für diese Sprache'),
                         ],
                     ],
                     [
@@ -86,7 +87,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
                     'E1591',
                     [
                         'priority' => [
-                            'Regel mit dieser Priorität existiert bereits',
+                            Localization::trans('Regel mit dieser Priorität existiert bereits'),
                         ],
                     ],
                     [

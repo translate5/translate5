@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\MismatchException;
 
 /**
@@ -134,7 +135,12 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
 
         // Prompt client-side confirmation
         $name = htmlentities($this->entity->getName());
-        $this->confirm("Are you sure you want to delete pricing preset '$name'?");
+
+        $this->confirm(str_replace(
+            '{name}',
+            $name,
+            Localization::trans('Are you sure you want to delete pricing preset “{name}”?')
+        ));
 
         // If confirmed - do delete
         $this->entity->delete();

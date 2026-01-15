@@ -178,12 +178,10 @@ class Metadata
 
         // write fieldnames in header, set their font to bold, set their width to auto
         $sheetCol = 'A';
-        $taskModel = new editor_Models_Task();
-        $taskGridTextCols = $taskModel::getTaskGridTextCols();
         foreach ($this->taskColumns as $colName) {
             // Not all column-names in the taskGrid have a translation.
-            if (array_key_exists($colName, $taskGridTextCols)) {
-                $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
+            if (array_key_exists($colName, editor_Models_Task::TASKGRID_TEXTCOLS)) {
+                $colHeadline = $this->translate->_(editor_Models_Task::TASKGRID_TEXTCOLS[$colName]);
             } elseif (array_key_exists($colName, $this->taskCustomColumns)) {
                 $colHeadline = $this->taskCustomColumns[$colName]['header'];
             } else {

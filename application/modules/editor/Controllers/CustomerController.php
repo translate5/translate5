@@ -34,6 +34,7 @@ use MittagQI\Translate5\Customer\CustomerService;
 use MittagQI\Translate5\LanguageResource\UsageExporter;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Test\Enums\TestUser;
+use MittagQI\ZfExtended\Localization;
 
 class Editor_CustomerController extends ZfExtended_RestController
 {
@@ -263,7 +264,7 @@ class Editor_CustomerController extends ZfExtended_RestController
 
             throw ZfExtended_UnprocessableEntity::createResponse('E1104', [
                 'domain' => [
-                    'duplicateDomain' => 'Diese Domain wird bereits verwendet.',
+                    'duplicateDomain' => Localization::trans('Diese Domain wird bereits verwendet.'),
                 ],
             ]);
         }
@@ -274,7 +275,7 @@ class Editor_CustomerController extends ZfExtended_RestController
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1063', [
             'number' => [
-                'duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.',
+                'duplicateClientNumber' => Localization::trans('Diese Kundennummer wird bereits verwendet.'),
             ],
         ]);
     }
