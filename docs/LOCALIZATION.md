@@ -37,7 +37,7 @@ class LocalizationExample
     protected string $propToLocalize = 'Now can be used to feed localization';
     
     #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
-    protected string $arrayToLocalize = [
+    protected array $arrayToLocalize = [
         'localizedKey1' => 'Now can be used to feed localization',
         'localizedKey2' => 'Now can be used to feed localization',
     ]
