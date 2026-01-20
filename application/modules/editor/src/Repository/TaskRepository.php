@@ -126,6 +126,20 @@ class TaskRepository
         ]);
     }
 
+    public function getProjectTaskCount(int $projectId): int
+    {
+        $where = [
+            'projectId = ?' => $projectId,
+            'id != ?' => $projectId,
+        ];
+        $s = $this->db->select()->from(TaskTable::TABLE_NAME, 'COUNT(*)');
+        foreach ($where as $field => $value) {
+            $s = $s->where($field, $value);
+        }
+
+        return (int) $this->db->fetchOne($s);
+    }
+
     private function getTaskListByWhere(array $where): iterable
     {
         $s = $this->db->select()->from(TaskTable::TABLE_NAME);
