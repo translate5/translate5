@@ -52,6 +52,7 @@ use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Segment\Event\BeforeSaveAlikeEvent;
 use MittagQI\Translate5\Segment\Event\SegmentProcessedEvent;
 use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
+use MittagQI\Translate5\Segment\ReferenceFieldService;
 use MittagQI\Translate5\Segment\Repetition\DTO\ReplaceDto;
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessingFailedEvent;
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionReplacementRequestedEvent;
@@ -76,6 +77,7 @@ class RepetitionService
         private readonly editor_Models_TaskProgress $taskProgress,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserJobRepository $jobRepository,
+        private readonly ReferenceFieldService $referenceFieldService,
     ) {
     }
 
@@ -93,6 +95,7 @@ class RepetitionService
             new editor_Models_TaskProgress(),
             EventDispatcher::create(),
             UserJobRepository::create(),
+            ReferenceFieldService::create(),
         );
     }
 
@@ -198,7 +201,7 @@ class RepetitionService
                 $validTargetMd5,
                 $firstRepetitionId,
                 $isSourceEditable,
-                $useSourceForReference,
+                $this->referenceFieldService->useSourceReferenceField($task, $master),
                 $count,
             );
         }
@@ -229,7 +232,7 @@ class RepetitionService
         array $validTargetMd5,
         int $firstRepetitionId,
         bool $isSourceEditable,
-        bool $useSourceForReference,
+        bool $useSourceTags,
         int $alikeCount,
     ): void {
         $history = null;
@@ -272,10 +275,6 @@ class RepetitionService
             if ($isSourceEditable || $isSourceRepetition) {
                 $sourceSuccess = $this->repetitionUpdater->updateSource($master, $repetition, $isSourceEditable);
             }
-
-            $useSourceTags = $useSourceForReference
-                || empty($master->getTarget())
-                || 0 !== (int) $master->getPretrans();
 
             if (! $sourceSuccess || ! $this->repetitionUpdater->updateTarget($master, $repetition, $useSourceTags)) {
                 //the segment has to be ignored!

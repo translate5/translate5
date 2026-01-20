@@ -34,6 +34,7 @@ use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\Segment\Operation\UpdateFlow;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentOperation;
+use MittagQI\Translate5\Segment\ReferenceFieldService;
 use MittagQI\Translate5\User\Model\User;
 use MittagQI\Translate5\Workflow\Assert\WriteableWorkflowAssert;
 use MittagQI\ZfExtended\Tools\Markup;
@@ -82,6 +83,8 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
 
     private WriteableWorkflowAssert $writeableWorkflowAssert;
 
+    private ReferenceFieldService $referenceFieldService;
+
     /**
      * reimport $filename xls into $task.
      * the fiel $filename is located inside the /data/importedTasks/<taskGuid>/excelReimport/ folder
@@ -122,6 +125,8 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
 
         $this->context = new ContextDto(UpdateFlow::ExcelReImport);
         $this->writeableWorkflowAssert = WriteableWorkflowAssert::create();
+
+        $this->referenceFieldService = ReferenceFieldService::create();
     }
 
     public function reimport(
@@ -208,11 +213,11 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
             // - load the model that handles the t5 segments
             $t5Segment->loadBySegmentNrInTask($segment->nr, $this->task->getTaskGuid());
 
-            // detect $orgSegmentAsExcel as content of the t5 target segment
-            $orgSegmentAsExcel = $this->segmentTagger->toExcel($t5Segment->getTargetEdit());
+            // detect $orgSegmentTargetAsExcel as content of the t5 target segment
+            $orgSegmentTargetAsExcel = $this->segmentTagger->toExcel($t5Segment->getTargetEdit());
 
             // do nothing if segment has not changed
-            if ($newSegment == $orgSegmentAsExcel) {
+            if ($newSegment == $orgSegmentTargetAsExcel) {
                 $this->addCommentOnly($t5Segment, $segment);
 
                 continue;
@@ -222,13 +227,22 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
             $newSegment = Markup::escapeTaglikePlaceholders($newSegment);
 
             // Check tags structure
-            $this->checkTagStructure($newSegment, $orgSegmentAsExcel, $segment);
+            if ($this->referenceFieldService->useSourceReferenceField($this->task, $t5Segment)) {
+                $source = $this->task->getEnableSourceEditing() ? $t5Segment->getSourceEdit() : $t5Segment->getSource();
+                $this->checkTagStructure(
+                    $newSegment,
+                    $this->segmentTagger->toExcel($source),
+                    $segment
+                );
+            } else {
+                $this->checkTagStructure($newSegment, $orgSegmentTargetAsExcel, $segment);
+            }
 
             // add TrackChanges informations comparing the new segment (from excel) with the t5 segment (converted to excel tagging)
             // but only if task is not in workflowStep 'translation'
             // @FIXME: ADD check Plugin.TrackChanges active, or something similar.
             if (! $workflow->isStepOfRole($this->task->getWorkflowStepName(), [$workflow::ROLE_TRANSLATOR])) {
-                $newSegment = $this->diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date(NOW_ISO), $this->user->getUserName());
+                $newSegment = $this->diffTagger->diffSegment($orgSegmentTargetAsExcel, $newSegment, date(NOW_ISO), $this->user->getUserName());
             }
 
             // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.

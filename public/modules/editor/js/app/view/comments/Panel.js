@@ -115,7 +115,7 @@ Ext.define('Editor.view.comments.Panel', {
                     bind:{
                       disabled:'{commentPanelIsDisabled}'
                     },
-                    lyout: {
+                    layout: {
                         align: 'stretch',
                         type: 'vbox'
                     },

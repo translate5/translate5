@@ -18,6 +18,36 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.33.3] - 2026-01-20
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5214](https://jira.translate5.net/browse/TRANSLATE-5214): ConnectWorldserver - Plugin Connect Worldserver: Integrity Constraint Violation on deleting Pretranslation task** <br>
+Plugin Connect Worldserver:
+- improved auto-deleting of pretranslation tasks
+
+**[TRANSLATE-5211](https://jira.translate5.net/browse/TRANSLATE-5211): Comments - Excel Export gets now also comments in translate5.** <br>
+Task excel export contains now also the existing comments in translate5.
+
+**[TRANSLATE-5175](https://jira.translate5.net/browse/TRANSLATE-5175): Editor general - Rework internal localization of translate5 texts and add FR and IT** <br>
+7.33.3: Proper encoding of special characters in different languages
+7.33.1: Fix so that client specific texts are working again
+7.33.0: Rework of localization: Cleanup of existing localization XLIFFs and introduce IT and FR as new translations of the application.
+
+
+**[TRANSLATE-5168](https://jira.translate5.net/browse/TRANSLATE-5168): InstantTranslate - imrpovement form field "send to human revision"** <br>
+Improve locales in human revision prompt window.
+
+
+### Bugfixes
+**[TRANSLATE-5169](https://jira.translate5.net/browse/TRANSLATE-5169): InstantTranslate - custom name for InstantTranslate not shown correctly for InstantTranslate only users** <br>
+Standalone instant-translate tab will share same title as when combined with term-portal.
+
+
 ## [7.33.2] - 2026-01-15
 
 ### Important Notes:

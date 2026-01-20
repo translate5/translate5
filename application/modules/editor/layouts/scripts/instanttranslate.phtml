@@ -38,6 +38,9 @@ END LICENSE AND COPYRIGHT
  * - Achtung: Bei Hinzufügen weiterer Layoutelemente darauf achten, dass diese
  *   im Viewhelper View_Helper_DisableBodyLayout deaktiviert werden
  */
+
+use MittagQI\ZfExtended\Tools\Markup;
+
 $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
 
@@ -52,7 +55,7 @@ $this->headLink()->prependStylesheet('/js/select2/dist/css/select2.min.css' . $v
 <!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <?php echo $this->headTitle() ?>
+        <title><?php echo Markup::escape($this->pageTitle) ?></title>
         <?php echo $this->headMeta() ?>
         <?php echo $this->headLink() ?>
         <?php echo $this->headStyle() ?>

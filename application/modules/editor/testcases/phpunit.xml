@@ -96,6 +96,12 @@
             <file>Unit/Segment/ImportWhitespaceProtectionTest.php</file>
             <file>Integration/ContentProtection/ContentProtectorTest.php</file>
         </testsuite>
+        <testsuite name="excel">
+            <file>Unit/ZfExtended/ExcelExportTest.php</file>
+            <file>editorAPI/ExcelExandImportTest.php</file>
+            <file>Unit/LanguageResource/UsageExportExcelTest.php</file>
+            <file>../PrivatePlugins/Enssner/tests/EnssnerExcelImportTest.php</file>
+        </testsuite>
         <testsuite name="auth">
             <file>editorAPI/Translate3108Test.php</file>
             <file>editorAPI/Translate3048Test.php</file>

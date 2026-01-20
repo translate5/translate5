@@ -117,11 +117,22 @@ class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
         /* @var $segments editor_Models_Segment_Iterator */
 
+        $anonymizeUsers = $this->task->anonymizeUsers();
+
+        $hasSegmentDescriptor = false; //resname / resource name field
         // write the segments into the excel
         foreach ($segments as $segment) {
             $source = $segmentTagger->toExcel($segment->getSource());
             $target = $segmentTagger->toExcel($segment->getTargetEdit());
-            $this->excel->addSegment((int) $segment->getSegmentNrInTask(), $source, $target, $segment->isEditable());
+
+            $this->excel->addSegment(
+                (int) $segment->getSegmentNrInTask(),
+                $source,
+                $target,
+                $segment->isEditable(),
+                $this->getCommentsExport($segment, $anonymizeUsers),
+                $segment->meta()->getSegmentDescriptor()
+            );
         }
 
         // .. then send the excel
@@ -130,6 +141,29 @@ class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport
 
         // ... and add a note about this export to the DB
         $this->addTaskExported();
+    }
+
+    private function getCommentsExport(editor_Models_Segment $segment, bool $anonymizeUsers): string
+    {
+        $commentSummary = $segment->getComments();
+
+        if ($commentSummary === null || $commentSummary === '') {
+            return '';
+        }
+
+        $comment = new editor_Models_Comment();
+        $comments = $comment->loadBySegmentId((int) $segment->getId(), $segment->getTaskGuid());
+        $result = [];
+        foreach ($comments as $commentRow) {
+            $commentRendered = $commentRow['comment'] . "\n";
+            $commentRendered .= '(' . $commentRow['modified'];
+            if (! $anonymizeUsers) {
+                $commentRendered .= ' - ' . $commentRow['userName'];
+            }
+            $result[] = $commentRendered . ')';
+        }
+
+        return join("\n----------\n", $result);
     }
 
     /**

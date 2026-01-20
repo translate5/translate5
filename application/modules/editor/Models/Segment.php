@@ -65,7 +65,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setAutoStateId(int $id)
  * @method string getFileOrder()
  * @method void setFileOrder(int $order)
- * @method string getComments()
+ * @method string|null getComments()
  * @method void setComments(string $comments)
  * @method string getWorkflowStepNr()
  * @method void setWorkflowStepNr(int $stepNr)
