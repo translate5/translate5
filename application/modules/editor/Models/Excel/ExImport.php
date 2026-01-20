@@ -95,6 +95,8 @@ class editor_Models_Excel_ExImport
      */
     protected $log;
 
+    private bool $hasResourceNames = false;
+
     /**
      * Class should not be used with new editor_Models_Excel_ExImport()
      * You should use
@@ -150,8 +152,14 @@ class editor_Models_Excel_ExImport
      * Write the segment informations into the 'review job' sheet
      * the row this informations are written is $this->segmentRow
      */
-    public function addSegment(int $nr, string $source, string $target, bool $isEditable)
-    {
+    public function addSegment(
+        int $nr,
+        string $source,
+        string $target,
+        bool $isEditable,
+        string $comments,
+        ?string $resourceName
+    ): void {
         $sheet = $this->getSheetJob();
         $sheet->setCellValue('A' . $this->segmentRow, $nr);
         // for the following fields setCellValueExplicit() is used. Else this fields will be interpreted as formula fields if a segment starts with "="
@@ -165,6 +173,13 @@ class editor_Models_Excel_ExImport
             $sheet->getStyle('E' . $this->segmentRow)->getProtection()->setLocked(Protection::PROTECTION_UNPROTECTED);
         }
 
+        $sheet->setCellValueExplicit('F' . $this->segmentRow, $comments, DataType::TYPE_STRING);
+
+        if (strlen($resourceName ?? '') > 0) {
+            $this->hasResourceNames = true;
+            $sheet->setCellValueExplicit('G' . $this->segmentRow, $resourceName, DataType::TYPE_STRING);
+        }
+
         $this->segmentRow++;
     }
 
@@ -174,7 +189,13 @@ class editor_Models_Excel_ExImport
     public function getExcel(): Spreadsheet
     {
         // set sheet 'review job' as active sheet
-        $this->getSheetJob();
+        $sheet = $this->getSheetJob();
+
+        //format Resource Name (resname / segmentDescriptor) only when given
+        if ($this->hasResourceNames) {
+            $sheet->getColumnDimension('G')->setWidth(50);
+            $sheet->setCellValue('G1', 'Resource Name');
+        }
 
         return $this->excel;
     }
@@ -329,6 +350,10 @@ class editor_Models_Excel_ExImport
         // setting write protection for the whole sheet
         $sheet->getProtection()->setSheet(true);
 
+        // allow column/row resizing
+        $sheet->getProtection()->setFormatColumns(false);
+        $sheet->getProtection()->setFormatRows(false);
+
         // set font-size to "14" for the whole sheet
         $sheet->getParent()->getDefaultStyle()->applyFromArray([
             'font' => [
@@ -342,14 +367,16 @@ class editor_Models_Excel_ExImport
         $sheet->getColumnDimension('C')->setWidth(70);
         $sheet->getColumnDimension('D')->setWidth(70);
         $sheet->getColumnDimension('E')->setWidth(50);
+        $sheet->getColumnDimension('F')->setWidth(50);
 
         // write fieldnames in header
         $sheet->setCellValue('A1', 'ID');
         $sheet->setCellValue('B1', self::LOCKED_CAPTION);
         $sheet->setCellValue('C1', 'Source');
         $sheet->setCellValue('D1', 'Target (Please enter your changes in this column)');
-        $sheet->setCellValue('E1', 'Comment');
-        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+        $sheet->setCellValue('E1', 'New Comment');
+        $sheet->setCellValue('F1', 'Comments from translate5');
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
     }
 
     /**

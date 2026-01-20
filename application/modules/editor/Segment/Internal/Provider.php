@@ -31,12 +31,21 @@ END LICENSE AND COPYRIGHT
  */
 
 use editor_Segment_Internal_TagComparision as TagComparision;
+use MittagQI\Translate5\Segment\ReferenceFieldService;
 
 class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
 {
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
     protected static $segmentTagClass = 'editor_Segment_Internal_Tag';
+
+    private ReferenceFieldService $referenceFieldService;
+
+    public function __construct()
+    {
+        $this->referenceFieldService = ReferenceFieldService::create();
+        parent::__construct();
+    }
 
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
     {
@@ -57,13 +66,8 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
         // (source or target at import time depending on config and if target at import time is empty)
         $against = $tags->getOriginalOrNormalSource();
         $originalTarget = $tags->getOriginalTarget();
-        $useSourceForReference = $task->getConfig()->runtimeOptions->editor
-            ->frontend->reviewTask->useSourceForReference;
 
-        if (! $useSourceForReference
-            && (! $originalTarget?->isEmpty())
-            && 0 === (int) $tags->getSegment()->getPretrans()
-        ) {
+        if (! $this->referenceFieldService->useSourceReferenceField($task, $tags->getSegment(), $originalTarget)) {
             $against = $originalTarget;
         }
 
