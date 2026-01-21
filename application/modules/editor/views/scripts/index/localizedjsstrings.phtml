@@ -2065,6 +2065,10 @@ Editor.data.l10n = {
 
 
     segmentGrid: {
+        column: {
+            qualityScore: '<?php echo $this->translate->_('Quality estimation');?>',
+            qualityScoreReasoning: '<?php echo $this->translate->_('Quality estimation reasoning');?>',
+        },
         header : {
             pendingRequestsTitle: '<?php echo $this->translate->_('Ausstehende Anfragen'); ?>',
             pendingRequestsMessage: '<?php echo $this->translate->_('Es sind noch {0} AJAX-Anfragen ausstehend. Wenn Sie jetzt verlassen, kann dies zu Fehlern in der Benutzeroberfläche führen. Möchten Sie warten, bis diese abgeschlossen sind, oder trotzdem verlassen?'); ?>',
@@ -2453,6 +2457,9 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             tooltip: '<?php echo $this->translate->_('Kunden, die diese Sprachressource standardmäßig als Pivot verwenden'); ?>'
         },
         editLanguageResource:{
+            conflictErrorTitle:'<?php echo $this->translate->_('Konflikt hinsichtlich zugewiesener Aufgaben');?>',
+            tqeConflictTitle:'<?php echo $this->translate->_('TQE default assignment');?>',
+            tqeInstantTranslateConflictTitle:'<?php echo $this->translate->_('TQE default assignment');?>',
             conflictErrorTitle:'<?php echo $this->translate->_('Konflikt hinsichtlich zugewiesener Aufgaben'); ?>'
         },
         tbxExport: {

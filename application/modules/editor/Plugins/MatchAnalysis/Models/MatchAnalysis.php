@@ -506,7 +506,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     }
 
     /**
-     * @return mixed|string
+     * @return array
      */
     public function getPricing()
     {

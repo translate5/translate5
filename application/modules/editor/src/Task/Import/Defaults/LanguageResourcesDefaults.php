@@ -17,12 +17,6 @@ use ZfExtended_Factory as Factory;
 
 class LanguageResourcesDefaults implements ITaskDefaults
 {
-    public function __construct(
-        private readonly LanguageResourceRepository $languageResourceRepository,
-        private readonly AssociateTaskOperation $associateTaskOperation,
-    ) {
-    }
-
     /**
      * @throws \ZfExtended_Models_Entity_NotFoundException
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -81,6 +75,12 @@ class LanguageResourcesDefaults implements ITaskDefaults
         }
 
         $task->updateIsTerminologieFlag($task->getTaskGuid());
+    }
+
+    public function __construct(
+        private readonly LanguageResourceRepository $languageResourceRepository,
+        private readonly AssociateTaskOperation $associateTaskOperation,
+    ) {
     }
 
     /**

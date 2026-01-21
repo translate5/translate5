@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
 use WilsonGlasser\Spout\Common\Entity\Cell;
 use WilsonGlasser\Spout\Common\Entity\ColumnDimension;
 use WilsonGlasser\Spout\Common\Entity\Style\Style;
@@ -33,16 +34,6 @@ use WilsonGlasser\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use WilsonGlasser\Spout\Writer\Common\Creator\WriterEntityFactory;
 use WilsonGlasser\Spout\Writer\Common\Helper\CellHelper;
 use WilsonGlasser\Spout\Writer\XLSX\Writer;
-
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Gesamtzahl der Termeinträge: %s');
- * $translate->_('Beginn des Exports...');
- * $translate->_('Fortschritt: %s');
- * $translate->_('Vorbereiten des Downloads...');
- * $translate->_('Erledigt in %s Sek.');
- */
 
 /**
  * exports term data stored in translate5 to valid XLSX files
@@ -191,11 +182,6 @@ class editor_Models_Export_Terminology_Xlsx
      */
     private $collectionId;
 
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    private $l10n;
-
     private Writer $writer;
 
     /**
@@ -216,14 +202,6 @@ class editor_Models_Export_Terminology_Xlsx
      */
     public function status($msg, $arg = null)
     {
-        // Get translate instance if not yet got
-        if (! $this->l10n) {
-            $this->l10n = ZfExtended_Zendoverwrites_Translate::getInstance();
-        }
-
-        // Localize $msg arg
-        $msg = $this->l10n->_($msg);
-
         // If $arg arg is given - use as template
         if ($arg !== null) {
             $msg = sprintf($msg, $arg);
@@ -276,8 +254,8 @@ class editor_Models_Export_Terminology_Xlsx
         $this->emailA = $refObjectModelM->getEmailsByCollectionId($collectionId);
 
         // Flush info on how many termEntries are going to be exported
-        $this->status('Gesamtzahl der Termeinträge: %s', $termEntryQty);
-        $this->status('Beginn des Exports...');
+        $this->status(Localization::trans('Gesamtzahl der Termeinträge: %s'), $termEntryQty);
+        $this->status(Localization::trans('Beginn des Exports...'));
 
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($termEntryQty / $byTermEntryQty); $p++) {
@@ -308,20 +286,20 @@ class editor_Models_Export_Terminology_Xlsx
             $progress = ($offset + count($termEntryA)) / $termEntryQty * 100;
 
             // Print progress percentage
-            $this->status('Fortschritt: %s', floor($progress) . '%');
+            $this->status(Localization::trans('Fortschritt: %s'), floor($progress) . '%');
 
             //
             //if ($p == 2) break;
         }
 
         // Flush preparing
-        $this->status('Vorbereiten des Downloads...');
+        $this->status(Localization::trans('Vorbereiten des Downloads...'));
 
         // Finish creating xlsx file
         $this->writer->close();
 
         // Flush done
-        $this->status('Erledigt in %s Sek.', round(mt(), 3));
+        $this->status(Localization::trans('Erledigt in %s Sek.'), round(mt(), 3));
 
         // Setup session's 'download'-flag, so that on reload we could catch that and initiate download
         $_SESSION['download'] = true;

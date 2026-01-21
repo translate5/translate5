@@ -29,108 +29,101 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Acl;
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * // roles
- * $translate->_('systemadmin');
- * $translate->_('admin');
- * $translate->_('api');
- * $translate->_('pm');
- * $translate->_('clientpm');
- * $translate->_('pmlight');
- * $translate->_('editor');
- * $translate->_('taskOverview');
- * $translate->_('basic');
- * $translate->_('noRights');
- * $translate->_('editor-only-override');
- * $translate->_('erp');
- * $translate->_('instantTranslate');
- * $translate->_('instantTranslateWriteTm');
- * $translate->_('instantTranslateHumanRevisionAllowed');
- * $translate->_('production');
- * $translate->_('termPM_allClients');
- * $translate->_('termPM');
- * $translate->_('termSearch');
- * $translate->_('termCustomerSearch');
- * $translate->_('termFinalizer');
- * $translate->_('termProposer');
- * $translate->_('termReviewer');
- * $translate->_('TMMaintenance');
- * $translate->_('TMMaintenance_allClients');
- * $translate->_('jobCoordinator');
- * // subroles
- * $translate->_('clientpm_projects');
- * $translate->_('clientpm_langresources');
- * $translate->_('clientpm_customers');
- * $translate->_('clientpm_users');
- */
-
-/**
  * Holds additional roles for translate5
  *
  * @codeCoverageIgnore
  */
 final class Roles
 {
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const SYSTEMADMIN = 'systemadmin';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ADMIN = 'admin';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const API = 'api';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const PM = 'pm';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const CLIENTPM = 'clientpm';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const PMLIGHT = 'pmlight';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const EDITOR = 'editor';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TASK_OVERVIEW = 'taskOverview';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const BASIC = 'basic';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const NORIGHTS = 'noRights';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const EDITOR_ONLY_OVERRIDE = 'editor-only-override';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const ERP = 'erp';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const INSTANTTRANSLATE = 'instantTranslate';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const INSTANTTRANSLATEWRITETM = 'instantTranslateWriteTm';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const INSTANT_TRANSLATE_HUMAN_REVISION_ALLOWED = 'instantTranslateHumanRevisionAllowed';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const PRODUCTION = 'production';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMPM_ALLCLIENTS = 'termPM_allClients';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMPM = 'termPM';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMSEARCH = 'termSearch';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMCUSTOMERSEARCH = 'termCustomerSearch';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMFINALIZER = 'termFinalizer';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMPROPOSER = 'termProposer';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TERMREVIEWER = 'termReviewer';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TM_MAINTENANCE = 'TMMaintenance';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const TM_MAINTENANCE_ALL_CLIENTS = 'TMMaintenance_allClients';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const JOB_COORDINATOR = 'jobCoordinator';
 
     // region sub-roles for the client-pm
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const CLIENTPM_PROJECTS = 'clientpm_projects';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const CLIENTPM_LANGRESOURCES = 'clientpm_langresources';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const CLIENTPM_CUSTOMERS = 'clientpm_customers';
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
     public const CLIENTPM_USERS = 'clientpm_users';
     // endregion
 

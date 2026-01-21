@@ -113,7 +113,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     items: [{
                         xtype: 'displayfield',
                         name:'resourceId',
-                        id:'resourceId',
                         renderer: function(id) {
                             var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                                 resource = store.getById(id);
@@ -221,7 +220,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         // after the LanguageResource has been created)
                         xtype: 'displayfield',
                         name:'categories',
-                        id:'categories',
                         renderer: function(value) {
                             if(!value){
                                 return '';

@@ -30,31 +30,6 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Übersetzt');
- * $translate->_('Übersetzt, auto');
- * $translate->_('Nicht übersetzt');
- * $translate->_('Lektoriert');
- * $translate->_('Lektoriert, auto');
- * $translate->_('Dauerhaft gesperrt');
- * $translate->_('Gesperrt');
- * $translate->_('Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss');
- * $translate->_('Lektoriert, unverändert');
- * $translate->_('Lektoriert, unverändert, auto');
- * $translate->_('2. Lektorat');
- * $translate->_('2. Lektorat, auto');
- * $translate->_('PM lektoriert');
- * $translate->_('PM lektoriert, auto');
- * $translate->_('PM lektoriert, unverändert');
- * $translate->_('PM lektoriert, unverändert, auto');
- * $translate->_('Vorübersetzt');
- * $translate->_('Draft');
- * $translate->_('wird ermittelt...');
- * $translate->_('In Bearbeitung');
- */
-
-/**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
  *
@@ -179,7 +154,17 @@ class editor_Models_Segment_AutoStates
      */
     public const PENDING = 999;
 
-    protected $states = [
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
+    public const NOT_SET_MSG = 'Nicht gesetzt';
+
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
+    public const PENDING_MSG = 'wird ermittelt...';
+
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
+    public const EDITING_BY_USER_MSG = 'In Bearbeitung';
+
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    protected array $states = [
         self::TRANSLATED => 'Übersetzt',
         self::TRANSLATED_AUTO => 'Übersetzt, auto',
         self::NOT_TRANSLATED => 'Nicht übersetzt',
@@ -237,8 +222,8 @@ class editor_Models_Segment_AutoStates
         $states = $this->states;
 
         //only needed in frontend:
-        $states[self::PENDING] = 'wird ermittelt...';
-        $states[self::EDITING_BY_USER] = 'In Bearbeitung';
+        $states[self::PENDING] = self::PENDING_MSG;
+        $states[self::EDITING_BY_USER] = self::EDITING_BY_USER_MSG;
 
         return $states;
     }

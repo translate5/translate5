@@ -28,12 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
-
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('The file is not uploaded');
- */
+use MittagQI\ZfExtended\Localization;
 
 /***
  *
@@ -202,14 +197,18 @@ class editor_TermcollectionController extends ZfExtended_RestController
         foreach ($files as $file => $info) {
             // file uploaded ?
             if (! $upload->isUploaded($file)) {
-                $this->uploadErrors[] = "The file is not uploaded";
+                $this->uploadErrors[] = Localization::trans('The file was not uploaded');
 
                 continue;
             }
 
             // validators are ok ?
             if (! $upload->isValid($file)) {
-                $this->uploadErrors[] = "The file:" . $file . " is with invalid file extension";
+                $this->uploadErrors[] = str_replace(
+                    '{file}',
+                    $file,
+                    Localization::trans('The file “{file}” has an invalid type')
+                );
 
                 continue;
             }
@@ -229,15 +228,9 @@ class editor_TermcollectionController extends ZfExtended_RestController
         if (empty($this->uploadErrors)) {
             return true;
         }
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */
         $errors = [
-            self::FILE_UPLOAD_NAME => [],
+            self::FILE_UPLOAD_NAME => $this->uploadErrors,
         ];
-
-        foreach ($this->uploadErrors as $error) {
-            $errors[self::FILE_UPLOAD_NAME][] = $translate->_($error);
-        }
 
         $e = new ZfExtended_ValidateException(print_r($errors, 1));
         $e->setErrors($errors);

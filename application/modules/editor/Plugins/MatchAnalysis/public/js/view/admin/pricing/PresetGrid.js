@@ -233,6 +233,28 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGrid', {
             },{
                 xtype: 'checkcolumn',
                 bind: {
+                    text: '{l10n.MatchAnalysis.pricing.preset.isCustomerTqeDefault.text}',
+                    tooltip: '{l10n.MatchAnalysis.pricing.preset.isCustomerTqeDefault.tooltip}'
+                },
+                width: 90,
+                itemId: 'tqeDefaultColumn',
+                hidden: !instanceConfig.isCustomerGrid,
+                hideable: instanceConfig.isCustomerGrid,
+                tdCls: 'pointer',
+                // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
+                // This is way easier than trying to model this dynamic relation canonically
+                renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
+                    var selection = view.grid.ownerCt.ownerCt.getViewModel().getData().list.selection,
+                        customerDefaultTqePresetId = (selection) ? selection.get('defaultTqePricingPresetId') : -1;
+                    isDefault = (record.id === customerDefaultTqePresetId); // customer is always set, else panel wouldn't be active
+                    return this.defaultRenderer.apply(this, [isDefault, metaData, record, rowIdx, colIdx, store, view]);
+                },
+                listeners: {
+                    beforecheckchange: 'onBeforeTqeCheckChange'
+                }
+            },{
+                xtype: 'checkcolumn',
+                bind: {
                     text: '{l10n.MatchAnalysis.pricing.preset.isDefault.text}',
                     tooltip: '{l10n.MatchAnalysis.pricing.preset.isDefault.tooltip}'
                 },
@@ -248,6 +270,25 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGrid', {
                 },
                 listeners: {
                     beforecheckchange: 'onBeforeGlobalCheckChange'
+                }
+            },{
+                xtype: 'checkcolumn',
+                bind: {
+                    text: '{l10n.MatchAnalysis.pricing.preset.isTqeDefault.text}',
+                    tooltip: '{l10n.MatchAnalysis.pricing.preset.isTqeDefault.tooltip}'
+                },
+                dataIndex: 'isTqeDefault',
+                itemId: 'globalTqeDefaultColumn',
+                disabled: instanceConfig.isCustomerGrid,
+                width: 90,
+                renderer: function(isTqeDefault, metaData, record, rowIdx, colIdx, store, view){
+                    if (!isTqeDefault && !view.ownerGrid.isCustomerGrid) {
+                        metaData.tdCls += ' pointer ';
+                    }
+                    return this.defaultRenderer.apply(this, arguments);
+                },
+                listeners: {
+                    beforecheckchange: 'onBeforeGlobalTqeCheckChange'
                 }
             },{
                 xtype: 'actioncolumn',

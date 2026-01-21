@@ -276,6 +276,14 @@ class DefaultCoordinatorGroupJobRepository
             ->where('group.parentId IS NULL')
         ;
 
+        // Checking if the task is importing because in case of import context,
+        // we want all available associations not to be filtered by workflow because
+        // the workflow can be changed in the import wizard. After this cleanup is triggered
+        // and only the picked workflow associations will be left assigned.
+        if (! $task->isImporting()) {
+            $select->where('DefaultGroupJob.workflow = ?', $task->getWorkflow());
+        }
+
         $stmt = $this->db->query($select);
 
         while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -318,6 +326,14 @@ class DefaultCoordinatorGroupJobRepository
             ->where('targetLang = ?', $task->getTargetLang())
             ->where('group.parentId in (?)', $parentGroupIds)
         ;
+
+        // Checking if the task is importing because in case of import context,
+        // we want all available associations not to be filtered by workflow because
+        // the workflow can be changed in the import wizard. After this cleanup is triggered
+        // and only the picked workflow associations will be left assigned.
+        if (! $task->isImporting()) {
+            $select->where('DefaultGroupJob.workflow = ?', $task->getWorkflow());
+        }
 
         $stmt = $this->db->query($select);
 

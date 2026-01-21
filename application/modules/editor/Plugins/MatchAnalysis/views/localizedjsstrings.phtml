@@ -125,6 +125,14 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
                     text: '<?php echo $this->translate->_('Kundenstandard'); ?>',
                     tooltip: '<?php echo $this->translate->_('Standardmäßig für diesen Kunden bei der Projektanlage ausgewählte Vorlage'); ?>'
                 },
+                isTqeDefault: {
+                    text: '<?php echo $this->translate->_('TQE default');?>',
+                    tooltip: '<?php echo $this->translate->_('Template selected by default for TQE analysis - unless overridden at the customer level');?>'
+                },
+                isCustomerTqeDefault: {
+                    text: '<?php echo $this->translate->_('Customer TQE');?>',
+                    tooltip: '<?php echo $this->translate->_('Template selected by default for this customer‘s TQE analysis');?>'
+                },
                 prices: {
                     text: '<?php echo $this->translate->_('Prices'); ?>',
                     tooltip: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise konfigurieren'); ?>'

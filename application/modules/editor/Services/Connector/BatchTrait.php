@@ -153,6 +153,10 @@ trait editor_Services_Connector_BatchTrait
                 // tag structure we need to store this value of the segment here and use it later for repair
                 'querySegment' => $this->tagHandler->getQuerySegment() ?? $querySegment,
                 'tagMap' => $this->tagHandler->getTagMap(),
+                // Store whitespace ID map for PairedTags handler (maps XLIFF IDs to whitespace content)
+                'whitespaceIdMap' => method_exists($this->tagHandler, 'getWhitespaceIdMap')
+                    ? $this->tagHandler->getWhitespaceIdMap()
+                    : [],
             ];
 
             // collect the segment size in bytes in temporary variable
@@ -286,6 +290,10 @@ trait editor_Services_Connector_BatchTrait
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
             $this->tagHandler->setQuerySegment($query['querySegment']);
+            // Restore whitespace ID map for PairedTags handler
+            if (method_exists($this->tagHandler, 'setWhitespaceIdMap')) {
+                $this->tagHandler->setWhitespaceIdMap($query['whitespaceIdMap'] ?? []);
+            }
             $this->processBatchResult($segmentResults);
 
             $this->logForSegment($query['segment']);

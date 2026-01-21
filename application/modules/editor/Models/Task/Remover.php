@@ -34,6 +34,7 @@ use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperati
 use MittagQI\Translate5\LanguageResource\TaskTm\Operation\DeleteTaskTmOperation;
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Task\JobsPurger;
+use MittagQI\ZfExtended\Localization;
 
 /**
  * Task Remover - on task deletion several things should happen, this is all encapsulated in this class
@@ -179,7 +180,7 @@ final class editor_Models_Task_Remover
 
         if ($this->task->isUsed($taskGuid)) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1042', [
-                'Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.',
+                Localization::trans('Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.'),
             ], [
                 'task' => $this->task,
             ]);
@@ -187,7 +188,7 @@ final class editor_Models_Task_Remover
 
         if ($this->task->isLocked($taskGuid) && ! $this->task->isErroneous()) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1043', [
-                'Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.',
+                Localization::trans('Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.'),
             ], [
                 'task' => $this->task,
             ]);

@@ -31,6 +31,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Sanitizer\Type;
 
 /**
@@ -91,7 +92,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
                 'E1015',
                 [
                     'name' => [
-                        'Regelname existiert bereits für Typ {type}',
+                        Localization::trans('Regelname existiert bereits für Typ {type}'),
                     ],
                 ],
                 [

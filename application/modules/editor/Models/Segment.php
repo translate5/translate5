@@ -77,6 +77,10 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method void setLevenshteinPrevious(int $distance)
  * @method string getEditedInStep()
  * @method void setEditedInStep(string $name)
+ * @method string getQualityScore()
+ * @method void setQualityScore(string $qualityScore)
+ * @method string getQualityScoreReasoning()
+ * @method void setQualityScoreReasoning(string $qualityScoreReasoning)
  *
  * this are just some helper for the always existing segment fields, similar named methods exists for all segment
  *     fields:

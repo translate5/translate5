@@ -60,6 +60,15 @@ Ext.define('Editor.view.LanguageResources.CustomerTmAssoc', {
         pruneRemoved: false,
     },
     plugins: ['cellediting'],
+    listeners: {
+        beforeedit: function(editor, context) {
+            // Disable editing penalty columns for MT resources
+            if ((context.field === 'penaltyGeneral' || context.field === 'penaltySublang')
+                && context.record.get('resourceType') === Editor.util.LanguageResources.resourceType.MT) {
+                return false;
+            }
+        }
+    },
     features: [{
         ftype: 'grouping',
         hideGroupedHeader: true,

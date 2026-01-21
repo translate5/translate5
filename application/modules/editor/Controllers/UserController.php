@@ -67,6 +67,7 @@ use MittagQI\Translate5\User\Operations\WithAuthentication\UpdateUserRolesOperat
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserCreateOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserDeleteOperation;
 use MittagQI\Translate5\User\Operations\WithAuthentication\UserUpdateOperation;
+use MittagQI\ZfExtended\Localization;
 use ZfExtended_UnprocessableEntity as UnprocessableEntity;
 
 class Editor_UserController extends ZfExtended_RestController
@@ -295,7 +296,7 @@ class Editor_UserController extends ZfExtended_RestController
 
         if (empty($oldpwd)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1420', [
-                'oldpasswd' => 'Old password is required',
+                'oldpasswd' => Localization::trans('Old password is required'),
             ]);
         }
 
@@ -303,7 +304,7 @@ class Editor_UserController extends ZfExtended_RestController
 
         if (! $auth->authenticate($auth->getLogin(), $oldpwd)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1421', [
-                'oldpasswd' => 'Old password does not match',
+                'oldpasswd' => Localization::trans('Old password does not match'),
             ]);
         }
 
@@ -353,7 +354,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1635',
                 [
                     'roles' => [
-                        'Sie können für diesen Benutzer keine {role} festlegen.',
+                        Localization::trans('Sie können für diesen Benutzer keine {role} festlegen.'),
                     ],
                 ],
                 [
@@ -364,7 +365,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1630',
                 [
                     'roles' => [
-                        'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
+                        Localization::trans('Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}'),
                     ],
                 ],
                 [
@@ -376,7 +377,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1630',
                 [
                     'roles' => [
-                        'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
+                        Localization::trans('Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}'),
                     ],
                 ],
                 [
@@ -388,7 +389,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1630',
                 [
                     'roles' => [
-                        'Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}',
+                        Localization::trans('Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}'),
                     ],
                 ],
                 [
@@ -402,7 +403,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1635',
                 [
                     'roles' => [
-                        'Sie können für diesen Benutzer keine {role} festlegen.',
+                        Localization::trans('Sie können für diesen Benutzer keine {role} festlegen.'),
                     ],
                 ],
                 [
@@ -413,7 +414,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2002',
                 [
                     'customers' => [
-                        'Der referenzierte Kunde existiert nicht (mehr).',
+                        Localization::trans('Der referenzierte Kunde existiert nicht (mehr).'),
                     ],
                 ],
                 [
@@ -425,7 +426,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'customers' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
+                        Localization::trans('Sie können den Kunden "{id}" hier nicht angeben'),
                     ],
                 ],
                 [
@@ -436,7 +437,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'customers' => [
-                        'Sie können den Kunden "{id}" hier nicht angeben',
+                        Localization::trans('Sie können den Kunden "{id}" hier nicht angeben'),
                     ],
                 ],
                 [
@@ -445,19 +446,19 @@ class Editor_UserController extends ZfExtended_RestController
             ),
             LoginAlreadyInUseException::class => UnprocessableEntity::createResponse('E1094', [
                 'login' => [
-                    'duplicateLogin' => 'Dieser Anmeldename wird bereits verwendet.',
+                    'duplicateLogin' => Localization::trans('Dieser Anmeldename wird bereits verwendet.'),
                 ],
             ]),
             GuidAlreadyInUseException::class => UnprocessableEntity::createResponse('E1095', [
                 'login' => [
-                    'duplicateUserGuid' => 'Diese UserGuid wird bereits verwendet.',
+                    'duplicateUserGuid' => Localization::trans('Diese UserGuid wird bereits verwendet.'),
                 ],
             ]),
             CoordinatorGroupNotFoundException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E2002',
                 [
                     'group' => [
-                        'coordinator-group-not-found',
+                        Localization::trans('coordinator-group-not-found'),
                     ],
                 ],
                 [
@@ -472,7 +473,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'customers' => [
-                        'Kunde nicht angegeben',
+                        Localization::trans('Kunde nicht angegeben'),
                     ],
                 ],
             ),
@@ -487,7 +488,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1631',
                 [
                     'roles' => [
-                        'user.update.roles.unable-to-assign-job-coordinator-role-to-existing-user',
+                        Localization::trans('user.update.roles.unable-to-assign-job-coordinator-role-to-existing-user'),
                     ],
                 ],
             ),
@@ -495,14 +496,14 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'group' => [
-                        'Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.',
+                        Localization::trans('Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.'),
                     ],
                 ],
             ),
             NotAccessibleCoordinatorGroupUserException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1627',
                 [
-                    'Versuch, einen nicht erreichbaren Benutzer zu manipulieren.',
+                    Localization::trans('Versuch, einen nicht erreichbaren Benutzer zu manipulieren.'),
                 ],
                 [
                     'coordinator' => $e->coordinatorGroupUser->guid,
@@ -517,7 +518,10 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'group' => [
-                        'Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.',
+                        Localization::trans(
+                            'Für Benutzer, die nicht die Rolle des Jobkoordinators haben, ' .
+                            'wird der Sprachdienstleister automatisch eingestellt.'
+                        ),
                     ],
                 ],
             ),
@@ -525,7 +529,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E1638',
                 [
                     'roles' => [
-                        'Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden: {reason}',
+                        Localization::trans('Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden: {reason}'),
                     ],
                 ],
                 [
@@ -547,7 +551,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'customers' => [
-                        'user.customer.un-assign.not-possible-as-coordinator-has-related-coordinator-group-jobs',
+                        Localization::trans('user.customer.un-assign.not-possible-as-coordinator-has-related-coordinator-group-jobs'),
                     ],
                 ],
                 [
@@ -559,7 +563,7 @@ class Editor_UserController extends ZfExtended_RestController
                 'E2003',
                 [
                     'customers' => [
-                        'user.customer.un-assign.not-possible-as-it-has-related-jobs',
+                        Localization::trans('user.customer.un-assign.not-possible-as-it-has-related-jobs'),
                     ],
                 ],
                 [
@@ -577,7 +581,7 @@ class Editor_UserController extends ZfExtended_RestController
             PmInTaskException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1048',
                 [
-                    'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.',
+                    Localization::trans('Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.'),
                 ],
                 [
                     'tasks' => implode(', ', $e->taskGuids),
@@ -589,7 +593,7 @@ class Editor_UserController extends ZfExtended_RestController
             LastCoordinatorException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1626',
                 [
-                    'cannot-delete-user.last-coordinator',
+                    Localization::trans('cannot-delete-user.last-coordinator'),
                 ],
                 [
                     'group' => $e->coordinator->group->getName(),
@@ -602,7 +606,7 @@ class Editor_UserController extends ZfExtended_RestController
             CoordinatorHasAssignedCoordinatorGroupJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1636',
                 [
-                    'cannot-delete-user.coordinator-has-assigned-group-jobs',
+                    Localization::trans('cannot-delete-user.coordinator-has-assigned-group-jobs'),
                 ],
                 [
                     'coordinatorGroup' => $e->coordinator->group->getName(),
@@ -615,7 +619,7 @@ class Editor_UserController extends ZfExtended_RestController
             CoordinatorHasAssignedDefaultCoordinatorGroupJobException::class => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1679',
                 [
-                    'user.delete.coordinator-has-assigned-default-group-jobs',
+                    Localization::trans('user.delete.coordinator-has-assigned-default-group-jobs'),
                 ],
                 [
                     'coordinatorGroup' => $e->coordinator->group->getName(),
@@ -628,7 +632,7 @@ class Editor_UserController extends ZfExtended_RestController
             default => ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1628',
                 [
-                    'Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.',
+                    Localization::trans('Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.'),
                 ],
                 [
                     'user' => $this->entity->getUserGuid(),

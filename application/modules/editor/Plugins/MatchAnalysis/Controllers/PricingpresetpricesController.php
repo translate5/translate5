@@ -26,14 +26,9 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Are you sure you want to delete prices for this language combination?');
- */
-
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\MismatchException;
 
 class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExtended_RestController
@@ -268,7 +263,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
         ]);
 
         // Prompt client-side confirmation
-        $this->confirm('Are you sure you want to delete prices for this language combination?');
+        $this->confirm(Localization::trans('Are you sure you want to delete prices for this language combination?'));
 
         // If confirmed - do delete
         $this->entity->delete();

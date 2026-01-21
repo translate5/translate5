@@ -51,6 +51,10 @@ class L10nUpdater
 
     private bool $prefillMissing = false;
 
+    private array $missing;
+
+    private array $missingByModule;
+
     public function __construct(
         private bool $doUpdateXliffs = false,
         private bool $doCollectData = false,
@@ -75,6 +79,9 @@ class L10nUpdater
 
     public function process(): void
     {
+        $this->missing = [];
+        $this->missingByModule = [];
+
         if ($this->doCollectData) {
             if (is_dir($this->saveDir)) {
                 \ZfExtended_Utils::recursiveDelete($this->saveDir);
@@ -108,6 +115,35 @@ class L10nUpdater
     }
 
     /**
+     * generates the overall count and tabular data for missing translations
+     * @return array{count: int, data: array}
+     */
+    public function getMissingData(): array
+    {
+        $data = [];
+        $overall = 0;
+        if (isset($this->missing) && count($this->missing) > 0) {
+            foreach (array_keys($this->missing) as $locale) {
+                $locData = [$locale, $this->missing[$locale]];
+                $overall += $this->missing[$locale];
+                $moduleData = [];
+                foreach ($this->missingByModule as $module => $localeData) {
+                    if ($localeData[$locale] > 0) {
+                        $moduleData[] = $module . ': ' . $localeData[$locale];
+                    }
+                }
+                $locData[] = implode(', ', $moduleData);
+                $data[] = $locData;
+            }
+        }
+
+        return [
+            'count' => $overall,
+            'data' => $data,
+        ];
+    }
+
+    /**
      * Updates the primary locale from source-files
      */
     private function processPrimary(): void
@@ -129,6 +165,7 @@ class L10nUpdater
         // library/ZfExtended
         // often belong to the main editor module
         $this->processModule(
+            'ZfExtended',
             L10nHelper::getModuleXliff('library', $this->locale),
             L10nHelper::getModuleCodePathes('library'),
             $primaryTranslations
@@ -137,6 +174,7 @@ class L10nUpdater
         // localized Plugins
         foreach ($this->localizedPluginPathes as $pluginDir) {
             $this->processModule(
+                basename($pluginDir),
                 $pluginDir . '/locales/' . $this->locale . Localization::FILE_EXTENSION_WITH_DOT,
                 [substr($pluginDir, strlen($this->basePath))],
                 $primaryTranslations
@@ -144,6 +182,7 @@ class L10nUpdater
         }
         // default module
         $this->processModule(
+            'default',
             L10nHelper::getModuleXliff('default', $this->locale),
             L10nHelper::getModuleCodePathes('default'),
             $primaryTranslations,
@@ -151,6 +190,7 @@ class L10nUpdater
         );
         // erp
         $this->processModule(
+            'erp',
             L10nHelper::getModuleXliff('erp', $this->locale),
             L10nHelper::getModuleCodePathes('erp'),
             $primaryTranslations,
@@ -166,10 +206,11 @@ class L10nUpdater
             // add all JSON files if we collect data
             $this->copyJsonFiles();
         }
+        $this->addNumUntranslated('editor', $this->locale, $xliffUpdater->getNumUntranslated());
     }
 
     /**
-     * Updates the secondary loca
+     * Updates the secondary locales
      */
     private function processSecondary(): void
     {
@@ -182,30 +223,40 @@ class L10nUpdater
 
             // create xliff pathes
             $xliffs = [];
-            $xliffs[L10nHelper::getModuleXliff('erp', $this->locale)] =
-                L10nHelper::getModuleXliff('erp', Localization::PRIMARY_LOCALE);
-            $xliffs[L10nHelper::getModuleXliff('default', $this->locale)] =
-                L10nHelper::getModuleXliff('default', Localization::PRIMARY_LOCALE);
-            $xliffs[L10nHelper::getModuleXliff('library', $this->locale)] =
-                L10nHelper::getModuleXliff('library', Localization::PRIMARY_LOCALE);
+            $xliffs[L10nHelper::getModuleXliff('erp', $this->locale)] = [
+                'name' => 'erp',
+                'path' => L10nHelper::getModuleXliff('erp', Localization::PRIMARY_LOCALE),
+            ];
+            $xliffs[L10nHelper::getModuleXliff('default', $this->locale)] = [
+                'name' => 'default',
+                'path' => L10nHelper::getModuleXliff('default', Localization::PRIMARY_LOCALE),
+            ];
+            $xliffs[L10nHelper::getModuleXliff('library', $this->locale)] = [
+                'name' => 'ZfExtended',
+                'path' => L10nHelper::getModuleXliff('library', Localization::PRIMARY_LOCALE),
+            ];
             foreach ($this->localizedPluginPathes as $pluginDir) {
-                $xliffs[$pluginDir . '/locales/' . $this->locale . Localization::FILE_EXTENSION_WITH_DOT] =
-                    $pluginDir . '/locales/' . Localization::PRIMARY_LOCALE . Localization::FILE_EXTENSION_WITH_DOT;
+                $xliffs[$pluginDir . '/locales/' . $this->locale . Localization::FILE_EXTENSION_WITH_DOT] = [
+                    'name' => basename($pluginDir),
+                    'path' => $pluginDir . '/locales/' . Localization::PRIMARY_LOCALE . Localization::FILE_EXTENSION_WITH_DOT,
+                ];
             }
             // editor last to overwrite translations from submodules
-            $xliffs[L10nHelper::getModuleXliff('editor', $this->locale)] =
-                L10nHelper::getModuleXliff('editor', Localization::PRIMARY_LOCALE);
-
+            $xliffs[L10nHelper::getModuleXliff('editor', $this->locale)] = [
+                'name' => 'editor',
+                'path' => L10nHelper::getModuleXliff('editor', Localization::PRIMARY_LOCALE),
+            ];
             // collect translations
             $translations = $this->collectAllTranslations(array_keys($xliffs));
 
             // now clone all the xliffs
-            foreach ($xliffs as $xliff => $sourceXliff) {
-                $cloner = new XliffCloner($xliff, $sourceXliff, $this->prefillMissing, $this->markMissing);
+            foreach ($xliffs as $xliff => $data) {
+                $cloner = new XliffCloner($xliff, $data['path'], $this->prefillMissing, $this->markMissing);
                 $cloner->clone($translations, $this->doUpdateXliffs);
                 if ($this->doCollectData) {
                     $cloner->saveAs($this->createXliffExportName($xliff));
                 }
+                $this->addNumUntranslated($data['name'], $this->locale, $cloner->getNumUntranslated());
             }
 
             if ($this->doCollectData) {
@@ -236,6 +287,7 @@ class L10nUpdater
     }
 
     private function processModule(
+        string $moduleName,
         string $xliffPath,
         array $modulePathes,
         array $translations,
@@ -247,6 +299,7 @@ class L10nUpdater
         if ($this->doCollectData) {
             $xliffUpdater->saveAs($this->createXliffExportName($xliffPath));
         }
+        $this->addNumUntranslated($moduleName, $this->locale, $xliffUpdater->getNumUntranslated());
     }
 
     private function collectAllXliffs(string $locale): array
@@ -334,5 +387,20 @@ class L10nUpdater
     {
         return $this->saveDir . '/' . $this->locale . '/' .
             L10nHelper::createExportFileName(substr($file, strlen($this->basePath)));
+    }
+
+    private function addNumUntranslated(string $moduleName, string $locale, int $numUntranslated): void
+    {
+        if (! array_key_exists($locale, $this->missing)) {
+            $this->missing[$locale] = 0;
+        }
+        if (! array_key_exists($moduleName, $this->missingByModule)) {
+            $this->missingByModule[$moduleName] = [];
+        }
+        if (! array_key_exists($locale, $this->missingByModule[$moduleName])) {
+            $this->missingByModule[$moduleName][$locale] = 0;
+        }
+        $this->missing[$locale] += $numUntranslated;
+        $this->missingByModule[$moduleName][$locale] += $numUntranslated;
     }
 }

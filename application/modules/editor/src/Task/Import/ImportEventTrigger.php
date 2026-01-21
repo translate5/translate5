@@ -135,11 +135,12 @@ class ImportEventTrigger
         ]);
     }
 
-    public function triggerImportWorkerQueued(editor_Models_Task $task, int $parentId): void
+    public function triggerImportWorkerQueued(editor_Models_Task $task, int $parentId, bool $importWizardUsed): void
     {
         $this->triggerEvent(self::IMPORT_WORKER_QUEUED, [
             'task' => $task,
             'workerId' => $parentId,
+            'importWizardUsed' => $importWizardUsed,
         ]);
     }
 

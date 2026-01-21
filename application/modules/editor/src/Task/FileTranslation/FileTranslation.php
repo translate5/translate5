@@ -163,6 +163,7 @@ class FileTranslation
         array $targetLanguageResourceAssignments = [],
     ): editor_Models_Task {
         $this->checkRights();
+
         // Explicit language resource assignments keyed by target language id. The queue ensures that each task receives the
         // next configured set of resource ids for its target language (if any).
         $targetLanguageResourceQueue = empty($targetLanguageResourceAssignments)
@@ -257,15 +258,11 @@ class FileTranslation
     private function manageAssociation(editor_Models_Task $task, ?TargetLanguageResourceQueue $targetLanguageResourceQueue): array
     {
         $explicitResources = $targetLanguageResourceQueue?->consume($task->getTargetLang());
-        if ($explicitResources !== null) {
-            if ($explicitResources === []) {
-                return $this->assignLanguageResources($task);
-            }
-
-            return $this->assignAvailableLanguageResources($task, $explicitResources);
+        if (empty($explicitResources)) {
+            return $this->assignLanguageResources($task);
         }
 
-        return $this->assignLanguageResources($task);
+        return $this->assignAvailableLanguageResources($task, $explicitResources);
     }
 
     private function assignAvailableLanguageResources(editor_Models_Task $task, array $resourceIds): array

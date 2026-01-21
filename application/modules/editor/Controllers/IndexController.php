@@ -43,19 +43,12 @@ use MittagQI\Translate5\User\FilterPreset;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * -- special config-translations --
- * $translateConfig->___('runtimeOptions.segments.qualityFlags', 'default');
- * $translateConfig->___('runtimeOptions.segments.stateFlags', 'default');
- * $translateConfig->___('runtimeOptions.segments.autoStateFlags', 'default');
- * $translateConfig->___('runtimeOptions.extJs.theme', 'defaults');
- * $translate->_('Nicht gesetzt');
- */
-
-/**
  * Dummy Index Controller
  */
+#[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.segments.qualityFlags', 'default')]
+#[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.segments.stateFlags', 'default')]
+#[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.segments.autoStateFlags', 'default')]
+#[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.extJs.theme', 'defaults')]
 class Editor_IndexController extends ZfExtended_Controllers_Action
 {
     use TaskContextTrait;
@@ -356,7 +349,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->setJsSegmentFlags('segments.qualityFlags', $rop->segments->qualityFlags->toArray());
         $manualStates = $rop->segments->stateFlags->toArray();
-        $manualStates[0] = 'Nicht gesetzt';
+        $manualStates[0] = editor_Models_Segment_AutoStates::NOT_SET_MSG;
         $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
         $states = new editor_Models_Segment_AutoStates();
 

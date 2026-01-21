@@ -212,6 +212,10 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         me.removeNotAvailableCustomers(me.getView().down('#useAsDefault'),newValue);
         // filter out all selected customers in pivotAsDefault which are not available in the current slection
         me.removeNotAvailableCustomers(me.getView().down('#pivotAsDefault'),newValue);
+        // filter out all selected customers in tqeAsDefault which are not available in the current selection
+        me.removeNotAvailableCustomers(me.getView().down('#tqeAsDefault'),newValue);
+        // filter out all selected customers in tqeInstantTranslateAsDefault which are not available in the current selection
+        me.removeNotAvailableCustomers(me.getView().down('#tqeInstantTranslateAsDefault'),newValue);
     },
 
     onCustomersReadTagFieldChange:function(field,newValue){
@@ -226,6 +230,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      * @param source
      */
     removeNotAvailableCustomers:function(child,source){
+        if(!child){
+            return;
+        }
         child.setValue(Ext.Array.intersect(child.getValue(),source));
     },
 

@@ -48,29 +48,11 @@ use ZfExtended_Models_User;
 use ZfExtended_Zendoverwrites_Translate;
 use ZipArchive;
 
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Typ der Ressource');
- * $translate->_('Name der Ressource');
- * $translate->_('Ressource');
- * $translate->_('Kunde');
- * $translate->_('Quellsprache');
- * $translate->_('Zielsprache');
- * $translate->_('Jahr/Monat');
- * $translate->_('Übersetzte Zeichen');
- * $translate->_('Zeitstempel');
- * $translate->_('Übersetzte Zeichen');
- * $translate->_('Anzahl der mit InstantTranslate übersetzten Dokumente');
- * $translate->_('Kunden');
- * $translate->_('Wiederholung');
- * $translate->_('Benutzer');
- */
-
 class UsageExporter
 {
     private const CHUNKS_BUFFER = 1000000; //number of log entries per excel file
 
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
     protected array $labels = [
         "langageResourceType" => "Typ der Ressource",
         "langageResourceName" => "Name der Ressource",

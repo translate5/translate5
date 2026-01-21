@@ -59,6 +59,8 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         {name: 'customerUseAsDefaultIds', critical: true},
         {name: 'customerWriteAsDefaultIds', critical: true},
         {name: 'customerPivotAsDefaultIds', critical: true},
+        {name: 'customerTqeAsDefaultIds', critical: true, defaultValue: []},
+        {name: 'customerTqeInstantTranslateAsDefaultIds', critical: true, defaultValue: []},
         {name: 'customerIds', critical: true},
         {name: 'status', type: 'string', persist: false},
         {name: 'statusInfo', type: 'string', persist: false},
@@ -87,6 +89,16 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         },
         {
             name: 'hasPivotAccess',
+            type: 'boolean',
+            persist: false
+        },
+        {
+            name: 'hasTqeAccess',
+            type: 'boolean',
+            persist: false
+        },
+        {
+            name: 'hasTqeInstantTranslateAccess',
             type: 'boolean',
             persist: false
         },
@@ -169,6 +181,8 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
             hasReadAccess : this.get('customerUseAsDefaultIds')  .some(inArray),
             hasWriteAccess: this.get('customerWriteAsDefaultIds').some(inArray),
             hasPivotAccess: this.get('customerPivotAsDefaultIds').some(inArray),
+            hasTqeAccess: this.get('customerTqeAsDefaultIds').some(inArray),
+            hasTqeInstantTranslateAccess: this.get('customerTqeInstantTranslateAsDefaultIds').some(inArray),
         });
     },
 

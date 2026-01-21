@@ -117,14 +117,14 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         win.insertCard({
             xtype:'taskUpload',
             itemId:'taskUploadCard',
-            groupIndex:7
+            groupIndex:8
         },'postimport');
 
         //insert the taskUpload card in before render
         win.insertCard({
             xtype:'languageResourcePivotWizard',
             itemId:'languageResourcePivotWizard',
-            groupIndex:3
+            groupIndex:4
         },'postimport');
 
         win.insertCard({
@@ -137,7 +137,7 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
             win.insertCard({
                 xtype: 'adminConfigWizard',
                 itemId: 'adminConfigWizard',
-                groupIndex: 4//index 2 is language resources assoc
+                groupIndex: 5//index 2 is language resources assoc
             }, 'postimport');
         }
     },

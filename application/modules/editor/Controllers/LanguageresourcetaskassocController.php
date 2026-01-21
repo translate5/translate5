@@ -33,6 +33,7 @@ use MittagQI\Translate5\LanguageResource\Event\LanguageResourceTaskAssociationCh
 use MittagQI\Translate5\LanguageResource\Provider\LanguageResourceProvider;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\ZfExtended\Localization;
 
 /**
  * Controller for the LanguageResources Associations
@@ -142,8 +143,10 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
 
         if ($task->isUsed($this->entity->getTaskGuid())) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
-                'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment ' .
-                'nicht von der Aufgabe entfernt werden!',
+                Localization::trans(
+                    'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment ' .
+                    'nicht von der Aufgabe entfernt werden!'
+                ),
             ]);
         }
 
@@ -192,7 +195,7 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1050',
                 [
-                    'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!',
+                    'languageResourceId' => Localization::trans('Die gewünschte Sprachressource gibt es nicht!'),
                 ],
                 [
                     'languageresourceId' => $this->data->languageResourceId,

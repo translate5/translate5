@@ -40,6 +40,7 @@ use MittagQI\Translate5\Task\BatchOperations\Exception\MaintenanceScheduledExcep
 use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchExport;
 use MittagQI\Translate5\Task\BatchOperations\Handler\TaskBatchSetDeadlineDate;
 use MittagQI\Translate5\Task\BatchOperations\TaskBatchExportInterface;
+use MittagQI\ZfExtended\Localization;
 
 /**
  * Controller for Batch Operations
@@ -72,7 +73,7 @@ class Editor_TaskbatchController extends ZfExtended_RestController
 
     public function indexAction(): void
     {
-        $invalidValueProvidedMessage = 'Ungültiger Wert bereitgestellt';
+        $invalidValueProvidedMessage = Localization::trans('Ungültiger Wert bereitgestellt');
 
         if ($this->getParam('countTasks')) {
             $request = $this->getRequest();
@@ -133,7 +134,7 @@ class Editor_TaskbatchController extends ZfExtended_RestController
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1401',
                 [
-                    'export' => 'Maintenance is scheduled, exports are not possible at the moment',
+                    'export' => Localization::trans('Maintenance is scheduled, exports are not possible at the moment'),
                 ],
             );
         } catch (InvalidValueProvidedException $e) {

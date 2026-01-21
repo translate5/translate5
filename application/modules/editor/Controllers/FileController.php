@@ -39,6 +39,7 @@ use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Task\Reimport\Worker;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskLockService;
+use MittagQI\ZfExtended\Localization;
 
 class editor_FileController extends ZfExtended_RestController
 {
@@ -101,7 +102,7 @@ class editor_FileController extends ZfExtended_RestController
 
         if (empty($fileId)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1426', [
-                'fileId' => 'missing field fileId',
+                'fileId' => Localization::trans('missing field fileId'),
             ]);
         }
 

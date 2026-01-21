@@ -54,6 +54,10 @@
                 <source>Bitte zu löschenden Bereich auswählen</source>
                 <target>Bitte zu löschenden Bereich auswählen</target>
             </trans-unit>
+            <trans-unit id="Q3VzdG9tZXIgVFFF">
+                <source>Customer TQE</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="RGF0dW0gZGVyIEFuYWx5c2U=">
                 <source>Datum der Analyse</source>
                 <target>Analysedatum</target>
@@ -209,6 +213,18 @@
             <trans-unit id="VE0gVm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl">
                 <source>TM Vorübersetzungs Match-Rate</source>
                 <target>Match-Rate TM-Vorübersetzung</target>
+            </trans-unit>
+            <trans-unit id="VFFFIGRlZmF1bHQ=">
+                <source>TQE default</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VGVtcGxhdGUgc2VsZWN0ZWQgYnkgZGVmYXVsdCBmb3IgVFFFIGFuYWx5c2lzIC0gdW5sZXNzIG92ZXJyaWRkZW4gYXQgdGhlIGN1c3RvbWVyIGxldmVs">
+                <source>Template selected by default for TQE analysis - unless overridden at the customer level</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VGVtcGxhdGUgc2VsZWN0ZWQgYnkgZGVmYXVsdCBmb3IgdGhpcyBjdXN0b21lcuKAmHMgVFFFIGFuYWx5c2lz">
+                <source>Template selected by default for this customer‘s TQE analysis</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu">
                 <source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source>

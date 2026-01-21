@@ -39,6 +39,7 @@ use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\TqeConflictChecker;
 use MittagQI\Translate5\LanguageResource\Exception\ReimportQueueException;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
@@ -59,17 +60,9 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Sanitizer as Sanitizer;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
-
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Keine Datei hochgeladen!');
- * $translate->_('File import in language resources Error on worker init()');
- * $translate->_('Die ausgewählte Datei war leer!');
- * $translate->_('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
- */
 
 /**
  * Language resource controller
@@ -285,6 +278,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
             $lrData['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
             $lrData['customerPivotAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'pivotAsDefault', $id);
+            $lrData['customerTqeAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'tqeAsDefault', $id);
+            $lrData['customerTqeInstantTranslateAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'tqeInstantTranslateAsDefault', $id);
 
             $lrData['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $lrData['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
@@ -566,6 +561,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $pivotAsDefault = array_column($customerAssocs, 'pivotAsDefault', 'customerId');
         $this->view->rows->customerPivotAsDefaultIds = array_keys(array_filter($pivotAsDefault));
 
+        // Filter out tqe as default
+        $tqeAsDefault = array_column($customerAssocs, 'tqeAsDefault', 'customerId');
+        $this->view->rows->customerTqeAsDefaultIds = array_keys(array_filter($tqeAsDefault));
+
+        // Filter out tqe instant-translate as default
+        $tqeInstantTranslateAsDefault = array_column($customerAssocs, 'tqeInstantTranslateAsDefault', 'customerId');
+        $this->view->rows->customerTqeInstantTranslateAsDefaultIds = array_keys(array_filter($tqeInstantTranslateAsDefault));
+
         // categories that are assigned to the resource
         $categoryIds = [];
         $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
@@ -592,6 +595,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $useAsDefault = null;
         $writeAsDefault = null;
         $pivotAsDefault = null;
+        $useTqeAsDefault = null;
+        $useTqeInstantTranslateAsDefault = null;
         $taskList = null;
 
         $this->entity->getFilter()->hasFilter('sourceLang', $sourceFilter);
@@ -600,6 +605,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->getFilter()->hasFilter('customerUseAsDefaultIds', $useAsDefault);
         $this->entity->getFilter()->hasFilter('customerWriteAsDefaultIds', $writeAsDefault);
         $this->entity->getFilter()->hasFilter('customerPivotAsDefaultIds', $pivotAsDefault);
+        $this->entity->getFilter()->hasFilter('customerTqeAsDefaultIds', $useTqeAsDefault);
+        $this->entity->getFilter()->hasFilter('customerTqeInstantTranslateAsDefaultIds', $useTqeInstantTranslateAsDefault);
         $this->entity->getFilter()->hasFilter('taskList', $taskList);
 
         //search the model for the filter value and set the filter value with the found matches(ids)
@@ -704,6 +711,26 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $handleFilter($pivotAsDefault, $resultList, 'editor_Models_LanguageResources_CustomerAssoc', 'loadByCustomerIdsPivotAsDefault', 'languageResourceId');
             } else {
                 $this->entity->getFilter()->deleteFilter('customerPivotAsDefaultIds');
+            }
+        }
+
+        //check if filtering for tqeAsDefault should be done
+        if (isset($useTqeAsDefault)) {
+            if (isset($useTqeAsDefault->value) && is_string($useTqeAsDefault->value)) {
+                $resultList = $searchEntity($useTqeAsDefault->value, 'editor_Models_Customer_Customer');
+                $handleFilter($useTqeAsDefault, $resultList, 'editor_Models_LanguageResources_CustomerAssoc', 'loadByCustomerIdsUseTqeAsDefault', 'languageResourceId');
+            } else {
+                $this->entity->getFilter()->deleteFilter('customerTqeAsDefaultIds');
+            }
+        }
+
+        //check if filtering for tqeInstantTranslateAsDefault should be done
+        if (isset($useTqeInstantTranslateAsDefault)) {
+            if (isset($useTqeInstantTranslateAsDefault->value) && is_string($useTqeInstantTranslateAsDefault->value)) {
+                $resultList = $searchEntity($useTqeInstantTranslateAsDefault->value, 'editor_Models_Customer_Customer');
+                $handleFilter($useTqeInstantTranslateAsDefault, $resultList, 'editor_Models_LanguageResources_CustomerAssoc', 'loadByCustomerIdsUseTqeInstantTranslateAsDefault', 'languageResourceId');
+            } else {
+                $this->entity->getFilter()->deleteFilter('customerTqeInstantTranslateAsDefaultIds');
             }
         }
 
@@ -873,6 +900,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->redirect("/editor/queuedexport/$token?title=$title");
     }
 
+    /**
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws Zend_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ReflectionException
+     */
     public function postAction()
     {
         $this->entity->init();
@@ -902,7 +940,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         if ($resource && ! $resource->getCreatable()) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1041', [
-                'Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.',
+                Localization::trans('Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.'),
             ]);
         }
 
@@ -940,7 +978,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->data['id'] = $this->entity->save();
 
         // especially tests are not respecting the array format ...
-        editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
+        editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds', 'customerTqeAsDefaultIds', 'customerTqeInstantTranslateAsDefaultIds']);
+
+        // Check for TQE and TQE customer conflicts (will throw exception if found and not resolved)
+        $this->checkOrResolveTqeConflicts(
+            (int) $this->entity->getId(),
+            $this->data['customerTqeAsDefaultIds'] ?? [],
+            $this->data['customerTqeInstantTranslateAsDefaultIds'] ?? [],
+            $sourceLangId,
+            $targetLangId,
+            (bool) $this->getParam('resolveTqeConflicts', false)
+        );
 
         try {
             CustomerAssocService::create()->updateAssociations(
@@ -1068,8 +1116,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->save();
             $this->view->rows = $this->entity->getDataObject();
 
+            // Check for TQE customer conflicts when updating resource
+            $this->checkTqeConflictsForUpdate();
+
             // especially tests are not respecting the array format ...
-            editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
+            editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds', 'customerTqeAsDefaultIds', 'customerTqeInstantTranslateAsDefaultIds']);
+
+            // Check for TQE customer conflicts when updating resource
 
             CustomerAssocService::create()->updateAssociations(
                 AssociationFormValues::fromArray(
@@ -1394,7 +1447,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if (! $connector->ping($this->entity->getResource(), $this->getConfig())) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1282',
-                ['Server für den angefragten Dienst ist nicht erreichbar.']
+                [Localization::trans('Server für den angefragten Dienst ist nicht erreichbar.')]
             );
         }
 
@@ -1432,7 +1485,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $importInfo = $this->handleFileUpload($connector);
 
         if (empty($importInfo)) {
-            $this->uploadErrors[] = 'Keine Datei hochgeladen!';
+            $this->uploadErrors[] = Localization::trans('Keine Datei hochgeladen!');
 
             return;
         }
@@ -1522,18 +1575,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         if ($errorNr !== UPLOAD_ERR_OK) {
-            $this->uploadErrors[] = ZfExtended_FileUploadException::getUploadErrorMessage($errorNr);
+            $this->uploadErrors[] = Localization::trans(ZfExtended_FileUploadException::getUploadErrorMessage($errorNr));
 
             return $importInfo;
         }
 
         //currently, an error means wrong filetype
         if ($upload->hasErrors()) {
-            $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
+            $this->uploadErrors[] = Localization::trans('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
         }
 
         if (empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
-            $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
+            $this->uploadErrors[] = Localization::trans('Die ausgewählte Datei war leer!');
         }
 
         return $importInfo;
@@ -1562,7 +1615,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $params['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
 
         if (! $worker->init(null, $params)) {
-            $this->uploadErrors[] = 'File import in language resources Error on worker init()';
+            $this->uploadErrors[] = Localization::trans('File import in language resources Error on worker init()');
 
             return;
         }
@@ -1609,15 +1662,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if (empty($this->uploadErrors)) {
             return true;
         }
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $errors = [
-            self::FILE_UPLOAD_NAME => [],
-        ];
 
-        foreach ($this->uploadErrors as $error) {
-            $errors[self::FILE_UPLOAD_NAME][] = $translate->_($error);
-        }
+        $errors = [
+            self::FILE_UPLOAD_NAME => $this->uploadErrors,
+        ];
 
         $e = new ZfExtended_ValidateException(print_r($errors, 1));
         $e->setErrors($errors);
@@ -2006,6 +2054,159 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
 
+    /**
+     * Check for TQE and TQE customer conflicts and optionally resolve them
+     *
+     * @param int|null $resourceId Resource being created/edited (null for new resources)
+     * @param int|null $sourceLang Source language ID
+     * @param int|null $targetLang Target language ID
+     * @param bool $resolveConflicts Whether to automatically resolve conflicts
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    private function checkOrResolveTqeConflicts(
+        ?int $resourceId,
+        array $tqeCustomerIds,
+        array $tqeInstantTranslateCustomerIds,
+        ?int $sourceLang,
+        ?int $targetLang,
+        bool $resolveConflicts = false
+    ): void {
+        if ((empty($tqeCustomerIds) && empty($tqeInstantTranslateCustomerIds)) || (empty($sourceLang) && empty($targetLang))) {
+            return;
+        }
+
+        $languagePairs = [];
+        if (! empty($sourceLang) && ! empty($targetLang)) {
+            $languagePairs[] = [
+                'sourceLang' => $sourceLang,
+                'targetLang' => $targetLang,
+            ];
+        }
+
+        $checker = TqeConflictChecker::create();
+
+        if (! empty($tqeCustomerIds)) {
+            if ($resolveConflicts) {
+                $conflicts = $checker->findConflicts($resourceId, $tqeCustomerIds, $languagePairs, TqeConflictChecker::FLAG_TQE);
+
+                if (! empty($conflicts)) {
+                    // build resolution map: remove TQE from all conflicting resources
+                    $resolutionMap = [];
+                    foreach ($conflicts as $customerId => $resources) {
+                        $resolutionMap[$customerId] = array_keys($resources);
+                    }
+                    $checker->resolveConflicts($resolutionMap, TqeConflictChecker::FLAG_TQE);
+                }
+            } else {
+                // just check for conflicts (will throw exception if found)
+                $checker->checkConflicts($resourceId, $tqeCustomerIds, $languagePairs, TqeConflictChecker::FLAG_TQE);
+            }
+        }
+
+        if (! empty($tqeInstantTranslateCustomerIds)) {
+            if ($resolveConflicts) {
+                $conflicts = $checker->findConflicts($resourceId, $tqeInstantTranslateCustomerIds, $languagePairs, TqeConflictChecker::FLAG_TQE_INSTANT_TRANSLATE);
+
+                if (! empty($conflicts)) {
+                    // build resolution map: remove TQE from all conflicting resources
+                    $resolutionMap = [];
+                    foreach ($conflicts as $customerId => $resources) {
+                        $resolutionMap[$customerId] = array_keys($resources);
+                    }
+                    $checker->resolveConflicts($resolutionMap, TqeConflictChecker::FLAG_TQE_INSTANT_TRANSLATE);
+                }
+            } else {
+                // just check for conflicts (will throw exception if found)
+                $checker->checkConflicts($resourceId, $tqeInstantTranslateCustomerIds, $languagePairs, TqeConflictChecker::FLAG_TQE_INSTANT_TRANSLATE);
+            }
+        }
+    }
+
+    /**
+     * Check for TQE and TQE conflicts when updating an existing resource
+     */
+    private function checkTqeConflictsForUpdate(): void
+    {
+        $tqeCustomerIds = $this->data['customerTqeAsDefaultIds'] ?? [];
+        $tqeInstantTranslateCustomerIds = $this->data['customerTqeInstantTranslateAsDefaultIds'] ?? [];
+
+        if (empty($tqeCustomerIds) && empty($tqeInstantTranslateCustomerIds)) {
+            return;
+        }
+
+        $languagesModel = new editor_Models_LanguageResources_Languages();
+        $languagePairs = $languagesModel->loadByLanguageResourceId((int) $this->entity->getId());
+
+        if (empty($languagePairs)) {
+            return;
+        }
+
+        $formattedPairs = [];
+        foreach ($languagePairs as $pair) {
+            $formattedPairs[] = [
+                'sourceLang' => (int) $pair['sourceLang'],
+                'targetLang' => (int) $pair['targetLang'],
+            ];
+        }
+
+        $checker = TqeConflictChecker::create();
+        $resolveConflicts = (bool) $this->getParam('resolveTqeConflicts', false);
+
+        // TODO: extract
+        if (! empty($tqeCustomerIds)) {
+            if ($resolveConflicts) {
+                $conflicts = $checker->findConflicts(
+                    (int) $this->entity->getId(),
+                    $tqeCustomerIds,
+                    $formattedPairs,
+                    TqeConflictChecker::FLAG_TQE
+                );
+
+                if (! empty($conflicts)) {
+                    // resolution map: remove TQE from all conflicting resources
+                    $resolutionMap = [];
+                    foreach ($conflicts as $customerId => $resources) {
+                        $resolutionMap[$customerId] = array_keys($resources);
+                    }
+                    $checker->resolveConflicts($resolutionMap, TqeConflictChecker::FLAG_TQE);
+                }
+            } else {
+                $checker->checkConflicts(
+                    (int) $this->entity->getId(),
+                    $tqeCustomerIds,
+                    $formattedPairs,
+                    TqeConflictChecker::FLAG_TQE
+                );
+            }
+        }
+
+        if (! empty($tqeInstantTranslateCustomerIds)) {
+            if ($resolveConflicts) {
+                $conflicts = $checker->findConflicts(
+                    (int) $this->entity->getId(),
+                    $tqeInstantTranslateCustomerIds,
+                    $formattedPairs,
+                    TqeConflictChecker::FLAG_TQE_INSTANT_TRANSLATE
+                );
+
+                if (! empty($conflicts)) {
+                    $resolutionMap = [];
+                    foreach ($conflicts as $customerId => $resources) {
+                        $resolutionMap[$customerId] = array_keys($resources);
+                    }
+                    $checker->resolveConflicts($resolutionMap, TqeConflictChecker::FLAG_TQE_INSTANT_TRANSLATE);
+                }
+            } else {
+                $checker->checkConflicts(
+                    (int) $this->entity->getId(),
+                    $tqeInstantTranslateCustomerIds,
+                    $formattedPairs,
+                    TqeConflictChecker::FLAG_TQE_INSTANT_TRANSLATE
+                );
+            }
+        }
+    }
+
     // additional API needed to process client-restricted usage of the controller
 
     /**
@@ -2042,6 +2243,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->adjustClientRestrictedCustomerAssoc(
             'customerPivotAsDefaultIds',
             $this->getCustassocByIndex($customerAssocs, 'pivotAsDefault', $resourceId),
+            $allowedCustomerIs,
+            $doDebug
+        );
+        $this->adjustClientRestrictedCustomerAssoc(
+            'customerTqeAsDefaultIds',
+            $this->getCustassocByIndex($customerAssocs, 'tqeAsDefault', $resourceId),
+            $allowedCustomerIs,
+            $doDebug
+        );
+        $this->adjustClientRestrictedCustomerAssoc(
+            'customerTqeInstantTranslateAsDefaultIds',
+            $this->getCustassocByIndex($customerAssocs, 'tqeInstantTranslateAsDefault', $resourceId),
             $allowedCustomerIs,
             $doDebug
         );

@@ -29,14 +29,7 @@ END LICENSE AND COPYRIGHT
 declare(strict_types=1);
 
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-
-/**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Entfernt keine');
- * $translate->_('Alle');
- * $translate->_('Tagpaare');
- */
+use MittagQI\ZfExtended\Localization;
 
 class editor_Services_T5Memory_Resource extends editor_Models_LanguageResources_Resource
 {
@@ -53,9 +46,9 @@ class editor_Services_T5Memory_Resource extends editor_Models_LanguageResources_
     {
         return [
             self::STRIP_FRAMING_TAGS_VALUES => [
-                [StripFramingTags::None->value, 'Entfernt keine'],
-                [StripFramingTags::All->value, 'Alle'],
-                [StripFramingTags::Paired->value, 'Tagpaare'],
+                [StripFramingTags::None->value, Localization::trans('Entfernt keine')],
+                [StripFramingTags::All->value, Localization::trans('Alle')],
+                [StripFramingTags::Paired->value, Localization::trans('Tagpaare')],
             ],
             self::FILE_EXTENSIONS => ['.tmx', '.zip'],
         ];

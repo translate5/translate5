@@ -37,5 +37,6 @@ class editor_Models_Validator_TaskMeta extends ZfExtended_Models_Validator_Abstr
             'max' => 255,
         ]);
         $this->addValidator('pricingPresetId', 'int');
+        $this->addValidator('tqePricingPresetId', 'int');
     }
 }

@@ -37,6 +37,7 @@ use MittagQI\Translate5\Plugins\TMMaintenance\Enum\BatchMode;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\ErrorException;
 use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
+use MittagQI\ZfExtended\Localization;
 
 class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestController
 {
@@ -223,7 +224,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             'E1377' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    'Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.',
+                    Localization::trans('Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.'),
                 ],
                 [
                     'status' => $exception->getExtra('status'),
@@ -232,26 +233,34 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             'E1611' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    'Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.',
+                    Localization::trans('Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.'),
                 ],
             ),
             'E1612' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    'Die gefundene Segment-ID weicht von der gesuchten ab, wahrscheinlich wurde sie ' .
-                        'inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.',
+                    Localization::trans(
+                        'Die gefundene Segment-ID weicht von der gesuchten ab, ' .
+                        'wahrscheinlich wurde sie inzwischen gelöscht oder bearbeitet. ' .
+                        'Sie müssen Ihre Suche aktualisieren.'
+                    ),
                 ],
             ),
             'E1688' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    'Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.',
+                    Localization::trans(
+                        'Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen ' .
+                        'gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.'
+                    ),
                 ],
             ),
             'E1306' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    'Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.',
+                    Localization::trans(
+                        'Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.'
+                    ),
                 ],
             ),
             default => $exception,

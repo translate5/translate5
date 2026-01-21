@@ -235,6 +235,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 \MittagQI\Translate5\Integration\SegmentUpdateDtoFactory::create()
             );
         }
+        if (! \Zend_Registry::isRegistered('languageresource.conflicted_association')) {
+            \Zend_Registry::set(
+                'languageresource.conflicted_association',
+                \MittagQI\Translate5\LanguageResource\CleanupAssociation\CollectConflictedAssociations::create()
+            );
+        }
+        if (! \Zend_Registry::isRegistered('task.file_translation.data_collector')) {
+            \Zend_Registry::set(
+                'task.file_translation.data_collector',
+                \MittagQI\Translate5\Task\FileTranslation\FileTranslationDataCollector::create()
+            );
+        }
     }
 
     public function _initController()

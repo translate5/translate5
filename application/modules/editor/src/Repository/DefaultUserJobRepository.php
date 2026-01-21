@@ -196,9 +196,16 @@ class DefaultUserJobRepository
             ->where('defaultUserJob.customerId = ?', $task->getCustomerId())
             ->where('defaultUserJob.sourceLang = ?', $task->getSourceLang())
             ->where('defaultUserJob.targetLang = ?', $task->getTargetLang())
-            ->where('defaultUserJob.workflow = ?', $task->getWorkflow())
             ->where('defaultLspJob.dataJobId IS NULL')
         ;
+
+        // Checking if the task is importing because in case of import context,
+        // we want all available associations not to be filtered by workflow because
+        // the workflow can be changed in the import wizard. After this cleanup is triggered
+        // and only the picked workflow associations will be left assigned.
+        if (! $task->isImporting()) {
+            $select->where('defaultUserJob.workflow = ?', $task->getWorkflow());
+        }
 
         $job = new DefaultUserJob();
 

@@ -87,7 +87,7 @@ class ImportService
      */
     public function __construct()
     {
-        $this->defaults = new TaskDefaults();
+        $this->defaults = TaskDefaults::create();
         $this->usageLogger = ZfExtended_Factory::get(
             TaskUsageLogger::class,
             [ZfExtended_Factory::get(editor_Models_TaskUsageLog::class)]
@@ -350,7 +350,7 @@ class ImportService
         // add task defaults (user associations and language resources)
         $this->defaults->setTaskDefaults($task, $this->importWizardUsed);
 
-        $this->workersService->queueImportWorkers($task, $dataProvider, $importConfig);
+        $this->workersService->queueImportWorkers($task, $dataProvider, $importConfig, $this->importWizardUsed);
     }
 
     /**

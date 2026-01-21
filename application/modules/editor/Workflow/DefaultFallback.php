@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
+
 /**
  * Fallback Workflow Class, needed only to simulate the old default workflow for updating from older versions to the version with workflows out of DB
  */
@@ -36,7 +38,7 @@ class editor_Workflow_DefaultFallback extends editor_Workflow_Default
         $this->definition = ZfExtended_Factory::get('editor_Workflow_CachableDefinition');
 
         $this->definition->name = $name;
-        $this->definition->label = ZfExtended_Zendoverwrites_Translate::getInstance()->_('Standard Workflow');
+        $this->definition->label = Localization::trans('Standard Workflow');
 
         $this->definition->stepChain[] = self::STEP_NO_WORKFLOW;
         $this->definition->stepChain[] = 'translation';

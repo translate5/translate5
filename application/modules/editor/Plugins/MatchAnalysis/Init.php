@@ -164,12 +164,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $task = $event->getParam('task');
         /** @var array $requestData */
         $requestData = $event->getParam('data');
+        $customerId = $task->getCustomerId() ?? null;
+        $preset = ZfExtended_Factory::get(Preset::class);
+
         // Get pricingPresetId: either given within request, or default for the customer, or system default
-        $pricingPresetId = $requestData['pricingPresetId']
-            ?? ZfExtended_Factory::get(Preset::class)
-                ->getDefaultPresetId($task->getCustomerId() ?? null);
-        // Add to meta
+        $pricingPresetId = $requestData['pricingPresetId'] ?? $preset->getDefaultPresetId($customerId);
         $metaDTO->pricingPresetId = $pricingPresetId;
+
+        // Get tqePricingPresetId: either given within request, or TQE default for the customer, or system default
+        $tqePricingPresetId = $requestData['tqePricingPresetId'] ?? $preset->getTqeDefaultPresetId($customerId);
+        $metaDTO->tqePricingPresetId = $tqePricingPresetId;
     }
 
     /**
@@ -903,6 +907,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         );
 
         $r->addRoute(
+            'presetTqeDefault',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_matchanalysis_pricingpreset/settqedefault/*',
+                [
+                    'module' => 'editor',
+                    'controller' => 'plugins_matchanalysis_pricingpreset',
+                    'action' => 'settqedefault',
+                ]
+            )
+        );
+
+        $r->addRoute(
             'presetpricesClone',
             new ZfExtended_Controller_RestLikeRoute(
                 'editor/plugins_matchanalysis_pricingpresetprices/clone/*',
@@ -933,13 +949,19 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     public function handleCustomerAfterIndex(Zend_EventManager_Event $event): void
     {
         $meta = ZfExtended_Factory::get(editor_Models_Db_CustomerMeta::class);
-        $metas = $meta->fetchAll('defaultPricingPresetId IS NOT NULL')->toArray();
+        $metas = $meta->fetchAll('defaultPricingPresetId IS NOT NULL OR defaultTqePricingPresetId IS NOT NULL')->toArray();
         $pricingPresetIds = array_column($metas, 'defaultPricingPresetId', 'customerId');
+        $tqePricingPresetIds = array_column($metas, 'defaultTqePricingPresetId', 'customerId');
         foreach ($event->getParam('view')->rows as &$customer) {
             if (array_key_exists($customer['id'], $pricingPresetIds)) {
                 $customer['defaultPricingPresetId'] = (int) $pricingPresetIds[$customer['id']];
             } else {
                 $customer['defaultPricingPresetId'] = null;
+            }
+            if (array_key_exists($customer['id'], $tqePricingPresetIds)) {
+                $customer['defaultTqePricingPresetId'] = (int) $tqePricingPresetIds[$customer['id']];
+            } else {
+                $customer['defaultTqePricingPresetId'] = null;
             }
         }
     }

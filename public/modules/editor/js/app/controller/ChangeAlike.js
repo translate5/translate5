@@ -279,7 +279,12 @@ Ext.define('Editor.controller.ChangeAlike', {
       if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
           //FIXME should be no callback to save chain here, since we are still in the save chain!
-          me.callbackToSaveChain();
+          me.callbackToSaveChain({
+              noAllikes : me.noAlikes(),// INFO: Ugly way to solve this but this callback triggers segmentEditSaved
+                                        // which if subscribed in other places will actually be triggered twice. Once
+                                        // here and once at the end of the chain. This will give you an posibility to make
+                                        // difference if you need it only once processed somewhere.
+          });
           return;
       }
       if(me.isAutoProcessing()) {

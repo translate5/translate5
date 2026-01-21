@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\LanguageResource\CleanupAssociation;
 
 use editor_Models_LanguageResources_CustomerAssoc;
+use MittagQI\ZfExtended\Localization;
 use ZfExtended_Factory;
 use ZfExtended_UnprocessableEntity;
 use ZfExtended_Utils;
@@ -82,8 +83,12 @@ class Customer extends Base
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1447', [
             'errorMessages' => [
-                'Die entfernten Kunden werden in den folgenden Aufgaben verwendet:',
-                'Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.',
+                Localization::trans('Die entfernten Kunden werden in den folgenden Aufgaben verwendet:'),
+                Localization::trans(
+                    'Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben ' .
+                    'dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden ' .
+                    'aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.'
+                ),
             ],
         ], extraData: [
             'taskList' => $taskNames,

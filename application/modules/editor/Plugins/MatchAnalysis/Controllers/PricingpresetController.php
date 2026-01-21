@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
+use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\MismatchException;
 
 /**
@@ -134,7 +135,12 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
 
         // Prompt client-side confirmation
         $name = htmlentities($this->entity->getName());
-        $this->confirm("Are you sure you want to delete pricing preset '$name'?");
+
+        $this->confirm(str_replace(
+            '{name}',
+            $name,
+            Localization::trans('Are you sure you want to delete pricing preset “{name}”?')
+        ));
 
         // If confirmed - do delete
         $this->entity->delete();
@@ -337,5 +343,34 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
 
         // Set current preset to be default, and get id of the one that was default
         $this->view->wasDefault = $this->entity->setAsDefaultPreset();
+    }
+
+    /**
+     * Sets the non-customer/common TQE default preset
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function settqedefaultAction()
+    {
+        // Check params
+        try {
+            $this->jcheck([
+                'presetId' => [
+                    'req' => true,
+                    'rex' => 'int11',
+                    'key' => $this->entity,
+                ],
+            ]);
+
+            // Catch mismatch-exception and flush msg
+        } catch (MismatchException $e) {
+            $this->jflush(false, $e->getMessage());
+        }
+
+        // Set current preset to be TQE default, and get id of the one that was TQE default
+        $this->view->wasDefault = $this->entity->setAsTqeDefaultPreset();
     }
 }

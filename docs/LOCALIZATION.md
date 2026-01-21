@@ -13,30 +13,64 @@
 * Make sure all symlinks are setup properly, otherwise some private plugins may not be extracted properly (use `t5 dev:symlinks` to set the symlinks up)
 
 ### Extraction of strings in the Code
-* Two methods are used to localize contents in PHP:
+* Three methods are used to localize contents in PHP:
 ```
+  Localization::trans("string-to-translate", $locale = null)
   $translate->_("string-to-translate", $locale = null)
   $view->templateApply("template-to-translate", $data = [])
 ```
-* The first parameter of those methods needs to be a single, unconcatenated string
-* When variables are used as argument, the strings to translate must be added in a comment to enable a proper extraction
-* A comment to add programmatic localizations looks like
+* The first argument of those methods needs to be an unconcated string or a concatenated string where ell string-delimiters are the same, either all " or '
+* When variables are used as argument, the strings to translate must be added in an PHP attribute to enable a proper extraction
+* To add programmatic translations, PHP attributes shall be used for PHP files and standardized comment-sections can be used in PHTML files
+* The possible PHP attributes look like
+```
+#[\MittagQI\ZfExtended\Localization\LocalizableString('external-string-to-translate')]
+#[\MittagQI\ZfExtended\Localization\LocalizableTableColumn('LEK_languages', 'langName')] 
+#[\MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.branch.name', 'value')]
+class LocalizationExample
+{
+
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
+    public const CONSTANT_TO_LOCALIZE = 'Now can be used to feed localization';
+
+    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
+    protected string $propToLocalize = 'Now can be used to feed localization';
+    
+    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    protected array $arrayToLocalize = [
+        'localizedKey1' => 'Now can be used to feed localization',
+        'localizedKey2' => 'Now can be used to feed localization',
+    ]
+}
+* `LocalizableTableColumn('LEK_languages', 'langName')`: All distinct column-values of the table will be added as strings
+* `LocalizableConfigValue('runtimeOptions.branch.name', 'column')`: The given column of the given config will be added. As column, "value", "default" and "defaults" are possible
+```
+* A comment to add programmatic localizations in PHTML - which should be added on top of the File - looks like
 ```
   /**
    * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
    * ============================================
    * $translate->_('My special string');
    * $translate->_('Another string');
-   * $translateTable->__('LEK_languages', 'langName');
-   * $translateConfig->___('runtimeOptions.segments.autoStateFlags', 'default');
    */
 ```
 
-* It should be added on top of the Code-File, after the License
-* A simple string will be added with `$translate->_('My special string');`
-* There are two "virtual" functions available to add strings from database-data:
-* `$translateTable->__("table", "column")`: All distinct column-values of the table will be added as strings
-* `$translateConfig->___("config-name", "column")`: The given column of the given config will be added. As column, "value", "default" and "defaults" are possible
+### How Localization strings look like
+* The localization generally is made in english
+* The strings preferrably should be as showing up in the english localization
+* Please no fancy "variables" like "what.this.string.is.for"
+* Please do use typographical quotes, no real quotes like " or '
+* Typographical quotes: ‘, ’, “, ”, “quoted”
+* The strings in the code preferrably need to be delimited by single quotes
+* If concatenation is used to format longer strings, the delimiter (" or ') needs to be identical throughout all parts !
+
+### How Localization strings look like
+* The localization generally is made in english
+* The strings preferrably should be as showing up in the english localization
+* Please no fancy "variables" like "what.this.string.is.for"
+* Please do use typographical quotes, no real quotes like " or '
+* Typographical quotes: ‘, ’, “, ”, “quoted”
+* The strings in the code need to be single, unconcatenated strings preferrably wrapped in single quotes
 
 ### How Localization strings look like
 * The localization generally is made in english
@@ -64,7 +98,7 @@
 * manual work may is needed after we moved to ZXLIFF-sources in `en`
 
 ### Client specific translations
-* client-specific localizations can be converted to zxliff with the `t5 upgrade-clientspecific` command
+* client-specific localizations can be converted to zxliff with the `t5 l10n:upgrade-clientspecific` command
 * this is done automatically with post-install scripts
 
 ### Adding a new locale

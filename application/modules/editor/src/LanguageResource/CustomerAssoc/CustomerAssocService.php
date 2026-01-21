@@ -92,6 +92,8 @@ class CustomerAssocService
             $useAsDefault = in_array($customerId, $formValues->useAsDefaultCustomers);
             $writeAsDefault = in_array($customerId, $formValues->writeAsDefaultCustomers);
             $pivotAsDefault = in_array($customerId, $formValues->pivotAsDefaultCustomers);
+            $useTqeAsDefault = in_array($customerId, $formValues->useTqeAsDefaultCustomers);
+            $useTqeInstantTranslateAsDefault = in_array($customerId, $formValues->useTqeInstantTranslateAsDefaultCustomers);
 
             if (isset($associatedCustomers[$customerId])) {
                 $association = $associatedCustomers[$customerId];
@@ -99,6 +101,8 @@ class CustomerAssocService
                 $association->setUseAsDefault($useAsDefault);
                 $association->setWriteAsDefault($writeAsDefault);
                 $association->setPivotAsDefault($pivotAsDefault);
+                $association->setTqeAsDefault($useTqeAsDefault);
+                $association->setTqeInstantTranslateAsDefault($useTqeInstantTranslateAsDefault);
 
                 $this->assocRepository->save($association);
 
@@ -111,6 +115,8 @@ class CustomerAssocService
                 $useAsDefault,
                 $writeAsDefault,
                 $pivotAsDefault,
+                $useTqeAsDefault,
+                $useTqeInstantTranslateAsDefault,
             );
         }
     }
@@ -121,6 +127,8 @@ class CustomerAssocService
         bool $useAsDefault = false,
         bool $writeAsDefault = false,
         bool $pivotAsDefault = false,
+        bool $useTqeAsDefault = false,
+        bool $useTqeInstantTranslateAsDefault = false,
     ): Association {
         $languageResource = $this->getLanguageResource($languageResourceId);
 
@@ -131,6 +139,8 @@ class CustomerAssocService
         $model->setUseAsDefault($useAsDefault);
         $model->setWriteAsDefault($writeAsDefault);
         $model->setPivotAsDefault($pivotAsDefault);
+        $model->setTqeAsDefault($useTqeAsDefault);
+        $model->setTqeInstantTranslateAsDefault($useTqeInstantTranslateAsDefault);
 
         $this->assocRepository->save($model);
 

@@ -543,6 +543,10 @@
                 <source>Andere Aufgaben-TM einblenden</source>
                 <target>Show foreign task TMs</target>
             </trans-unit>
+            <trans-unit id="QW5nZWZvcmRlcnRlcyBTZWdtZW50IG5pY2h0IGdlZnVuZGVuLiBXYWhyc2NoZWlubGljaCB3dXJkZSBlcyBnZWzDtnNjaHQu">
+                <source>Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.</source>
+                <target>The segment you are trying to save has already been deleted by another process.</target>
+            </trans-unit>
             <trans-unit id="QW5nZXdpbmtlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gbGlua3MgZWluZsO8Z2Vu">
                 <source>Angewinkeltes Anführungszeichen links einfügen</source>
                 <target>Insert angled quotation mark on the left</target>
@@ -718,6 +722,10 @@
             <trans-unit id="QXJlIHlvdSBzdXJlIHlvdSB3YW50IHRvIGRlbGV0ZSBwcmljZXMgZm9yIHRoaXMgbGFuZ3VhZ2UgY29tYmluYXRpb24/">
                 <source>Are you sure you want to delete prices for this language combination?</source>
                 <target>Are you sure you want to delete prices for this language pair?</target>
+            </trans-unit>
+            <trans-unit id="QXJlIHlvdSBzdXJlIHlvdSB3YW50IHRvIGRlbGV0ZSBwcmljaW5nIHByZXNldCDigJx7bmFtZX3igJ0/">
+                <source>Are you sure you want to delete pricing preset “{name}”?</source>
+                <target>Are you sure you want to delete the pricing preset “{name}”?</target>
             </trans-unit>
             <trans-unit id="QXJtZW5pc2No">
                 <source>Armenisch</source>
@@ -1055,6 +1063,10 @@
                 <source>Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}</source>
                 <target>Target segment contents changed outside translate5 are visible as tracked change marks in the segment after re-import. Change marks in segments from before the re-import are lost. Changed source segments are also updated. Newly added segments (e.g. from a segment split) will be ignored. Currently, the following bilingual files can be updated: {0}</target>
             </trans-unit>
+            <trans-unit id="QXZlcmFnZSBxdWFsaXR5IGVzdGltYXRpb24gdmFsdWUgZm9yIHRoZSB0YXNr">
+                <source>Average quality estimation value for the task</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="QmFzaXNlaW5oZWl0">
                 <source>Basiseinheit</source>
                 <target>Base unit</target>
@@ -1150,6 +1162,10 @@
             <trans-unit id="QmVpbSBJbXBvcnQgdm9uIEF1ZmdhYmVuIHdlcmRlbiAiRWRpdG9yIiBCZW51dHplciBtaXQgZGVuIHBhc3NlbmRlbiBTcHJhY2hlbiA8YSBocmVmPSJodHRwOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTU1NzE2NCIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJtZWhyIEluZm8iPmF1dG9tYXRpc2NoIGRlciBBdWZnYWJlIHp1Z2V3aWVzZW48L2E+Lg==">
                 <source>Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</source>
                 <target>During import, users with the right “Editor” and matching language combination <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">will automatically be assigned to the task</a>.</target>
+            </trans-unit>
+            <trans-unit id="QmVpbSBMw7ZzY2hlbiB3ZXJkZW4gZGllIFp1d2Vpc3VuZ2VuIGRlciBTcHJhY2hyZXNzb3VyY2UgenUgZGVuIEF1ZmdhYmVuIGViZW5mYWxscyBlbnRmZXJudC4gV29sbGVuIFNpZSB3aXJrbGljaCBkaWUgU3ByYWNocmVzc291cmNlIHVuZCBpaHJlIFp1d2Vpc3VuZ2VuIGzDtnNjaGVuPw==">
+                <source>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</source>
+                <target>If removed, this language resource will be unassigned from all of the tasks above. Do you want to remove this language resource and remove all assignments?</target>
             </trans-unit>
             <trans-unit id="QmVpbSDDnGJlcnNldHplbiBkZXIgRGF0ZWkgaXN0IGVpbiBGZWhsZXIgYXVmZ2V0cmV0ZW47IGVpbiBEb3dubG9hZCBzdGVodCBuaWNodCB6dXIgVmVyZsO8Z3VuZy4=">
                 <source>Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung.</source>
@@ -1342,6 +1358,10 @@
             <trans-unit id="Qml0dGUga29udGFrdGllcmVuIFNpZSBJaHJlbiBBZG1pbmlzdHJhdG9y">
                 <source>Bitte kontaktieren Sie Ihren Administrator</source>
                 <target>Please contact your administrator</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgbMO2c2VuIFNpZSBhbGxlIEZlaGxlciBkZXIgZm9sZ2VuZGVuIEthdGVnb3JpZSBPREVSIHNldHplbiBTaWUgc2llIGF1ZiDigJxmYWxzY2hlciBGZWhsZXLigJ06PGJyLz57Y2F0ZWdvcmllc30=">
+                <source>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”:<br/>{categories}</source>
+                <target>Please solve all errors of the following category OR set them to “false positive”:<br/>{categories}</target>
             </trans-unit>
             <trans-unit id="Qml0dGUgcHLDvGZlbiwgb2IgZXMgc2ljaCB1bSBlaW5lIGVjaHRlIFphaGwgdnMuIGVpbmUgUHJvZHVrdG51bW1lciBvLsOkLiBoYW5kZWx0LiBCZWkgdmVyd2VuZGV0ZW0gVHJlbm5lciBpbiBlaW5lciBlaW5lIFByb2R1a3RudW1tZXIgby7DpC4gaGFuZGVsdCBpbiBTUkMgYml0dGUgaWdub3JpZXJlbi4=">
                 <source>Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer eine Produktnummer o.ä. handelt in SRC bitte ignorieren.</source>
@@ -1556,6 +1576,10 @@
                 <source>Das Ergebnis des oben beschriebenen ist die Nachbearbeitungszeit für das Segment innerhalb eines Workflow-Schrittes.</source>
                 <target>The result of what is described above is the post-editing time for the segment within a workflow step.</target>
             </trans-unit>
+            <trans-unit id="RGFzIEZvcm1hdCBmw7xyIGRpZSBlZGl0aWVyYmFyZW4gU2VnbWVudGUgaXN0IG5pY2h0IHZhbGlkZS4gQnNwOiAxLTMsNSw4LTk=">
+                <source>Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9</source>
+                <target>The format of the segment range assigned to the user is not valid. Example: 1-3,5,8-9</target>
+            </trans-unit>
             <trans-unit id="RGFzIFBERiBrYW5uIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4h">
                 <source>Das PDF kann heruntergeladen werden!</source>
                 <target>The PDF is now available for download!</target>
@@ -1588,6 +1612,10 @@
                 <source>Das Segment kann nicht ohne Inhalt gespeichert werden!</source>
                 <target>A segment cannot be saved if it is empty!</target>
             </trans-unit>
+            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIHdhaHJzY2hlaW5saWNoIHd1cmRlIGVzIGluendpc2NoZW4gZ2Vsw7ZzY2h0IG9kZXIgYmVhcmJlaXRldC4gU2llIG3DvHNzZW4gSWhyZSBTdWNoZSBha3R1YWxpc2llcmVuLg==">
+                <source>Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.</source>
+                <target>Could not delete segment. <br />Please refresh your search and try again. <br />Found segment id differs from the requested one. <br />Probably the segment index changed on the server due to other operations.</target>
+            </trans-unit>
             <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4=">
                 <source>Das Segment konnte nicht gespeichert werden.</source>
                 <target>Unable to save segment.</target>
@@ -1595,6 +1623,10 @@
             <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgc2NobGllw59lbiBTaWUgZGFzIFNlZ21lbnQgZ2dmLiBkdXJjaCBLbGljayBhdWYgIkFiYnJlY2hlbiIgdW5kIMO2ZmZuZW4sIGJlYXJiZWl0ZW4gdW5kIHNwZWljaGVybiBTaWUgZXMgZXJuZXV0LiBWaWVsZW4gRGFuayEgPGJyLz48YnIvPkdlcmFkZSBiZWFyYmVpdGV0ZXIgVGV4dCB3YXI6PGJyLz48YnIvPg==">
                 <source>Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/></source>
                 <target>The segment could not be saved. Please close the segment (if necessary via “Cancel”), then open, edit and save the segment again. Thank you! <br/><br/>The text you just edited was:<br/><br/></target>
+            </trans-unit>
+            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGltIFRNIGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgdmVyc3VjaGVuIFNpZSBlcyBlcm5ldXQu">
+                <source>Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.</source>
+                <target>The segment could not be saved to the TM. <br />Please try again later.<br />If this message persists, please try to refresh your search. <br />If the message still persists, please notify the system support.</target>
             </trans-unit>
             <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGlucyBUTSBnZXNwZWljaGVydCB3ZXJkZW4=">
                 <source>Das Segment konnte nicht ins TM gespeichert werden</source>
@@ -1764,9 +1796,17 @@
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>The user has the right to use the language resources in InstantTranslate and TermPortal that are assigned to the same clients as those this user is assigned to.</target>
             </trans-unit>
+            <trans-unit id="RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IFBNIGluIGVpbmVyIG9kZXIgbWVocmVyZW4gQXVmZ2FiZW4u">
+                <source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source>
+                <target>The user cannot be deleted because they are used as PM in one or more tasks.</target>
+            </trans-unit>
             <trans-unit id="RGVyIERhdGVpbmFtZSBlbnRzcHJpY2h0IG5pY2h0IGRlciB6dSBha3R1YWxpc2llcmVuZGVuIERhdGVp">
                 <source>Der Dateiname entspricht nicht der zu aktualisierenden Datei</source>
                 <target>The filename does not match the file to be updated.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIERhdGVpdHlwICJ7ZXh0fSIgZGVyIGF1c2dld8OkaGx0ZW4gRGF0ZWkgIntmaWxlbmFtZX0iIHdpcmQgbmljaHQgdW50ZXJzdMO8dHp0Lg==">
+                <source>Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.</source>
+                <target>The file-type “{ext}” of the selected file “{filename}” is not supported.</target>
             </trans-unit>
             <trans-unit id="RGVyIERhdGVpdHlwIHdpcmQgZsO8ciBkaWUgQWt0dWFsaXNpZXJ1bmcgbmljaHQgdW50ZXJzdMO8dHp0Lg==">
                 <source>Der Dateityp wird für die Aktualisierung nicht unterstützt.</source>
@@ -1780,6 +1820,10 @@
                 <source>Der Export wird ausgeführt. Bitte warten ...</source>
                 <target>Export is running. Please wait...</target>
             </trans-unit>
+            <trans-unit id="RGVyIEluaGFsdCBmw7xyIGRpZSBlZGl0aWVyYmFyZW4gU2VnbWVudGUgaXN0IG5pY2h0IHZhbGlkZS4gRGllIFphaGxlbiBtw7xzc2VuIGluIGRlciByaWNodGlnZW4gUmVpaGVuZm9sZ2UgYW5nZWdlYmVuIHNlaW4gdW5kIGTDvHJmZW4gbmljaHQgw7xiZXJsYXBwZW4sIHdlZGVyIGlubmVyaGFsYiBkZXIgRWluZ2FiZSBub2NoIG1pdCBhbmRlcmVuIFVzZXJuIHZvbiBkZXJzZWxiZW4gUm9sbGUu">
+                <source>Der Inhalt für die editierbaren Segmente ist nicht valide. Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen, weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.</source>
+                <target>The content of the segment range assigned to the user is not valid. Make sure that the values are not reverse and do not overlap (neither in itself nor with other users of the same role).</target>
+            </trans-unit>
             <trans-unit id="RGVyIExldmVuc2h0ZWluLUFic3RhbmQgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93LVNjaHJpdHRlcyBmw7xyIGVpbiBTZWdtZW50IHdpcmQgendpc2NoZW4gZGVyIFZlcnNpb24gZGVzIFNlZ21lbnRzIHZvciBkZXIgQmVhcmJlaXR1bmcgaW5uZXJoYWxiIGVpbmVzIFdvcmtmbG93LVNjaHJpdHRlcyB1bmQgZGVyIGxldHp0ZW4gQmVhcmJlaXR1bmcgaW5uZXJoYWxiIGRlcyBXb3JrZmxvdy1TY2hyaXR0ZXMgYmVyZWNobmV0Lg==">
                 <source>Der Levenshtein-Abstand innerhalb eines Workflow-Schrittes für ein Segment wird zwischen der Version des Segments vor der Bearbeitung innerhalb eines Workflow-Schrittes und der letzten Bearbeitung innerhalb des Workflow-Schrittes berechnet.</source>
                 <target>The Levenshtein distance for a segment within a workflow step is calculated between the segment’s version before it was edited in that step and its last edit within the same step.</target>
@@ -1787,6 +1831,14 @@
             <trans-unit id="RGVyIExldmVuc2h0ZWluLUFic3RhbmQgdm9tIEJlZ2lubiBkZXMgV29ya2Zsb3dzIGbDvHIgZWluIFNlZ21lbnQgd2lyZCB6d2lzY2hlbiBkZXIgVmVyc2lvbiBkZXMgU2VnbWVudHMgenUgQmVnaW5uIGRlcyBXb3JrZmxvd3MgdW5kIHNlaW5lciBsZXR6dGVuIHZvcmhhbmRlbmVuIEJlYXJiZWl0dW5nIGJlcmVjaG5ldC4=">
                 <source>Der Levenshtein-Abstand vom Beginn des Workflows für ein Segment wird zwischen der Version des Segments zu Beginn des Workflows und seiner letzten vorhandenen Bearbeitung berechnet.</source>
                 <target>The Levenshtein distance from the start of the workflow for a segment is calculated between the version of the segment at the start of the workflow and its last existing edit.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIE51dHp1bmdzbW9kdXMgZGVyIEF1ZmdhYmUga2FubiB2ZXLDpG5kZXJ0IHdlcmRlbiwgd2VubiBrZWluIEJlbnV0emVyIGRlciBBdWZnYWJlIHp1Z2V3aWVzZW4gaXN0Lg==">
+                <source>Der Nutzungsmodus der Aufgabe kann verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
+                <target>The usage mode of the task can only be changed if no user is assigned to the task.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg==">
+                <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
+                <target>The parameter login containing the desired username is missing.</target>
             </trans-unit>
             <trans-unit id="RGVyIFJlaW1wb3J0IHd1cmRlIG1pdCBGZWhsZXJuIGFiZ2VzY2hsb3NzZW4uIFdlaXRlcmUgSW5mb3JtYXRpb25lbiBmaW5kZW4gU2llIGltIEVyZ2VibmlzcHJvdG9rb2xs">
                 <source>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</source>
@@ -1820,6 +1872,10 @@
                 <source>Der Suchstring ist zu groß</source>
                 <target>The search string is too big</target>
             </trans-unit>
+            <trans-unit id="RGVyIFRhc2sga2FubiBuaWNodCBhYmdlc2NobG9zc2VuIHdlcmRlbiwgZGEgbmljaHQgYWxsZSBTZWdtZW50ZSBlaW5lbiBTdGF0dXMgZ2VzZXR6dCBoYWJlbi4gQml0dGUgdmVyd2VuZGVuIFNpZSBkaWUgRmlsdGVyZnVua3Rpb24gdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGZpbmRlbi4=">
+                <source>Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.</source>
+                <target>The task can not be finished, because some segments do not have a status set. Please use the segment filter to get the affected segments.</target>
+            </trans-unit>
             <trans-unit id="RGVyIFp1Z3JpZmZzdG9rZW4gd2lyZCBudXIgZWlubWFsIGFuZ2V6ZWlndC4gU2llIHdlcmRlbiBuaWNodCBnZXNwZWljaGVydCB1bmQga8O2bm5lbiBuaWNodCBhYmdlcnVmZW4gd2VyZGVuLiBTdGVsbGVuIFNpZSBzaWNoZXIsIGRhc3MgU2llIGVzIGFuIGVpbmVtIHNpY2hlcmVuIE9ydCBhdWZiZXdhaHJlbi48YnIvPjxici8+PGI+ezB9PC9iPg==">
                 <source>Der Zugriffstoken wird nur einmal angezeigt. Sie werden nicht gespeichert und können nicht abgerufen werden. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren.<br/><br/><b>{0}</b></source>
                 <target>The access token will only be shown once. It will not be stored and cannot be retrieved. Make sure to save it somewhere safe.<br/><br/><b>{0}</b></target>
@@ -1828,9 +1884,25 @@
                 <source>Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.</source>
                 <target>The current task status does not allow that action.</target>
             </trans-unit>
+            <trans-unit id="RGVyIGFrdHVlbGxlIFN0YXR1cyBkZXIgQXVmZ2FiZSB2ZXJiaWV0ZXQgZGllc2UgQWt0aW9uIQ==">
+                <source>Der aktuelle Status der Aufgabe verbietet diese Aktion!</source>
+                <target>The current status of the task prohibits this action!</target>
+            </trans-unit>
             <trans-unit id="RGVyIGVyc3RlIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMsIGRlciBkZW4gSm9iIMO2ZmZuZXQgdW5kIGFremVwdGllcnQsIGVybGVkaWd0IGRlbiBKb2IuIEFsbGUgYW5kZXJlbiBCZW51dHplcnp1b3JkbnVuZ2VuIHdlcmRlbiBlbnRmZXJudCB1bmQgZGllIEJlbnV0emVyIGluZm9ybWllcnQu">
                 <source>Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.</source>
                 <target>The first user assigned to a workflow step who opens and accepts the job will do the job. All other users’ assignments are removed, and the users informed accordingly.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIHJlZmVyZW56aWVydGUgQmVudXR6ZXIgaXN0IGRlciBBdWZnYWJlIG5pY2h0IG1laHIgenVnZXdpZXNlbiBvZGVyIGV4aXN0aWVydCBuaWNodCBtZWhyLg==">
+                <source>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</source>
+                <target>The referenced user is not associated to the task or even does not exist anymore.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKQ==">
+                <source>Der referenzierte Kunde existiert nicht (mehr)</source>
+                <target>The referenced customer no longer exists.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKS4=">
+                <source>Der referenzierte Kunde existiert nicht (mehr).</source>
+                <target>The referenced customer does not exist (anymore).</target>
             </trans-unit>
             <trans-unit id="RGVyIHswfSB3dXJkZSBlcmZvbGdyZWljaCBnZWzDtnNjaHQu">
                 <source>Der {0} wurde erfolgreich gelöscht.</source>
@@ -1908,9 +1980,17 @@
                 <source>Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar für den zugewiesenen Benutzer.</source>
                 <target>The task %s has been auto-closed by translate5 and is no longer editable for the assigned user.</target>
             </trans-unit>
+            <trans-unit id="RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gU2V0emVuIFNpZSBkZW4gU3RhdHVzIGF1ZiBmaW5hbCB1bSB1bmQgYmVlbmRlbiBTaWUgZGFubiBkaWUgQXVmZ2FiZS4=">
+                <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Setzen Sie den Status auf final um und beenden Sie dann die Aufgabe.</source>
+                <target>The task still contains segments in draft status. Change the status to final and finish the task then.</target>
+            </trans-unit>
             <trans-unit id="RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gw5ZmZm5lbiBTaWUgZGllIEF1ZmdhYmUgdW5kIHNldHplbiBTaWUgZGVuIFN0YXR1cyB1bS4=">
                 <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.</source>
                 <target>The task still contains segments in draft status. Open the task and change the status.</target>
+            </trans-unit>
+            <trans-unit id="RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0LCB1bmQga2FubiBkYWhlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuLg==">
+                <source>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</source>
+                <target>The task is locked by a user and cannot be deleted therefore!!</target>
             </trans-unit>
             <trans-unit id="RGllIEF1ZmdhYmUgaXN0IHZvbGxzdMOkbmRpZyBiZWFyYmVpdGV0LCBlcyBzaW5kIGtlaW5lIHdlaXRlcmVuIEJlbnV0emVyIGRlciBBdWZnYWJlIHp1Z2VvcmRuZXQuPGJyIC8+CjxiciAvPgo=">
                 <source>Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
@@ -1920,9 +2000,21 @@
 <br />
 </target>
             </trans-unit>
+            <trans-unit id="RGllIEF1ZmdhYmUga2FubiBuaWNodCB2b24gZWluZW0gUE0gYmVlbmRldCB3ZXJkZW4sIHdlaWwgZWluIEJlbnV0emVyIGRpZSBBdWZnYWJlIHp1ciBCZWFyYmVpdHVuZyBnZcO2ZmZuZXQgaGF0Lg==">
+                <source>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</source>
+                <target>The task can not be set to ended because another user is still editing it.</target>
+            </trans-unit>
             <trans-unit id="RGllIEF1ZmdhYmUga29ubnRlIGF1ZmdydW5kIHZvbiBGZWhsZXJuIG5pY2h0IGltcG9ydGllcnQgd2VyZGVuIQ==">
                 <source>Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!</source>
                 <target>The task could not be imported due to errors!</target>
+            </trans-unit>
+            <trans-unit id="RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzc291cmNlIGthbm4gZGFoZXIgaW0gTW9tZW50IG5pY2h0IHZvbiBkZXIgQXVmZ2FiZSBlbnRmZXJudCB3ZXJkZW4h">
+                <source>Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!</source>
+                <target>The Task is in use, the language resource can not be removed from the task at the meoment!</target>
+            </trans-unit>
+            <trans-unit id="RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4=">
+                <source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source>
+                <target>The task is in use and therefore cannot be deleted.</target>
             </trans-unit>
             <trans-unit id="RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0">
                 <source>Die Aufgabe wurde erfolgreich aktualisiert</source>
@@ -1967,6 +2059,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="RGllIEV4Y2VsLURhdGVpIGtvbm50ZSByZWltcG9ydGllcnQgd2VyZGVuLCBkaWUgbmFjaGZvbGdlbmRlbiBTZWdtZW50ZSBiZWluaGFsdGVuIGFiZXIgRmVobGVyIHVuZCBtw7xzc2VuIGtvcnJpZ2llcnQgd2VyZGVuOg==">
                 <source>Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:</source>
                 <target>The Excel file could be reimported, but the following segments contain errors that need to be corrected:</target>
+            </trans-unit>
+            <trans-unit id="RGllIEtvb3JkaW5hdG9yZW5yb2xsZSBrYW5uIGRlbSBCZW51dHplciBuaWNodCBlbnR6b2dlbiB3ZXJkZW46IHtyZWFzb259">
+                <source>Die Koordinatorenrolle kann dem Benutzer nicht entzogen werden: {reason}</source>
+                <target>The coordinator role cannot be revoked from the user: {reason}</target>
             </trans-unit>
             <trans-unit id="RGllIE5hY2hiZWFyYmVpdHVuZ3N6ZWl0IGFiIGRlbSBTdGFydCBkZXMgV29ya2Zsb3dzIGlzdCBkaWUgWmVpdCwgZGllIGbDvHIgZGllIEJlYXJiZWl0dW5nIGVpbmVzIFNlZ21lbnRzIGbDvHIgYWxsZSBCZWFyYmVpdHVuZ2VuIGFiIGRlbSBTdGFydCBkZXMgV29ya2Zsb3dzIGJlbsO2dGlndCB3aXJkLg==">
                 <source>Die Nachbearbeitungszeit ab dem Start des Workflows ist die Zeit, die für die Bearbeitung eines Segments für alle Bearbeitungen ab dem Start des Workflows benötigt wird.</source>
@@ -2068,6 +2164,18 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Die Wiederholungen konnten nicht gespeichert werden</source>
                 <target>The repetitions could not be saved</target>
             </trans-unit>
+            <trans-unit id="RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRlciBCZW51dHplciBkaWVzZSBha3R1ZWxsIGJlbnV0enQu">
+                <source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</source>
+                <target>The assignment between a task and a user could not be removed because the user is currently using the task.</target>
+            </trans-unit>
+            <trans-unit id="RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu">
+                <source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source>
+                <target>The assignment between a task and a user could not be removed because the task is currently locked by the user.</target>
+            </trans-unit>
+            <trans-unit id="RGllIGFuZGVyZW4gQmVudXR6ZXIga8O2bm5lbiBuaWNodCBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQgd2VyZGVuLCBldmVudHVlbGwgd2FyIGVpbiBhbmRlcmVyIEJlbnV0emVyIHNjaG5lbGxlciB1bmQgaGF0IFNpZSBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQu">
+                <source>Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.</source>
+                <target>The other users cannot be removed from the task, another user may have been quicker and removed you from the task.</target>
+            </trans-unit>
             <trans-unit id="RGllIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0YXVmZ2FiZSBleGlzdGllcnQgbmljaHQ=">
                 <source>Die angeforderte Projektaufgabe existiert nicht</source>
                 <target>The requested project task does not exist</target>
@@ -2092,6 +2200,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
                 <target>The automated replacements could not be applied to all found segments. This can have various causes. Please use the “Search and replace” window without using the “Replace all” function in order to find and edit the segments individually.</target>
             </trans-unit>
+            <trans-unit id="RGllIGVudGZlcm50ZW4gS3VuZGVuIHdlcmRlbiBpbiBkZW4gZm9sZ2VuZGVuIEF1ZmdhYmVuIHZlcndlbmRldDo=">
+                <source>Die entfernten Kunden werden in den folgenden Aufgaben verwendet:</source>
+                <target>The removed client(s) are used in the folowing tasks:</target>
+            </trans-unit>
             <trans-unit id="RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIEF1c2dhbmd0ZXh0Ojxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u">
                 <source>Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.</source>
                 <target>The following tags do not exist in the source text:<br/><ul><li>{0}</li></ul>This is how to solve this error:<br/><ul><li>Click “OK” to close this window</li><li>Press ESC to leave the segment without saving</li><li>Reopen the segment</li></ul>Re-apply your changes.</target>
@@ -2099,6 +2211,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFppZWx0ZXh0ICh6dXIgSW1wb3J0emVpdC9Wb3LDvGJlcnNldHp1bmcpOjxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u">
                 <source>Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.</source>
                 <target>The following tags were not present in the target text (at import/pre-translation):<br/><ul><li>{0}</li></ul>This is how to solve this error:<br/><ul><li>Click “OK” to close this window</li><li>Press ESC to leave the segment without saving</li><li>Reopen the segment</li></ul>Re-apply your changes.</target>
+            </trans-unit>
+            <trans-unit id="RGllIGdlZnVuZGVuZSBTZWdtZW50LUlEIHdlaWNodCB2b24gZGVyIGdlc3VjaHRlbiBhYiwgd2FocnNjaGVpbmxpY2ggd3VyZGUgc2llIGluendpc2NoZW4gZ2Vsw7ZzY2h0IG9kZXIgYmVhcmJlaXRldC4gU2llIG3DvHNzZW4gSWhyZSBTdWNoZSBha3R1YWxpc2llcmVuLg==">
+                <source>Die gefundene Segment-ID weicht von der gesuchten ab, wahrscheinlich wurde sie inzwischen gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.</source>
+                <target>The segment could not be saved. <br />Please try to refresh your search. <br />The found segment-id on the server differs from the requested one. <br />Probably the segment index changed on the server due to other operations.</target>
             </trans-unit>
             <trans-unit id="RGllIGdld8OkaGx0ZSBTb3J0aWVydW5nIGRlciBTZWdtZW50ZSB3dXJkZSB6dXLDvGNrZ2VzZXR6dCE=">
                 <source>Die gewählte Sortierung der Segmente wurde zurückgesetzt!</source>
@@ -2108,6 +2224,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
                 <target>The desired action cannot be processed! The currently open segment must be saved/closed first.</target>
             </trans-unit>
+            <trans-unit id="RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc3NvdXJjZSBnaWJ0IGVzIG5pY2h0IQ==">
+                <source>Die gewünschte Sprachressource gibt es nicht!</source>
+                <target>The chosen language resource does not exist.</target>
+            </trans-unit>
             <trans-unit id="RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZHVwbGl6aWVydCwgZGFzIFNlZ21lbnQga2FubiBuaWNodCBnZXNwZWljaGVydCB3ZXJkZW4uIEzDtnNjaGVuIFNpZSBkaWUgZHVwbGl6aWVydGVuIFRhZ3MuIDxiciAvPkR1cGxpemllcnRlIFRhZ3M6ezB9">
                 <source>Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}</source>
                 <target>The following tags were duplicated during editing; the segment cannot be saved. Delete the duplicated tags. <br />Duplicated tags:{0}</target>
@@ -2116,9 +2236,17 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.</source>
                 <target>This data contains all requests to the language resources, be it from usage in tasks or with InstantTranslate.</target>
             </trans-unit>
+            <trans-unit id="RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu">
+                <source>Diese Domain wird bereits verwendet.</source>
+                <target>This domain is already in use.</target>
+            </trans-unit>
             <trans-unit id="RGllc2UgS2F0ZWdvcmllIHd1cmRlIG5pY2h0IG9kZXIgbnVyIHVudm9sbHN0w6RuZGlnIGdlcHLDvGZ0">
                 <source>Diese Kategorie wurde nicht oder nur unvollständig geprüft</source>
                 <target>This category was not or only partly analysed</target>
+            </trans-unit>
+            <trans-unit id="RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu">
+                <source>Diese Kundennummer wird bereits verwendet.</source>
+                <target>This client-number is already in use.</target>
             </trans-unit>
             <trans-unit id="RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu">
                 <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
@@ -2131,6 +2259,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="RGllc2UgU3ByYWNocmVzc291cmNlIHd1cmRlIGVudGZlcm50IChJRDogJXMp">
                 <source>Diese Sprachressource wurde entfernt (ID: %s)</source>
                 <target>This language resource was removed (ID: %s)</target>
+            </trans-unit>
+            <trans-unit id="RGllc2UgVXNlckd1aWQgd2lyZCBiZXJlaXRzIHZlcndlbmRldC4=">
+                <source>Diese UserGuid wird bereits verwendet.</source>
+                <target>This user GUID is already in use.</target>
             </trans-unit>
             <trans-unit id="RGllc2UgWmllbHNwcmFjaGUgd2lyZCB2b24gZGVyIFJlc3NvdXJjZSBuaWNodCB1bnRlcnN0w7x0enQh">
                 <source>Diese Zielsprache wird von der Ressource nicht unterstützt!</source>
@@ -2147,6 +2279,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ=">
                 <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>
                 <target>Spreaded such status for all occurrences within this task</target>
+            </trans-unit>
+            <trans-unit id="RGllc2VyIEFubWVsZGVuYW1lIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu">
+                <source>Dieser Anmeldename wird bereits verwendet.</source>
+                <target>This loginname is already in use!</target>
             </trans-unit>
             <trans-unit id="RGllc2VyIEF1ZnRyYWcgd2lyZCBhdXRvbWF0aXNjaCBiZWltIEVycmVpY2hlbiBkZXIgQXVmZ2FiZW5mcmlzdCBhbSAlcyBnZXNjaGxvc3Nlbi4=">
                 <source>Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.</source>
@@ -2183,6 +2319,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="RGllIHZvcmlnZSBBbmZyYWdlIGRhdWVydGUgbMOkbmdlciBhbHMge3RpbWVvdXR9IFNla3VuZGVuLjxiciAvPkRhaGVyIHdpcmQgZGllIG1hbnVlbGxlIEF1c2zDtnN1bmcgZGVyIMOcYmVyc2V0enVuZyBha3RpdmllcnQu">
                 <source>Die vorige Anfrage dauerte länger als {timeout} Sekunden.<br />Daher wird die manuelle Auslösung der Übersetzung aktiviert.</source>
                 <target>The previous request took longer than {timeout} seconds.<br />Therefore, manual translation triggering is activated.</target>
+            </trans-unit>
+            <trans-unit id="RGllIHp1IGzDtnNjaGVuZGUgU3ByYWNocmVzc291cmNlIHdpcmQgdm9uIGZvbGdlbmRlbiBBdWZnYWJlbiBiZW51dHp0Og==">
+                <source>Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:</source>
+                <target>The to be removed language resource is used in the following tasks:</target>
             </trans-unit>
             <trans-unit id="RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0uIERpZXMgZ2lsdCBhdWNoIGbDvHIgYW5kZXJlIGRlcnplaXQgZWluZ2Vsb2dndGUgQmVudXR6ZXIu">
                 <source>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</source>
@@ -2592,6 +2732,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Es gibt Probleme mit dem angefragten Dienst.</source>
                 <target>There are problems with the queried service.</target>
             </trans-unit>
+            <trans-unit id="RXMgZ2lidCBiZXJlaXRzIGVpbmUgYmVzdMOkdGlndGUga29ua3VycmllcmVuZGUgQXVmdHJhZ3N2ZXJnYWJl">
+                <source>Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe</source>
+                <target>Confirmed competitive job assignment already exsists</target>
+            </trans-unit>
             <trans-unit id="RXMgZ2lidCBpbiBkaWVzZXIgQXVmZ2FiZSBpbnRlcm5lIFRhZyBGZWhsZXIsIGRpZSBmw7xyIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgYXV0b21hdGlzY2gga29ycmlnaWVydCB3dXJkZW4=">
                 <source>Es gibt in dieser Aufgabe interne Tag Fehler, die für einen fehlerfreien Export automatisch korrigiert wurden</source>
                 <target>There are problems with internal tags in this task that have been automatically resolved for a proper export</target>
@@ -2932,6 +3076,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Färöisch (Färöer)</source>
                 <target>Faroese (Faroe Islands)</target>
             </trans-unit>
+            <trans-unit id="RsO8ciBCZW51dHplciwgZGllIG5pY2h0IGRpZSBSb2xsZSBkZXMgSm9ia29vcmRpbmF0b3JzIGhhYmVuLCB3aXJkIGRlciBTcHJhY2hkaWVuc3RsZWlzdGVyIGF1dG9tYXRpc2NoIGVpbmdlc3RlbGx0Lg==">
+                <source>Für Benutzer, die nicht die Rolle des Jobkoordinators haben, wird der Sprachdienstleister automatisch eingestellt.</source>
+                <target>Language Service Provider is set automaticaly for non Job Coordinator role users.</target>
+            </trans-unit>
             <trans-unit id="RsO8ciBTZWdtZW50ZSwgZGllIG5pY2h0IGlubmVyaGFsYiBlaW5lcyBXb3JrZmxvdy1TY2hyaXR0ZXMgYmVhcmJlaXRldCB3dXJkZW4sIHdpcmQgZGVyIExldmVuc2h0ZWluLUFic3RhbmQgZsO8ciBkaWVzZW4gU2Nocml0dCBhbHMgMCBnZXNwZWljaGVydCwgc29iYWxkIGRlciBsZXR6dGUgQmVudXR6ZXIgZWluZXMgV29ya2Zsb3ctU2Nocml0dGVzIHNlaW5lIEFyYmVpdCBiZWVuZGV0IGhhdC4=">
                 <source>Für Segmente, die nicht innerhalb eines Workflow-Schrittes bearbeitet wurden, wird der Levenshtein-Abstand für diesen Schritt als 0 gespeichert, sobald der letzte Benutzer eines Workflow-Schrittes seine Arbeit beendet hat.</source>
                 <target>For segments, that have not been edited within a workflow step, the Levenshtein distance is saved as 0 for this step, when the last user of a workflow step finishes his job.</target>
@@ -3216,6 +3364,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="SWhyZSBTaXR6dW5nc2RhdGVuIHNpbmQgYWJnZWxhdWZlbi4gU2llIHdlcmRlbiBudW4genVyIEFubWVsZGVzZWl0ZSB3ZWl0ZXJnZWxlaXRldC4=">
                 <source>Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.</source>
                 <target>Your session has expired. You will be redirected to the login page.</target>
+            </trans-unit>
+            <trans-unit id="SWhyZSBadXdlaXN1bmcgenVyIEF1ZmdhYmUgd3VyZGUgZW50ZmVybnQsIGRhaGVyIGvDtm5uZW4gU2llIGRpZXNlIG5pY2h0IG1laHIgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4u">
+                <source>Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.</source>
+                <target>Your job was removed, therefore you are not allowed to access that task anymore.</target>
             </trans-unit>
             <trans-unit id="SW0gQnJvd3NlciBhdXMgTVQgw7xiZXJub21tZW4=">
                 <source>Im Browser aus MT übernommen</source>
@@ -3854,6 +4006,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Kunde hinzufügen</source>
                 <target>Add client</target>
             </trans-unit>
+            <trans-unit id="S3VuZGUgaXN0IG5pY2h0IG1pdCBkZXIgQmVudXR6ZXJncnVwcGUgS29vcmRpbmF0b3IgdmVyYnVuZGVu">
+                <source>Kunde ist nicht mit der Benutzergruppe Koordinator verbunden</source>
+                <target>The customer is not associated with the Coordinator user group</target>
+            </trans-unit>
             <trans-unit id="S3VuZGVu">
                 <source>Kunden</source>
                 <target>Clients</target>
@@ -3865,6 +4021,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg==">
                 <source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source>
                 <target>Copy client settings to current client</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGUgbmljaHQgYW5nZWdlYmVu">
+                <source>Kunde nicht angegeben</source>
+                <target>Customer not provided</target>
             </trans-unit>
             <trans-unit id="S3VuZGVubGlzdGUgdm9tIFNlcnZlciBha3R1YWxpc2llcmVu">
                 <source>Kundenliste vom Server aktualisieren</source>
@@ -4129,6 +4289,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="TWFkYWdhc3Npc2No">
                 <source>Madagassisch</source>
                 <target>Malagasy</target>
+            </trans-unit>
+            <trans-unit id="TWFpbnRlbmFuY2UgaXMgc2NoZWR1bGVkLCBleHBvcnRzIGFyZSBub3QgcG9zc2libGUgYXQgdGhlIG1vbWVudA==">
+                <source>Maintenance is scheduled, exports are not possible at the moment</source>
+                <target>Maintenance is scheduled, exports are not possible at the moment</target>
             </trans-unit>
             <trans-unit id="TWFqb3I=">
                 <source>Major</source>
@@ -4526,6 +4690,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Norwegisch (Nynorsk) (Norwegen)</source>
                 <target>Norwegian (Nynorsk) (Norway)</target>
             </trans-unit>
+            <trans-unit id="Tm8gd29yayBmaWxlcyBmb3VuZCBmb3Igb25lIG9mIHRoZSB0YXJnZXQgbGFuZ3VhZ2VzLiBUaGlzIGhhcHBlbnMgd2hlbiB0aGUgdXNlciBzZWxlY3RzIG11bHRpcGxlIHRhcmdldCBsYW5ndWFnZXMgaW4gdGhlIGRyb3Bkb3duIGFuZCB0aGVuIGltcG9ydHMgYSBiaWxpbmd1YWwgZmlsZSB2aWEgZHJhZyBhbmQgZHJvcC4=">
+                <source>No work files found for one of the target languages. This happens when the user selects multiple target languages in the dropdown and then imports a bilingual file via drag and drop.</source>
+                <target>No work files found for one of the target languages. This happens when the user selects multiple target languages in the dropdown and then imports a bilingual file via drag and drop.</target>
+            </trans-unit>
             <trans-unit id="TnIu">
                 <source>Nr.</source>
                 <target>No.</target>
@@ -4553,6 +4721,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="TnVyIEZlaGxlcg==">
                 <source>Nur Fehler</source>
                 <target>Errors only</target>
+            </trans-unit>
+            <trans-unit id="TnVyIEtvb3JkaW5hdG9yIGthbm4gZGVtIEF1ZnRyYWcgZGVyIEdydXBwZSBLb29yZGluYXRvciB6dWdld2llc2VuIHdlcmRlbg==">
+                <source>Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden</source>
+                <target>Only Coordinator can be assigned to Coordinator group job</target>
             </trans-unit>
             <trans-unit id="TnVyIFF1ZWxsZQ==">
                 <source>Nur Quelle</source>
@@ -4641,6 +4813,14 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="T2thcGktQmF0Y2gtS29uZmlndXJhdGlvbnNkYXRlaSAoYmNvbmYpIGhvY2hsYWRlbg==">
                 <source>Okapi-Batch-Konfigurationsdatei (bconf) hochladen</source>
                 <target>Upload Okapi batch configuration file (BCONF)</target>
+            </trans-unit>
+            <trans-unit id="T2xkIHBhc3N3b3JkIGRvZXMgbm90IG1hdGNo">
+                <source>Old password does not match</source>
+                <target>Old password does not match</target>
+            </trans-unit>
+            <trans-unit id="T2xkIHBhc3N3b3JkIGlzIHJlcXVpcmVk">
+                <source>Old password is required</source>
+                <target>Old password is required</target>
             </trans-unit>
             <trans-unit id="T21pc3Npb24=">
                 <source>Omission</source>
@@ -4854,6 +5034,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Projekte</source>
                 <target>Projects</target>
             </trans-unit>
+            <trans-unit id="UHJvamVrdGUga8O2bm5lbiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbi4=">
+                <source>Projekte können nicht bearbeitet werden.</source>
+                <target>Projects cannot be edited.</target>
+            </trans-unit>
             <trans-unit id="UHJvamVrdCBlcnN0ZWxsZW4=">
                 <source>Projekt erstellen</source>
                 <target>Create project</target>
@@ -4929,6 +5113,14 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="UVMgU3RhdGlzdGlr">
                 <source>QS Statistik</source>
                 <target>QA statistics</target>
+            </trans-unit>
+            <trans-unit id="UXVhbGl0eSBlc3RpbWF0aW9u">
+                <source>Quality estimation</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="UXVhbGl0eSBlc3RpbWF0aW9uIHJlYXNvbmluZw==">
+                <source>Quality estimation reasoning</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="UXVhbGl0w6R0">
                 <source>Qualität</source>
@@ -5042,9 +5234,17 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Regelbeschreibung</source>
                 <target>Rule description</target>
             </trans-unit>
+            <trans-unit id="UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz">
+                <source>Regel mit dieser Priorität existiert bereits</source>
+                <target>Rule with this priority already exists</target>
+            </trans-unit>
             <trans-unit id="UmVnZWxuYW1l">
                 <source>Regelname</source>
                 <target>Rule name</target>
+            </trans-unit>
+            <trans-unit id="UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ==">
+                <source>Regelname existiert bereits für Typ {type}</source>
+                <target>Provided Rule name already exists for type {type}</target>
             </trans-unit>
             <trans-unit id="UmVnZXggZsO8ciBkaWUgVUktVmFsaWRpZXJ1bmc=">
                 <source>Regex für die UI-Validierung</source>
@@ -5378,6 +5578,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Sekunden</source>
                 <target>seconds</target>
             </trans-unit>
+            <trans-unit id="U2VuZA==">
+                <source>Send</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="U2VxdWVudGllbGxlcyBBcmJlaXRlbg==">
                 <source>Sequentielles Arbeiten</source>
                 <target>Sequential work</target>
@@ -5426,6 +5630,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Serbisch (Latein Serbien und Montenegro)</source>
                 <target>Serbian (Latin Serbia and Montenegro)</target>
             </trans-unit>
+            <trans-unit id="U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4=">
+                <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
+                <target>Server for the queried service is not reachable.</target>
+            </trans-unit>
             <trans-unit id="U2Vzb3Robw==">
                 <source>Sesotho</source>
                 <target>Sotho</target>
@@ -5450,6 +5658,26 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Sichtbarkeit nicht editierbarer Zieltextspalten</source>
                 <target>Visibility of the non-editable target columns</target>
             </trans-unit>
+            <trans-unit id="U2llIGhhYmVuIHZlcnN1Y2h0IGRpZSBBdWZnYWJlIHp1ciBCZWFyYmVpdHVuZyB6dSDDtmZmbmVuLiBEYXMgaXN0IGluIGRlciBad2lzY2hlbnplaXQgbmljaHQgbWVociBtw7ZnbGljaC4=">
+                <source>Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.</source>
+                <target>You have attempted to open the task for editing. This is no longer possible.</target>
+            </trans-unit>
+            <trans-unit id="U2llIGvDtm5uZW4gZGVuIEpvYiB6dXIgWmVpdCBuaWNodCBiZWFyYmVpdGVuLCBkZXIgQmVudXR6ZXIgaGF0IGRpZSBBdWZnYWJlIGJlcmVpdHMgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldC4=">
+                <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
+                <target>The job can not be modified, since the user has already opened the task for editing.</target>
+            </trans-unit>
+            <trans-unit id="U2llIGvDtm5uZW4gZGVuIEt1bmRlbiAie2lkfSIgaGllciBuaWNodCBhbmdlYmVu">
+                <source>Sie können den Kunden "{id}" hier nicht angeben</source>
+                <target>You can't provide customer “id” here</target>
+            </trans-unit>
+            <trans-unit id="U2llIGvDtm5uZW4gZGllIFJvbGxlIHtyb2xlfSBuaWNodCBtaXQgZWluZXIgZGVyIGZvbGdlbmRlbiBSb2xsZW4gZmVzdGxlZ2VuOiB7cm9sZXN9">
+                <source>Sie können die Rolle {role} nicht mit einer der folgenden Rollen festlegen: {roles}</source>
+                <target>You can not set role {role} with one of the following roles: {roles}</target>
+            </trans-unit>
+            <trans-unit id="U2llIGvDtm5uZW4gZsO8ciBkaWVzZW4gQmVudXR6ZXIga2VpbmUge3JvbGV9IGZlc3RsZWdlbi4=">
+                <source>Sie können für diesen Benutzer keine {role} festlegen.</source>
+                <target>You cannot set {role} for this user.</target>
+            </trans-unit>
             <trans-unit id="U2llIHNpbmQgbmljaHQgYmVyZWNodGlndCwgZGllc2UgU3ByYWNocmVzc291cmNlIHp1IGVudGZlcm5lbi4=">
                 <source>Sie sind nicht berechtigt, diese Sprachressource zu entfernen.</source>
                 <target>You are not allowed to remove this language resource.</target>
@@ -5457,6 +5685,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="U2llIHNpbmQgbmljaHQgYmVyZWNodGlndCwgZGllc2VuIEJlbnV0emVyIHp1IGVudGZlcm5lbi4=">
                 <source>Sie sind nicht berechtigt, diesen Benutzer zu entfernen.</source>
                 <target>You are not allowed to remove this user.</target>
+            </trans-unit>
+            <trans-unit id="U2llIHZlcndlbmRlbiBkaWVzZSBSZWdlbCBiZXJlaXRzIGbDvHIgZGllc2UgU3ByYWNoZQ==">
+                <source>Sie verwenden diese Regel bereits für diese Sprache</source>
+                <target>You already use this rule for this language</target>
             </trans-unit>
             <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgVG9rZW4gbMO2c2NoZW4gbcO2Y2h0ZW4/">
                 <source>Sind Sie sicher, dass Sie das Token löschen möchten?</source>
@@ -5706,6 +5938,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
                 <target>Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)</target>
             </trans-unit>
+            <trans-unit id="U3BlaWNoZXJzdGF0dXM6IHtzdGF0dXN9LiBCaXR0ZSB2ZXJzdWNoZW4gU2llIGVzIGluIEvDvHJ6ZSBlcm5ldXQu">
+                <source>Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.</source>
+                <target>Memory status: {status}. Please try again in a while.</target>
+            </trans-unit>
             <trans-unit id="U3BlaWNoZXJ0IGFsbGUgU2VnbWVudGUgYWxsZXIgQXVmZ2FiZW4sIGRpZSBvYmVuIGFuZ2VoYWt0IHNpbmQgdW5kIGRlbSBUTSBtaXQgU2NocmVpYnJlY2h0ZW4genVnZXdpZXNlbiBzaW5k">
                 <source>Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
                 <target>Saves all segments of all tasks, that are checked above and are assigned to the TM with write permissions</target>
@@ -5734,6 +5970,10 @@ The users have been informed accordingly via e-mail.<br />
                 <source>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</source>
                 <target>Re-import the previously downloaded Excel file back into the task.</target>
             </trans-unit>
+            <trans-unit id="U3ByYWNoZGllbnN0bGVpc3RlciBpc3QgZWluIFBmbGljaHRmZWxkIGbDvHIgZGllIFJvbGxlIGRlcyBKb2Jrb29yZGluYXRvcnMu">
+                <source>Sprachdienstleister ist ein Pflichtfeld für die Rolle des Jobkoordinators.</source>
+                <target>Language Service Provider is a mandatory field for the Job Coordinator role.</target>
+            </trans-unit>
             <trans-unit id="U3ByYWNoZQ==">
                 <source>Sprache</source>
                 <target>Language</target>
@@ -5753,6 +5993,10 @@ The users have been informed accordingly via e-mail.<br />
             <trans-unit id="U3ByYWNocmVzc291cmNlIGJlYXJiZWl0ZW4=">
                 <source>Sprachressource bearbeiten</source>
                 <target>edit language resource</target>
+            </trans-unit>
+            <trans-unit id="U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg==">
+                <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
+                <target>Language resource of selected resource type can not be created in UI.</target>
             </trans-unit>
             <trans-unit id="U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/">
                 <source>Sprachressource endgültig löschen?</source>
@@ -6029,6 +6273,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>TMX Datei importieren</source>
                 <target>Import TMX file</target>
             </trans-unit>
+            <trans-unit id="VFFFIGRlZmF1bHQgYXNzaWdubWVudA==">
+                <source>TQE default assignment</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="VGFiIGFtIEFuZmFuZw==">
                 <source>Tab am Anfang</source>
                 <target>Tab at the beginning</target>
@@ -6100,6 +6348,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             <trans-unit id="VGFzay1HdWlk">
                 <source>Task-Guid</source>
                 <target>Task GUID</target>
+            </trans-unit>
+            <trans-unit id="VGFzayBleHBvcnQ6IHRoZSB0YXNrIGFscmVhZHkgY29udGFpbnMgcnVubmluZyBvciBwZW5kaW5nIGV4cG9ydHMuIFRyeSBhZ2FpbiBsYXRlcg==">
+                <source>Task export: the task already contains running or pending exports. Try again later</source>
+                <target>Task export: the task already contains running or pending exports. Please try again later</target>
             </trans-unit>
             <trans-unit id="VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg==">
                 <source>Tastaturkürzel nachschlagen</source>
@@ -6221,9 +6473,13 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>Thai (Thailand)</source>
                 <target>Thai (Thailand)</target>
             </trans-unit>
-            <trans-unit id="VGhlIGZpbGUgaXMgbm90IHVwbG9hZGVk">
-                <source>The file is not uploaded</source>
-                <target>The file is not uploaded</target>
+            <trans-unit id="VGhlIGZpbGUgd2FzIG5vdCB1cGxvYWRlZA==">
+                <source>The file was not uploaded</source>
+                <target>The file was not uploaded</target>
+            </trans-unit>
+            <trans-unit id="VGhlIGZpbGUg4oCce2ZpbGV94oCdIGhhcyBhbiBpbnZhbGlkIHR5cGU=">
+                <source>The file “{file}” has an invalid type</source>
+                <target>The file “{file}” has an invalid type</target>
             </trans-unit>
             <trans-unit id="VGhlIGlzc3VlIGVpdGhlciBoYXMgbm90IGJlZW4gY2F0ZWdvcml6ZWQgb3IgY2Fubm90IGJlIGNhdGVnb3JpemVkLg==">
                 <source>The issue either has not been categorized or cannot be categorized.</source>
@@ -6240,6 +6496,18 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             <trans-unit id="VGhlcmUgaXMgYW4gaXNzdWUgcmVsYXRlZCB0byB0aGUgaW50ZXJuYXRpb25hbGl6YXRpb24gb2YgY29udGVudC4=">
                 <source>There is an issue related to the internationalization of content.</source>
                 <target>There is an issue related to the internationalization of content.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlbGVjdGVkIGN1c3RvbWVycyBhcmUgYWxyZWFkeSBhc3NpZ25lZCBhcyBUUUUgSW5zdGFudC1UcmFuc2xhdGUgZGVmYXVsdCBmb3Igb3RoZXIgbGFuZ3VhZ2UgcmVzb3VyY2VzIHdpdGggdGhlIHNhbWUgbGFuZ3VhZ2UgY29tYmluYXRpb25zLg==">
+                <source>The selected customers are already assigned as TQE Instant-Translate default for other language resources with the same language combinations.</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlbGVjdGVkIGN1c3RvbWVycyBhcmUgYWxyZWFkeSBhc3NpZ25lZCBhcyBUUUUgZGVmYXVsdCBmb3Igb3RoZXIgbGFuZ3VhZ2UgcmVzb3VyY2VzIHdpdGggdGhlIHNhbWUgbGFuZ3VhZ2UgY29tYmluYXRpb25zLg==">
+                <source>The selected customers are already assigned as TQE default for other language resources with the same language combinations.</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRhc2tHdWlkIGZpZWxkIGlzIGVtcHR5">
+                <source>The taskGuid field is empty</source>
+                <target>The “taskGuid” field is empty</target>
             </trans-unit>
             <trans-unit id="VGhlIHRleHQgY29udGFpbnMgYSBncmFtbWF0aWNhbCBlcnJvciAoaW5jbHVkaW5nIGVycm9ycyBvZiBzeW50YXggYW5kIG1vcnBob2xvZ3kpLg==">
                 <source>The text contains a grammatical error (including errors of syntax and morphology).</source>
@@ -6505,6 +6773,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>Ungültiger Regulärer Ausdruck</source>
                 <target>Invalid regular expression</target>
             </trans-unit>
+            <trans-unit id="VW5nw7xsdGlnZXIgV2VydCBiZXJlaXRnZXN0ZWxsdA==">
+                <source>Ungültiger Wert bereitgestellt</source>
+                <target>Invalid value provided</target>
+            </trans-unit>
             <trans-unit id="VW5pbnRlbGxpZ2libGU=">
                 <source>Unintelligible</source>
                 <target>Unintelligible</target>
@@ -6612,6 +6884,14 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             <trans-unit id="VmVyc2NoaWViYmFyZXIgRWRpdG9yIHVuZCBoaWxmcmVpY2hlIFRhc3RhdHVya8O8cnplbA==">
                 <source>Verschiebbarer Editor und hilfreiche Tastaturkürzel</source>
                 <target>Moveable editor and useful keyboard short-cuts</target>
+            </trans-unit>
+            <trans-unit id="VmVyc3VjaCwgZWluZW4gbmljaHQgZXJyZWljaGJhcmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbi4=">
+                <source>Versuch, einen nicht erreichbaren Benutzer zu manipulieren.</source>
+                <target>Attempt to manipulate not accessible user.</target>
+            </trans-unit>
+            <trans-unit id="VmVyc3VjaHQsIGVpbmVuIEJlbnV0emVyIHp1IG1hbmlwdWxpZXJlbiwgZGVyIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuIGthbm4u">
+                <source>Versucht, einen Benutzer zu manipulieren, der nicht bearbeitet werden kann.</source>
+                <target>Attempts to manipulate a user who cannot be edited.</target>
             </trans-unit>
             <trans-unit id="VmVyd2FsdGVuIHZvbiBWZXJiaW5kdW5nZW4=">
                 <source>Verwalten von Verbindungen</source>
@@ -6809,6 +7089,10 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>Wenn Sie auf "Nein" klicken möchten, schließen Sie bitte dieses Popup und fügen Sie einen Kommentar hinzu, warum</source>
                 <target>If you want to click on “No”, close this pop-up and add a comment explaining why</target>
             </trans-unit>
+            <trans-unit id="V2VubiBTaWUgZGllc2UgS3VuZGVuIGVudGZlcm5lbiwgd2lyZCBkaWUgWnVvcmRudW5nIGRpZXNlciBTcHJhY2hyZXNzb3VyY2UgenUgZGVuIEF1ZmdhYmVuIGRpZXNlciBLdW5kZW4gYXVmZ2Vob2Jlbi4gTcO2Y2h0ZW4gU2llIGRpZSBadXdlaXN1bmdlbiBhdWZoZWJlbj8gTnVyIGRhbm4ga8O2bm5lbiBTaWUgZGllIEt1bmRlbiBhdXMgZGllc2VyIFNwcmFjaHJlc3NvdXJjZSBoaWVyIGluIGRlciBTcHJhY2hyZXNzb3VyY2VudmVyd2FsdHVuZyBlbnRmZXJuZW4u">
+                <source>Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.</source>
+                <target>Removing those clients will unassign this language resource from the tasks of those clients. Do you want to unassign it? Only then you can remove the client from this language resource here in the language resource management.</target>
+            </trans-unit>
             <trans-unit id="V2VubiBha3RpdmllcnQgd2VyZGVuIHp1dm9yIGdlc3BlcnJ0ZSBTZWdtZW50ZSBpbiBkaWUgQW5hbHlzZSB1bmQgV29ydGFuemFobCBlaW5iZXpvZ2VuLg==">
                 <source>Wenn aktiviert werden zuvor gesperrte Segmente in die Analyse und Wortanzahl einbezogen.</source>
                 <target>If enabled, locked segments are included in the analysis and word count.</target>
@@ -6957,6 +7241,14 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             <trans-unit id="V29ydGFydA==">
                 <source>Wortart</source>
                 <target>Part of speech</target>
+            </trans-unit>
+            <trans-unit id="V291bGQgeW91IGxpa2UgdG8gcmVtb3ZlIHRoZSBUUUUgSW5zdGFudC1UcmFuc2xhdGUgYXNzaWdubWVudHMgZnJvbSB0aGUgb3RoZXIgcmVzb3VyY2VzIGFuZCBhc3NpZ24gdGhlbSB0byB0aGlzIHJlc291cmNlPw==">
+                <source>Would you like to remove the TQE Instant-Translate assignments from the other resources and assign them to this resource?</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="V291bGQgeW91IGxpa2UgdG8gcmVtb3ZlIHRoZSBUUUUgYXNzaWdubWVudHMgZnJvbSB0aGUgb3RoZXIgcmVzb3VyY2VzIGFuZCBhc3NpZ24gdGhlbSB0byB0aGlzIHJlc291cmNlPw==">
+                <source>Would you like to remove the TQE assignments from the other resources and assign them to this resource?</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="V8OkaGxlbiBTaWUgUHJvamVrdGUgdW5kIGRpZSBkYXp1Z2Vow7ZyaWdlbiBBdWZnYWJlbiBhdXMsIGluZGVtIFNpZSBhdWYgZGFzIEtvbnRyb2xsa8Okc3RjaGVuIGtsaWNrZW4gKFNpZSBrw7ZubmVuIGF1Y2ggZWluemVsbmUgQXVmZ2FiZW4gYXVzd8OkaGxlbiBiencuIGRpZSBBdXN3YWhsIGF1ZmhlYmVuLCB6LiBCLiBiZWkgUHJvamVrdGVuIG1pdCBtZWhyZXJlbiBBdWZnYWJlbikgb2RlciB3ZW5kZW4gU2llIEZpbHRlciBhdWYgSWhyZSBQcm9qZWt0bGlzdGUgYW4uIFfDpGhsZW4gU2llIGRhbm4gZGllIEVpZ2Vuc2NoYWZ0LCBkaWUgU2llIMOkbmRlcm4gbcO2Y2h0ZW4sIHVuZCBmw7xnZW4gU2llIGRlbiBuZXVlbiBXZXJ0IGhpbnp1">
                 <source>Wählen Sie Projekte und die dazugehörigen Aufgaben aus, indem Sie auf das Kontrollkästchen klicken (Sie können auch einzelne Aufgaben auswählen bzw. die Auswahl aufheben, z. B. bei Projekten mit mehreren Aufgaben) oder wenden Sie Filter auf Ihre Projektliste an. Wählen Sie dann die Eigenschaft, die Sie ändern möchten, und fügen Sie den neuen Wert hinzu</source>
@@ -7362,6 +7654,14 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
                 <source>bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/></source>
                 <target>please remember to complete your assignment for the project below. The deadline is approaching.<br/><br/>Please log in here with your personal access data for processing:<br/><br/>{portalLink}<br/><br/>Double-click on the task to enter edit mode.You can also interrupt the processing of your task at any time and resume it at a later time.<br/><br/>You can also interrupt the processing of your task at any time and resume it at a later time.<br/></target>
             </trans-unit>
+            <trans-unit id="Y2Fubm90LWRlbGV0ZS11c2VyLmNvb3JkaW5hdG9yLWhhcy1hc3NpZ25lZC1ncm91cC1qb2Jz">
+                <source>cannot-delete-user.coordinator-has-assigned-group-jobs</source>
+                <target>The user can not be deleted, he is Job Coordinator of some Coordinator group jobs.</target>
+            </trans-unit>
+            <trans-unit id="Y2Fubm90LWRlbGV0ZS11c2VyLmxhc3QtY29vcmRpbmF0b3I=">
+                <source>cannot-delete-user.last-coordinator</source>
+                <target>The user can not be deleted, he is last Job Coordinator of Coordinator group “group”.</target>
+            </trans-unit>
             <trans-unit id="Y2xpZW50cG0=">
                 <source>clientpm</source>
                 <target>PM (selected clients)</target>
@@ -7405,6 +7705,22 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM den Lesezugriff 
             <trans-unit id="Y29uZmlnX292ZXJ3cml0ZV91c2Vy">
                 <source>config_overwrite_user</source>
                 <target>User</target>
+            </trans-unit>
+            <trans-unit id="Y29vcmRpbmF0b3ItZG9udC1iZWxvbmctdG8tY29vcmRpbmF0b3ItZ3JvdXA=">
+                <source>coordinator-dont-belong-to-coordinator-group</source>
+                <target>Coordinator does not belong to Coordinator group</target>
+            </trans-unit>
+            <trans-unit id="Y29vcmRpbmF0b3ItZ3JvdXAtbm90LWZvdW5k">
+                <source>coordinator-group-not-found</source>
+                <target>The referenced Coordinator group does not exist (anymore).</target>
+            </trans-unit>
+            <trans-unit id="Y29vcmRpbmF0b3ItaGFzLW5vdC15ZXQtY29uZmlybWVkLXRoZS1jb29yZGluYXRvci1ncm91cC1qb2I=">
+                <source>coordinator-has-not-yet-confirmed-the-coordinator-group-job</source>
+                <target>Coordinator has not yet confirmed the Coordinator group job</target>
+            </trans-unit>
+            <trans-unit id="Y29vcmRpbmF0b3Itb2YtcGFyZW50LWdyb3VwLWhhcy1ub3QteWV0LWNvbmZpcm1lZC10aGUtY29vcmRpbmF0b3ItZ3JvdXAtam9i">
+                <source>coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job</source>
+                <target>The Coordinator of the higher-level Coordinator group has not yet confirmed the Coordinator group job</target>
             </trans-unit>
             <trans-unit id="Y29vcmRpbmF0b3JHcm91cC5jb25maXJtRGVsZXRlVGV4dA==">
                 <source>coordinatorGroup.confirmDeleteText</source>
@@ -7586,6 +7902,34 @@ Synchronization always takes place in one direction: source data -&gt; target
                 <source>instantTranslateWriteTm</source>
                 <target>InstantTranslate write to TM</target>
             </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuY3JlYXRlLmNvb3JkaW5hdG9yLWdyb3VwLWpvYi1hbHJlYWR5LWV4aXN0cw==">
+                <source>job-assignment.create.coordinator-group-job-already-exists</source>
+                <target>Job for current Coordinator group and workflow step already exists.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuY3JlYXRlLmdyb3VwLXVzZXItam9iLWNhbi1ub3QtYmUtY3JlYXRlZC1iZWZvcmUtY29vcmRpbmF0b3ItZ3JvdXAtam9i">
+                <source>job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job</source>
+                <target>Coordinator group user cannot be assigned to a job before the Coordinator group job has been created</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuY3JlYXRlLm9ubHktY29vcmRpbmF0b3ItY2FuLWJlLWFzc2lnbmVkLXRvLWNvb3JkaW5hdG9yLWdyb3VwLWpvYg==">
+                <source>job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job</source>
+                <target>Only Coordinator can be assigned to Coordinator group job</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuY3JlYXRlLnBhcmVudC1jb29yZGluYXRvci1ncm91cC1kb2VzLW5vdC1oYXZlLWFwcHJvcHJpYXRlLWpvYg==">
+                <source>job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job</source>
+                <target>Parent Coordinator group does not have appropriate job assignment</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQuZGVsZXRlLnRoZXJlLWlzLXVuLWRlbGV0YWJsZS1ib3VuZC1qb2I=">
+                <source>job-assignment.delete.there-is-un-deletable-bound-job</source>
+                <target>Coordinator group job has related jobs that cannot be deleted.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQudHJhY2stY2hhbmdlcy1yaWdodHMtYXJlLW5vdC1zdWJzZXQtb2YtY29vcmRpbmF0b3ItZ3JvdXAtam9i">
+                <source>job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job</source>
+                <target>The permissions of the Coordinator group user job should be a subset of the permissions of the Coordinator group job.</target>
+            </trans-unit>
+            <trans-unit id="am9iLWFzc2lnbm1lbnQudXBkYXRlLmFzc2lnbmVkLXVzZXItY2FuLWJlLWNoYW5nZWQtb25seS1mb3ItY29vcmRpbmF0b3ItZ3JvdXAtam9i">
+                <source>job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job</source>
+                <target>Assigned user can be changed only for Coordinator group job</target>
+            </trans-unit>
             <trans-unit id="am9iQ29vcmRpbmF0b3I=">
                 <source>jobCoordinator</source>
                 <target>Job Coordinator</target>
@@ -7630,6 +7974,10 @@ Synchronization always takes place in one direction: source data -&gt; target
                 <source>min</source>
                 <target>min</target>
             </trans-unit>
+            <trans-unit id="bWlzc2luZyBmaWVsZCBmaWxlSWQ=">
+                <source>missing field fileId</source>
+                <target>Missing field “fileId”</target>
+            </trans-unit>
             <trans-unit id="bWl0IEVpbnN0ZWxsdW5nZW4gZsO8cjo=">
                 <source>mit Einstellungen für:</source>
                 <target>with preferences for: </target>
@@ -7661,6 +8009,10 @@ Synchronization always takes place in one direction: source data -&gt; target
             <trans-unit id="bm9SaWdodHM=">
                 <source>noRights</source>
                 <target>noRights</target>
+            </trans-unit>
+            <trans-unit id="bm90LWNvb3JkaW5hdG9yLWdyb3VwLWN1c3RvbWVyLXRhc2s=">
+                <source>not-coordinator-group-customer-task</source>
+                <target>The task does not belong to one of the Coordinator group customers</target>
             </trans-unit>
             <trans-unit id="bm90aWNl">
                 <source>notice</source>
@@ -7809,6 +8161,22 @@ Synchronization always takes place in one direction: source data -&gt; target
             <trans-unit id="dW5iZXN0w6R0aWd0">
                 <source>unbestätigt</source>
                 <target>unconfirmed</target>
+            </trans-unit>
+            <trans-unit id="dXNlci5jdXN0b21lci51bi1hc3NpZ24ubm90LXBvc3NpYmxlLWFzLWNvb3JkaW5hdG9yLWhhcy1yZWxhdGVkLWNvb3JkaW5hdG9yLWdyb3VwLWpvYnM=">
+                <source>user.customer.un-assign.not-possible-as-coordinator-has-related-coordinator-group-jobs</source>
+                <target>The customer “customer” cannot be removed from the Coordinator because it has some Coordinator group jobs that belong to the customer.</target>
+            </trans-unit>
+            <trans-unit id="dXNlci5jdXN0b21lci51bi1hc3NpZ24ubm90LXBvc3NpYmxlLWFzLWl0LWhhcy1yZWxhdGVkLWpvYnM=">
+                <source>user.customer.un-assign.not-possible-as-it-has-related-jobs</source>
+                <target>The customer “customer” cannot be removed from the User because it has some jobs that belong to the customer.</target>
+            </trans-unit>
+            <trans-unit id="dXNlci5kZWxldGUuY29vcmRpbmF0b3ItaGFzLWFzc2lnbmVkLWRlZmF1bHQtZ3JvdXAtam9icw==">
+                <source>user.delete.coordinator-has-assigned-default-group-jobs</source>
+                <target>The user is the Job Coordinator for some default Coordinator group jobs.</target>
+            </trans-unit>
+            <trans-unit id="dXNlci51cGRhdGUucm9sZXMudW5hYmxlLXRvLWFzc2lnbi1qb2ItY29vcmRpbmF0b3Itcm9sZS10by1leGlzdGluZy11c2Vy">
+                <source>user.update.roles.unable-to-assign-job-coordinator-role-to-existing-user</source>
+                <target>Role "Job Coordinator" can be set only on User creation process or to Coordinator group User.</target>
             </trans-unit>
             <trans-unit id="dXNlckpvYi5kZWxldGUuY29uZmlybURlbGV0ZUNvb3JkaW5hdG9yR3JvdXBKb2I=">
                 <source>userJob.delete.confirmDeleteCoordinatorGroupJob</source>

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Localization;
 
 /**
  * Wrapper for ZfExtended_SessionController
@@ -89,7 +90,7 @@ class editor_SessionController extends ZfExtended_SessionController
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1342',
                 [
-                    'login' => 'Der Parameter login mit dem gewünschten Benutzernamen fehlt.',
+                    'login' => Localization::trans('Der Parameter login mit dem gewünschten Benutzernamen fehlt.'),
                 ]
             );
         }

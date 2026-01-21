@@ -41,20 +41,22 @@ use ZfExtended_Models_Entity_NotFoundException as NotFoundException;
 use ZfExtended_NoAccessException;
 
 /**
- * @method string getId()
+ * @method int getId()
  * @method void setId(int $id)
  * @method string getName()
  * @method void setName(string $name)
  * @method string getUnitType()
  * @method void setUnitType(string $unitType)
- * @method string getIsDefault()
+ * @method int getIsDefault()
  * @method void setIsDefault(int $int)
+ * @method int getIsTqeDefault()
+ * @method void setIsTqeDefault(int $int)
  * @method string getDescription()
  * @method string getPriceAdjustment()
  * @method void setPriceAdjustment(float $priceAdjustment)
  * @method void setDescription(string $string)
- * @method string getCustomerId()
- * @method void setCustomerId(mixed $customerId)
+ * @method int|string|null getCustomerId()
+ * @method void setCustomerId(int|string|null $customerId)
  */
 class Preset extends ZfExtended_Models_Entity_Abstract
 {
@@ -112,15 +114,15 @@ class Preset extends ZfExtended_Models_Entity_Abstract
             $sysPreset->save();
 
             // Return it's id
-            return $sysPreset->getId();
+            return (int) $sysPreset->getId();
         }
 
         // Return existing default's id
-        return $sysPresetRow->id;
+        return (int) $sysPresetRow->id;
     }
 
     /**
-     * @param null $customerId
+     * @param int|string|null $customerId
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -130,13 +132,14 @@ class Preset extends ZfExtended_Models_Entity_Abstract
     {
         // If customerId arg is given, try to load customer-specific default pricing preset
         if ($customerId) {
+            $customerId = (int) $customerId;
             // Get customer meta model
             $customerMeta = new editor_Models_Customer_Meta();
 
             try {
                 $customerMeta->loadByCustomerId($customerId);
                 if (! empty($customerMeta->getDefaultPricingPresetId())) {
-                    return $customerMeta->getDefaultPricingPresetId();
+                    return (int) $customerMeta->getDefaultPricingPresetId();
                 }
             } catch (NotFoundException $e) {
             }
@@ -146,7 +149,7 @@ class Preset extends ZfExtended_Models_Entity_Abstract
         try {
             $this->loadRow('isDefault = 1 AND ISNULL(`customerId`)');
 
-            return $this->getId();
+            return (int) $this->getId();
         } catch (NotFoundException $e) {
         }
 
@@ -154,12 +157,91 @@ class Preset extends ZfExtended_Models_Entity_Abstract
         try {
             $this->loadRow('name = ? ', self::PRESET_SYSDEFAULT_NAME);
 
-            return $this->getId();
+            return (int) $this->getId();
         } catch (NotFoundException $e) {
         }
 
         // If not found, generate it and return it's id
         return $this->importDefaultWhenNeeded();
+    }
+
+    /**
+     * Get default TQE pricing preset id for a given customer
+     *
+     * @param int|string|null $customerId
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws NotFoundException
+     */
+    public function getTqeDefaultPresetId($customerId = null): int
+    {
+        // If customerId arg is given, try to load customer-specific default TQE pricing preset
+        if ($customerId) {
+            $customerId = (int) $customerId;
+            // Get customer meta model
+            $customerMeta = new editor_Models_Customer_Meta();
+
+            try {
+                $customerMeta->loadByCustomerId($customerId);
+                if (! empty($customerMeta->getDefaultTqePricingPresetId())) {
+                    return (int) $customerMeta->getDefaultTqePricingPresetId();
+                }
+            } catch (NotFoundException $e) {
+            }
+        }
+
+        // Try to load system default TQE pricing preset by isTqeDefault-flag
+        try {
+            $this->loadRow('isTqeDefault = 1 AND ISNULL(`customerId`)');
+
+            return (int) $this->getId();
+        } catch (NotFoundException $e) {
+        }
+
+        // Fallback to the regular default pricing preset logic
+        return $this->getDefaultPresetId($customerId);
+    }
+
+    /**
+     * Make current preset to be the system default TQE preset.
+     * Will reset any other non-customer TQE default preset
+     * Returns the ID of the former TQE default (if any)
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function setAsTqeDefaultPreset(): int
+    {
+        // If it's a customer-level preset - throw an exception
+        if ($this->getCustomerId() !== null) {
+            throw new ZfExtended_Exception('Only presets not bound to a customer can be set as TQE default preset');
+        }
+
+        // Value to be returned if no any other preset is a TQE default preset
+        $wasDefaultId = 0;
+
+        // Get current system TQE default, if any
+        $wasDefaultRow = $this->db->fetchRow($this->db->select()->where('customerId IS NULL AND isTqeDefault = 1'));
+
+        // If found
+        if ($wasDefaultRow != null) {
+            // Spoof value to be returned with found's id
+            $wasDefaultId = $wasDefaultRow->id;
+
+            // Clear isTqeDefault-flag and save
+            $wasDefaultRow->isTqeDefault = 0;
+            $wasDefaultRow->save();
+        }
+
+        // Set isTqeDefault-flag and save
+        $this->setIsTqeDefault(1);
+        $this->save();
+
+        // Return prev TQE default
+        return (int) $wasDefaultId;
     }
 
     /**
@@ -169,12 +251,13 @@ class Preset extends ZfExtended_Models_Entity_Abstract
      */
     public function getCustomerName(): ?string
     {
-        if (empty($this->getCustomerId())) {
+        $customerId = $this->getCustomerId();
+        if (empty($customerId)) {
             return null;
         }
-        if ($this->customer == null || $this->customer->getId() != $this->getCustomerId()) {
+        if ($this->customer == null || $this->customer->getId() != $customerId) {
             $this->customer = Factory::get(Customer::class);
-            $this->customer->load($this->getCustomerId());
+            $this->customer->load((int) $customerId);
         }
 
         return $this->customer->getName();
@@ -206,7 +289,7 @@ class Preset extends ZfExtended_Models_Entity_Abstract
         // If found
         if ($wasDefaultRow != null) {
             // Spoof value to be returned with found's id
-            $wasDefaultId = $wasDefaultRow->id;
+            $wasDefaultId = (int) $wasDefaultRow->id;
 
             // Clear isDefault-flag and save
             $wasDefaultRow->isDefault = 0;
@@ -218,7 +301,7 @@ class Preset extends ZfExtended_Models_Entity_Abstract
         $this->save();
 
         // Return prev default
-        return $wasDefaultId;
+        return (int) $wasDefaultId;
     }
 
     /**
@@ -269,20 +352,20 @@ class Preset extends ZfExtended_Models_Entity_Abstract
             $clone->setCustomerId($customerId);
         }
         $clone->setDescription($this->getDescription());
-        $clone->setPriceAdjustment($this->getPriceAdjustment());
+        $clone->setPriceAdjustment((float) $this->getPriceAdjustment());
         $clone->setUnitType($this->getUnitType());
         $clone->save();
 
         // Clone ranges from current preset to cloned one
         $rangeClone = Factory
             ::get(PresetRange::class)
-                ->cloneByPresetId($this->getId(), $clone->getId());
+                ->cloneByPresetId((int) $this->getId(), (int) $clone->getId());
 
         /** @var PresetPrices $range */
         $prices = Factory::get(PresetPrices::class);
 
         // Get prices set up for this preset
-        $pricesA = $prices->getByPresetId($this->getId());
+        $pricesA = $prices->getByPresetId((int) $this->getId());
 
         // Foreach
         foreach ($pricesA as $pricesI) {
@@ -297,7 +380,7 @@ class Preset extends ZfExtended_Models_Entity_Abstract
 
             // Init prices's clone
             $prices->init([
-                'presetId' => $clone->getId(),
+                'presetId' => (int) $clone->getId(),
                 'sourceLanguageId' => $pricesI['sourceLanguageId'],
                 'targetLanguageId' => $pricesI['targetLanguageId'],
                 'currency' => $pricesI['currency'],
@@ -320,14 +403,14 @@ class Preset extends ZfExtended_Models_Entity_Abstract
      */
     public function getRangeColumns(): array
     {
-        return Factory::get(PresetRange::class)->getByPresetId($this->getId(), false);
+        return Factory::get(PresetRange::class)->getByPresetId((int) $this->getId(), false);
     }
 
     /**
      * Create new preset which may belong to $customerId, if given,
      * and which have same set of ranges as system default preset has
      *
-     * @param null $customerId
+     * @param int|string|null $customerId
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -347,6 +430,6 @@ class Preset extends ZfExtended_Models_Entity_Abstract
         $defaultId = $this->importDefaultWhenNeeded();
 
         // Clone ranges from system default preset to newly created (e.g. current) one
-        Factory::get(PresetRange::class)->cloneByPresetId($defaultId, $this->getId());
+        Factory::get(PresetRange::class)->cloneByPresetId($defaultId, (int) $this->getId());
     }
 }

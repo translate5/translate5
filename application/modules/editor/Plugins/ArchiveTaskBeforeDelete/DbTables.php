@@ -149,6 +149,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_coordinator_group_user' => false,
         'LEK_default_coordinator_group_job' => false,
         'LEK_instant_translate_tm' => false,
+        'LEK_translate5ai_qualityestimate_analysis' => false,
+        'LEK_translate5ai_qualityestimate_analysis_results' => false,
+        'LEK_translate5ai_qualityestimate_taskassoc' => false,
     ];
 
     /**

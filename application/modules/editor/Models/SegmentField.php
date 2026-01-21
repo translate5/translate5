@@ -27,17 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
- * $translate->_('Spalte A');
- * $translate->_('Spalte B');
- * $translate->_('Spalte C');
- * $translate->_('Spalte D');
- * $translate->_('Spalte E');
- * $translate->_('Spalte F');
- */
-
-/**
  * Entity Model for segment fields
  * @method string getId()
  * @method void setId(int $id)
@@ -56,6 +45,12 @@ END LICENSE AND COPYRIGHT
  * @method string getEditable()
  * @method void setEditable(bool $editable)
  */
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spalte A')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spalte B')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spalte C')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spalte D')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spalte E')]
+#[MittagQI\ZfExtended\Localization\LocalizableString('Spalte F')]
 class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract
 {
     //consts also defined in GUI Model Editor.model.segment.Field
@@ -65,7 +60,7 @@ class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract
 
     public const TYPE_RELAIS = 'relais';
 
-    protected $dbInstanceClass = 'editor_Models_Db_SegmentField';
+    protected $dbInstanceClass = editor_Models_Db_SegmentField::class;
 
     /**
      * loads all segment fields for the given taskGuid as rowset

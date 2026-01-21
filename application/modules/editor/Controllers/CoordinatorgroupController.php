@@ -38,6 +38,7 @@ use MittagQI\Translate5\CoordinatorGroup\Operations\WithAuthentication\Coordinat
 use MittagQI\Translate5\Repository\CoordinatorGroupRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\User\Exception\InexistentUserException;
+use MittagQI\ZfExtended\Localization;
 
 class editor_CoordinatorgroupController extends ZfExtended_RestController
 {
@@ -97,7 +98,7 @@ class editor_CoordinatorgroupController extends ZfExtended_RestController
                 'E2000',
                 [
                     'name' => [
-                        'Name (Angabe notwendig)',
+                        Localization::trans('Name (Angabe notwendig)'),
                     ],
                 ],
                 [

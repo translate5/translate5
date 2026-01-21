@@ -30,12 +30,15 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Import;
 
 use editor_Models_Task;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Task\Import\Defaults\ITaskDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\JobAssignmentDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\Import\Defaults\PivotResourceDefaults;
+use MittagQI\Translate5\Task\Import\Defaults\TaskDefaultRegisteredEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class TaskDefaults
 {
@@ -44,8 +47,9 @@ class TaskDefaults
      */
     private array $defaults;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
         $languageResourceRepository = new LanguageResourceRepository();
         $associateOperation = AssociateTaskOperation::create();
         $this->defaults = [
@@ -53,6 +57,13 @@ class TaskDefaults
             new PivotResourceDefaults($languageResourceRepository, $associateOperation),
             JobAssignmentDefaults::create(),
         ];
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            EventDispatcher::create(),
+        );
     }
 
     /**
@@ -65,5 +76,7 @@ class TaskDefaults
                 $default->applyDefaults($task, $importWizardUsed);
             }
         }
+
+        $this->eventDispatcher->dispatch(new TaskDefaultRegisteredEvent($task, $importWizardUsed));
     }
 }

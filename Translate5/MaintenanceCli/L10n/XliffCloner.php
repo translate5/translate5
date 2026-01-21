@@ -41,6 +41,7 @@ class XliffCloner extends AbstractXliffProcessor
 
     public function clone(array $translations, bool $doWriteFile = false): void
     {
+        $this->numUntranslated = 0;
         $untranslated = [];
         $strings = $this->loadStringsToClone();
         sort($strings, SORT_NATURAL);
@@ -48,11 +49,16 @@ class XliffCloner extends AbstractXliffProcessor
         foreach ($strings as $string) {
             if (array_key_exists($string, $translations)) {
                 $this->addTransUnit($string, $translations[$string]);
+                if (empty($translations[$string])) {
+                    $this->numUntranslated++;
+                }
             } elseif ($this->prefillUntranslated || $this->markUntranslated) {
                 // when marking, we add an own section for untranslated strings
                 $untranslated[] = $string;
+                $this->numUntranslated++;
             } else {
                 $this->addTransUnit($string, '');
+                $this->numUntranslated++;
             }
         }
 
