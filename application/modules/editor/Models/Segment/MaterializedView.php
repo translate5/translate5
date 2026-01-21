@@ -31,17 +31,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Segment_MaterializedView
 {
-    public const VIEW_PREFIX = 'LEK_segment_view_';
+    public const string VIEW_PREFIX = 'LEK_segment_view_';
 
-    /**
-     * @var string
-     */
-    protected $taskGuid;
+    protected ?string $taskGuid = null;
 
-    /**
-     * @var string
-     */
-    protected $viewName;
+    protected string $viewName;
 
     public function __construct($taskGuid = null)
     {
@@ -52,9 +46,8 @@ class editor_Models_Segment_MaterializedView
 
     /**
      * sets the taskguid to be used internally
-     * @param string $taskGuid
      */
-    public function setTaskGuid($taskGuid)
+    public function setTaskGuid(string $taskGuid): void
     {
         $this->taskGuid = $taskGuid;
         $this->viewName = $this->makeViewName($taskGuid);
@@ -62,18 +55,16 @@ class editor_Models_Segment_MaterializedView
 
     /**
      * generates the view name out of the taskGuid
-     * @param string $taskGuid
      */
-    protected function makeViewName($taskGuid)
+    protected function makeViewName(string $taskGuid): string
     {
         return self::VIEW_PREFIX . md5($taskGuid);
     }
 
     /**
      * returns the name of the data view
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         $this->checkTaskGuid();
 
@@ -83,19 +74,24 @@ class editor_Models_Segment_MaterializedView
     /**
      * creates a temporary table used as materialized view
      */
-    public function create()
+    public function create(): void
     {
         $this->checkTaskGuid();
         //$start = microtime(true);
+
         if ($this->createMutexed()) {
-            $this->getTask()?->logger('editor.task.mv')->info('E1348', 'The tasks materialized view {matView} was created.', [
-                'matView' => $this->viewName,
-            ]);
-            $this->addFields();
+            $this->getTask()?->logger('editor.task.mv')->info(
+                'E1348',
+                'The tasks materialized view {matView} was created.',
+                [
+                    'matView' => $this->viewName,
+                ]
+            );
             $this->fillWithData();
 
             return;
         }
+
         //the following check call is to avoid using a not completly filled MV in a second request accessing this task
         $this->checkMvFillState();
     }
@@ -136,41 +132,59 @@ class editor_Models_Segment_MaterializedView
      */
     protected function createMutexed(): bool
     {
-        // temporary feature switch
         $config = Zend_Registry::get('config');
         $engineInnoDB = (bool) $config->resources->db?->matViewEngineInnoDB;
+        $engine = $engineInnoDB ? 'InnoDB' : 'MyISAM';
 
-        $createSql = 'CREATE TABLE `' . $this->viewName . '` LIKE `LEK_segments`;';
-
-        if (! $engineInnoDB) {
-            $createSql .= 'ALTER TABLE `' . $this->viewName . '` ENGINE=MyISAM;';
-        }
-        $createSql .= 'ALTER TABLE `' . $this->viewName . '` ADD KEY (`segmentNrInTask`);';
         $db = Zend_Db_Table::getDefaultAdapter();
+
+        // Get the original table structure
+        $createTableSql = $db->fetchRow("SHOW CREATE TABLE `LEK_segments`");
+        $createSql = $createTableSql['Create Table'] . ";\n";
+
+        // Replace table name
+        $createSql = preg_replace(
+            '/CREATE TABLE `LEK_segments`/',
+            "CREATE TABLE `{$this->viewName}`",
+            $createSql
+        );
+
+        // Change engine
+        $createSql = preg_replace(
+            '/ENGINE=\w+/',
+            "ENGINE={$engine}",
+            $createSql
+        );
+
+        // Add new fields before the closing parenthesis
+        $additionalFields = $this->addFields();
+        $createSql = preg_replace(
+            '/PRIMARY KEY/',
+            $additionalFields . ",\n PRIMARY KEY",
+            $createSql
+        );
+
+        $createSql .= 'ALTER TABLE `' . $this->viewName . '` ADD KEY (`segmentNrInTask`);';
 
         try {
             $db->query($createSql);
 
             return true;
         } catch (Zend_Db_Statement_Exception $e) {
-            $m = $e->getMessage();
-            //the second string check must be case insensitive for windows usage
-            if (strpos($m, 'SQLSTATE') !== 0 || stripos($m, 'Base table or view already exists: 1050 Table \'' . $this->viewName . '\' already exists') === false) {
-                throw $e;
+            if (stripos($e->getMessage(), 'already exists') !== false) {
+                return false;
             }
 
-            return false;
+            throw $e;
         }
     }
 
     /**
      * Adds the fluent field names to the materialized view
      */
-    protected function addFields()
+    protected function addFields(): string
     {
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $data = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
-        /* @var $data editor_Models_Db_SegmentData */
+        $data = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         $md = $data->info($data::METADATA);
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
@@ -180,18 +194,22 @@ class editor_Models_Segment_MaterializedView
         $addColTpl = [];
         foreach ($baseCols as $v) {
             if (empty($md[$v])) {
-                throw new Zend_Exception('Missing Column ' . $v . ' in LEK_segment_data on creating the materialized view!');
+                throw new Zend_Exception(
+                    'Missing Column ' . $v . ' in LEK_segment_data on creating the materialized view!'
+                );
             }
-            $sql = 'ADD COLUMN `%s%s` ' . strtoupper($md[$v]['DATA_TYPE']);
+
+            $sql = "`%s%s` " . strtoupper($md[$v]['DATA_TYPE']);
+
             if (! empty($md[$v]['LENGTH'])) {
-                $sql .= '(' . $md[$v]['LENGTH'] . ')';
+                $sql .= "({$md[$v]['LENGTH']})";
             }
+
             if (empty($md[$v]['NULLABLE'])) {
                 $sql .= ' NOT NULL';
             }
 
-            //searching in our text fields should be searched binary, see TRANSLATE-646
-            if ($v == 'original' || $v == 'edited') {
+            if ($v === 'original' || $v === 'edited') {
                 $sql .= ' COLLATE utf8mb4_bin';
             }
 
@@ -203,19 +221,18 @@ class editor_Models_Segment_MaterializedView
             return sprintf($addColTpl[$realCol], $name, $suffix);
         };
 
-        $addColSql = $sfm->walkFields($walker);
-        $addColSql[] = 'ADD COLUMN `segmentDescriptor` varchar(1024) NULL';
-        $addColSql[] = 'ADD COLUMN `metaCache` longtext NOT NULL';
+        $fields = $sfm->walkFields($walker);
+        $fields[] = "`segmentDescriptor` varchar(1024) NULL";
+        $fields[] = "`metaCache` longtext NOT NULL";
 
-        $sql = 'ALTER TABLE `' . $this->viewName . '` ' . join(', ', $addColSql) . ';';
-        $db->query($sql);
+        return implode(", \n", $fields);
     }
 
     /**
      * checks if the MV is already filled up, if not, wait a maximum of 28 seconds.
      * @throws Zend_Exception
      */
-    protected function checkMvFillState()
+    protected function checkMvFillState(): void
     {
         $fillQuery = 'select mv.cnt mvCnt, tab.cnt tabCnt from (select count(*) cnt from LEK_segments where taskGuid = ?) tab, ';
         $fillQuery .= '(select count(*) cnt from ' . $this->viewName . ' where taskGuid = ?) mv;';
@@ -231,13 +248,15 @@ class editor_Models_Segment_MaterializedView
         }
 
         //here throw exception
-        throw new Zend_Exception('TimeOut on waiting for the following materialized view to be filled (Task ' . $this->taskGuid . '): ' . $this->viewName);
+        throw new Zend_Exception(
+            'TimeOut on waiting for the following materialized view to be filled (Task ' . $this->taskGuid . '): ' . $this->viewName
+        );
     }
 
     /**
      * prefills the materialized view
      */
-    protected function fillWithData()
+    protected function fillWithData(): void
     {
         $this->metaCacheCreateTempTable();
         $selectSql = ['INSERT INTO ' . $this->viewName . ' SELECT s.*'];
@@ -263,7 +282,7 @@ class editor_Models_Segment_MaterializedView
     /**
      * Updates the Materialized View Data Object with the saved data.
      */
-    public function updateSegment(editor_Models_Segment $segment)
+    public function updateSegment(editor_Models_Segment $segment): void
     {
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments', [[], $this->viewName]);
         /* @var $db editor_Models_Db_Segments */
@@ -280,7 +299,7 @@ class editor_Models_Segment_MaterializedView
     /**
      * Updates the view metaCache for the given segment and its siblings in the same transunit
      */
-    public function updateSiblingMetaCache(editor_Models_Segment $segment)
+    public function updateSiblingMetaCache(editor_Models_Segment $segment): void
     {
         $groupId = $segment->meta()->getTransunitHash();
         //using two selects to force the optimizer to run first the very inner SELECT and after that make a join with the outer view.
@@ -299,9 +318,8 @@ class editor_Models_Segment_MaterializedView
     /**
      * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given
      * groupId/transunitHash (including fileId)
-     * @return string
      */
-    protected function buildMetaCacheSql($segmentId = null)
+    protected function buildMetaCacheSql($segmentId = null): string
     {
         //integer cast is also save, no need for binding
         $segmentId = (int) $segmentId;
@@ -316,7 +334,9 @@ class editor_Models_Segment_MaterializedView
             $selectSql .= ' LEFT JOIN `siblings` ON `siblings`.`transunitHash` = m.`transunitHash`';
             $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
         } else {
-            $selectSql .= ' LEFT JOIN ' . $this->metaCacheInnerSql($segmentId) . ' siblings ON siblings.transunitHash = m.transunitHash';
+            $selectSql .= ' LEFT JOIN ' . $this->metaCacheInnerSql(
+                $segmentId
+            ) . ' siblings ON siblings.transunitHash = m.transunitHash';
             $selectSql .= ' WHERE s.taskGuid = ? and m.transunitHash = ? and d.segmentId = s.id';
         }
         $selectSql .= ' GROUP BY d.segmentId';
@@ -324,7 +344,7 @@ class editor_Models_Segment_MaterializedView
         return $selectSql;
     }
 
-    protected function metaCacheCreateTempTable()
+    protected function metaCacheCreateTempTable(): void
     {
         $db = Zend_Db_Table::getDefaultAdapter();
         $sql = 'DROP TEMPORARY TABLE IF EXISTS `siblings`;';
@@ -356,9 +376,8 @@ class editor_Models_Segment_MaterializedView
 
     /**
      * returns the metaCache of a specific segment
-     * @return null|string
      */
-    public function getMetaCache(editor_Models_Segment $segment)
+    public function getMetaCache(editor_Models_Segment $segment): ?string
     {
         $db = Zend_Db_Table::getDefaultAdapter();
         $s = $db->select()
@@ -376,7 +395,7 @@ class editor_Models_Segment_MaterializedView
      * returns boolean if the materialized view exists in the DB or not
      * @return boolean
      */
-    public function exists()
+    public function exists(): bool
     {
         $db = Zend_Db_Table::getDefaultAdapter();
 
@@ -393,11 +412,15 @@ class editor_Models_Segment_MaterializedView
      * drops the segment data view to the given taskguid
      * @throws Zend_Exception
      */
-    public function drop()
+    public function drop(): void
     {
-        $this->getTask()?->logger('editor.task.mv')->info('E1349', 'The tasks materialized view {matView} was dropped.', [
-            'matView' => $this->viewName,
-        ]);
+        $this->getTask()?->logger('editor.task.mv')->info(
+            'E1349',
+            'The tasks materialized view {matView} was dropped.',
+            [
+                'matView' => $this->viewName,
+            ]
+        );
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query("DROP TABLE IF EXISTS " . $this->viewName);
     }
