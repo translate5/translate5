@@ -19,6 +19,26 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.34.0] - 2026-01-21
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4834](https://jira.translate5.net/browse/TRANSLATE-4834): translate5 AI - Translation Quality Estimation (TQE): base implementation** <br>
+Translation Quality Estimation (TQE) is now possible with translate5 AI.
+
+
+### Changed
+**[TRANSLATE-5207](https://jira.translate5.net/browse/TRANSLATE-5207): Task Management - Make creating materialized view atomic to prevent race conditions** <br>
+[:gear:  Improvement] Improved task materialized view creation to prevent possible race condition
+
+**[TRANSLATE-5196](https://jira.translate5.net/browse/TRANSLATE-5196): localization - Localization Workflow tools** <br>
+7.34.0: First set of internal CLI tools for internal application translation management released
+
+
 ## [7.33.3] - 2026-01-20
 
 ### Important Notes:
