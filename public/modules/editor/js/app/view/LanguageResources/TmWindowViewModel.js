@@ -97,7 +97,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
             return get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
         },
         isTqeResource: function (get) {
-            return ['Llama','OpenAI','Azure'].includes(get('serviceName'));
+            return ['Llama','OpenAI','Azure','AzureOpenAI'].includes(get('serviceName'));
         },
         isStrippingFramingTagsSupported: function (get) {
             return get('strippingFramingTagsSupported');

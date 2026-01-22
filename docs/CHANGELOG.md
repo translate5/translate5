@@ -20,6 +20,27 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.34.1] - 2026-01-22
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4834](https://jira.translate5.net/browse/TRANSLATE-4834): translate5 AI - Translation Quality Estimation (TQE): base implementation** <br>
+7.34.1: Fix for installations without AI plug-in
+7.34.0: Translation Quality Estimation (TQE) is now possible with translate5 AI.
+
+
+### Bugfixes
+**[TRANSLATE-5182](https://jira.translate5.net/browse/TRANSLATE-5182): LanguageResources - Track changes stripped when sendWhitespaceAsTag is evaluated** <br>
+Fix problem where track changes where stripped when runtimeOptions.LanguageResources.{resource}.sendWhitespaceAsTag is enabled
+
+**[TRANSLATE-4554](https://jira.translate5.net/browse/TRANSLATE-4554): LanguageResources - Foreign task TMs shown for first language only in project wizard** <br>
+Show foreign Task TMs in wizard for all languages of project
+
+
 ## [7.34.0] - 2026-01-21
 
 ### Important Notes:

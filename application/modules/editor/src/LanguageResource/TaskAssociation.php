@@ -125,6 +125,9 @@ class TaskAssociation extends AssociationAbstract
 
             return array_filter(array_values($result));
         }
+
+        $filterClone = is_object($this->filter) ? clone $this->filter : $this->filter;
+
         //this ensures that taskGuid does not contain evil content from userland
         $taskGuid = $task->getTaskGuid();
 
@@ -224,7 +227,11 @@ class TaskAssociation extends AssociationAbstract
 
         $s->group('languageResource.id');
 
-        return $this->loadFilterdCustom($s);
+        $result = $this->loadFilterdCustom($s);
+
+        $this->filter = $filterClone;
+
+        return $result;
     }
 
     /***
