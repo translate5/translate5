@@ -59,19 +59,40 @@ class XliffTagRepairer
      */
     private array $strategies = [];
 
+    public static function create(): self
+    {
+        return new self(
+            // register default strategies in order
+            [
+                new TagTypeRepair(),
+                new RidAttributeRepair(),
+                new RemoveExtraTags(),
+                new AddMissingTags(),
+            ],
+            // default it to regex
+            new RegexTagParser()
+        );
+    }
+
+    public static function createWithRepairers(array $repairers): self
+    {
+        return new self(
+            $repairers,
+            // default it to regex
+            new RegexTagParser()
+        );
+    }
+
     /**
      * Constructor
      */
-    public function __construct(?TagParserInterface $parser = null)
+    public function __construct(array $repairers, TagParserInterface $parser)
     {
-        // default it to regex
-        $this->parser = $parser ?? new RegexTagParser();
+        $this->parser = $parser;
 
-        // register default strategies in order
-        $this->add(new TagTypeRepair());
-        $this->add(new RidAttributeRepair());
-        $this->add(new RemoveExtraTags());
-        $this->add(new AddMissingTags());
+        foreach ($repairers as $repairer) {
+            $this->add($repairer);
+        }
     }
 
     public function add(RepairInterface $strategy): self

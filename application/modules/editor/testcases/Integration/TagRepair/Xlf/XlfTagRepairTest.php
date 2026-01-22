@@ -63,7 +63,7 @@ class XlfTagRepairTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->xliffTagRepairer = new XliffTagRepairer();
+        $this->xliffTagRepairer = XliffTagRepairer::create();
     }
 
     /**

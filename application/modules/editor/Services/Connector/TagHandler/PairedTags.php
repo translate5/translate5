@@ -117,7 +117,7 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
                 $convertedString = $this->convertActualWhitespaceToXliff($convertedString);
             }
 
-            $repairer = new XliffTagRepairer();
+            $repairer = XliffTagRepairer::create();
 
             $repairedText = $repairer->repairTranslation($this->getQuerySegment(), $convertedString);
 
