@@ -482,7 +482,6 @@ export default class EditorWrapper {
                 }
             }
 
-
             writer.setSelection(preservedSelection);
 
             if (!skipDataChangeEvent) {

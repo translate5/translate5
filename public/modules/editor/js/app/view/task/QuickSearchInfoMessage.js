@@ -114,7 +114,8 @@ Ext.define('Editor.view.task.QuickSearchInfoMessage',{
         if(editor === undefined){
             return null;
         }
-        return editor.context.row;
+
+        return editor.context?.row;
     },
 
 });
