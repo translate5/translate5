@@ -1680,7 +1680,7 @@ class EditorWrapper {
 
             return new _model_node__WEBPACK_IMPORTED_MODULE_5__["default"](
                 null,
-                {...attributes.attributes, class: attributes.classes.join(' ')},
+                {...attributes.attributes, class: attributes.classes ? attributes.classes.join(' ') : ''},
                 name,
                 createParents(parents)
             );

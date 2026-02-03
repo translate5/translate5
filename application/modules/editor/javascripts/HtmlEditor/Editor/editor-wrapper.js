@@ -1142,7 +1142,7 @@ export default class EditorWrapper {
 
             return new ModelNode(
                 null,
-                {...attributes.attributes, class: attributes.classes.join(' ')},
+                {...attributes.attributes, class: attributes.classes ? attributes.classes.join(' ') : ''},
                 name,
                 createParents(parents)
             );
