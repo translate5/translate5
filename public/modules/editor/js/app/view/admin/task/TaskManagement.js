@@ -42,6 +42,7 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
         'Editor.view.admin.task.ManageFiles.Main'
     ],
     itemId: 'adminTaskTaskManagement',
+    reference: 'adminTaskTaskManagement',
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
