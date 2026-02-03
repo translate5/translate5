@@ -222,34 +222,34 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         return this.editor._editor.ui.view.element.clientWidth;
     },
     fitHeight: function() {
-        let me = this,
-            recordHeight = me.getRecordHeightUsage(),
-            inputMinHeight = recordHeight - me.statusStrip.getHeight() - 2;
+        let recordHeight = this.getRecordHeightUsage(),
+            statusStripHeight = this.statusStrip.getHeight(),
+            inputMinHeight = recordHeight - statusStripHeight + (statusStripHeight ? 20 : 0);
 
-        if (! me.currentlyEditingRecord) {
+        if (! this.currentlyEditingRecord) {
             return;
         }
 
-        if (! me.inputCmp) {
+        if (! this.inputCmp) {
             return;
         }
 
         // Set min height for both as well
-        me.setMinHeight(recordHeight).up().setMinHeight(recordHeight);
+        this.setMinHeight(recordHeight).up().setMinHeight(recordHeight);
 
         // Setup min height for input extjs component and input of the editor component
-        me.inputCmp.setMinHeight(inputMinHeight);
-        me.inputCmp.el.down('.ck-editor__main')?.dom.setAttribute('style', '--height:' + inputMinHeight + 'px');
+        this.inputCmp.setMinHeight(inputMinHeight);
+        this.inputCmp.el.down('.ck-editor__main')?.dom.setAttribute('style', '--height:' + inputMinHeight + 'px');
 
         // Get target height usage
-        let targetHeight = me.getTargetHeightUsage();
+        let targetHeight = this.getTargetHeightUsage();
 
         // Set height for both editor container and editor row panel
-        me.setHeight(targetHeight).up().setHeight(targetHeight);
+        this.setHeight(targetHeight).up().setHeight(targetHeight);
 
         // Make sure grid row node's height fits the editor's row height
         // to prevent editor from overlapping next row node
-        let recNode = me.editingPlugin.view.getNodeByRecord(me.currentlyEditingRecord);
+        let recNode = this.editingPlugin.view.getNodeByRecord(this.currentlyEditingRecord);
         if (recNode) {
             recNode.style.height = targetHeight + 'px';
         }
