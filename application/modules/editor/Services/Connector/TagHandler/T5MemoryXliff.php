@@ -35,6 +35,8 @@ use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Segment\TagRepair\Xliff\GuessExtraTags;
+use MittagQI\Translate5\Segment\TagRepair\Xliff\XliffTagRepairer;
 use MittagQI\Translate5\T5Memory\ContentProtection\DiffProtector;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
@@ -58,6 +60,8 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     private readonly LanguageRepository $languageRepository;
 
+    private Zend_Config $config;
+
     public function __construct(array $options = [])
     {
         parent::__construct($options);
@@ -67,6 +71,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         $this->numberProtectorProvider = NumberProtectorProvider::create();
         $this->diffProtector = DiffProtector::create();
         $this->languageRepository = LanguageRepository::create();
+        $this->config = \Zend_Registry::get('config');
     }
 
     /**
@@ -84,6 +89,12 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             $targetLang,
             $skippedTags,
         );
+
+        if ($this->config->runtimeOptions->LanguageResources->t5memory->guessUnrecognizedTagsFromTm ?? false) {
+            $resultString = strip_tags($this->replaceTagsWithContent($resultString), self::ALLOWED_TAGS);
+            $tagRepair = XliffTagRepairer::createWithRepairers([new GuessExtraTags()]);
+            $resultString = $tagRepair->repairTranslation($this->getQuerySegment(), $resultString);
+        }
 
         $resultString = parent::restoreInResult($resultString, $isSource);
 

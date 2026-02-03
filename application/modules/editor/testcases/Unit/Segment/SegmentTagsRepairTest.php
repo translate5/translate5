@@ -273,7 +273,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         // Simulate the service result - the brokenTranslation doesn't have the whitespace
         // The repair logic should add the missing whitespace XLIFF tags
 
-        $repairer = new XliffTagRepairer();
+        $repairer = XliffTagRepairer::create();
         $repairedText = $repairer->repairTranslation($querySegment, $brokenTranslation);
 
         // The repaired text should now contain the missing whitespace XLIFF tags
@@ -320,7 +320,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         self::assertMatchesRegularExpression('/<x id="\d+"\/>/', $querySegment, 'Query segment should contain whitespace XLIFF tags');
 
         // Repair the translation
-        $repairer = new XliffTagRepairer();
+        $repairer = XliffTagRepairer::create();
         $repairedText = $repairer->repairTranslation($querySegment, $brokenTranslation);
 
         // Should restore the missing whitespace tag
@@ -370,7 +370,7 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $tagHandlerCorrect = new editor_Services_Connector_TagHandler_PairedTags();
         $fixedQuery = $tagHandlerCorrect->prepareQuery($fixedSegment);
 
-        $tagRepair = new XliffTagRepairer();
+        $tagRepair = XliffTagRepairer::create();
         $repaired = $tagRepair->repairTranslation($fixedQuery, $brokenQuery);
 
         $tagParser = new RegexTagParser();
