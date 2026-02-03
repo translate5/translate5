@@ -35,6 +35,7 @@ enum TestUser: string
     case TestLector = 'testlector';
     case TestManager = 'testmanager';
     case TestManager2 = 'testmanager2';
+    case TestSysadmin = 'testsysadmin';
     case TestTermProposer = 'testtermproposer';
     case TestTranslator = 'testtranslator';
     case WrongUserName = 'wrongUsername';

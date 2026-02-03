@@ -27,4 +27,4 @@
 
 -- in order that passwords are updated correctly in fresh databases the email must be noreply@translate5.net
 UPDATE `Zf_users` 
-SET `email` = 'noreply@translate5.net' where `login` in ('testmanager', 'testlector', 'testtranslator', 'testapiuser', 'testtermproposer', 'testmanager2');
+SET `email` = 'noreply@translate5.net' where `login` in ('testmanager', 'testlector', 'testtranslator', 'testapiuser', 'testtermproposer', 'testmanager2', 'testsysadmin');

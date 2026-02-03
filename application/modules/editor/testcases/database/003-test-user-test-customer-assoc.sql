@@ -26,4 +26,4 @@
 -- */
 
 UPDATE Zf_users SET customers = (CONCAT(',',(SELECT id FROM LEK_customer where number='123456789'),','))
-WHERE login IN('testmanager','testlector','testtranslator','testapiuser','testtermproposer');
+WHERE login IN('testmanager','testlector','testtranslator','testapiuser','testtermproposer','testsysadmin');
