@@ -110,7 +110,7 @@ export default class TagsConversion {
         }
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
-        if (this.isInternalTagNode(item)) {
+        if (this.isInternalTagNode(item) && this.#isCorrectInternalTagNode(item)) {
             return stringToDom(this._replaceInternalTagToImage(item, this._editorElement, pixelMapping)).childNodes[0];
         }
 
@@ -704,5 +704,15 @@ export default class TagsConversion {
         }
 
         return typeof item.nodeType !== 'undefined' && item.nodeType === Node.ELEMENT_NODE;
+    }
+
+    /**
+     * Check if internal tag node has appropriate structure (dev>span.short,span.full)
+     *
+     * @param {HTMLElement} item
+     * @returns {boolean}
+     */
+    #isCorrectInternalTagNode(item) {
+        return item.querySelector('span.full') !== null && item.querySelector('span.short') !== null;
     }
 }

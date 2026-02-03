@@ -1668,16 +1668,6 @@ class EditorWrapper {
 
             const [name, attributes] = parents.shift();
 
-            // if (
-            //     name === 'htmlSpan'
-            //     && (
-            //         // Here we open implementation from other modules, need to rethink this approach
-            //         attributes.classes.includes('t5spellcheck') || attributes.classes.includes('term')
-            //     )
-            // ) {
-            //     return null;
-            // }
-
             return new _model_node__WEBPACK_IMPORTED_MODULE_5__["default"](
                 null,
                 {...attributes.attributes, class: attributes.classes ? attributes.classes.join(' ') : ''},
@@ -2932,7 +2922,7 @@ class TagsConversion {
         }
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
-        if (this.isInternalTagNode(item)) {
+        if (this.isInternalTagNode(item) && this.#isCorrectInternalTagNode(item)) {
             return (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(this._replaceInternalTagToImage(item, this._editorElement, pixelMapping)).childNodes[0];
         }
 
@@ -3526,6 +3516,10 @@ class TagsConversion {
         }
 
         return typeof item.nodeType !== 'undefined' && item.nodeType === Node.ELEMENT_NODE;
+    }
+
+    #isCorrectInternalTagNode(item) {
+        return item.querySelector('span.full') !== null && item.querySelector('span.short') !== null;
     }
 }
 

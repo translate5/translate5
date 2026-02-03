@@ -1130,16 +1130,6 @@ export default class EditorWrapper {
 
             const [name, attributes] = parents.shift();
 
-            // if (
-            //     name === 'htmlSpan'
-            //     && (
-            //         // Here we open implementation from other modules, need to rethink this approach
-            //         attributes.classes.includes('t5spellcheck') || attributes.classes.includes('term')
-            //     )
-            // ) {
-            //     return null;
-            // }
-
             return new ModelNode(
                 null,
                 {...attributes.attributes, class: attributes.classes ? attributes.classes.join(' ') : ''},
