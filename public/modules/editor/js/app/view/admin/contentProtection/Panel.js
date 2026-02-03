@@ -54,6 +54,9 @@ Ext.define('Editor.view.admin.contentProtection.Panel', {
     layout: {
         type: 'fit'
     },
+    statics: {
+        HELP_URL: 'https://confluence.translate5.net/display/BUS/Content+protection'
+    },
 
     initConfig: function (instanceConfig) {
         var me = this,

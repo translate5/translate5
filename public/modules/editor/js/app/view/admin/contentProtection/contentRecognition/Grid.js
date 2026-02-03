@@ -102,7 +102,7 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.Grid', {
                     {
                         xtype: 'button',
                         iconCls: 'x-fa fa-question-circle',
-                        handler: () => window.open('https://confluence.translate5.net/display/TAD/Application+NumberFormat', '_blank')
+                        handler: () => window.open(Editor.view.admin.contentProtection.Panel.HELP_URL, '_blank')
                     },
                     {
                         xtype: 'tbspacer',
