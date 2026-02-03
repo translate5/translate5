@@ -125,6 +125,14 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         this.editor.insertSymbol(symbol);
     },
 
+    undo: function() {
+        this.editor.undo();
+    },
+
+    redo: function() {
+        this.editor.redo();
+    },
+
     setValue: function(value, record, columnToEdit, isReplacing = false, isAdding = false) {
         let me = this,
             textarea = me.textareaEl;

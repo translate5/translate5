@@ -1107,6 +1107,14 @@ class EditorWrapper {
         this.getEditorViewNode().classList.remove(classToToggle);
     }
 
+    undo() {
+        this._editor.execute('undo');
+    }
+
+    redo() {
+        this._editor.execute('redo');
+    }
+
     /**
      * Returns HTML node of an editor
      *

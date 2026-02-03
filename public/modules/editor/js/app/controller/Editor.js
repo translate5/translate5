@@ -25,11 +25,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Editor Controller
- * @class Editor.controller.Editor
- * @extends Ext.app.Controller
- */
 Ext.define('Editor.controller.Editor', {
     extend: 'Ext.app.Controller',
     requires: [
@@ -816,6 +811,14 @@ Ext.define('Editor.controller.Editor', {
     toggleSegmentLock: function() {
         var segments = Editor.app.getController('Segments');
         segments && segments.onToggleLockBtn();
+    },
+
+    undo: function() {
+        this.getEditPlugin().editor.mainEditor.undo();
+    },
+
+    redo: function() {
+        this.getEditPlugin().editor.mainEditor.redo();
     },
 
     /**
