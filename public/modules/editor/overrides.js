@@ -1848,6 +1848,41 @@ Ext.define('Translate5.override.window.MessageBox', {
 
         // Re-enable ok-button
         this.msgButtons.ok?.setDisabled(false);
+    },
+
+    /**
+     * Overridden to investigate https://jira.translate5.net/browse/TRANSLATE-5237
+     */
+    updateButtonText: function() {
+        var me = this,
+            buttonText = me.buttonText,
+            buttons = 0,
+            btnId,
+            btn;
+
+        for (btnId in buttonText) {
+            if (buttonText.hasOwnProperty(btnId)) {
+                btn = me.msgButtons[btnId];
+                if (btn) {
+                    if (me.cfg && me.cfg.buttonText) {
+                        buttons = buttons | Math.pow(2, Ext.Array.indexOf(me.buttonIds, btnId));
+                    }
+                    if (btn.text !== buttonText[btnId]) {
+
+                        // Here is the debug code for https://jira.translate5.net/browse/TRANSLATE-5237 (RootCause error)           // +
+                        // the error happens at btn.setText() => Ext.button.Button.updateText() => me.btnEl.addCls()                // +
+                        // when no btn.btnEl.dom present anymore, for some reason, and if so, here we print some info in console    // +
+                        if (btn.rendered && !btn.btnEl.dom) {                                                                       // +
+                            console.log('button id:' + btn.id);                                                                     // +
+                            console.log('button whole dom (cached): ' + btn.el.dom?.outerHTML);                                     // +
+                            console.log('button whole dom (by id): ' + document.getElementById(btn.id)?.outerHTML);                 // +
+                        }                                                                                                           // +
+                        btn.setText(buttonText[btnId]);
+                    }
+                }
+            }
+        }
+        return buttons;
     }
 });
 Ext.define('Translate5.override.data.request.Ajax', {
