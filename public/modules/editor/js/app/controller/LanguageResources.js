@@ -310,8 +310,16 @@ Ext.define('Editor.controller.LanguageResources', {
             return;
         }
 
-        // Create language resource store instance
-        Ext.create('Editor.store.LanguageResources.LanguageResource');
+        // Create language resource store instance, if not yet instantiated.
+        // This check is needed for cases when 'Language resources'-tab is accessible to the user,
+        // and in that case - the chained store should be inherited from that tab's store instance
+        // instead of the instance created right here, as otherwise there will be no sync between
+        // these stores so if some client(s) will be added to some LR in 'Language resources'-tab
+        // this won't be auto-reflected as (un)checked state of checkboxes in 'Language resources'-subtab
+        // of Clients-tab for these client(s)
+        if (!Ext.getStore('languageResourceStore')) {
+            Ext.create('Editor.store.LanguageResources.LanguageResource');
+        }
 
         var vm = tabPanel.up('[viewModel]').getViewModel();
         var vmStores = vm.storeInfo || {};
