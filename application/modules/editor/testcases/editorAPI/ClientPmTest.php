@@ -65,6 +65,9 @@ class ClientPmTest extends ImportTestAbstract
 
         // the pm should see both tasks
         static::api()->login(TestUser::TestManager->value);
+        $languages = static::api()->getJson('editor/language');
+        static::assertIsArray($languages);
+        static::assertNotEmpty($languages);
         $tasks = static::api()->getJson('editor/task?limit=' . (self::$numTasksBefore + 10));
 
         // take number of tasks at the beginning into account
