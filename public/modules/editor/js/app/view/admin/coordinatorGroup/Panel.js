@@ -38,9 +38,11 @@ Ext.define('Editor.view.admin.coordinatorGroup.Panel', {
 
     bind: {
         title: '{l10n.coordinatorGroup.title}',
+        tooltip: '{l10n.coordinatorGroup.tooltip}',
     },
-
-    tooltip: Editor.data.l10n.coordinatorGroup.tooltip,
+    setTooltip: function(tooltip) {
+        this.tab.el.dom.setAttribute('data-qtip', tooltip);
+    },
     glyph: 'f47f@FontAwesome5FreeSolid',
     controller: 'coordinatorGroupPanelView',
     listeners: {
