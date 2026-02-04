@@ -865,7 +865,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
 
-        if (! is_numeric($tagId) && ! isset($this->quickInsertsList[$tagId])) {
+        if (! isset($this->_tagMapping[$tagId]) && ! isset($this->quickInsertsList[$tagId])) {
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1609', [
                 'tagname' => $tagId,
                 'filename' => $this->_fileName ?: 'not provided',
