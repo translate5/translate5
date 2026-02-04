@@ -1,6 +1,6 @@
 Ext.define('Editor.view.segments.new.RowEditorNew', {
     extend: 'Ext.grid.RowEditor',
-    itemId: 't5RowEditor', //'segmentsHtmleditor', TODO don't forget to rename all listeners
+    itemId: 't5RowEditor',
 
     requires: [
         'Editor.view.segments.new.EditorNew',

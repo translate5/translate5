@@ -345,8 +345,10 @@ Ext.define('Editor.controller.Localizer', {
             tagExcessTextSource: '<?php echo $this->translate->_('Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.'); ?>',
             tagExcessTextTarget: '<?php echo $this->translate->_('Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.'); ?>',
             tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!'); ?>',
-            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'); ?>'
-        }
+            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'); ?>',
+            segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
+            cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'
+        },
     });
 
     Ext.define("Editor.locale.de.controller.JsLogger", {
@@ -375,13 +377,6 @@ Ext.define('Editor.controller.Localizer', {
             numberOfChars: '<?php echo $this->translate->_('Anzahl Zeichen'); ?>'
         }
     });
-
-<?php
-//    Editor.view.segments.RowEditor.prototype.messages = {
-/*        segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',*/
-/*        cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'*/
-//    };
-?>
 
     Editor.view.segments.RowEditing.prototype.messages = {
         previousSegmentNotSaved: '<?php echo $this->translate->_('Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!'); ?>',

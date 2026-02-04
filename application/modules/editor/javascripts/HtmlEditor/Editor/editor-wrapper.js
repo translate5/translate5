@@ -374,6 +374,10 @@ export default class EditorWrapper {
         // Use the smallest of `to` or `maxOffset`
         const effectiveTo = Math.min(position, maxOffset);
 
+        if (0 === effectiveTo) {
+            return;
+        }
+
         this._editor.model.change(writer => {
             const start = writer.model.createPositionFromPath(root, [0, effectiveTo]);
             const end = writer.model.createPositionFromPath(root, [0, effectiveTo]);
