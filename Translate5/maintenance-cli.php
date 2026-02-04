@@ -33,7 +33,8 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
     AuthTokenDeleteCommand,
     AuthTokenListCommand,
     CachePurgeCommand,
@@ -44,6 +45,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DatabaseBackupCommand,
     DatabaseOptimizeCommand,
     DatabaseQueryCommand,
+    DatabaseSegmentviewDropCommand,
     DatabaseStatCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
@@ -164,7 +166,8 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     WorkerRunCommand,
     WorkflowCloneCommand,
     WorkflowListCommand,
-    WorkflowStepCommand};
+    WorkflowStepCommand
+};
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
@@ -178,6 +181,7 @@ $commands = [
     new DatabaseBackupCommand(),
     new DatabaseOptimizeCommand(),
     new DatabaseStatCommand(),
+    new DatabaseSegmentviewDropCommand(),
     new DatabaseUpdateCommand(),
     new DatabaseQueryCommand(),
     new FilesystemExternalCheckCommand(),
