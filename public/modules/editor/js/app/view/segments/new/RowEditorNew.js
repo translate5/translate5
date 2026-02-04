@@ -755,7 +755,7 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
         //rose the idea, that there might exist special race conditions, where
         //the context.record is not the record of the newValue
         if (!plug.context || !plug.context.record || plug.context.record.internalId !== record.internalId) {
-            let title = me.messages.segmentNotSavedUserMessage + newValue;
+            let title = me.strings.segmentNotSavedUserMessage + newValue;
             let msg = ' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue;
 
             if (plug.context && plug.context.record) {
@@ -773,7 +773,7 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
         // let cleanValue = newValue;
 
         if (newValue.length === 0 && record.get(me.columnToEdit).length > 0) {
-            Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
+            Editor.MessageBox.addError(me.strings.cantSaveEmptySegment);
 
             return false;
         }
