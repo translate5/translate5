@@ -513,13 +513,49 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * loads and returns the currently used associations of the given taskGuid.
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadUsed(string $taskGuid, string $userGuid = null): array
+    public function loadUsed(string $taskGuid, string $userGuid = null, &$debug = false): array
     {
+        // $debug arg is true only when this point is reached via editor_Models_Loaders_Taskuserassoc::loadFirstInUse
+        if ($debug) {
+            $debug = [
+                'taskGuid' => $taskGuid,
+                'userGuid' => $userGuid,
+                'beforeCleanup' => [
+                    'existing' => $this->doLoad($taskGuid, $userGuid, false),
+                    'expected' => $this->doLoad($taskGuid, $userGuid, true),
+                ],
+            ];
+        }
+
+        // Do cleanup
         $this->cleanupLocked($taskGuid);
-        $s = $this->db->select()
-            ->where('taskGuid = ?', $taskGuid)
-            ->where('usedState IS NOT NULL')
-            ->where('usedInternalSessionUniqId IS NOT NULL');
+
+        // Find jobs
+        $jobs = $this->doLoad($taskGuid, $userGuid, true);
+
+        // If at least one job found, no 'No access on job anymore' error will pop, so nothing to debug here
+        if (count($jobs)) {
+            $debug = false;
+
+            // Else append 'after cleanup' state to debug data
+        } else {
+            $debug['afterCleanup'] = [
+                'existing' => $this->doLoad($taskGuid, $userGuid, false),
+                'expected' => $jobs,
+            ];
+        }
+
+        return $jobs;
+    }
+
+    private function doLoad(string $taskGuid, string $userGuid = null, bool $expected = false): array
+    {
+        $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
+
+        if ($expected) {
+            $s->where('usedState IS NOT NULL')->where('usedInternalSessionUniqId IS NOT NULL');
+        }
+
         if (! empty($userGuid)) {
             $s->where('userGuid = ?', $userGuid);
         }
