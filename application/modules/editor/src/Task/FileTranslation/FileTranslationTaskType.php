@@ -66,5 +66,7 @@ class FileTranslationTaskType extends FileTranslationTypeAbstract
 
     protected bool $isTask = true;
 
-    protected bool $isInternalTask = false;
+    // Intentionally inherit the internal-task flag from FileTranslationTypeAbstract,
+    // so visibility of instanttranslate-pre-translate-task is controlled by the ACL
+    // (ACCESS_INSTANTTRANSLATE_TASK) and not forcibly exposed for all users.
 }

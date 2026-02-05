@@ -718,6 +718,10 @@ Ext.application({
         else {
             //if task is not given or false, we try to remove task fragments from the URL
             newLocation = currentLocation.replace(matchTask, '/editor/');
+
+            // https://jira.translate5.net/browse/TRANSLATE-4902: Log location change via pushState() for further investigation
+            console.log('current location ' + currentLocation + ' replaced with ' + newLocation);
+            console.log(new Error().stack);
         }
         window.history.pushState({}, "", newLocation);
         Editor.data.restpath = window.location.pathname; //we set the new task relative location as restpath, so all other requests use it too

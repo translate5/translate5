@@ -476,7 +476,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     updateTaskAssoc: function(assocStore){
         var me = this,
             panels = Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
-            store = assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null); // TODO FIXME: How can a Panel act as a store ??
+            store = assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid().getStore() : null);
         if(!panels || panels.length < 1 || !store){
             return;
         }

@@ -193,7 +193,13 @@ class TaskQuerySelectFactory
                 TaskDb::TABLE_NAME,
                 $columns
             )
-            ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getProjectTypes())
+            ->where(TaskDb::TABLE_NAME . '.taskType in (?)', $this->taskType->getNonInternalProjectTypes())
+            // Only list root projects (projectId is NULL or equals id) to avoid showing
+            // project-child tasks (e.g. human-revision tasks) as standalone projects.
+            ->where(
+                '(' . TaskDb::TABLE_NAME . '.projectId IS NULL OR ' .
+                TaskDb::TABLE_NAME . '.projectId = ' . TaskDb::TABLE_NAME . '.id)'
+            )
         ;
 
         if ($this->hasRestrictedAccess($viewer)) {

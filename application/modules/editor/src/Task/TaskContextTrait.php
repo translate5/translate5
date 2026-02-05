@@ -149,12 +149,12 @@ trait TaskContextTrait
     {
         //load job, if there is no job in usage, throw 403
         $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
-
-        $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask);
+        $debug = true;
+        $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask, $debug);
 
         if (is_null($this->_currentJob)) {
             $exception = new NoJobFoundException('E1600');
-            $this->log ??= ZfExtended_Factory::get('editor_Logger_Workflow', [$this->_currentTask]);
+            $this->log ??= ZfExtended_Factory::get('editor_Logger_Workflow', [$this->_currentTask, $debug]);
             $this->log->exception($exception);
 
             throw $exception;

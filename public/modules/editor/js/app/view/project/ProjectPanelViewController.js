@@ -238,7 +238,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * Before project task store load
      */
     onProjectTaskBeforeLoad:function(){
-        this.lookup('projectGrid').setLoading(true);
+        this.lookup('projectGrid').mask();
+        this.lookup('adminTaskTaskManagement').mask();
     },
 
     /***
@@ -409,13 +410,15 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         me.focusProjectTaskSilent(record);
 
         if(!record){
-            me.lookup('projectGrid').setLoading(false);
+            me.lookup('projectGrid').unmask();
+            me.lookup('adminTaskTaskManagement').unmask();
             return;
         }
 
         //update the location hash
         me.redirectFocus(record,true);
-        me.lookup('projectGrid').setLoading(false);
+        me.lookup('projectGrid').unmask();
+        me.lookup('adminTaskTaskManagement').unmask();
     },
 
     /***

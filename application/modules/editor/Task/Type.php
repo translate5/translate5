@@ -146,6 +146,16 @@ final class editor_Task_Type implements ResourceInterface
     }
 
     /**
+     * gets all type IDs which are considered to be a project and which are non internal
+     */
+    public function getNonInternalProjectTypes(bool $excludeTasks = false): array
+    {
+        return $this->filterTypes(function (string $id, editor_Task_Type_Abstract $type) use ($excludeTasks) {
+            return $type->isProject() && ! $type->isInternalTask() && ! ($excludeTasks && $type->isTask());
+        });
+    }
+
+    /**
      * Internal filter function for getting filtered type IDs
      */
     protected function filterTypes(Closure $callback): array

@@ -189,8 +189,8 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
                     me.hideLoadingMask();
                 }
 
-                //fire the event when all active requests are finished
-                me.fireEvent('taskAssocSavingFinished', record, me.getLanguageResourcesTaskAssocGrid().getStore());
+                // Fire the event when all active requests are finished
+                me.fireEvent('taskAssocSavingFinished', record, me.getLanguageResourcesTaskAssocGrid()?.getStore());
             },
             failure: function (response) {
                 Editor.app.getController('ServerException').handleException(response);
@@ -216,11 +216,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
      */
     getLanguageResourcesTaskAssocGrid: function () {
         var me = this,
-            addTaskWindow = me.getAdminTaskAddWindow();
-        if (addTaskWindow) {
-            return addTaskWindow.down('#languageResourcesTaskAssocGrid');
-        }
-        return me.getTaskManagement().down('#languageResourcesTaskAssocGrid');
+            parent = me.getAdminTaskAddWindow() || me.getTaskManagement();
+
+        return parent?.down('#languageResourcesTaskAssocGrid');
     },
 
     /**

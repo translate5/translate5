@@ -109,6 +109,31 @@ Ext.define('Editor.model.Segment', {
             writeAllFields: false
         }
     },
+
+    /**
+     * Set proxy url explicitly to make sure it has taskid/xxx
+     *
+     * @returns {*}
+     */
+    getProxy: function() {
+        var proxy = this.self.getProxy();
+
+        // Solution #1
+        proxy.setUrl(`/editor/taskid/${Editor.data.task.id}/segment`);
+
+        // Solution #2 (assuming this.taskId was set on segment open)
+        // proxy.setUrl(`/editor/taskid/${this.taskId}/segment`)
+
+        // Solution #3 (append /taskid/xxx/ if missing)
+        // Editor.app.addTaskToUrl(Editor.data.task)
+
+        // Solution #4 (pick from hash)
+        // var taskId = location.hash.match(/task\/[0-9]+/).shift().split('/').pop()
+        // proxy.setUrl(`/editor/taskid/${taskId}/segment`)
+
+        return proxy;
+    },
+
     /**
      * Updates the segment length in the metaCache for the given editable field name
      * @param {String} fieldname for which the length is changed

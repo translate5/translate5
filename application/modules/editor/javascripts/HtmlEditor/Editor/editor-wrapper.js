@@ -374,6 +374,10 @@ export default class EditorWrapper {
         // Use the smallest of `to` or `maxOffset`
         const effectiveTo = Math.min(position, maxOffset);
 
+        if (0 === effectiveTo) {
+            return;
+        }
+
         this._editor.model.change(writer => {
             const start = writer.model.createPositionFromPath(root, [0, effectiveTo]);
             const end = writer.model.createPositionFromPath(root, [0, effectiveTo]);
@@ -482,7 +486,6 @@ export default class EditorWrapper {
                 }
             }
 
-
             writer.setSelection(preservedSelection);
 
             if (!skipDataChangeEvent) {
@@ -568,6 +571,14 @@ export default class EditorWrapper {
 
     removeEditorCssClass(classToToggle) {
         this.getEditorViewNode().classList.remove(classToToggle);
+    }
+
+    undo() {
+        this._editor.execute('undo');
+    }
+
+    redo() {
+        this._editor.execute('redo');
     }
 
     /**
@@ -1123,19 +1134,9 @@ export default class EditorWrapper {
 
             const [name, attributes] = parents.shift();
 
-            // if (
-            //     name === 'htmlSpan'
-            //     && (
-            //         // Here we open implementation from other modules, need to rethink this approach
-            //         attributes.classes.includes('t5spellcheck') || attributes.classes.includes('term')
-            //     )
-            // ) {
-            //     return null;
-            // }
-
             return new ModelNode(
                 null,
-                {...attributes.attributes, class: attributes.classes.join(' ')},
+                {...attributes.attributes, class: attributes.classes ? attributes.classes.join(' ') : ''},
                 name,
                 createParents(parents)
             );

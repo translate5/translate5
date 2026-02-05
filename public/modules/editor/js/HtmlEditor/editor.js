@@ -912,6 +912,10 @@ class EditorWrapper {
         // Use the smallest of `to` or `maxOffset`
         const effectiveTo = Math.min(position, maxOffset);
 
+        if (0 === effectiveTo) {
+            return;
+        }
+
         this._editor.model.change(writer => {
             const start = writer.model.createPositionFromPath(root, [0, effectiveTo]);
             const end = writer.model.createPositionFromPath(root, [0, effectiveTo]);
@@ -1020,7 +1024,6 @@ class EditorWrapper {
                 }
             }
 
-
             writer.setSelection(preservedSelection);
 
             if (!skipDataChangeEvent) {
@@ -1106,6 +1109,14 @@ class EditorWrapper {
 
     removeEditorCssClass(classToToggle) {
         this.getEditorViewNode().classList.remove(classToToggle);
+    }
+
+    undo() {
+        this._editor.execute('undo');
+    }
+
+    redo() {
+        this._editor.execute('redo');
     }
 
     /**
@@ -1661,19 +1672,9 @@ class EditorWrapper {
 
             const [name, attributes] = parents.shift();
 
-            // if (
-            //     name === 'htmlSpan'
-            //     && (
-            //         // Here we open implementation from other modules, need to rethink this approach
-            //         attributes.classes.includes('t5spellcheck') || attributes.classes.includes('term')
-            //     )
-            // ) {
-            //     return null;
-            // }
-
             return new _model_node__WEBPACK_IMPORTED_MODULE_5__["default"](
                 null,
-                {...attributes.attributes, class: attributes.classes.join(' ')},
+                {...attributes.attributes, class: attributes.classes ? attributes.classes.join(' ') : ''},
                 name,
                 createParents(parents)
             );
@@ -2925,7 +2926,7 @@ class TagsConversion {
         }
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
-        if (this.isInternalTagNode(item)) {
+        if (this.isInternalTagNode(item) && this.#isCorrectInternalTagNode(item)) {
             return (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(this._replaceInternalTagToImage(item, this._editorElement, pixelMapping)).childNodes[0];
         }
 
@@ -3519,6 +3520,10 @@ class TagsConversion {
         }
 
         return typeof item.nodeType !== 'undefined' && item.nodeType === Node.ELEMENT_NODE;
+    }
+
+    #isCorrectInternalTagNode(item) {
+        return item.querySelector('span.full') !== null && item.querySelector('span.short') !== null;
     }
 }
 

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,46 +25,38 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.view.segments.grid.Toolbar
- * @extends Ext.toolbar.Toolbar
- * @initalGenerated
- */
 Ext.define('Editor.view.segments.grid.Toolbar', {
     extend: 'Ext.toolbar.Toolbar',
     alias: 'widget.segmentsToolbar',
 
     requires: [
-    	'Editor.view.segments.SpecialCharacters',
-    	'Editor.view.segments.grid.ToolbarViewModel',
-    	'Editor.view.segments.grid.ToolbarViewController'
+        'Editor.view.segments.SpecialCharacters',
+        'Editor.view.segments.grid.ToolbarViewModel',
+        'Editor.view.segments.grid.ToolbarViewController'
     ],
     controller: 'segmentsToolbar',
     viewModel: {
-        type:'segmentsToolbar'
+        type: 'segmentsToolbar'
     },
 
-    initConfig: function(instanceConfig) {
-            var me = this,
-		        config,
-		        menu;
+    initConfig: function (instanceConfig) {
+        let me = this,
+            config,
+            menu;
 
-            menu = {
-                xtype: 'menu',
-                items: [{
+        menu = {
+            xtype: 'menu',
+            items: [
+                {
                     itemId: 'repetitionsBtn',
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.repetitionBtn}',
                         tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.repetitionTooltip : ""}',
                         disabled: '{isEditingSegment}',
                     }
-                }, '-', {
+                },
+                '-',
+                {
                     xtype: 'menuitem',
                     mode: {
                         type: 'editMode'
@@ -75,7 +66,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     group: 'toggleView',
                     textAlign: 'left'
-                }, {
+                },
+                {
                     xtype: 'menuitem',
                     mode: {
                         type: 'ergonomicMode',
@@ -85,9 +77,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     group: 'toggleView',
                     textAlign: 'left'
-                }, {
+                },
+                {
                     xtype: 'menuseparator'
-                }, {
+                },
+                {
                     xtype: 'menucheckitem',
                     itemId: 'hideTagBtn',
                     bind: {
@@ -95,7 +89,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     tagMode: 'hide',
                     group: 'tagMode'
-                }, {
+                },
+                {
                     xtype: 'menucheckitem',
                     itemId: 'shortTagBtn',
                     checked: true,
@@ -104,7 +99,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     tagMode: 'short',
                     group: 'tagMode'
-                }, {
+                },
+                {
                     xtype: 'menucheckitem',
                     itemId: 'fullTagBtn',
                     checked: true,
@@ -113,86 +109,91 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     tagMode: 'full',
                     group: 'tagMode'
-                }, {
+                },
+                {
                     xtype: 'menuseparator'
-                }]
-            };
-            
-            //add the available translate5 translations
-            Ext.Object.each(Editor.data.l10n.segmentGrid.toolbar.interfaceTranslation, function(i, n) {
-                menu.items.push({
-                    xtype: 'menucheckitem',
-                    itemId: 'localeMenuItem' + i,
-                    checked: Editor.data.locale == i,
-                    bind: {
-                        text: '{l10n.segmentGrid.toolbar.interfaceTranslation.' + i + '}',
-                    },
-                    value: i,
-                    tagMode: 'full',
-                    group: 'localeMenuGroup'
-                });
-            });
+                }
+            ]
+        };
 
-            // add change user theme only if allowed
-            if(Editor.data.frontend.changeUserThemeVisible){
-                // add themes menu
-                menu.items.push(me.getThemeMenuConfig());
-            }
-
-            menu.items.push( {
-                xtype:'menuseparator'
-            });
-            // add visibility of character counter under segment-editor
-            // the state of the checkbox will be the default checked-state until the user changes the settings for the first time
+        //add the available translate5 translations
+        Ext.Object.each(Editor.data.l10n.segmentGrid.toolbar.interfaceTranslation, function (i, n) {
             menu.items.push({
                 xtype: 'menucheckitem',
-                itemId: 'showHideCharCounter',
-                checked: (Editor.app.getTaskConfig('editor.toolbar.showHideCharCounter') == 1), // the default can be set by config, overwritable on system & customer level
-                wasCheckedChanged: false,
+                itemId: 'localeMenuItem' + i,
+                checked: Editor.data.locale == i,
                 bind: {
-                    disabled: '{isEditingSegment}',
-                    text: '{l10n.segmentGrid.toolbar.showCharacterCounter}',
-                    tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.showCharacterCounterEditingTooltip : l10n.segmentGrid.toolbar.showCharacterCounterTooltip}'
+                    text: '{l10n.segmentGrid.toolbar.interfaceTranslation.' + i + '}',
                 },
-                listeners: {
-                    checkchange : function() {
-                        this.wasCheckedChanged = true;
-                        this.saveState();
-                    }
-                },
-                stateful: true,
-                stateId: 'editor.showHideCharCounter',
-                getState: function() {
-                    // we save a checked state only, if the state was user-initiated at one point
-                    if(this.wasCheckedChanged){
-                        return { checked: this.checked };
-                    }
-                    return {}; // by default, no checked-state will be saved
-                },
-                applyState: function(state) {
-                    if (state && state.hasOwnProperty('checked')) {
-                        this.wasCheckedChanged = true; // when a user-config was set, the state will be synced from then on
-                        this.checked = state.checked;
-                    }
-                }
+                value: i,
+                tagMode: 'full',
+                group: 'localeMenuGroup'
             });
+        });
 
-            var useHNavArrow = false,
-                userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
-                userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
-                checkedItems = Ext.state.Manager.getProvider().get('editor.segmentActionMenu')?.checkedItems || '';
+        // add change user theme only if allowed
+        if (Editor.data.frontend.changeUserThemeVisible) {
+            // add themes menu
+            menu.items.push(me.getThemeMenuConfig());
+        }
 
-            config = {
-                items: [{
+        menu.items.push({
+            xtype: 'menuseparator'
+        });
+        // add visibility of character counter under segment-editor
+        // the state of the checkbox will be the default checked-state until the user changes the settings for the first time
+        menu.items.push({
+            xtype: 'menucheckitem',
+            itemId: 'showHideCharCounter',
+            checked: (Editor.app.getTaskConfig('editor.toolbar.showHideCharCounter') == 1), // the default can be set by config, overwritable on system & customer level
+            wasCheckedChanged: false,
+            bind: {
+                disabled: '{isEditingSegment}',
+                text: '{l10n.segmentGrid.toolbar.showCharacterCounter}',
+                tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.showCharacterCounterEditingTooltip : l10n.segmentGrid.toolbar.showCharacterCounterTooltip}'
+            },
+            listeners: {
+                checkchange: function () {
+                    this.wasCheckedChanged = true;
+                    this.saveState();
+                }
+            },
+            stateful: true,
+            stateId: 'editor.showHideCharCounter',
+            getState: function () {
+                // we save a checked state only, if the state was user-initiated at one point
+                if (this.wasCheckedChanged) {
+                    return {checked: this.checked};
+                }
+                return {}; // by default, no checked-state will be saved
+            },
+            applyState: function (state) {
+                if (state && state.hasOwnProperty('checked')) {
+                    this.wasCheckedChanged = true; // when a user-config was set, the state will be synced from then on
+                    this.checked = state.checked;
+                }
+            }
+        });
+
+        let useHNavArrow = false,
+            userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
+            userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
+            checkedItems = Ext.state.Manager.getProvider().get('editor.segmentActionMenu')?.checkedItems || '';
+
+        config = {
+            items: [
+                {
                     xtype: 'button',
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.settings}',
                     },
                     itemId: 'viewModeMenu',
                     menu: menu
-                },{
+                },
+                {
                     xtype: 'tbseparator'
-                },{
+                },
+                {
                     xtype: 'button',
                     type: 'segment-zoom',
                     itemId: 'zoomInBtn',
@@ -203,7 +204,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     },
-                },{
+                },
+                {
                     xtype: 'button',
                     type: 'segment-zoom',
                     itemId: 'zoomOutBtn',
@@ -214,9 +216,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     }
-                },{
+                },
+                {
                     xtype: 'tbseparator'
-                },{
+                },
+                {
                     xtype: 'button',
                     glyph: 'e17b@FontAwesome5FreeSolid',
                     itemId: 'clearSortAndFilterBtn',
@@ -227,9 +231,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     }
-                },{
+                },
+                {
                     xtype: 'tbseparator'
-                },{
+                },
+                {
                     xtype: 'button',
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
@@ -240,8 +246,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     },
-                    icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
-                },{
+                    icon: Editor.data.moduleFolder + 'images/show_bookmarks.png'
+                },
+                {
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeatedIncludeFirst',
@@ -253,7 +260,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         }
                     },
                     toggleGroup: 'repetitions'
-                },{
+                },
+                {
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeatedExcludeFirst',
@@ -265,9 +273,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         }
                     },
                     toggleGroup: 'repetitions'
-                }, {
+                },
+                {
                     xtype: 'tbseparator',
-                }, {
+                },
+                {
                     itemId: 'saveBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('saveBtn'),
@@ -276,7 +286,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.save}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'saveDraftBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('saveDraftBtn'),
@@ -285,7 +296,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.saveDraft}',
                         disabled: '{!isEditingSegment}'
                     }
-                }, {
+                },
+                {
                     itemId: 'cancelBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('cancelBtn'),
@@ -294,7 +306,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.cancel}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'resetSegmentBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('resetSegmentBtn'),
@@ -303,7 +316,38 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.reset}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
+                    itemId: 'copySourceToTargetBtn',
+                    dispatcher: true,
+                    hidden: !~checkedItems.indexOf('copySourceToTargetBtn'),
+                    glyph: 'f24d@FontAwesome5FreeSolid',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.copySourceToTarget}',
+                        disabled: '{!isEditingSegment}',
+                    }
+                },
+                {
+                    itemId: 'undoBtn',
+                    dispatcher: true,
+                    hidden: !~checkedItems.indexOf('undoBtn'),
+                    glyph: 'f2ea@FontAwesome5FreeSolid',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.undo}',
+                        disabled: '{!isEditingSegment}',
+                    }
+                },
+                {
+                    itemId: 'redoBtn',
+                    dispatcher: true,
+                    hidden: !~checkedItems.indexOf('redoBtn'),
+                    glyph: 'f01e@FontAwesome5FreeSolid',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.redo}',
+                        disabled: '{!isEditingSegment}',
+                    }
+                },
+                {
                     itemId: 'goToUpperByWorkflowNoSaveBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('goToUpperByWorkflowNoSaveBtn'),
@@ -312,7 +356,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.prevFiltered}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'saveNextByWorkflowBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('saveNextByWorkflowBtn'),
@@ -321,7 +366,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'saveDraftNextByWorkflowBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('saveDraftNextByWorkflowBtn'),
@@ -330,7 +376,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.saveDraftAndNextFiltered}',
                         disabled: '{!isEditingSegment}'
                     }
-                }, {
+                },
+                {
                     itemId: 'goToLowerByWorkflowNoSaveBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('goToLowerByWorkflowNoSaveBtn'),
@@ -339,7 +386,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.nextFiltered}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'savePreviousBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('savePreviousBtn'),
@@ -348,7 +396,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndPrevious}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'goToUpperNoSaveBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('goToUpperNoSaveBtn'),
@@ -357,7 +406,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.prev}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'goAlternateLeftBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('goAlternateLeftBtn'),
@@ -366,7 +416,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.alternateLeft}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'saveNextBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('saveNextBtn'),
@@ -375,7 +426,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndNext}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'goToLowerNoSaveBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('goToLowerNoSaveBtn'),
@@ -384,7 +436,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.next}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     itemId: 'goAlternateRightBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('goAlternateRightBtn'),
@@ -393,20 +446,22 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         tooltip: '{l10n.segmentGrid.toolbar.alternateRight}',
                         disabled: '{!isEditingSegment}',
                     }
-                }, {
+                },
+                {
                     xtype: 'button',
                     itemId: 'focusSegmentShortcutBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('focusSegmentShortcutBtn'),
                     bind: {
-                        tooltip:{
+                        tooltip: {
                             dismissDelay: 0,
                             text: '{scrollToTooltip}' //is a formula!
                         }
                     },
                     icon: Editor.data.moduleFolder + 'images/scrollTo.png',
                     iconAlign: 'right'
-                }, {
+                },
+                {
                     itemId: 'watchSegmentBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('watchSegmentBtn'),
@@ -420,7 +475,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     }
-                }, {
+                },
+                {
                     xtype: 'button',
                     itemId: 'segmentLockBtn',
                     hidden: !~checkedItems.indexOf('segmentLockBtn'),
@@ -435,7 +491,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     },
-                }, {
+                },
+                {
                     xtype: 'button',
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.currentSegment}'
@@ -454,148 +511,197 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                                 checkboxTooltip: '{l10n.segmentGrid.toolbar.allMenuCheckTooltip}'
                             }
                         },
-                        items: [{
-                            itemId: 'saveBtn',
-                            checked: !!~checkedItems.indexOf('saveBtn'),
-                            icon: Editor.data.moduleFolder + 'images/tick.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.save}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'saveDraftBtn',
-                            checked: !!~checkedItems.indexOf('saveDraftBtn'),
-                            icon: Editor.data.moduleFolder + 'images/page_edit.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.saveDraft}',
-                                disabled: '{!isEditingSegment}'
-                            }
-                        }, {
-                            itemId: 'cancelBtn',
-                            checked: !!~checkedItems.indexOf('cancelBtn'),
-                            icon: Editor.data.moduleFolder + 'images/cross.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.cancel}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'resetSegmentBtn',
-                            checked: !!~checkedItems.indexOf('resetSegmentBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_undo.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.reset}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, '-', {
-                            itemId: 'goToUpperByWorkflowNoSaveBtn',
-                            checked: !!~checkedItems.indexOf('goToUpperByWorkflowNoSaveBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_up_filtered_nosave.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.prevFiltered}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'saveNextByWorkflowBtn',
-                            checked: !!~checkedItems.indexOf('saveNextByWorkflowBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_down_filtered.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'saveDraftNextByWorkflowBtn',
-                            checked: !!~checkedItems.indexOf('saveDraftNextByWorkflowBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_draft.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.saveDraftAndNextFiltered}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'goToLowerByWorkflowNoSaveBtn',
-                            checked: !!~checkedItems.indexOf('goToLowerByWorkflowNoSaveBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_nosave.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.nextFiltered}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, '-', {
-                            itemId: 'savePreviousBtn',
-                            checked: !!~checkedItems.indexOf('savePreviousBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_up.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.saveAndPrevious}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'goToUpperNoSaveBtn',
-                            checked: !!~checkedItems.indexOf('goToUpperNoSaveBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_up_nosave.png ',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.prev}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'goAlternateLeftBtn',
-                            checked: !!~checkedItems.indexOf('goAlternateLeftBtn'),
-                            hidden: !useHNavArrow,
-                            icon: Editor.data.moduleFolder + 'images/arrow_left.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.alternateLeft}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'saveNextBtn',
-                            checked: !!~checkedItems.indexOf('saveNextBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_down.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.saveAndNext}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'goToLowerNoSaveBtn',
-                            checked: !!~checkedItems.indexOf('goToLowerNoSaveBtn'),
-                            icon: Editor.data.moduleFolder + 'images/arrow_down_nosave.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.next}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'goAlternateRightBtn',
-                            checked: !!~checkedItems.indexOf('goAlternateRightBtn'),
-                            hidden: !useHNavArrow,
-                            icon: Editor.data.moduleFolder + 'images/arrow_right.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.alternateRight}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, '-', {
-                            itemId: 'focusSegmentShortcutBtn',
-                            checked: !!~checkedItems.indexOf('focusSegmentShortcutBtn'),
-                            bind: {
-                                text: '{scrollToTooltip}' //is a formula!
+                        items: [
+                            {
+                                itemId: 'saveBtn',
+                                checked: !!~checkedItems.indexOf('saveBtn'),
+                                icon: Editor.data.moduleFolder + 'images/tick.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.save}',
+                                    disabled: '{!isEditingSegment}',
+                                }
                             },
-                            icon: Editor.data.moduleFolder + 'images/scrollTo.png',
-                        }, {
-                            itemId: 'watchSegmentBtn',
-                            checked: !!~checkedItems.indexOf('watchSegmentBtn'),
-                            icon: Editor.data.moduleFolder + 'images/star_add.png',
-                            bind: {
-                                text: '{segmentIsWatched ? l10n.segmentGrid.toolbar.stopWatchingSegment : l10n.segmentGrid.toolbar.startWatchingSegment}',
-                                icon: Editor.data.moduleFolder + 'images/{segmentIsWatched ? "star_remove" : "star_add"}.png'
+                            {
+                                itemId: 'saveDraftBtn',
+                                checked: !!~checkedItems.indexOf('saveDraftBtn'),
+                                icon: Editor.data.moduleFolder + 'images/page_edit.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.saveDraft}',
+                                    disabled: '{!isEditingSegment}'
+                                }
+                            },
+                            {
+                                itemId: 'cancelBtn',
+                                checked: !!~checkedItems.indexOf('cancelBtn'),
+                                icon: Editor.data.moduleFolder + 'images/cross.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.cancel}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'resetSegmentBtn',
+                                checked: !!~checkedItems.indexOf('resetSegmentBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_undo.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.reset}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'copySourceToTargetBtn',
+                                checked: !!~checkedItems.indexOf('copySourceToTargetBtn'),
+                                glyph: 'f24d@FontAwesome5FreeSolid',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.copySourceToTarget}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'undoBtn',
+                                checked: !!~checkedItems.indexOf('undoBtn'),
+                                glyph: 'f2ea@FontAwesome5FreeSolid',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.undo}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'redoBtn',
+                                checked: !!~checkedItems.indexOf('redoBtn'),
+                                glyph: 'f01e@FontAwesome5FreeSolid',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.redo}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            '-',
+                            {
+                                itemId: 'goToUpperByWorkflowNoSaveBtn',
+                                checked: !!~checkedItems.indexOf('goToUpperByWorkflowNoSaveBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_up_filtered_nosave.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.prevFiltered}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'saveNextByWorkflowBtn',
+                                checked: !!~checkedItems.indexOf('saveNextByWorkflowBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_down_filtered.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'saveDraftNextByWorkflowBtn',
+                                checked: !!~checkedItems.indexOf('saveDraftNextByWorkflowBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_draft.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.saveDraftAndNextFiltered}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'goToLowerByWorkflowNoSaveBtn',
+                                checked: !!~checkedItems.indexOf('goToLowerByWorkflowNoSaveBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_nosave.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.nextFiltered}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            '-',
+                            {
+                                itemId: 'savePreviousBtn',
+                                checked: !!~checkedItems.indexOf('savePreviousBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_up.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.saveAndPrevious}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'goToUpperNoSaveBtn',
+                                checked: !!~checkedItems.indexOf('goToUpperNoSaveBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_up_nosave.png ',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.prev}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'goAlternateLeftBtn',
+                                checked: !!~checkedItems.indexOf('goAlternateLeftBtn'),
+                                hidden: !useHNavArrow,
+                                icon: Editor.data.moduleFolder + 'images/arrow_left.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.alternateLeft}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'saveNextBtn',
+                                checked: !!~checkedItems.indexOf('saveNextBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_down.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.saveAndNext}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'goToLowerNoSaveBtn',
+                                checked: !!~checkedItems.indexOf('goToLowerNoSaveBtn'),
+                                icon: Editor.data.moduleFolder + 'images/arrow_down_nosave.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.next}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            {
+                                itemId: 'goAlternateRightBtn',
+                                checked: !!~checkedItems.indexOf('goAlternateRightBtn'),
+                                hidden: !useHNavArrow,
+                                icon: Editor.data.moduleFolder + 'images/arrow_right.png',
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.alternateRight}',
+                                    disabled: '{!isEditingSegment}',
+                                }
+                            },
+                            '-',
+                            {
+                                itemId: 'focusSegmentShortcutBtn',
+                                checked: !!~checkedItems.indexOf('focusSegmentShortcutBtn'),
+                                bind: {
+                                    text: '{scrollToTooltip}' //is a formula!
+                                },
+                                icon: Editor.data.moduleFolder + 'images/scrollTo.png',
+                            },
+                            {
+                                itemId: 'watchSegmentBtn',
+                                checked: !!~checkedItems.indexOf('watchSegmentBtn'),
+                                icon: Editor.data.moduleFolder + 'images/star_add.png',
+                                bind: {
+                                    text: '{segmentIsWatched ? l10n.segmentGrid.toolbar.stopWatchingSegment : l10n.segmentGrid.toolbar.startWatchingSegment}',
+                                    icon: Editor.data.moduleFolder + 'images/{segmentIsWatched ? "star_remove" : "star_add"}.png'
+                                }
+                            },
+                            {
+                                itemId: 'segmentLockBtn',
+                                checked: !!~checkedItems.indexOf('segmentLockBtn'),
+                                hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentOperation') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentOperation'),
+                                icon: Editor.data.moduleFolder + 'images/lock.png',
+                                bind: {
+                                    icon: Editor.data.moduleFolder + 'images/{segmentIsEditable ? "lock_open" : "lock"}.png',
+                                    disabled: '{isEditingSegment || !selectedSegment || segmentIsBlocked}',
+                                    text: '{l10n.segmentGrid.toolbar.segmentLockBtn}'
+                                }
                             }
-                        }, {
-                            itemId: 'segmentLockBtn',
-                            checked: !!~checkedItems.indexOf('segmentLockBtn'),
-                            hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentOperation') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentOperation'),
-                            icon: Editor.data.moduleFolder + 'images/lock.png',
-                            bind: {
-                                icon: Editor.data.moduleFolder + 'images/{segmentIsEditable ? "lock_open" : "lock"}.png',
-                                disabled: '{isEditingSegment || !selectedSegment || segmentIsBlocked}',
-                                text: '{l10n.segmentGrid.toolbar.segmentLockBtn}'
-                            }
-                        }]
+                        ]
                     }
-                }, {
+                },
+                {
                     xtype: 'button',
                     itemId: 'batchOperations',
                     bind: {
@@ -605,53 +711,62 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     menu: {
                         xtype: 'menu',
-                        items: [{
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuText}'
+                        items: [
+                            {
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuText}'
+                                }
+                            },
+                            {
+                                hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentBatch') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentBatch'),
+                                icon: Editor.data.moduleFolder + 'images/lock.png',
+                                operation: 'lock',
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuLock}'
+                                }
+                            },
+                            {
+                                hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentBatch') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentBatch'),
+                                icon: Editor.data.moduleFolder + 'images/lock_open.png',
+                                operation: 'unlock',
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuUnlock}'
+                                }
+                            },
+                            {
+                                icon: Editor.data.moduleFolder + 'images/star_add.png',
+                                operation: 'bookmark',
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuBookmark}'
+                                }
+                            },
+                            {
+                                icon: Editor.data.moduleFolder + 'images/star_remove.png',
+                                operation: 'unbookmark',
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuUnbookmark}'
+                                }
+                            },
+                            {
+                                icon: Editor.data.moduleFolder + 'images/book_link.png',
+                                operation: 'finalizestatus',
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuFinalizeStatus}',
+                                    disabled: '{syncStatusDisabled}'
+                                }
+                            },
+                            {
+                                icon: Editor.data.moduleFolder + 'images/page_edit.png',
+                                operation: 'draftstatus',
+                                bind: {
+                                    text: '{l10n.segmentGrid.batchOperations.menuDraftStatus}',
+                                    disabled: '{syncStatusDisabled}'
+                                }
                             }
-                        },{
-                            hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentBatch') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentBatch'),
-                            icon: Editor.data.moduleFolder+'images/lock.png',
-                            operation: 'lock',
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuLock}'
-                            }
-                        },{
-                            hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentBatch') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentBatch'),
-                            icon: Editor.data.moduleFolder+'images/lock_open.png',
-                            operation: 'unlock',
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuUnlock}'
-                            }
-                        },{
-                            icon: Editor.data.moduleFolder+'images/star_add.png',
-                            operation: 'bookmark',
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuBookmark}'
-                            }
-                        },{
-                            icon: Editor.data.moduleFolder+'images/star_remove.png',
-                            operation: 'unbookmark',
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuUnbookmark}'
-                            }
-                        },{
-                            icon: Editor.data.moduleFolder+'images/book_link.png',
-                            operation: 'finalizestatus',
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuFinalizeStatus}',
-                                disabled: '{syncStatusDisabled}'
-                            }
-                        },{
-                            icon: Editor.data.moduleFolder+'images/page_edit.png',
-                            operation: 'draftstatus',
-                            bind: {
-                                text: '{l10n.segmentGrid.batchOperations.menuDraftStatus}',
-                                disabled: '{syncStatusDisabled}'
-                            }
-                        }]
+                        ]
                     }
-                },{
+                },
+                {
                     xtype: 'button',
                     itemId: 'specialChars',
                     hidden: !userCanModifyWhitespaceTags && !userCanInsertWhitespaceTags,
@@ -660,16 +775,18 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         disabled: '{!isEditingSegment}',
                     },
                     menu: {
-                        setOwnerCmp: function(ownerCmp) {
+                        setOwnerCmp: function (ownerCmp) {
                             this.ownerCmp = ownerCmp;
                         },
                         floating: true,
                         disabled: false,
                         xtype: 'specialCharacters'
                     }
-                },{
-                	xtype: 'tbfill'
-                },{
+                },
+                {
+                    xtype: 'tbfill'
+                },
+                {
                     xtype: 'button',
                     //FIXME let me come from a config:
                     href: me.getKeyboardShortcutUrl(),
@@ -681,11 +798,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             showDelay: 0
                         }
                     }
-                }]
-            };
+                }
+            ]
+        };
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
+
         return me.callParent([config]);
     },
 
@@ -693,19 +813,19 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
      * Create the theme menu picker config
      * @returns {{text: string, menu: {items: *[]}}}
      */
-    getThemeMenuConfig:function(){
-        var me=this,
+    getThemeMenuConfig: function () {
+        var me = this,
             config,
-            uiThemesRecord = Editor.app.getUserConfig('extJs.theme',true),
+            uiThemesRecord = Editor.app.getUserConfig('extJs.theme', true),
             menuItems = [];
 
-        Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
+        Ext.Array.each(uiThemesRecord.get('defaults'), function (i) {
             menuItems.push({
-                text: (Editor.data.frontend.config.themesName[i] !== undefined) ? Editor.data.frontend.config.themesName[i]  :  Ext.String.capitalize(i),
+                text: (Editor.data.frontend.config.themesName[i] !== undefined) ? Editor.data.frontend.config.themesName[i] : Ext.String.capitalize(i),
                 value: i,
                 checked: uiThemesRecord.get('value') === i,
                 group: 'uiTheme',
-                handler: function (item){
+                handler: function (item) {
                     Editor.app.changeUserTheme(item.value);
                 }
             });
@@ -723,8 +843,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
         return config;
     },
 
-    getKeyboardShortcutUrl: function(){
-        if(Editor.data.locale === 'en'){
+    getKeyboardShortcutUrl: function () {
+        if (Editor.data.locale === 'en') {
             return 'https://confluence.translate5.net/x/KIDoHQ';
         }
         return 'https://confluence.translate5.net/x/BgCVGQ';

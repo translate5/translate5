@@ -28,6 +28,7 @@
 INSERT INTO `Zf_users` (`userGuid` , `firstName` , `surName` , `gender` , `login` , `email` , `roles` , `passwd`, `editable`, `locale`)
 VALUES
 ('{00000000-0000-0000-C100-CCDDEE000001}', 'manager', 'test', 'm', 'testmanager', 'noreply@translate5.net', 'pm,editor,admin,instantTranslate', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
+('{00000000-0000-0000-C100-CCDDEE000008}', 'sysadmin', 'test', 'm', 'testsysadmin', 'noreply@translate5.net', 'editor,taskOverview,admin,systemadmin,api,pm,termPM_allClients,TMMaintenance_allClients,instantTranslate,instantTranslateHumanRevisionAllowed,termCustomerSearch,termFinalizer,termProposer,termReviewer', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
 ('{00000000-0000-0000-C100-CCDDEE000002}', 'lector', 'test', 'm', 'testlector', 'noreply@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
 ('{00000000-0000-0000-C100-CCDDEE000003}', 'translator', 'test', 'm', 'testtranslator', 'noreply@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
 ('{00000000-0000-0000-C100-CCDDEE000004}', 'api', 'test', 'm', 'testapiuser', 'noreply@translate5.net', 'pm,editor,admin,api', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),

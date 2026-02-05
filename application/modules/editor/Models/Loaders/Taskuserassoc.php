@@ -84,11 +84,11 @@ class editor_Models_Loaders_Taskuserassoc
         return $tua;
     }
 
-    public static function loadFirstInUse(string $userGuid, editor_Models_Task $task): ?editor_Models_TaskUserAssoc
+    public static function loadFirstInUse(string $userGuid, editor_Models_Task $task, &$debug = false): ?editor_Models_TaskUserAssoc
     {
         $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $job editor_Models_TaskUserAssoc */
-        $foundJobs = $job->loadUsed($task->getTaskGuid(), $userGuid);
+        $foundJobs = $job->loadUsed($task->getTaskGuid(), $userGuid, $debug);
 
         if (empty($foundJobs)) {
             return null;

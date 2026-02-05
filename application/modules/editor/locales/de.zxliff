@@ -1521,7 +1521,7 @@
                 <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=de#region" target="_blank" rel="noopener noreferrer">1. Gebietsschema-bezogene Formatvorgaben</a>
                 <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Syntax für Datumsangaben</a>
                 <br/><a href="https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank" rel="noopener noreferrer">3. Zahlen-Syntax</a>
-                <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU-Demonstration</a>
+                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/icudemos" target="_blank" rel="noopener noreferrer">4. ICU-Demonstration</a>
                 </target>
             </trans-unit>
             <trans-unit id="Q29udGVudCBoYXMgYmVlbiBkdXBsaWNhdGVkIGltcHJvcGVybHku">

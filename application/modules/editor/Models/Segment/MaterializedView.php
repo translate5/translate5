@@ -156,6 +156,27 @@ class editor_Models_Segment_MaterializedView
             $createSql
         );
 
+        // Remove table AUTO_INCREMENT and any CONSTRAINT definitions
+        $createSql = preg_replace(
+            '/\s+AUTO_INCREMENT=\d+/',
+            '',
+            $createSql
+        );
+
+        // no need for foreign keys in the view
+        $createSql = preg_replace(
+            '/\s*CONSTRAINT\s+`[^`]+`\s+FOREIGN KEY.*/',
+            '',
+            $createSql
+        );
+
+        //remove danling comma at the end
+        $createSql = preg_replace(
+            '/,\n\s*\)\s+ENGINE/m',
+            "\n" . ') ENGINE',
+            $createSql
+        );
+
         // Add new fields before the closing parenthesis
         $additionalFields = $this->addFields();
         $createSql = preg_replace(
