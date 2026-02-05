@@ -769,7 +769,8 @@ abstract class TagSequence implements JsonSerializable
                         if (! $tag->removed &&
                             $tag->isSplitable() &&
                             $tag->isEqual($last) &&
-                            $last->endIndex === $tag->startIndex
+                            $last->endIndex === $tag->startIndex &&
+                            $this->hasNoInBetweens($tags, $last->endIndex, [$last->order, $tag->order])
                         ) {
                             // we need to care for any holders of the tag, which may cannot contain it anymore
                             $lastHolder = $this->findHolderByOrder($tags, $last);
@@ -805,16 +806,10 @@ abstract class TagSequence implements JsonSerializable
                                 $last->parentOrder = -1;
                             }
                             $tag->removed = true;
-                        } elseif ($tag->startIndex > $last->endIndex ||
-                            // complex logic:
-                            // if a tag after is not inside the last tag, we break the search for joinables
-                            // We must take into account though,
-                            // singular/zero-length tags may be ordered after (paired) tags with length
-                            // albeit being rendered before ... this is due to the design of the rendering-queue
-                            ($tag->parentOrder !== $last->order && ! ($tag->hasZeroLength() && $tag->startIndex === $last->startIndex))
-                        ) {
-                            // since the tags are ordered by start-index we can finish as soon we are "behind" the last-tag
-                            // or any other tag that is not inside the last tag
+                        } elseif ($tag->startIndex > $last->endIndex) {
+                            // we do know the tags are ordered by start-index so we can break here
+                            // note: the ordering of tags with the same start-index cannot be safely assumed,
+                            // therefore hasNoInBetweens-API must be used
                             break;
                         }
                     }
@@ -878,23 +873,18 @@ abstract class TagSequence implements JsonSerializable
                     if (! $tags[$j]->removed &&
                         $tags[$j]->isSplitable() &&
                         $tags[$j]->isEqual($tags[$i]) &&
-                        $tags[$i]->endIndex === $tags[$j]->startIndex
+                        $tags[$i]->endIndex === $tags[$j]->startIndex &&
+                        $this->hasNoInBetweens($tags, $tags[$i]->endIndex, [$tags[$i]->order, $tags[$j]->order])
                     ) {
                         $tags[$i]->endIndex = $tags[$j]->endIndex;
                         // all nested tags of the second part now belong to the extended first tag
                         $this->changeParentOrder($tags[$j]->order, $tags[$i]->order);
                         $tags[$j]->removed = true;
                         $merged = true;
-                    } elseif ($tags[$j]->startIndex > $tags[$i]->endIndex ||
-                        // complex logic:
-                        // if a tag after is not inside the last tag, we break the search for joinables
-                        // We must take into account though,
-                        // singular/zero-length tags may be ordered after (paired) tags with length
-                        // albeit being rendered before ... this is due to the design of the rendering-queue
-                        ($tags[$j]->parentOrder !== $tags[$i]->order && ! ($tags[$j]->hasZeroLength() && $tags[$j]->startIndex === $tags[$i]->startIndex))
-                    ) {
-                        // since the tags are ordered by start-index we can finish as soon we are "behind" the last-tag
-                        // or any other tag that is not inside the last tag
+                    } elseif ($tags[$j]->startIndex > $tags[$i]->endIndex) {
+                        // we do know the tags are ordered by start-index so we can break here
+                        // note: the ordering of tags with the same start-index cannot be safely assumed,
+                        // therefore hasNoInBetweens-API must be used
                         break;
                     }
                 }
@@ -908,6 +898,27 @@ abstract class TagSequence implements JsonSerializable
                 }
             }
         }
+    }
+
+    /**
+     * Searches for tags, that are on a specific boundry where other tags "touch" and that are no children of the
+     * touching tags
+     * @param editor_Segment_Tag[] $tags Tags to search in
+     * @param int $index The boundary text index
+     * @param int[] $orders the orders/tags for which others can be children and not account as "in-between"
+     */
+    protected function hasNoInBetweens(array $tags, int $index, array $orders): bool
+    {
+        foreach ($tags as $tag) {
+            if ($tag->startIndex === $index &&
+                ! in_array($tag->order, $orders) && // exclude the touching tags themselves!
+                ($tag->parentOrder === -1 || ! in_array($tag->parentOrder, $orders))
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
