@@ -118,7 +118,7 @@ Ext.define('Editor.MessageBox', {
             var tpl = new Ext.XTemplate([
                 '<table class="message-box-data">',
                 '<tpl for=".">',
-                '<tr><td class="type"><tpl if="{type}">{type}:</tpl> </td><td class="msg">{[Ext.String.htmlEncode(values.error)]}</td></tr>',
+                '<tr><td class="type"><tpl if="{type}">{type}:</tpl> </td><td class="msg">{[DOMPurify.sanitize(values.error)]}</td></tr>',
                 '</tpl>',
                 '</table>'
             ]);
@@ -164,7 +164,7 @@ Ext.define('Editor.MessageBox', {
     addMessage: function (msg, status, factor) {
         factor = factor || Editor.data.messageBox.delayFactor;
         factor = (factor && parseFloat(factor) || 1);
-        msg = Ext.String.htmlEncode(msg);
+        msg = DOMPurify.sanitize(msg);
         // add some smarts to msg's duration (div by 13.3 between 3 & 9 seconds)
         let delay = msg.length / 13.3;
         delay = Math.min(15, Math.max(3, delay));

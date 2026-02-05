@@ -128,6 +128,7 @@ $dep->post_install_copy = [
     'vendor/gportela85/datetimefield/src/DateTimeField.js' => 'public/modules/editor/js/ux/DateTimeField.js',
     'vendor/gportela85/datetimefield/src/DateTimePicker.js' => 'public/modules/editor/js/ux/DateTimePicker.js',
     'vendor/gportela85/datetimefield/src/LICENSE' => 'public/modules/editor/js/ux/LICENSE',
+    'vendor/levmyshkin/dom_purify/dist' => 'public/modules/editor/js/purify',
 ];
 
 $dep = json_encode($dep, JSON_PRETTY_PRINT);
