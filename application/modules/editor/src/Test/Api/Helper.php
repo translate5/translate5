@@ -221,6 +221,42 @@ final class Helper extends ZfExtended_Test_ApiHelper
     }
 
     /**
+     * Waits for a complete project (with several languages) to be imported
+     * Expects a task-Object, either the regular API one (preferred) or also the api-internal stdClass object
+     * returns the data of the completely loaded project
+     * @throws Zend_Http_Client_Exception
+     */
+    public function waitForInstantTranslateProjectImported(int $projectId): array
+    {
+        $tasks = $this->getJson('editor/instanttranslateapi/filelist');
+        $projectTasks = [];
+        $projectTaskGuids = [];
+        foreach ($tasks->allPretranslatedFiles ?? [] as $task) {
+            $task = $this->loadTask((int) $task->taskId);
+            if ($task->projectId === $projectId) {
+                $projectTasks[] = $task;
+                $projectTaskGuids[] = $task->taskGuid;
+            }
+        }
+
+        if (count($projectTaskGuids) > 0) {
+            DbHelper::waitForWorkers(
+                /** @phpstan-ignore-next-line */
+                $this->test,
+                \editor_Models_Import_Worker_SetTaskToOpen::class,
+                $projectTaskGuids,
+                true,
+                self::RELOAD_TASK_LIMIT
+            );
+        }
+        sleep(1);
+        // reload project & reattach project-tasks
+        $this->task = $this->loadTask($projectId); // crucial: we need to return the project!
+
+        return $projectTasks;
+    }
+
+    /**
      * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after
      * RELOAD_TASK_LIMIT task state checks
      *

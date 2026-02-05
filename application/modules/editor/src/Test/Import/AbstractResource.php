@@ -28,11 +28,13 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Import;
 
+use AllowDynamicProperties;
 use MittagQI\Translate5\Test\Api\Helper;
 
 /**
  * General base-Class for all resources
  */
+#[AllowDynamicProperties]
 abstract class AbstractResource
 {
     protected string $_name;

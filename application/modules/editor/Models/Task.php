@@ -1441,19 +1441,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         return $wfm->getActiveByTask($this);
     }
 
-    /***
+    /**
      * Load all tasks of a given project. If taskOnly is true, in the result array, the master(project) task
      * will not be included
-     *
-     * @param int $projectId
-     * @param bool $tasksOnly
-     * @return array
      */
     public function loadProjectTasks(int $projectId, bool $tasksOnly = false): array
     {
         $s = $this->db->select();
         if ($tasksOnly) {
-            $s->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
+            $s->where('taskType IN (?)', editor_Task_Type::getInstance()->getTaskTypes());
         }
         $s->where('projectId=?', $projectId);
 
