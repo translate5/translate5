@@ -534,7 +534,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      */
     public function isEqualType(editor_Tag $tag): bool
     {
-        if (is_a($tag, 'editor_Segment_Tag') && $tag->getType() == $this->getType()) {
+        if (is_a($tag, editor_Segment_Tag::class) && $tag->getType() === $this->getType()) {
             return true;
         }
 
@@ -547,7 +547,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      */
     public function isSplitable(): bool
     {
-        return true;
+        return ! $this->isSingular();
     }
 
     /**

@@ -206,6 +206,10 @@ abstract class TagSequence implements JsonSerializable
      */
     protected function _setMarkup(string $text = null): void
     {
+        $this->setText('');
+        $this->tags = [];
+        $this->orderIndex = -1;
+        $this->capturedErrors = [];
         if (! empty($text) && $text != editor_Segment_Tag::strip($text)) {
             // for better error-tracking, we cache the initial markup to be able to log it
             $this->originalMarkup = $text;
@@ -281,9 +285,6 @@ abstract class TagSequence implements JsonSerializable
     public function setTagsByText(string $text): void
     {
         $textBefore = $this->text;
-        $this->setText('');
-        $this->tags = [];
-        $this->orderIndex = -1;
         $this->_setMarkup($text);
         if ($this->text != $textBefore) {
             $extraData = [
@@ -398,7 +399,7 @@ abstract class TagSequence implements JsonSerializable
     public function render(array $skippedTypes = null): string
     {
         // nothing to do without tags
-        if (count($this->tags) == 0) {
+        if ($this->numTags() === 0) {
             return $this->text;
         }
         // create holder and render it's children
@@ -416,7 +417,7 @@ abstract class TagSequence implements JsonSerializable
     public function renderReplaced(string $mode = self::MODE_STRIPPED): string
     {
         // nothing to do without tags
-        if (count($this->tags) == 0) {
+        if ($this->numTags() === 0) {
             return $this->text;
         }
         // create holder and render it's children
@@ -722,7 +723,7 @@ abstract class TagSequence implements JsonSerializable
     abstract protected function createFromDomElement(DOMElement $element, int $startIndex, DOMNodeList $children = null): editor_Segment_Tag;
 
     /**
-     * Joins Tags that are equal and directly beneath each other
+     * Joins Tags that are equal and directly behind each other
      * Also removes any internal connections between the tags
      * Joins paired tags, removes obsolete tags
      */
@@ -737,7 +738,7 @@ abstract class TagSequence implements JsonSerializable
             $tags[] = $last;
             // 1) remove paired closers
             for ($i = 1; $i < $numTags; $i++) {
-                // when a tag is a paired opener we try to find it's counterpart and remove it from the chain
+                // when a tag is a paired opener we try to find its counterpart and remove it from the chain
                 // paired opener/closer tags do not create problems with nesting as they are ony virtually paired
                 if ($last->isPairedOpener()) {
                     for ($j = $i; $j < $numTags; $j++) {
@@ -761,47 +762,61 @@ abstract class TagSequence implements JsonSerializable
             $numTags = count($tags);
             for ($i = 0; $i < $numTags - 1; $i++) {
                 $last = $tags[$i];
-                for ($j = $i + 1; $j < $numTags; $j++) {
-                    $tag = $tags[$j];
-                    // we join only tags that are splitable of course ...
-                    if ($tag->isSplitable() && $tag->isEqual($last) && $last->endIndex === $tag->startIndex) {
-                        // we need to care for any holders of the tag, which may cannot contain it anymore
-                        $lastHolder = $this->findHolderByOrder($tags, $last);
-                        $tagHolder = $this->findHolderByOrder($tags, $tag);
-                        $last->endIndex = $tag->endIndex;
-                        // all nested tags of the second part now belong to the merged first tag
-                        $this->changeParentOrder($tag->order, $last->order);
-                        // correct potential holders if they still can contain the composition
-                        if ($lastHolder !== null && $lastHolder->canContain($last)) {
-                            $last->parentOrder = $lastHolder->order;
-                        } elseif ($tagHolder !== null && $tagHolder->canContain($last)) {
-                            $last->parentOrder = $tagHolder->order;
-                        }
-                        // check, if the composition now can hold the former holders - and do so
-                        if ($lastHolder !== null && $last->canContain($lastHolder)) {
-                            // we may need to change the order, as containing tags usually come first
-                            if ($lastHolder->order < $last->order) {
-                                $this->swapOrder($lastHolder, $last, 'order');
+                if (! $last->removed) {
+                    for ($j = $i + 1; $j < $numTags; $j++) {
+                        $tag = $tags[$j];
+                        // we join only tags that are splitable of course ...
+                        if (! $tag->removed &&
+                            $tag->isSplitable() &&
+                            $tag->isEqual($last) &&
+                            $last->endIndex === $tag->startIndex
+                        ) {
+                            // we need to care for any holders of the tag, which may cannot contain it anymore
+                            $lastHolder = $this->findHolderByOrder($tags, $last);
+                            $tagHolder = $this->findHolderByOrder($tags, $tag);
+                            $last->endIndex = $tag->endIndex;
+                            // all nested tags of the second part now belong to the merged first tag
+                            $this->changeParentOrder($tag->order, $last->order);
+                            // correct potential holders if they still can contain the composition
+                            if ($lastHolder !== null && $lastHolder->canContain($last)) {
+                                $last->parentOrder = $lastHolder->order;
+                            } elseif ($tagHolder !== null && $tagHolder->canContain($last)) {
+                                $last->parentOrder = $tagHolder->order;
                             }
-                            $lastHolder->parentOrder = $last->order;
-                            $last->parentOrder = -1; // we are now containing our ex-parent !
-                        }
-                        if ($tagHolder !== null && $last->canContain($tagHolder)) {
-                            // we may need to change the order, as containing tags usually come first
-                            if ($tagHolder->order < $last->order) {
-                                $this->swapOrder($tagHolder, $last, 'order');
+                            // check, if the composition now can hold the former holders - and do so
+                            if ($lastHolder !== null && $last->canContain($lastHolder)) {
+                                // we may need to change the order, as containing tags usually come first
+                                if ($lastHolder->order < $last->order) {
+                                    $this->swapOrder($lastHolder, $last, 'order');
+                                }
+                                $lastHolder->parentOrder = $last->order;
+                                $last->parentOrder = -1; // we are now containing our ex-parent !
                             }
-                            $tagHolder->parentOrder = $last->order;
+                            if ($tagHolder !== null && $last->canContain($tagHolder)) {
+                                // we may need to change the order, as containing tags usually come first
+                                if ($tagHolder->order < $last->order) {
+                                    $this->swapOrder($tagHolder, $last, 'order');
+                                }
+                                $tagHolder->parentOrder = $last->order;
+                            }
+                            // the now changed tag may has an invalid parent-order - because the parent is too small now
+                            // we again use the find-holder API - which only returns holders that can contain the tag
+                            if ($last->parentOrder > -1 && $this->findHolderByOrder($tags, $last) === null) {
+                                $last->parentOrder = -1;
+                            }
+                            $tag->removed = true;
+                        } elseif ($tag->startIndex > $last->endIndex ||
+                            // complex logic:
+                            // if a tag after is not inside the last tag, we break the search for joinables
+                            // We must take into account though,
+                            // singular/zero-length tags may be ordered after (paired) tags with length
+                            // albeit being rendered before ... this is due to the design of the rendering-queue
+                            ($tag->parentOrder !== $last->order && ! ($tag->hasZeroLength() && $tag->startIndex === $last->startIndex))
+                        ) {
+                            // since the tags are ordered by start-index we can finish as soon we are "behind" the last-tag
+                            // or any other tag that is not inside the last tag
+                            break;
                         }
-                        // the now changed tag may has an invalid parent-order - because the parent is too small now
-                        // we again use the find-holder API - which only returns holders that can contain the tag
-                        if ($last->parentOrder > -1 && $this->findHolderByOrder($tags, $last) === null) {
-                            $last->parentOrder = -1;
-                        }
-                        $tag->removed = true;
-                    } elseif ($tag->startIndex > $last->endIndex) {
-                        // since the tags are ordered by start-index we can finish as soon we are "behind" the last-tag
-                        break;
                     }
                 }
             }
@@ -816,7 +831,7 @@ abstract class TagSequence implements JsonSerializable
                     }
                 }
             }
-            // the tags that were singular but now are real tags (paired tags) may have a improper nesting. We have to correct that
+            // the tags that were singular but now are real tags (paired tags) may have an improper nesting. We have to correct that
             // it can be assumed, all tags have a proper order here. Since when rendering, the paired tags again will be singular, we correct the nesting by applying a proper order & rightOrder
             foreach ($this->tags as $inner) {
                 foreach ($this->tags as $outer) {
@@ -837,6 +852,59 @@ abstract class TagSequence implements JsonSerializable
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Merges the Tags in our sequence that are direct successors to each other
+     * This is used in some situations as cleanup after structural changes to avoid chunked tags
+     * Usually, this needs only to be done in the consolidation-phase when creating the sequence
+     */
+    protected function merge(): void
+    {
+        $this->sort();
+        $merged = false;
+        foreach ($this->tags as $tag) {
+            $tag->removed = false;
+        }
+        $tags = $this->tags;
+        $numTags = count($tags);
+        for ($i = 0; $i < $numTags - 1; $i++) {
+            if (! $tags[$i]->removed) {
+                for ($j = $i + 1; $j < $numTags; $j++) {
+                    // we join only tags that are splitable of course ...
+                    if (! $tags[$j]->removed &&
+                        $tags[$j]->isSplitable() &&
+                        $tags[$j]->isEqual($tags[$i]) &&
+                        $tags[$i]->endIndex === $tags[$j]->startIndex
+                    ) {
+                        $tags[$i]->endIndex = $tags[$j]->endIndex;
+                        // all nested tags of the second part now belong to the extended first tag
+                        $this->changeParentOrder($tags[$j]->order, $tags[$i]->order);
+                        $tags[$j]->removed = true;
+                        $merged = true;
+                    } elseif ($tags[$j]->startIndex > $tags[$i]->endIndex ||
+                        // complex logic:
+                        // if a tag after is not inside the last tag, we break the search for joinables
+                        // We must take into account though,
+                        // singular/zero-length tags may be ordered after (paired) tags with length
+                        // albeit being rendered before ... this is due to the design of the rendering-queue
+                        ($tags[$j]->parentOrder !== $tags[$i]->order && ! ($tags[$j]->hasZeroLength() && $tags[$j]->startIndex === $tags[$i]->startIndex))
+                    ) {
+                        // since the tags are ordered by start-index we can finish as soon we are "behind" the last-tag
+                        // or any other tag that is not inside the last tag
+                        break;
+                    }
+                }
+            }
+        }
+        if ($merged) {
+            $this->tags = [];
+            for ($i = 0; $i < $numTags; $i++) {
+                if (! $tags[$i]->removed) {
+                    $this->tags[] = $tags[$i];
                 }
             }
         }

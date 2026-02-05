@@ -331,26 +331,9 @@ class SegmentTagSequence extends TagSequence
         // Word1 <del>...</del> <del>...</del> Word2 -> Word1 Word2
         $markup = $remover->remove($markup);
 
-        // TODO FIXME: This is crazy code, why not $clonedTags = $this->createClone(); ???
-        $clonedTags = $this->cloneFiltered();
-        $clonedTags->text = '';
-        $clonedTags->textLength = 0;
-        $clonedTags->tags = [];
-        $clonedTags->orderIndex = -1;
-        $clonedTags->capturedErrors = [];
+        /** @var static $clonedTags */ //... late static binding is at times too much for phpstan
+        $clonedTags = $this->createClone();
         $clonedTags->_setMarkup($markup);
-
-        // TODO FIXME: Why is this call still here when TrackChanges is already removed above ?
-        if ($clonedTags->hasNestedTrackChangesTags()) {
-            $clonedTags->normalizeTrackChangesTags();
-        }
-        // if no trackchanges-tags were removed, the method will not fix parent orders...
-
-        // TODO FIXME: Why is this call still here if TC is already removed above ? -> the whole API can be removed
-        // then instead of deprecating it ...
-        if (! $clonedTags->deleteTrackChangesTags($condenseBlanks)) {
-            $clonedTags->fixParentOrders();
-        }
 
         return $clonedTags;
     }
@@ -537,7 +520,7 @@ class SegmentTagSequence extends TagSequence
      * Removes all TrackChanges tags, also deletes all contents of del-tags
      * Returns, if stuff was removed and the tags resorted/reordered
      */
-    private function deleteTrackChangesTags(bool $condenseBlanks = true): bool
+    private function deleteTrackChangesTags(bool $condenseBlanks = true): bool // @phpstan-ignore-line
     {
         $this->sort(); // making sure we're in order
         $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)

@@ -204,6 +204,9 @@ class editor_Segment_FieldTags extends SegmentTagSequence
                 // we create only an info instead of a warning here as there is currently nothing, the user can do
                 $this->createLogger()->info('E1696', 'Termtagger created invalid markup: {details}', $warningData);
             }
+            // After termtagger-tags have been repaired, we may have superflous tags ...
+            // very often trackchanges are chunked by the termtagging
+            $this->merge();
         }
     }
 
