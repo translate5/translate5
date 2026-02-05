@@ -233,7 +233,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
         $projectTaskGuids = [];
         foreach ($tasks->allPretranslatedFiles ?? [] as $task) {
             $task = $this->loadTask((int) $task->taskId);
-            if ($task->projectId === $projectId) {
+            if ((int) $task->projectId === $projectId) {
                 $projectTasks[] = $task;
                 $projectTaskGuids[] = $task->taskGuid;
             }
