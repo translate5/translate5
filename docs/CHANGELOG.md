@@ -21,6 +21,108 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.34.2] - 2026-02-05
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5197](https://jira.translate5.net/browse/TRANSLATE-5197): Editor general - Add icon for inserting complete source segment and for revert/redo last change** <br>
+[🆕 Feature] Added new buttons to segment toolbar
+
+**[TRANSLATE-4834](https://jira.translate5.net/browse/TRANSLATE-4834): translate5 AI - Translation Quality Estimation (TQE): base implementation** <br>
+7.34.2: DB migration file checks to prevent previously fixed DB problems in future
+7.34.1: Fix for installations without AI plug-in
+7.34.0: Translation Quality Estimation (TQE) is now possible with translate5 AI.
+
+
+### Changed
+**[TRANSLATE-5258](https://jira.translate5.net/browse/TRANSLATE-5258): InstantTranslate - Instant-translate file translation: selected MT engine not used** <br>
+Fixed problem where the selected MT resource was not used in instant-translate file translation.
+
+**[TRANSLATE-5253](https://jira.translate5.net/browse/TRANSLATE-5253): Import/Export - Check for string tag id in defs of sdlxliff** <br>
+Correct check for string tag ids in tag definition section of sdlxliff file
+
+**[TRANSLATE-5207](https://jira.translate5.net/browse/TRANSLATE-5207): Task Management - Make creating materialized view atomic to prevent race conditions** <br>
+7.34.2 - [:bug:  Bugfix] when using config matViewEngineInnoDB segment views could not be created anymore
+7.34.0 - [:gear:  Improvement] Improved task materialized view creation to prevent possible race condition
+
+**[TRANSLATE-5054](https://jira.translate5.net/browse/TRANSLATE-5054): Editor general - Editor: tags change position after saving** <br>
+FIX: rarely, a sequence of TrackChanges tags lead to invalidly merging some of them
+
+
+### Bugfixes
+**[TRANSLATE-5257](https://jira.translate5.net/browse/TRANSLATE-5257): translate5 AI - translate5 AI: maxToken to low for reasoning models** <br>
+The default value for calculating max tokens for the LLM's is increased so reasoning models dont run into limits.
+
+**[TRANSLATE-5254](https://jira.translate5.net/browse/TRANSLATE-5254): translate5 AI - translate5 AI: error when sending segments as xliff to LLMs** <br>
+Fix for a problem where error was triggered when sending segments as xliff to the LLMs.
+
+**[TRANSLATE-5249](https://jira.translate5.net/browse/TRANSLATE-5249): Editor general - API endpoint /editor/languages is not available for normal users** <br>
+The available languages were available only for API users via the API. 
+Now also ordinary users can fetch them via API.
+
+**[TRANSLATE-5247](https://jira.translate5.net/browse/TRANSLATE-5247): Task Management - In some cases change of deadline date in project wizard may throw an error** <br>
+Fix change of deadline date in project wizard
+
+**[TRANSLATE-5243](https://jira.translate5.net/browse/TRANSLATE-5243): Editor general - Error occurrs in editor** <br>
+[🐞 Fix] Improved stability of the editor
+
+**[TRANSLATE-5237](https://jira.translate5.net/browse/TRANSLATE-5237): Editor general - RootCause: Cannot read properties of undefined (reading 'isSynchronized')** <br>
+DEBUG: added logging for further insvestigation of a rare problem related to messagebox shown based on WebSocket event
+
+**[TRANSLATE-5235](https://jira.translate5.net/browse/TRANSLATE-5235): Editor general - RootCause: Cannot read properties of undefined (reading 'coordinatorGroup')** <br>
+FIXED: problem with tooltip for 'Coordinator Groups'-tab 
+
+**[TRANSLATE-5231](https://jira.translate5.net/browse/TRANSLATE-5231): Editor general - RootCause: can't access property "get", this.task is undefined** <br>
+FIXED: project task management is now temporarily disabled while project tasks grid is loading
+
+**[TRANSLATE-5229](https://jira.translate5.net/browse/TRANSLATE-5229): Editor general - RootCause: Cannot read properties of undefined (reading 'cantSaveEmptySegment')** <br>
+FIXED: error popping on attempt to save empty segment
+
+**[TRANSLATE-5223](https://jira.translate5.net/browse/TRANSLATE-5223): TermPortal - RootCause: Cannot read properties of undefined (reading 'getKey')** <br>
+FIXED: problem popping while typing keyword for terms search
+
+**[TRANSLATE-5221](https://jira.translate5.net/browse/TRANSLATE-5221): Editor general - Use a UI lib for HTML sanitizing instead just htmlEncode** <br>
+Use a more sophisticated UI lib for HTML sanitising instead just encoding it.
+
+**[TRANSLATE-5220](https://jira.translate5.net/browse/TRANSLATE-5220): Task Management - InstantTranslate task multilingual visible for simple admins and PMs** <br>
+Acl will be applied for multi instant-translate tasks.
+
+**[TRANSLATE-5216](https://jira.translate5.net/browse/TRANSLATE-5216): translate5 AI - Check why gpt 5.1 and 5.2 work only very inconsistently in MS Azure AI foundry and not at all at openai** <br>
+[🐞 Fix]  Added support of GPT-5 models
+
+**[TRANSLATE-5209](https://jira.translate5.net/browse/TRANSLATE-5209): Editor general - Error when opening a segment** <br>
+[🐞 Fix] Fix opening segment in case it has wrong internal tags markup
+
+**[TRANSLATE-5202](https://jira.translate5.net/browse/TRANSLATE-5202): Editor general - RootCause: can't access property "down", me.getTaskManagement() is undefined** <br>
+FIXED: problem with too quick start of task editing after language resource associations were changed
+
+**[TRANSLATE-5200](https://jira.translate5.net/browse/TRANSLATE-5200): Editor general - Error occurs on attempt to save an empty segment** <br>
+[🐞 Fix] Fixed error being occurred on attempt to save an empty segment
+
+**[TRANSLATE-5199](https://jira.translate5.net/browse/TRANSLATE-5199): Editor general - Hardly (or not at all) visible spell check mark-up in some cases** <br>
+[🐞 Fix] Make spellcheck visible when min-max length is enabled
+
+**[TRANSLATE-5190](https://jira.translate5.net/browse/TRANSLATE-5190): Editor general - JS error in front end on random operations** <br>
+Fix front end popping error
+
+**[TRANSLATE-5172](https://jira.translate5.net/browse/TRANSLATE-5172): LanguageResources - Syncronize customer-LR assoc data between LR-tab and Clients-tab's LR-subtab** <br>
+FIXED: added missing syncronization between 'Language resources'-tab and 'Clients'-tab's 'Language resources'-subtab
+
+**[TRANSLATE-5058](https://jira.translate5.net/browse/TRANSLATE-5058): Editor general - Improve segment content sanitation to prevent XSS attacks (finding  H1.1)** <br>
+7.34.2: Improve segment content checks
+7.33.0: Solve an XSS attack vector in segment content.
+
+**[TRANSLATE-4920](https://jira.translate5.net/browse/TRANSLATE-4920): Editor general, TrackChanges - Accept-reject trackchanges works wrong** <br>
+Fixed accept/reject trackchanges
+
+**[TRANSLATE-4902](https://jira.translate5.net/browse/TRANSLATE-4902): Editor general - RootCause: E1381 error on the backend (on segment save)** <br>
+FIXED: task ID detection on segment saving
+
+
 ## [7.34.1] - 2026-01-22
 
 ### Important Notes:
