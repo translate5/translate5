@@ -32,9 +32,11 @@ use MittagQI\Translate5\Authentication\OpenId\{
     ClientException as OpenIdClientException
 };
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskUnlockPermissionAssert;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 use MittagQI\Translate5\Task\Unlock\TaskUnlockService;
+use MittagQI\Translate5\User\Exception\InexistentUserException;
 use ZfExtended_Authentication as Auth;
 
 /**
@@ -369,8 +371,17 @@ class LoginController extends ZfExtended_Controllers_Login
             'userStatePrevious' => $task->getState(),
         ];
 
-        $user = Auth::getInstance()->getUser();
-        if ($user === null) {
+        if (! Auth::getInstance()->isAuthenticated()) {
+            return;
+        }
+
+        $userRepository = new UserRepository();
+
+        try {
+            $user = $userRepository->get(
+                Auth::getInstance()->getUser()->getId()
+            );
+        } catch (InexistentUserException) {
             return;
         }
 

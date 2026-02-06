@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_LanguageResources_LanguageResource;
 use editor_Models_Db_Task;
+use editor_Models_Segment_MatchRateType;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Db\TaskAssociation as TaskAssociationDb;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
@@ -77,8 +78,7 @@ class LanguageResourceTaskAssocRepository
                 ]
             )
             ->where('taskAssoc.taskGuid = ?', $taskGuid)
-            ->where('taskAssoc.languageResourceId = ?', $languageResourceId)
-        ;
+            ->where('taskAssoc.languageResourceId = ?', $languageResourceId);
 
         $row = $this->db->fetchRow($select);
 
@@ -219,5 +219,25 @@ class LanguageResourceTaskAssocRepository
         }
 
         return $rows;
+    }
+
+    /**
+     * Remove only MT resources from a task
+     */
+    public function deleteMTsForTask(string $taskGuid): void
+    {
+        $mtResources = $this->db->select()
+            ->from(
+                [
+                    'lr' => editor_Models_Db_LanguageResources_LanguageResource::TABLE_NAME,
+                ],
+                ['id']
+            )
+            ->where('lr.resourceType = ?', editor_Models_Segment_MatchRateType::TYPE_MT);
+
+        $this->db->delete(TaskAssociationDb::TABLE_NAME, [
+            'taskGuid = ?' => $taskGuid,
+            'languageResourceId IN (?)' => $mtResources,
+        ]);
     }
 }

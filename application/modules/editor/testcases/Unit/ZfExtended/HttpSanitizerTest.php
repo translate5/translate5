@@ -33,6 +33,9 @@ namespace MittagQI\Translate5\Test\Unit\ZfExtended;
 use MittagQI\ZfExtended\Sanitizer;
 use MittagQI\ZfExtended\Sanitizer\SegmentContentException;
 use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Diff\Differ;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use Zend_Exception;
 use ZfExtended_BadRequest;
 use ZfExtended_SecurityException;
 
@@ -78,12 +81,32 @@ class HttpSanitizerTest extends TestCase
 
     /**
      * @dataProvider validMarkupData
+     * @throws SegmentContentException
+     * @throws ZfExtended_BadRequest
+     * @throws Zend_Exception
      */
     public function testSegmentContent(string $input, ?string $expected = null): void
     {
         $expected ??= $input;
 
-        $this->assertEquals($expected, Sanitizer::segmentContent($input), 'Sanitized result is not as expected');
+        try {
+            $this->assertEquals($expected, Sanitizer::segmentContent($input), 'Sanitized result is not as expected');
+        } catch (SegmentContentException $e) {
+            $this->fail(
+                $e->getMessage() . ': ' .
+                $this->makeDiff($e->getExtra('input'), $e->getExtra('cleaned'))
+            );
+        }
+    }
+
+    private function makeDiff(string $input, string $cleaned): string
+    {
+        $regex = '#(</?[a-zA-Z_](?:[^>"\']|"[^"]*"|\'[^\']*\')*>)#i';
+        $input = implode("\n", preg_split($regex, $input, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+        $cleaned = implode("\n", preg_split($regex, $cleaned, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+        $differ = new Differ(new UnifiedDiffOutputBuilder());
+
+        return $differ->diff($input, $cleaned);
     }
 
     /**
@@ -139,6 +162,10 @@ class HttpSanitizerTest extends TestCase
             ['<div class="open 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>Lorem<div class="close 54455354 internal-tag ownttip"><span class="short" title="TEST">&lt;/1&gt;</span><span class="full" data-originalid="124" data-length="-1">TEST</span></div>'],
             ['<ins class="trackchanges ownttip" data-usertrackingid="101759" data-usercssnr="usernr2" data-workflowstep="translatorCheck2" data-timestamp="2025-03-18T11:22:41+00:00">Få </ins><del class="trackchanges ownttip deleted" data-usertrackingid="101759" data-usercssnr="usernr2" data-workflowstep="translatorCheck2" data-timestamp="2025-03-18T11:22:29+00:00">Få</del><img class="open critical qmflag ownttip qmflag-2" data-t5qid="222" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />flag<img class="close critical qmflag ownttip qmflag-2" data-t5qid="222" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" />'],
             ['<ins class="trackchanges ownttip" data-userguid="{00000000-0000-0000-C100-CCDDEE000001}" data-username="Manager Test" data-usercssnr="usernr1" data-workflowstep="reviewing1" data-timestamp="2018-05-16T11:10:28+02:00">X</ins>'],
+
+            // ---------- REAL TRANSLATE5 SEGMENTS complained by E1764 warnOnly check ----------
+            ['<ins class="trackchanges ownttip" data-usertrackingid="10447" data-usercssnr="usernr1" data-workflowstep="translation1" data-timestamp="2026-02-04T19:19:15+01:00">TEST</ins><del class="trackchanges ownttip deleted" data-usertrackingid="10447" data-usercssnr="usernr1" data-workflowstep="translation1" data-timestamp="2026-02-04T19:19:17+01:00">K</del><del class="trackchanges ownttip deleted" data-usertrackingid="10447" data-usercssnr="usernr1" data-workflowstep="translation1" data-timestamp="2026-02-04T19:19:18+01:00">XTEST</del> k&#318;&#250;&#269; <div class="single 62e number internal-tag ownttip"><span class="short" title="&lt;1/&gt; CP: KeepProtectedStrings">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="SW" data-target="SW"></span></div> <div class="single 6e3 number internal-tag ownttip"><span class="short" title="&lt;2/&gt; CP: default generic with whitespace">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="9" data-target="9"></span></div>
+'],
 
             // ---------- MALICIOUS FRAGMENTS THAT SHOULD BE STRIPPED ----------
             [

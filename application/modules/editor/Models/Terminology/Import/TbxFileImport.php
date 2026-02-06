@@ -371,12 +371,18 @@ class editor_Models_Terminology_Import_TbxFileImport
     {
         $importCount = 0;
         $progress = 0;
+        $firePreParse = (bool) ($this->config->runtimeOptions->tbx->preParseTermEntryEvent ?? false);
 
         while ($xmlReader->read() && $xmlReader->name !== $this->tbxMap[$this::TBX_TERM_ENTRY]);
         //process termentry
         while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
             if (strlen($_xml = $xmlReader->readOuterXML())) {
                 $termEntryNode = new SimpleXMLElement($_xml);
+                if ($firePreParse) {
+                    $this->events->trigger('beforeTermEntryParsing', $this, [
+                        'termEntryNode' => $termEntryNode,
+                    ]);
+                }
                 $parentEntry = $this->handleTermEntry($termEntryNode);
 
                 foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {

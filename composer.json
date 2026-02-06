@@ -169,7 +169,8 @@
     "smi2/phpclickhouse": "^1.6",
     "wilsonglasser/spout": "dev-master",
     "select2/select2": "4.1.0-rc.0",
-    "symfony/html-sanitizer": "^7.3"
+    "symfony/html-sanitizer": "^7.3",
+    "levmyshkin/dom_purify": "^3.2"
   },
   "extra": {
     "merge-plugin": {

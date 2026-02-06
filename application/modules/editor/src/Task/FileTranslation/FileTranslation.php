@@ -71,6 +71,7 @@ use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -117,6 +118,7 @@ class FileTranslation
             ZfExtended_Authentication::getInstance(),
             Zend_Registry::get('PluginManager')->get('MatchAnalysis'),
             Zend_EventManager_StaticEventManager::getInstance(),
+            LanguageResourceTaskAssocRepository::create(),
         );
     }
 
@@ -129,6 +131,7 @@ class FileTranslation
         private readonly ZfExtended_Authentication $authentication,
         private readonly editor_Plugins_MatchAnalysis_Init $matchanalysisPlugin,
         private readonly Zend_EventManager_StaticEventManager $eventManager,
+        private readonly LanguageResourceTaskAssocRepository $assocRepository
     ) {
     }
 
@@ -261,6 +264,10 @@ class FileTranslation
         if (empty($explicitResources)) {
             return $this->assignLanguageResources($task);
         }
+
+        // cleanup and left over MT resource assigned to the task before we proceed with custom selected MT resources
+        // for this task. Manage association is only called once per task so this here is safe to do.
+        $this->assocRepository->deleteMTsForTask($task->getTaskGuid());
 
         return $this->assignAvailableLanguageResources($task, $explicitResources);
     }

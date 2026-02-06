@@ -57,6 +57,7 @@ class Translate1475Test extends JsonTestAbstract
         $config
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')
+            ->setMaxWaitTime(100)
             ->setToEditAfterImport();
     }
 
@@ -77,7 +78,7 @@ class Translate1475Test extends JsonTestAbstract
     {
         $replacements = [
             '<tag/>' => '<div class="single 70682069643d2231223e266c743b73796d2667743bee80a3266c743b2f73796d2667743b3c2f7068 internal-tag ownttip"><span title="&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="ph" data-length="-1" class="full">&lt;ph id=&quot;1&quot;&gt;&amp;lt;sym&amp;gt;&amp;lt;/sym&amp;gt;&lt;/ph&gt;</span></div>',
-            '<i mana="ger">' => '<ins class="trackchanges ownttip" data-userguid="{00000000-0000-0000-C100-CCDDEE000001}" data-username="manager test" data-usercssnr="usernr1" data-workflowstep="reviewing1" data-timestamp="2018-11-20T10:38:16+01:00">',
+            '<i_manager>' => '<ins class="trackchanges ownttip" data-userguid="{00000000-0000-0000-C100-CCDDEE000001}" data-username="manager test" data-usercssnr="usernr1" data-workflowstep="reviewing1" data-timestamp="2018-11-20T10:38:16+01:00">',
             '<i>' => '<ins class="trackchanges ownttip" data-userguid="{00000000-0000-0000-C100-CCDDEE000002}" data-username="lector test" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2018-11-20T10:38:16+01:00">',
             '<d>' => '<del class="trackchanges ownttip" data-userguid="{00000000-0000-0000-C100-CCDDEE000002}" data-username="lector test" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2018-11-20T10:38:16+01:00">',
             '</i>' => '</ins>',
@@ -87,12 +88,12 @@ class Translate1475Test extends JsonTestAbstract
         $segmentContent = [];
         $segmentContent[] = '<tag/>Ichbin<i>einTerm Ichbin</i>einTerm';
         $segmentContent[] = '<tag/><i>Ichbin keinTerm</i> <i>Ichbin keinTerm</i>x';
-        $segmentContent[] = '<tag/><i mana="ger">Ichbin keinTerm</i> <d>x</d><i>Ichbin keinTerm</i>';
-        $segmentContent[] = '<tag/><i mana="ger">Ichbi</i><i>n kein</i><i mana="ger">Term</i> <i>Ichbin keinTerm</i><d>x</d>';
+        $segmentContent[] = '<tag/><i_manager>Ichbin keinTerm</i> <d>x</d><i>Ichbin keinTerm</i>';
+        $segmentContent[] = '<tag/><i_manager>Ichbi</i><i>n kein</i><i_manager>Term</i> <i>Ichbin keinTerm</i><d>x</d>';
         $segmentContent[] = '<tag/><i>Soll heißen Ich</i>bineinTerm';
         $segmentContent[] = '<tag/>Muss heißen <d>x</d><i>Ichbin keinTerm</i>';
 
-        $segmentContent = str_replace(array_keys($replacements), $replacements, $segmentContent);
+        $segmentContent = str_replace(array_keys($replacements), array_values($replacements), $segmentContent);
 
         //get segment list
         $segments = static::api()->getSegments(null, 20);

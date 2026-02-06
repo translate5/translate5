@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3592af04ed4ab076ff41ae9e44ae4977",
+    "content-hash": "7991dcadfcfa9c1337d7bfe46df0e017",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2759,6 +2759,37 @@
                 "source": "https://github.com/lesstif/php-jira-rest-client/tree/2.6.0"
             },
             "time": "2021-09-21T14:42:49+00:00"
+        },
+        {
+            "name": "levmyshkin/dom_purify",
+            "version": "3.2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/levmyshkin/dom_purify.git",
+                "reference": "081b17079df18f37b7413808d565276c0f67a27e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/levmyshkin/dom_purify/zipball/081b17079df18f37b7413808d565276c0f67a27e",
+                "reference": "081b17079df18f37b7413808d565276c0f67a27e",
+                "shasum": ""
+            },
+            "type": "drupal-library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "DOMPurify is a DOM-only, super-fast, uber-tolerant XSS sanitizer for HTML, MathML and SVG",
+            "support": {
+                "source": "https://github.com/levmyshkin/dom_purify/tree/3.2.6"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/cure53",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-05-29T15:25:21+00:00"
         },
         {
             "name": "maennchen/zipstream-php",

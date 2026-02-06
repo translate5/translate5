@@ -56,6 +56,9 @@ FONTAWESOME_CLASSES_FROM_EXTJS;
 $extSuffix = '';
 if ($this->appVersion == ZfExtended_Utils::VERSION_DEVELOPMENT) {
     $extSuffix = '-debug';
+    $dompurify = APPLICATION_RUNDIR . '/js/purify/purify.js';
+} else {
+    $dompurify = APPLICATION_RUNDIR . '/js/purify/purify.min.js';
 }
 ?>
 <script src="<?php echo $this->extJsBasepath; ?>/build/ext-all<?php echo $extSuffix; ?>.js"></script>
@@ -96,5 +99,7 @@ Ext.Loader.setPath = function(mod, path) {
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/lib/rangy-selectionsaverestore.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/lib/rangy-classapplier.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/js/rangy/lib/rangy-serializer.js"></script>
+
+<script src="<?php echo $dompurify; ?>"></script>
 
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/js/HtmlEditor/editor.js<?php echo $version; ?>"></script>
