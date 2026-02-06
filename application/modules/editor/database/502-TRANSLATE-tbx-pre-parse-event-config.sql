@@ -26,4 +26,4 @@
 -- */
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`)
-VALUES ('runtimeOptions.tbx.preParseTermEntryEvent', 1, 'editor', 'plugins', '0', '0', '', 'boolean', 'Enable firing the beforeTermEntryParsing event before processing each TBX term entry during import. Required by plugins that need to fix TBX structure before parsing (e.g. Fronius).');
+VALUES ('runtimeOptions.tbx.preParseTermEntryEvent', 1, 'editor', 'plugins', '0', '0', '', 'boolean', 'Enable firing the beforeTermEntryParsing event before processing each TBX term entry during import. Required by plugins that need to fix TBX structure before parsing.');
