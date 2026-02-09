@@ -84,7 +84,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
         ]);
         $this->addValidator('description', 'stringLength', [
             'min' => 0,
-            'max' => 500,
+            'max' => 1000,
         ]);
         $this->addValidator('customerId', 'int');
         $this->addValidator('segmentCount', 'int');
