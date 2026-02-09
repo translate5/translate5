@@ -439,7 +439,10 @@ the format is:
         if ($since = $this->input->getOption('since')) {
             $since = strtotime($since);
             if ($since === false) {
-                $this->io->warning('The given --since|-s time can not be parsed to a valid date - ignored!');
+                $this->io->warning([
+                    'The given --since|-s time can not be parsed to a valid date - ignored!',
+                    'format reminder for relative time values: --since=\'-12h\'',
+                ]);
             } else {
                 $since = date('Y-m-d H:i:s', $since);
                 $this->usedFilters['since'] = $since;
@@ -454,7 +457,10 @@ the format is:
             }
             $until = strtotime($until);
             if ($until === false) {
-                $this->io->warning('The given --until|-u time can not be parsed to a valid date - ignored!');
+                $this->io->warning([
+                    'The given --until|-u time can not be parsed to a valid date - ignored!',
+                    'format reminder for relative time values: --until=\'+12h\'',
+                ]);
             } else {
                 $until = date('Y-m-d H:i:s', $until);
                 $this->usedFilters['until'] = $until;
