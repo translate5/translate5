@@ -60,7 +60,8 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         },
         store: {
             '#Segments': {
-                load: 'onSegmentsLoad'
+                beforeload: 'onSegmentsBeforeLoad',
+                prefetch: 'onSegmentsPrefetch',
             }
         }
     },
@@ -108,6 +109,29 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             }, 50);
             return value;
         };
+    },
+
+    onSegmentsBeforeLoad: function(store) {
+        var me = this,
+            filters = store.getProxy().extraParams.qualities || '',
+            matchedInconsistencyFilters = filters.matchAll('consistent:(source|target)'),
+            inconsistencyFilters = matchedInconsistencyFilters ? Array.from(matchedInconsistencyFilters) : [],
+            inconsistent = inconsistencyFilters.length === 1 ? inconsistencyFilters[0][1] : false;
+
+        // If right now either no inconsistency filters are applied,
+        // or applied but both for source and target at the same time
+        // - setup background as false, i.e. not applicable
+        if (!inconsistent) {
+            me.background = false;
+
+        // Else setup some basic structure to be filled further on store prefetch-events
+        } else {
+            me.background = {
+                column: inconsistent,
+                groups: {},
+                colors: {}
+            };
+        }
     },
 
     applyQualityStylesForRecord: function (store, rec, operation) {
@@ -249,39 +273,34 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     /**
      * @param store
      */
-    onSegmentsLoad: function(store) {
-        this.setupInconsistencyStyle(store);
+    onSegmentsPrefetch: function(store, records) {
+        this.setupInconsistencyStyle(store, records);
     },
 
     /**
      * @param store
      */
-    setupInconsistencyStyle: function(store) {
-        var filters = store.getProxy().extraParams.qualities || '',
-            matchedInconsistencyFilters = filters.matchAll('consistent:(source|target)'),
-            inconsistencyFilters = matchedInconsistencyFilters ? Array.from(matchedInconsistencyFilters) : [],
-            inconsistent = inconsistencyFilters.length === 1 ? inconsistencyFilters[0][1] : false;
+    setupInconsistencyStyle: function(store, records){
+        var me = this;
 
-        // If right now either no inconsistency filters are applied,
-        // or applied but both for source and target at the same time - do nothing
-        if (!inconsistent) {
-            this.background = false;
-            return;
-        }
+        // If background-prop is false, it means either no inconsistency filters are applied,
+        // or applied but both for source and target at the same time, so nothing to do here for now
+        if (!me.background) return;
 
         // Auxiliary variables
         var baseColors = [
                 'hsl(100deg 100% 50%)',     // green
                 'hsl(349.52deg 100% 85%)'   // pink
             ],
-            groups = {},
-            groupBy = inconsistent === 'target'
+            groupBy = me.background.column === 'target'
                 ? (Editor.data.task.get('enableSourceEditing')
                     ? 'sourceEditToSort'
                     : 'sourceToSort')
                 : 'targetEditToSort',
             groupVal,
             groupIdx,
+            groups = me.background.groups,
+            colors = me.background.colors,
             group,
             groupColor,
             itemIdx,
@@ -289,16 +308,14 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             lightnessRange = 16;
 
         // Get groups
-        store.getData().each((page, records) => {
-            for (var rec of records) {
-                groupVal = rec.get(groupBy);
-                if (groupVal in groups) {
-                    groups[groupVal].push(rec.getId());
-                } else {
-                    groups[groupVal] = [rec.getId()];
-                }
+        for (var rec of records) {
+            groupVal = rec.get(groupBy);
+            if (groupVal in groups) {
+                groups[groupVal].push(rec.getId());
+            } else {
+                groups[groupVal] = [rec.getId()];
             }
-        });
+        }
 
         // Unset groups having only one item
         for (groupVal in groups) {
@@ -307,42 +324,32 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             }
         }
 
-        // Info to be further used in rendering
-        this.background = {
-            column: inconsistent,
-            colors: {}
-        };
+        // Foreach record
+        for (rec of records) {
 
-        // Foreach page of records
-        store.getData().each((page, records) => {
+            // Get group md5
+            groupVal = rec.get(groupBy);
 
-            // Foreach record on page
-            for (var rec of records) {
+            // If we do really have a repetition group under such md5
+            if (groupVal in groups) {
 
-                // Get group md5
-                groupVal = rec.get(groupBy);
+                // Get group base color
+                groupIdx = Object.keys(groups).indexOf(groupVal);
+                groupColor = baseColors[groupIdx % 2];
 
-                // If we do really have a repetition group under such md5
-                if (groupVal in groups) {
+                // Get item color
+                group = groups[groupVal];
+                itemIdx = group.indexOf(rec.getId());
+                itemPos = itemIdx / group.length;
+                colors[rec.getId()] = groupColor.replace(
+                    /([0-9]+)(%\))/,
+                    ($0, $1) => (parseInt($1) - lightnessRange / 2 * itemPos) + '%)'
+                );
 
-                    // Get group base color
-                    groupIdx = Object.keys(groups).indexOf(groupVal);
-                    groupColor = baseColors[groupIdx % 2];
-
-                    // Get item color
-                    group = groups[groupVal];
-                    itemIdx = group.indexOf(rec.getId());
-                    itemPos = itemIdx / group.length;
-                    this.background.colors[rec.getId()] = groupColor.replace(
-                        /([0-9]+)(%\))/,
-                        ($0, $1) => (parseInt($1) - lightnessRange / 2 * itemPos) + '%)'
-                    );
-
-                    // Reset item color
-                } else {
-                    this.background.colors[rec.getId()] = '';
-                }
+                // Reset item color
+            } else {
+                colors[rec.getId()] = '';
             }
-        });
+        }
     }
 });
