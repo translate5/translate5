@@ -676,12 +676,12 @@ Ext.define('Editor.controller.Editor', {
     //         fn: me.copySelectionWithInternalTags,
     //         scope: me
     //     },
-         paste: {
-             delegated: false,
-             priority: 5000,
-             fn: me.pasteContent,
-             scope: me
-         },
+            paste: {
+                delegated: false,
+                priority: 5000,
+                fn: me.pasteContent,
+                scope: me
+            },
         });
 
 
@@ -1754,7 +1754,8 @@ Ext.define('Editor.controller.Editor', {
 
         // preset text and html with the found ranges
         // for insert as html (must not include element-ids that already exist in Ext.cache!)
-        copy.selDataText = copy.selDataHtml = copy.selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
+        copy.selDataHtml = copy.selDataHtml.replaceAll(/id="ext-element-[0-9]+"/g, '');
+        copy.selDataText = copy.selDataHtml;
 
         // for insert as text only
         //the toString is working if copying img tags
