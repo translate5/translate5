@@ -153,8 +153,8 @@ trait TaskContextTrait
         $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask, $debug);
 
         if (is_null($this->_currentJob)) {
-            $exception = new NoJobFoundException('E1600');
-            $this->log ??= ZfExtended_Factory::get('editor_Logger_Workflow', [$this->_currentTask, $debug]);
+            $exception = new NoJobFoundException('E1600', ['debug' => $debug]);
+            $this->log ??= ZfExtended_Factory::get('editor_Logger_Workflow', [$this->_currentTask]);
             $this->log->exception($exception);
 
             throw $exception;

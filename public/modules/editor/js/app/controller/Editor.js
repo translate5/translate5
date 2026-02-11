@@ -1694,7 +1694,7 @@ Ext.define('Editor.controller.Editor', {
         const plugin = this.getEditPlugin();
 
         //do only something when editing targets:
-        if (!this.isEditing || !/^target/.test(plugin.editor.columnToEdit)) {
+        if (!this.isEditing || !/^target/.test(plugin.editor.columnToEdit) || !event.getTarget('.ck-content')) {
             return;
         }
 
