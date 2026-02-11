@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Localization;
+
 // DEV OPTION: setting this value to TRUE will show some Code which can be usefull for development. E.g. a list of all defined icons is shown
 $devShowAllIconsTemplate = FALSE;
 // DEV OPTION: Will disable the instant translation so the user must submit a button to translate (normally set via Zf_config)
@@ -42,7 +44,7 @@ $user = ZfExtended_Authentication::getInstance()->getUser();
 // see View_Helper_LanguageSelector
 $session = new Zend_Session_Namespace();
 
-$availableTranslations = $translate->getAvailableTranslations();
+$availableTranslations = Localization::getFrontendLocales();
 asort($availableTranslations);
 $languageSelector = [];
 
