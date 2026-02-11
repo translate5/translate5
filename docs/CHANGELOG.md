@@ -22,6 +22,35 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.34.3] - 2026-02-11
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5262](https://jira.translate5.net/browse/TRANSLATE-5262): InstantTranslate - Improve instant-translate segmentation config description** <br>
+Config description improvement.
+
+
+### Bugfixes
+**[TRANSLATE-5276](https://jira.translate5.net/browse/TRANSLATE-5276): InstantTranslate - InstantTranslate: Language DropDown Empty** <br>
+FIX InstantTranslate: Standalone language dropdown empty in standalone mode
+
+**[TRANSLATE-5265](https://jira.translate5.net/browse/TRANSLATE-5265): Editor general - Project description limit is 500 chars however error appears on 1000** <br>
+[🐞 Fix] Increase check for project description max length to the allowed value
+
+**[TRANSLATE-5259](https://jira.translate5.net/browse/TRANSLATE-5259): SpellCheck (LanguageTool integration) - PHP error when trying to access non existent languages in spellchecker** <br>
+PHP error in context of spellcheck fixed.
+
+**[TRANSLATE-5037](https://jira.translate5.net/browse/TRANSLATE-5037): Editor general - copying from editor will insert terminology markup** <br>
+FIXED: improved detection of whether copying is done from opened richtext editor
+
+**[TRANSLATE-4957](https://jira.translate5.net/browse/TRANSLATE-4957): Editor general - RootCause: No access on job anymore** <br>
+[DEBUG] Added logging to trace job access problem origin
+
+
 ## [7.34.2] - 2026-02-05
 
 ### Important Notes:
