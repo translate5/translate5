@@ -46,6 +46,24 @@ Ext.define('Ext.overrides.data.proxy.Server', {
         return url;
     }
 });
+Ext.define('Ext.overrides.data.proxy.Ajax', {
+    override: 'Ext.data.proxy.Ajax',
+    sendRequest: function(request) {
+        let config = request.getCurrentConfig();                                                         // +
+        if (config.action === 'read' && config.url.match('segment\\?') && config.params.limit) {         // +
+            console.log(`segments load: ` +                                                              // +
+                `restpath -> ${Editor.data.restpath}; ` +                                                // +
+                `location -> ${window.location}; ` +                                                     // +
+                `Editor.data.task.id -> ${Editor.data.task?.id}; ` +                                     // +
+                `request.proxy.url -> "${request.proxy?.url}"`                                           // +
+            );                                                                                           // +
+        }                                                                                                // +
+        request.setRawRequest(Ext.Ajax.request(config));                                                 // +
+        // request.setRawRequest(Ext.Ajax.request(request.getCurrentConfig()));                          // -
+        this.lastRequest = request;
+        return request;
+    },
+});
 
 /**
  * Fixing missing contains method for bufferedstores

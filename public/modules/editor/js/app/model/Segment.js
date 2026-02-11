@@ -120,6 +120,7 @@ Ext.define('Editor.model.Segment', {
 
         // Solution #1
         proxy.setUrl(`/editor/taskid/${Editor.data.task.id}/segment`);
+        console.log('getProxy', `/editor/taskid/${Editor.data.task.id}/segment`);
 
         // Solution #2 (assuming this.taskId was set on segment open)
         // proxy.setUrl(`/editor/taskid/${this.taskId}/segment`)
