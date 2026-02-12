@@ -366,11 +366,6 @@ class LoginController extends ZfExtended_Controllers_Login
             return;
         }
 
-        $payload = (object) [
-            'userState' => editor_Models_Task::STATE_OPEN,
-            'userStatePrevious' => $task->getState(),
-        ];
-
         if (! Auth::getInstance()->isAuthenticated()) {
             return;
         }
@@ -410,7 +405,6 @@ class LoginController extends ZfExtended_Controllers_Login
         $taskUnlockService = TaskUnlockService::create();
         $taskUnlockService->unlock(
             $task,
-            $payload,
             $user,
             $log,
             $this->events,

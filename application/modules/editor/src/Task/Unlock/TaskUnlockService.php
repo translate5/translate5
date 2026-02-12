@@ -43,7 +43,6 @@ use ZfExtended_EventManager;
 use ZfExtended_Logger;
 use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_ValidateException;
 
 /**
  * Used to unlock the task when the browser is closed in the UI. From the UI sendBeacon will be sent with required
@@ -51,7 +50,7 @@ use ZfExtended_ValidateException;
  */
 final class TaskUnlockService
 {
-    private TaskUnlockPermissionAssert $taskActionPermissionAssert; // @phpstan-ignore-line
+    private TaskUnlockPermissionAssert $taskActionPermissionAssert;
 
     private function __construct(
         TaskUnlockPermissionAssert $taskActionPermissionAssert,
@@ -68,17 +67,12 @@ final class TaskUnlockService
 
     public function unlock(
         editor_Models_Task $task,
-        object $payload,
         User $user,
         ZfExtended_Logger $log,
         ZfExtended_EventManager $events,
         bool $isEditAllTasks,
     ): void {
-        //FIXME disabled since buggy
-        /*
         $this->assertTaskIsNotProject($task);
-
-        $data = $this->sanitizeUnlockPayload($payload);
 
         $this->taskActionPermissionAssert->assertGranted(
             TaskAction::Read,
@@ -86,17 +80,14 @@ final class TaskUnlockService
             new PermissionAssertContext($user)
         );
 
-        $this->assertUnlockStateIsOpen($data);
-
         //task manipulation is allowed additionally on Excel export (for opening read-only, changing user states etc.)
         $task->checkStateAllowsActions([editor_Models_Task::STATE_EXCELEXPORTED]);
 
-        $this->updateUserState($task, $data, $user, $log, $isEditAllTasks);
-        $this->closeAndUnlock($task, $data, $user, $log, $events);
-        */
+        $this->updateUserState($task, $user, $log, $isEditAllTasks);
+        $this->closeAndUnlock($task, $user, $events);
     }
 
-    private function assertTaskIsNotProject(editor_Models_Task $task): void // @phpstan-ignore-line
+    private function assertTaskIsNotProject(editor_Models_Task $task): void
     {
         if (! $task->isProject()) {
             return;
@@ -112,73 +103,32 @@ final class TaskUnlockService
         ]);
     }
 
-    private function sanitizeUnlockPayload(object $data): object // @phpstan-ignore-line
-    {
-        $payload = (array) $data;
-
-        return (object) [
-            // always sanitize to open. Task is unlocked when the user state is open.
-            'userState' => isset($payload['userState']) ? editor_Workflow_Default::STATE_OPEN : null,
-            'userStatePrevious' => isset($payload['userStatePrevious']) ? (string) $payload['userStatePrevious'] : null,
-        ];
-    }
-
-    private function assertUnlockStateIsOpen(object $data): void // @phpstan-ignore-line
-    {
-        if ($data->userState !== editor_Workflow_Default::STATE_OPEN) {
-            throw new ZfExtended_ValidateException('Unlock requests must set userState to "open".');
-        }
-    }
-
     /**
      * Unlocks the current task if it's a request that closes the task (set state to open, end, finish)
      * removes the task from session
      */
-    private function closeAndUnlock(// @phpstan-ignore-line
+    private function closeAndUnlock(
         editor_Models_Task $task,
-        object $data,
         User $user,
-        ZfExtended_Logger $log,
         ZfExtended_EventManager $events,
     ): void {
-        $hasState = ! empty($data->userState);
-        $isEnding = isset($data->state) && $data->state == $task::STATE_END;
-        $resetToOpen = $hasState && $data->userState == editor_Workflow_Default::STATE_EDIT && $isEnding;
-        if ($resetToOpen) {
-            //This state change will be saved at the end of this method.
-            $data->userState = editor_Workflow_Default::STATE_OPEN;
-        }
-        if (! $isEnding && (! $this->isLeavingTaskRequest($data))) {
-            return;
-        }
-
         $task->unlockForUser($user->getUserGuid());
-
-        if ($resetToOpen) {
-            $this->updateUserState($task, $data, $user, $log, true);
-        }
 
         $events->trigger(
             "afterTaskClose",
             $this,
             [
                 'task' => $task,
-                'openState' => $data->userState ?? null,
             ]
         );
     }
 
     protected function updateUserState(
         editor_Models_Task $task,
-        object $data,
         User $user,
         ZfExtended_Logger $log,
         bool $isEditAllTasks,
     ): void {
-        if (empty($data->userState)) {
-            return;
-        }
-
         $userTaskAssoc = new editor_Models_TaskUserAssoc();
 
         try {
@@ -216,31 +166,35 @@ final class TaskUnlockService
             return;
         }
 
+        // Only allow transitioning to "open" from "edit" or "view" states.
+        // This prevents overwriting terminal states like "finished", "waiting", "auto-finish".
+        $currentJobState = $userTaskAssoc->getState();
+        $allowedPreviousStates = [editor_Workflow_Default::STATE_EDIT, editor_Workflow_Default::STATE_VIEW];
+
+        if (! in_array($currentJobState, $allowedPreviousStates, true)
+        ) {
+            // Make sense to log this info ?
+            //$log->info('E1011', 'Skipping job state change: cannot transition from {currentState} to open', [
+            //    'tua' => $userTaskAssoc,
+            //    'currentState' => $currentJobState,
+            //]);
+
+            return;
+        }
+
         $userTaskAssoc->setUsedInternalSessionUniqId(null);
         $userTaskAssoc->setUsedState(null);
 
-        $userTaskAssoc->setState($data->userState);
+        $userTaskAssoc->setState(editor_Workflow_Default::STATE_OPEN);
 
         $userTaskAssoc->save();
 
-        if ($oldUserTaskAssoc->getState() != $data->userState) {
+        if ($oldUserTaskAssoc->getState() != editor_Workflow_Default::STATE_OPEN) {
             $log->info('E1011', 'job status changed from {oldState} to {newState}', [
                 'tua' => $oldUserTaskAssoc,
                 'oldState' => $oldUserTaskAssoc->getState(),
-                'newState' => $data->userState,
+                'newState' => editor_Workflow_Default::STATE_OPEN,
             ]);
         }
-    }
-
-    /**
-     * returns true if PUT Requests opens a task for open or finish
-     */
-    private function isLeavingTaskRequest(object $data): bool
-    {
-        if (empty($data->userState)) {
-            return false;
-        }
-
-        return $data->userState == editor_Workflow_Default::STATE_OPEN || $data->userState == editor_Workflow_Default::STATE_FINISH;
     }
 }

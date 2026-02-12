@@ -68,8 +68,6 @@ Ext.define('Editor.controller.TaskLifecycle', {
         var url = Editor.data.restpath + 'taskunlock/' + task.getId();
 
         var payload = {
-            "userState": "open",
-            "userStatePrevious": task.get('userState'),
             "id": task.getId()
         };
 
