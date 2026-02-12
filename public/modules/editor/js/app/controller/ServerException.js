@@ -217,6 +217,7 @@ Ext.define('Editor.controller.ServerException', {
             _status = status.toString();
         }
         errorCode = json && json.errorCode;
+        
         switch(status) {
             case 0:
             case -1:
@@ -276,7 +277,13 @@ Ext.define('Editor.controller.ServerException', {
                 if (response.request && response.request.options && response.request.options.url) {
                     msg423 = msg423 + ': ' + response.request.options.url;
                 }
+                
                 // call the new logger function
+                console.log('SegmentStore', Ext.getStore('Segments')?.proxy?.url);
+                console.log('RequestOptions URL', response?.request?.options?.url);
+                console.log('RequestOptions proxy URL', response?.request?.options?.proxy?.url);
+                console.log('location.href', window.location.href);
+                console.log('location.hash', window.location.hash);
                 Editor.MessageBox.addError(appendServerMsg(str['403']));
                 jslogger && jslogger.logException(new Error(msg423));
                 return;

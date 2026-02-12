@@ -78,6 +78,7 @@ class DatabaseSegmentviewDropCommand extends Translate5AbstractCommand
 
         $dbUpdater = ZfExtended_Factory::get(DbUpdater::class, [true]);
         $dbUpdater->dropSegmentMaterializedViews();
+        \Zend_Registry::get('cache')->clean();
 
         $this->io->success('Dropped all segment materialized views.');
 
