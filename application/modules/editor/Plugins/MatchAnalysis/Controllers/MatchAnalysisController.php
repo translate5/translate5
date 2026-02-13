@@ -134,12 +134,10 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     {
         $params = $this->getAllParams();
 
-        /* @var $task editor_Models_Task */
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($params['taskGuid']);
 
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $fileName = $translate->_('Trefferanalyse') . ' - ' . $task->getTaskName();
+        $fileName = 'Match-Analysis - ' . $task->getTaskName();
         $taskNr = $task->getTaskNr();
         if (! empty($taskNr)) {
             $fileName = $fileName . ' - (' . $taskNr . ')';
