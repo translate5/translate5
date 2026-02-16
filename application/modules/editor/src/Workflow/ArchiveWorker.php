@@ -78,6 +78,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
 
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         $this->task->loadByTaskGuid($this->taskGuid);
+        $this->task->createMaterializedView();
 
         $taskJson = $this->exportTaskMetaData($parameters['exportToFolder']);
         $this->exportXlf2($parameters['exportToFolder']);
