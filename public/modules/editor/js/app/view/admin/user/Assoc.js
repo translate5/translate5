@@ -255,8 +255,12 @@ Ext.define('Editor.view.admin.user.Assoc', {
             return;
         }
 
+        const url = record.get('taskGuid')
+            ? `task/${record.get('taskGuid')}/job/combo/users`
+            : `customers/${customerId}/default-job/combo/users`;
+
         Ext.Ajax.request({
-            url: Editor.data.restpath + `customers/${customerId}/default-job/combo/users`,
+            url: Editor.data.restpath + url,
             method: 'GET',
             success: function (response) {
                 const data = Ext.decode(response.responseText);

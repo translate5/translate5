@@ -108,7 +108,6 @@ class editor_TaskunlockController extends ZfExtended_RestController
 
         $taskUnlockService->unlock(
             $this->entity,
-            (object) $this->data,
             $authenticatedUser,
             $this->log,
             $this->events,

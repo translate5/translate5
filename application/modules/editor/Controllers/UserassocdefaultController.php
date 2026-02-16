@@ -140,9 +140,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
             $context = new PermissionAssertContext($authUser);
             $customer = $this->customerRepository->get((int) $this->getRequest()->getParam('customerId'));
 
-            if (! $this->customerPermissionAssert->isGranted(CustomerAction::DefaultJob, $customer, $context)) {
-                throw new ZfExtended_NotFoundException('Customer not found');
-            }
+            $this->customerPermissionAssert->assertGranted(CustomerAction::DefaultJob, $customer, $context);
 
             // @phpstan-ignore-next-line
             $this->view->rows = UserProvider::create()->getPossibleUsers(
