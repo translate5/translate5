@@ -1694,7 +1694,7 @@ Ext.define('Editor.controller.Editor', {
         const plugin = this.getEditPlugin();
 
         //do only something when editing targets:
-        if (!this.isEditing || !/^target/.test(plugin.editor.columnToEdit) || !event.getTarget('.ck-content')) {
+        if (!this.isEditing || !/^target/.test(plugin.editor.columnToEdit)) {
             return;
         }
 
@@ -1752,9 +1752,19 @@ Ext.define('Editor.controller.Editor', {
             copy.selDataHtml += selectedRange.toHtml();
         }
 
+        const html = RichTextEditor.stringToDom(copy.selDataHtml);
+        const termTags = html.querySelectorAll('.term');
+        for (const termTag of termTags) {
+            const fragment = document.createRange().createContextualFragment(termTag.innerHTML);
+            html.insertBefore(fragment, termTag);
+            termTag.remove();
+        }
+
+        let htmlString = html.innerHTML;
+
         // preset text and html with the found ranges
         // for insert as html (must not include element-ids that already exist in Ext.cache!)
-        copy.selDataText = copy.selDataHtml = copy.selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
+        copy.selDataText = copy.selDataHtml = htmlString.replace(/id="ext-element-[0-9]+"/, '');
 
         // for insert as text only
         //the toString is working if copying img tags
