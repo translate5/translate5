@@ -353,6 +353,9 @@ Ext.define('Editor.view.segments.Grid', {
                         return value;
                     } : null,
                 width: 50,
+                filter: {
+                    type: 'numeric'
+                },
             },
             {
                 xtype: 'gridcolumn',
@@ -361,6 +364,9 @@ Ext.define('Editor.view.segments.Grid', {
                 text: Editor.data.l10n.segmentGrid.column.qualityScoreReasoning,
                 width: 250,
                 hidden: true,
+                filter: {
+                    type: 'string'
+                },
             },
         ]);
 
