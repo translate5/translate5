@@ -104,6 +104,7 @@ class LanguageListCommand extends UserAbstractCommand
         foreach ($languages as $language) {
             if (! $all) {
                 $rows[] = [
+                    $language['id'],
                     $language['langName'],
                     $language['rfc5646'],
                     $language['lcid'],
@@ -135,7 +136,7 @@ class LanguageListCommand extends UserAbstractCommand
                 'Visibility',
             ], $rows);
         } else {
-            $this->io->table(['Name', 'rfc5646', 'LCID', 'Visibility'], $rows);
+            $this->io->table(['Internal ID', 'Name', 'rfc5646', 'LCID', 'Visibility'], $rows);
         }
 
         return 0;
