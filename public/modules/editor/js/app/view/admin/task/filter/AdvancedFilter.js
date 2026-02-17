@@ -151,9 +151,10 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
      * Get active filter model instance from given grid filter object 
      */
     getFilterModelObject:function(item){
-    	var operator=item.operator || item.getOperator(),
-    		property=item.property || item.getProperty(),
-    		value=item.value || item.getValue();
+    	let operator = item.isFilter ? item.getOperator() : item.operator,
+    		property = item.isFilter ? item.getProperty() : item.property,
+            value = item.isFilter ? item.getValue() : item.value;
+
 		return Ext.create('Editor.model.admin.task.filter.ActiveFilter',{
 			'operator': operator,
 			'property': property,

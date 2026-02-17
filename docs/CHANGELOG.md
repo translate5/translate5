@@ -23,6 +23,58 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.34.4] - 2026-02-17
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4834](https://jira.translate5.net/browse/TRANSLATE-4834): translate5 AI - Translation Quality Estimation (TQE): base implementation** <br>
+7.34.4: Added log entry when all segment views were dropped
+7.34.2: DB migration file checks to prevent previously fixed DB problems in future
+7.34.1: Fix for installations without AI plug-in
+7.34.0: Translation Quality Estimation (TQE) is now possible with translate5 AI.
+
+
+### Changed
+**[TRANSLATE-5288](https://jira.translate5.net/browse/TRANSLATE-5288): translate5 AI - Filters for TQE and TQE reasoning columns in editor** <br>
+UI filters for TQE columns.
+
+**[TRANSLATE-5287](https://jira.translate5.net/browse/TRANSLATE-5287): translate5 AI - TQE reasoning should always be done in English** <br>
+Added new TQE system prompt to force the reasoning only on English.
+
+**[TRANSLATE-5066](https://jira.translate5.net/browse/TRANSLATE-5066): ConnectWorldserver - Private Plugin Connect Worldserver: bundle one WS project into one Translate5 task** <br>
+7.34.4: Private Plugin Connect Worldserver: bundle one WS project into one Translate5 project
+
+
+### Bugfixes
+**[TRANSLATE-5300](https://jira.translate5.net/browse/TRANSLATE-5300): Content Protection - Conversion worker fails unexpectedly if language resource is deleted** <br>
+Fix behaviour for Conversion worker in case if language resource is no longer exists
+
+**[TRANSLATE-5297](https://jira.translate5.net/browse/TRANSLATE-5297): Editor general - Segment view not on archive operation.** <br>
+PHP error fixed
+
+**[TRANSLATE-5284](https://jira.translate5.net/browse/TRANSLATE-5284): Task Management - Match-rate filter in task overview advanced filters does not work** <br>
+Technical error in UI led to non working match rate filter when using 0 as filter value
+
+**[TRANSLATE-5274](https://jira.translate5.net/browse/TRANSLATE-5274): InstantTranslate, User Management - user role send to humann revision should require role InstantTranslate** <br>
+Fix auto set role for human revision.
+
+**[TRANSLATE-5264](https://jira.translate5.net/browse/TRANSLATE-5264): Editor general - Error customer not found fixed** <br>
+PHP error fixed
+
+**[TRANSLATE-5126](https://jira.translate5.net/browse/TRANSLATE-5126): InstantTranslate - Instant translate: open task for editing leaves task locked** <br>
+7.34.4: Reactivated the fixed unlock on browser close functionality
+7.32.10: Deactivated the buggy unlock on browser close functionality until fixes are ready
+7.32.8: Task will be unlocked and the job will be closed when user closes the browser.
+
+**[TRANSLATE-5037](https://jira.translate5.net/browse/TRANSLATE-5037): Editor general - copying from editor will insert terminology markup** <br>
+7.34.4: Additional fix
+7.34.3: improved detection of whether copying is done from opened richtext editor
+
+
 ## [7.34.3] - 2026-02-11
 
 ### Important Notes:
