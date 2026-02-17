@@ -87,18 +87,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $this->languageResourceId = (int) $parameters['languageResourceId'];
 
-        try {
-            $this->languageResource = $this->languageResourceRepository->get($this->languageResourceId);
-        } catch (\ZfExtended_Models_Entity_NotFoundException) {
-            return false;
-        }
-
-        if (editor_Services_Manager::SERVICE_T5_MEMORY !== $this->languageResource->getServiceType()) {
-            return false;
-        }
-
-        $this->memoriesBackup = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
-
         return true;
     }
 
@@ -112,6 +100,26 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     protected function work(): bool
     {
+        try {
+            $this->languageResource = $this->languageResourceRepository->get($this->languageResourceId);
+        } catch (\ZfExtended_Models_Entity_NotFoundException) {
+            $this->log->info(
+                'E1590',
+                'Conversion: Language resource with id {languageResourceId} was not found. It might be deleted before conversion process.',
+                [
+                    'languageResourceId' => $this->languageResourceId,
+                ]
+            );
+
+            return false;
+        }
+
+        if (editor_Services_Manager::SERVICE_T5_MEMORY !== $this->languageResource->getServiceType()) {
+            return false;
+        }
+
+        $this->memoriesBackup = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
         if (ConversionState::ConversionScheduled !== $this->tmConversionService->getConversionState($this->languageResourceId)) {
             return false;
         }
