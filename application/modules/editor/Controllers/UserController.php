@@ -190,7 +190,7 @@ class Editor_UserController extends ZfExtended_RestController
                 && $row['editable'] === '1'
                 && ! empty($row['roles'])
                 && $row['roles'] !== ','
-                && ! empty(array_diff(explode(',', $row['roles']), $editableRoles))
+                && ! empty(array_diff(array_filter(explode(',', $row['roles'])), $editableRoles))
                 && ! $authUser->isCoordinator()
             ;
 
