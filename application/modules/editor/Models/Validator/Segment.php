@@ -76,6 +76,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         // create something like a ::createValidationResponse? The main problem is again the translation, since validations are in english and therefore not translatable
         throw new editor_Models_Segment_UnprocessableException($errorCode, [
             'errors' => $this->getMessages(),
+            'segmentContent' => $data['targetEdit'] ?? '- targetEdit not given -',
         ]);
     }
 

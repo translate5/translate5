@@ -339,6 +339,11 @@ Ext.define('Editor.controller.ServerException', {
                  });
                 return;
         }
+
+        if(json && json.errorMessage && /Fatal: Could not connect to the database!/.test(json.errorMessage)) {
+            Editor.MessageBox.addError('The Database is currently not available. <br>Please retry in a few seconds / minutes.');
+            return;
+        }
         if(json && json.errorMessage) {
             statusText += ': <br>'+json.errorMessage;
         }
