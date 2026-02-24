@@ -89,10 +89,36 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     onEditableColumnRender: function (column) {
         let me = this;
         column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
-
             // If TrackChanges plugin is active - append 'is-mqm' class to the <del> tags containing <img> tag
             if (Editor.plugins.TrackChanges) {
                 value = value.replaceAll(/(<del class=")([^>]+><img)/g, '$1is-mqm $2');
+            }
+
+            try {
+                const container = document.createElement('div');
+                container.innerHTML = value;
+                const newlineDivs = container.querySelectorAll('div.newline');
+
+                newlineDivs.forEach(div => {
+                    // skip if the newline div is inside a <del> (mirror add-line-breaks behavior)
+                    if (div.closest('del') !== null) {
+                        return;
+                    }
+
+                    const nextNode = div.nextSibling;
+
+                    // avoid inserting duplicate <br> if there already is one
+                    if (nextNode && nextNode.nodeType === Node.ELEMENT_NODE && nextNode.tagName.toLowerCase() === 'br') {
+                        return;
+                    }
+
+                    div.parentNode.insertBefore(document.createElement('br'), nextNode);
+                });
+
+                value = container.innerHTML;
+            } catch (e) {
+                // Fallback to regex behavior if DOM parsing fails
+                value = value.replaceAll(/<div([^>]*class="[^"]*\bnewline\b[^>]*)>(.*?)<\/div>/gi, '<div$1>$2</div><br/>');
             }
 
             setTimeout(function () {
