@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use editor_Task_Type;
 use MittagQI\Translate5\Repository\{SegmentHistoryDataRepository, SegmentHistoryRepository};
+use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
 use MittagQI\Translate5\Statistics\Helpers\LevenshteinCalcTaskHistory;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\{InputInterface, InputOption};
@@ -70,6 +71,10 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
         );
     }
 
+    /**
+     * @throws InvalidInputForLevenshtein
+     * @throws \Zend_Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
@@ -124,7 +129,7 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
                 implode('","', editor_Task_Type::getInstance()->getTaskTypes()) . '") ORDER BY id')
         );
         $progressBar = new ProgressBar($output, count($allTasks));
-        $levenshteinCalc = new LevenshteinCalcTaskHistory($sqlSince);
+        $levenshteinCalc = LevenshteinCalcTaskHistory::create($sqlSince);
 
         foreach ($allTasks as $taskGuid => $workflowName) {
             $levenshteinCalc->calculate($taskGuid, $workflowName);

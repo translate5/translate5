@@ -56,7 +56,7 @@ class StatisticsAggregateTest extends JsonTestAbstract
     {
         self::$aggregation = SegmentHistoryAggregationRepository::create();
         self::$aggregateTask = new AggregateTaskHistory();
-        self::$levenshteinCalc = new LevenshteinCalcTaskHistory();
+        self::$levenshteinCalc = LevenshteinCalcTaskHistory::create();
         self::$db = Zend_Db_Table::getDefaultAdapter();
 
         $config->addTask('de', 'en', -1, '3_trans_units_6_segments.xlf');

@@ -34,32 +34,40 @@ use editor_Models_SegmentField;
 use editor_Models_Workflow_Step;
 use editor_Workflow_Default;
 use MittagQI\Translate5\Repository\{SegmentHistoryDataRepository, SegmentHistoryRepository};
+use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
 use MittagQI\Translate5\Segment\SegmentLevenshtein;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 
-class LevenshteinCalcTaskHistory
+readonly class LevenshteinCalcTaskHistory
 {
-    private LoggedJobsData $jobsLogged;
-
-    private SegmentHistoryRepository $history;
-
-    private SegmentHistoryDataRepository $historyData;
-
-    private editor_Models_Workflow_Step $stepModel;
-
-    private ?Zend_Db_Adapter_Abstract $db;
-
-    public function __construct(
-        private readonly string $sqlSince = '',
+    protected function __construct(
+        private LoggedJobsData $jobsLogged,
+        private SegmentHistoryRepository $history,
+        private SegmentHistoryDataRepository $historyData,
+        private editor_Models_Workflow_Step $stepModel,
+        private SegmentLevenshtein $levenshtein,
+        private ?Zend_Db_Adapter_Abstract $db,
+        private string $sqlSince = '',
     ) {
-        $this->jobsLogged = new LoggedJobsData($sqlSince, false);
-        $this->history = SegmentHistoryRepository::create();
-        $this->historyData = new SegmentHistoryDataRepository();
-        $this->stepModel = new editor_Models_Workflow_Step();
-        $this->db = Zend_Db_Table::getDefaultAdapter();
     }
 
+    public static function create(string $sqlSince = ''): self
+    {
+        return new self(
+            new LoggedJobsData($sqlSince, false),
+            SegmentHistoryRepository::create(),
+            new SegmentHistoryDataRepository(),
+            new editor_Models_Workflow_Step(),
+            SegmentLevenshtein::create(),
+            Zend_Db_Table::getDefaultAdapter(),
+            $sqlSince,
+        );
+    }
+
+    /**
+     * @throws InvalidInputForLevenshtein
+     */
     public function calculate(string $taskGuid, string $workflowName): void
     {
         $results = $this->db->fetchAll(
@@ -186,6 +194,9 @@ class LevenshteinCalcTaskHistory
         }
     }
 
+    /**
+     * @throws InvalidInputForLevenshtein
+     */
     private function updateLevenshteinDistances(
         int $segmentId,
         string $segmentCurrentValue,
@@ -195,7 +206,8 @@ class LevenshteinCalcTaskHistory
         int $segmentHistoryId = 0,
     ): void {
         $segmentOriginalValue = $this->db->fetchOne(
-            'SELECT original FROM LEK_segment_data WHERE segmentId=' . $segmentId . ' AND name="' . editor_Models_SegmentField::TYPE_TARGET . '"'
+            'SELECT original FROM LEK_segment_data WHERE segmentId=' . $segmentId
+            . ' AND name="' . editor_Models_SegmentField::TYPE_TARGET . '"'
         );
         if ($segmentOriginalValue === '') {
             // load the last entry of the "translation" step (1st step of the workflow of "translation" type/role)
@@ -233,11 +245,11 @@ class LevenshteinCalcTaskHistory
             $segmentPrevStepValue = $segmentOriginalValue;
         }
 
-        $levenshteinOriginal = SegmentLevenshtein::calcDistance(
+        $levenshteinOriginal = $this->levenshtein->calcDistance(
             $segmentOriginalValue,
             $segmentCurrentValue
         );
-        $levenshteinPrevious = SegmentLevenshtein::calcDistance(
+        $levenshteinPrevious = $this->levenshtein->calcDistance(
             $segmentPrevStepValue,
             $segmentCurrentValue
         );
