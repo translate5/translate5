@@ -28,6 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\Translate5\Service\SystemCheck;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -47,16 +48,21 @@ class SystemCheckCommand extends Translate5AbstractCommand
 
         // the full command description shown when running the command with
         // the "--help" option
-            ->setHelp('Tool to check the system requirements and system health.');
-
-        $this->addArgument('module', InputArgument::OPTIONAL, 'Runs only a specific check module.');
-
-        $this->addOption(
-            'pre-installation',
-            null,
-            InputOption::VALUE_NONE,
-            'In installation mode only the basic environment check (or the given module) is called and the Zend Application is not initialized'
-        );
+            ->setHelp('Tool to check the system requirements and system health.')
+            ->addArgument('module', InputArgument::OPTIONAL, 'Runs only a specific check module.')
+            ->addOption(
+                'pre-installation',
+                null,
+                InputOption::VALUE_NONE,
+                'In installation mode only the basic environment check (or the given module) '
+                . 'is called and the Zend Application is not initialized'
+            )
+            ->addOption(
+                'no-services',
+                null,
+                InputOption::VALUE_NONE,
+                'No service checks are done, only local installation related.'
+            );
     }
 
     /**
@@ -64,7 +70,7 @@ class SystemCheckCommand extends Translate5AbstractCommand
      * {@inheritDoc}
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         require_once 'library/ZfExtended/Models/SystemRequirement/Validator.php';
         require_once 'library/ZfExtended/Models/SystemRequirement/Modules/Abstract.php';
@@ -88,7 +94,40 @@ class SystemCheckCommand extends Translate5AbstractCommand
         $result = 0;
         $validator = new \ZfExtended_Models_SystemRequirement_Validator($isInstallation);
         /* @var $validator \ZfExtended_Models_SystemRequirement_Validator */
-        $results = $validator->validate($module);
+
+        if ($input->getOption('no-services')) {
+            $results = $validator->validate($module, ignoredModules: [SystemCheck::CHECK_NAME]);
+        } else {
+            $results = $validator->validate($module);
+        }
+
+        if ($this->isPorcelain) {
+            $hasError = false;
+            $hasWarning = false;
+            foreach ($results as $module => $oneResult) {
+                if ($oneResult->hasError()) {
+                    $hasError = true;
+
+                    break;
+                }
+                if ($oneResult->hasWarning()) {
+                    $hasWarning = true;
+                    // do no break loop if another result has errors
+                }
+            }
+            if ($hasError) {
+                $this->io->error('Instance status problematic');
+
+                return self::FAILURE;
+            } elseif ($hasWarning) {
+                $this->io->warning('Instance status not optimal');
+
+                return self::FAILURE;
+            }
+            $this->io->success('Instance status all ok');
+
+            return self::SUCCESS;
+        }
 
         foreach ($results as $module => $oneResult) {
             /* @var $oneResult \ZfExtended_Models_SystemRequirement_Result */
