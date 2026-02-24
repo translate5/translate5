@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Segment;
 
+use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
 use MittagQI\Translate5\Segment\SegmentLevenshtein;
 use PHPUnit\Framework\TestCase;
 
@@ -82,8 +83,9 @@ TAG;
 
     /**
      * @dataProvider provideString
+     * @throws InvalidInputForLevenshtein
      */
-    public function testUTF8(string $s1, string $s2, int $expected, bool $requiresGrapheme = false): void
+    public function test(string $s1, string $s2, int $expected, bool $requiresGrapheme = false): void
     {
         if ($requiresGrapheme && PHP_VERSION_ID < 80500) {
             $this->markTestSkipped('Requires grapheme_levenshtein (PHP 8.5+).');

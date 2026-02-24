@@ -80,7 +80,7 @@ class StatisticsInspectCommand extends TaskCommand
             return self::FAILURE;
         }
 
-        $historyAggregationData = SegmentHistoryAggregationRepository::create();
+        $historyAggregationRepository = SegmentHistoryAggregationRepository::create();
         $aggregationRows = [];
         $levenshteinRows = [];
 
@@ -88,11 +88,11 @@ class StatisticsInspectCommand extends TaskCommand
         foreach ($tasks as $task) {
             $aggregationRows = array_merge(
                 $aggregationRows,
-                $historyAggregationData->getAggregationRowsByTaskGuid($task->getTaskGuid())
+                $historyAggregationRepository->getAggregationRowsByTaskGuid($task->getTaskGuid())
             );
             $levenshteinRows = array_merge(
                 $levenshteinRows,
-                $historyAggregationData->getLevenshteinRowsByTaskGuid($task->getTaskGuid())
+                $historyAggregationRepository->getLevenshteinRowsByTaskGuid($task->getTaskGuid())
             );
             $taskData[] = (array) $task->getDataObject();
         }
@@ -102,7 +102,7 @@ class StatisticsInspectCommand extends TaskCommand
 
         $workflowFilterValues = $this->normalizeWorkflowFilters($input->getOption('workflow'));
 
-        $kpi = new editor_Models_KPI(SegmentHistoryAggregationRepository::create());
+        $kpi = new editor_Models_KPI($historyAggregationRepository);
         $kpi->setTasks($taskData);
         $kpiStatistics = $kpi->getStatistics(
             $this->buildWorkflowFilters($workflowFilterValues),
