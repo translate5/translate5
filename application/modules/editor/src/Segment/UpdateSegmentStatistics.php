@@ -158,10 +158,10 @@ class UpdateSegmentStatistics
         }
 
         $segment->setLevenshteinOriginal(
-            LevenshteinUTF8::calcDistance($segmentOriginalValue, $segmentCurrentValue)
+            SegmentLevenshtein::calcDistance($segmentOriginalValue, $segmentCurrentValue)
         );
         $segment->setLevenshteinPrevious(
-            LevenshteinUTF8::calcDistance($segmentPrevStepValue, $segmentCurrentValue)
+            SegmentLevenshtein::calcDistance($segmentPrevStepValue, $segmentCurrentValue)
         );
     }
 

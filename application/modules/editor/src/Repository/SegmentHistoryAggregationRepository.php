@@ -249,6 +249,66 @@ class SegmentHistoryAggregationRepository
             );
     }
 
+    public function getAggregationRowsBySegmentId(int $segmentId): array
+    {
+        return $this->getRowsBySegmentId(SegmentHistoryAggregation::TABLE_NAME, $segmentId);
+    }
+
+    public function getLevenshteinRowsBySegmentId(int $segmentId): array
+    {
+        return $this->getRowsBySegmentId(SegmentHistoryAggregation::TABLE_NAME_LEV, $segmentId);
+    }
+
+    public function getAggregationRowsByTaskGuid(string $taskGuid): array
+    {
+        return $this->getRowsByTaskGuid(SegmentHistoryAggregation::TABLE_NAME, $taskGuid);
+    }
+
+    public function getLevenshteinRowsByTaskGuid(string $taskGuid): array
+    {
+        return $this->getRowsByTaskGuid(SegmentHistoryAggregation::TABLE_NAME_LEV, $taskGuid);
+    }
+
+    private function getRowsBySegmentId(string $tableName, int $segmentId): array
+    {
+        if (! $this->client->isAlive()) {
+            return [];
+        }
+
+        try {
+            return $this->client->select(
+                'SELECT * FROM ' . $tableName . ' WHERE segmentId = :segmentId',
+                [
+                    'segmentId' => $segmentId,
+                ]
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+
+            return [];
+        }
+    }
+
+    private function getRowsByTaskGuid(string $tableName, string $taskGuid): array
+    {
+        if (! $this->client->isAlive()) {
+            return [];
+        }
+
+        try {
+            return $this->client->select(
+                'SELECT * FROM ' . $tableName . ' WHERE taskGuid = :taskGuid',
+                [
+                    'taskGuid' => trim($taskGuid, '{}'),
+                ]
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+
+            return [];
+        }
+    }
+
     private function logError(string $errMsg): void
     {
         $this->logger->error('E1633', 'Statistics DB error: {msg}', [
