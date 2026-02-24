@@ -42,7 +42,9 @@ use editor_Models_Segment_TrackChangeTag;
 use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
 
 /**
- * Replaces tags as characters and multibyte characters as single bytes till grapheme_levenshtein can be used
+ * Replaces tags as characters out of the Private Use Area (PUA) of Unicode
+ *  so that levenshtein recognizes them as single change.
+ * All multibyte characters are also replaced as single bytes till grapheme_levenshtein can be used.
  */
 final class SegmentLevenshtein
 {
@@ -57,7 +59,7 @@ final class SegmentLevenshtein
         }
 
         $charMap = [];
-        $usedPuaChars = self::collectPuaChars($s1 . $s2);
+        $usedPuaChars = self::collectPrivateUseAreaChars($s1 . $s2);
         $puaCursor = 0xE000;
         $s1 = self::removeAndProtectTags($s1, $charMap, $usedPuaChars, $puaCursor);
         $s2 = self::removeAndProtectTags($s2, $charMap, $usedPuaChars, $puaCursor);
@@ -108,7 +110,7 @@ final class SegmentLevenshtein
             $placeHolders = array_keys($tag->getOriginalTags());
             foreach ($placeHolders as $placeholder) {
                 if (! array_key_exists($placeholder, $map)) {
-                    $map[$placeholder] = self::nextUnusedPuaChar($usedPuaChars, $puaCursor);
+                    $map[$placeholder] = self::nextUnusedPrivateUseAreaChar($usedPuaChars, $puaCursor);
                 }
             }
         }
@@ -125,7 +127,7 @@ final class SegmentLevenshtein
     /**
      * @return array<string, bool>
      */
-    private static function collectPuaChars(string $text): array
+    private static function collectPrivateUseAreaChars(string $text): array
     {
         if (! preg_match_all('/[\x{E000}-\x{F8FF}]/u', $text, $matches)) {
             return [];
@@ -137,7 +139,7 @@ final class SegmentLevenshtein
     /**
      * @throws InvalidInputForLevenshtein
      */
-    private static function nextUnusedPuaChar(array &$usedPuaChars, int &$puaCursor): string
+    private static function nextUnusedPrivateUseAreaChar(array &$usedPuaChars, int &$puaCursor): string
     {
         while ($puaCursor <= 0xF8FF) {
             $char = function_exists('mb_chr')
