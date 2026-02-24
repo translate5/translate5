@@ -38,30 +38,44 @@ use editor_Workflow_Default;
 use MittagQI\Translate5\Repository\{SegmentHistoryDataRepository,
     SegmentHistoryRepository
 };
+use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
 use MittagQI\Translate5\Statistics\Helpers\LoggedJobsData;
+use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Models_Entity_NotFoundException;
 
 class UpdateSegmentStatistics
 {
     private bool $enabled;
 
+    /**
+     * @throws Zend_Exception
+     */
     public function __construct(
         private readonly SegmentHistoryRepository $history,
         private readonly SegmentHistoryDataRepository $historyData,
         private readonly SegmentHistoryAggregation $aggregator,
+        private readonly SegmentLevenshtein $levenshtein,
     ) {
         $this->enabled = (bool) Zend_Registry::get('config')->resources->db->statistics?->enabled;
     }
 
+    /**
+     * @throws Zend_Exception
+     */
     public static function create(): self
     {
         return new self(
             SegmentHistoryRepository::create(),
             new SegmentHistoryDataRepository(),
-            SegmentHistoryAggregation::create()
+            SegmentHistoryAggregation::create(),
+            SegmentLevenshtein::create(),
         );
     }
 
+    /**
+     * @throws InvalidInputForLevenshtein
+     */
     public function updateFor(
         editor_Models_Segment $segment,
         string $workflowName,
@@ -126,6 +140,9 @@ class UpdateSegmentStatistics
         );
     }
 
+    /**
+     * @throws InvalidInputForLevenshtein
+     */
     private function updateLevenshtein(
         editor_Models_Segment $segment,
         int $workflowStepNr,
@@ -158,10 +175,10 @@ class UpdateSegmentStatistics
         }
 
         $segment->setLevenshteinOriginal(
-            SegmentLevenshtein::calcDistance($segmentOriginalValue, $segmentCurrentValue)
+            $this->levenshtein->calcDistance($segmentOriginalValue, $segmentCurrentValue)
         );
         $segment->setLevenshteinPrevious(
-            SegmentLevenshtein::calcDistance($segmentPrevStepValue, $segmentCurrentValue)
+            $this->levenshtein->calcDistance($segmentPrevStepValue, $segmentCurrentValue)
         );
     }
 
@@ -195,14 +212,12 @@ class UpdateSegmentStatistics
             'role' => editor_Workflow_Default::ROLE_TRANSLATOR,
         ]);
         if (empty($translatorStep)) {
-            // error_log('No first translation step for "'.$workflowName.'" workflow');
             return null;
         }
 
         return $this->getLastHistoryEntry($segmentId, [
             'workflowStep = ?' => $translatorStep['name'],
         ]);
-        // error_log('No history entry for segment #' . $segment->getId().' within "'.$translatorStep['name'].'" step ['.$currentStep['name'].']');
     }
 
     private function getLastHistoryEntry(int $segmentId, array $filter): ?string
@@ -225,9 +240,14 @@ class UpdateSegmentStatistics
         $langResId = 0;
         if (! empty($langResUuid)) {
             $languageResource = new editor_Models_LanguageResources_LanguageResource();
-            $langResInfo = $languageResource->loadByUuid($langResUuid);
-            if (! empty($langResInfo)) {
-                $langResId = (int) $langResInfo->toArray()['id'];
+
+            try {
+                $langResInfo = $languageResource->loadByUuid($langResUuid);
+                if (! empty($langResInfo)) {
+                    $langResId = (int) $langResInfo->toArray()['id'];
+                }
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                // do nothing
             }
         }
 

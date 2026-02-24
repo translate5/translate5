@@ -91,7 +91,7 @@ TAG;
             $this->markTestSkipped('Requires grapheme_levenshtein (PHP 8.5+).');
         }
 
-        self::assertEquals($expected, SegmentLevenshtein::calcDistance($s1, $s2));
+        self::assertEquals($expected, SegmentLevenshtein::create()->calcDistance($s1, $s2));
     }
 
     /**

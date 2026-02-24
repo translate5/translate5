@@ -38,6 +38,7 @@ namespace MittagQI\Translate5\Segment;
 
 use editor_Models_Segment_InternalTag;
 use editor_Models_Segment_Mqm;
+use editor_Models_Segment_TermTag;
 use editor_Models_Segment_TrackChangeTag;
 use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
 
@@ -46,13 +47,31 @@ use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
  *  so that levenshtein recognizes them as single change.
  * All multibyte characters are also replaced as single bytes till grapheme_levenshtein can be used.
  */
-final class SegmentLevenshtein
+final readonly class SegmentLevenshtein
 {
+    public function __construct(
+        private editor_Models_Segment_TrackChangeTag $trackChangeTag,
+        private editor_Models_Segment_TermTag $termTag,
+        private editor_Models_Segment_InternalTag $internalTag,
+        private editor_Models_Segment_Mqm $mqmTag,
+    ) {
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            new editor_Models_Segment_TrackChangeTag(),
+            new editor_Models_Segment_TermTag(),
+            new editor_Models_Segment_InternalTag(),
+            new editor_Models_Segment_Mqm(),
+        );
+    }
+
     /**
      * calculates the levenshtein distance for segment content
      * @throws InvalidInputForLevenshtein
      */
-    public static function calcDistance(string $s1, string $s2): int
+    public function calcDistance(string $s1, string $s2): int
     {
         if ($s1 === $s2) {
             return 0;
@@ -61,8 +80,8 @@ final class SegmentLevenshtein
         $charMap = [];
         $usedPuaChars = self::collectPrivateUseAreaChars($s1 . $s2);
         $puaCursor = 0xE000;
-        $s1 = self::removeAndProtectTags($s1, $charMap, $usedPuaChars, $puaCursor);
-        $s2 = self::removeAndProtectTags($s2, $charMap, $usedPuaChars, $puaCursor);
+        $s1 = $this->removeAndProtectTags($s1, $charMap, $usedPuaChars, $puaCursor);
+        $s2 = $this->removeAndProtectTags($s2, $charMap, $usedPuaChars, $puaCursor);
 
         if (str_contains($s1, '<')) {
             throw new InvalidInputForLevenshtein('E1776', [
@@ -92,7 +111,7 @@ final class SegmentLevenshtein
      * - protects internal tags as private use area characters so that tag changes are recognized as change too
      * @throws InvalidInputForLevenshtein
      */
-    private static function removeAndProtectTags(
+    private function removeAndProtectTags(
         string $str,
         array &$map,
         array &$usedPuaChars,
@@ -100,14 +119,14 @@ final class SegmentLevenshtein
     ): string {
         if (str_contains($str, '<')) {
             // remove change tracking tags
-            $str = (new editor_Models_Segment_TrackChangeTag())->removeTrackChanges($str);
+            $str = $this->trackChangeTag->removeTrackChanges($str);
+            $str = $this->termTag->remove($str);
         }
 
         // find all internal tags - if any
         if (str_contains($str, '<')) {
-            $tag = new editor_Models_Segment_InternalTag();
-            $str = $tag->protectWithSemanticIds($str);
-            $placeHolders = array_keys($tag->getOriginalTags());
+            $str = $this->internalTag->protectWithSemanticIds($str);
+            $placeHolders = array_keys($this->internalTag->getOriginalTags());
             foreach ($placeHolders as $placeholder) {
                 if (! array_key_exists($placeholder, $map)) {
                     $map[$placeholder] = self::nextUnusedPrivateUseAreaChar($usedPuaChars, $puaCursor);
@@ -116,8 +135,7 @@ final class SegmentLevenshtein
         }
 
         if (str_contains($str, '<img')) {
-            $tag = new editor_Models_Segment_Mqm();
-            $str = $tag->remove($str);
+            $str = $this->mqmTag->remove($str);
         }
 
         // finally remap tag placeholders with private use area character
