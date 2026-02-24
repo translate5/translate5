@@ -68,6 +68,11 @@ TAG;
             'utf8-normalize-2' => ['atitinkančios apsauginės', 'atitinkancios apsaugines', 2],
             'utf8-normalize-3' => ['atitinkančios apsauginės', 'atitinkancios apsaugine', 3],
             'internal-tag-order' => ['Apsauginės platformo' . $internalTag, $internalTag . 'Apsauginės platformoč', 2],
+            'internal-tag-term' => [
+                'Apsauginės <div class="term deprecatedTerm" title="term2" data-tbxid="81a5458c-c4b3-49e9-af3b-c6222b91275a">platformo' . $internalTag . '</div>',
+                'Apsauginės platformo' . $internalTag,
+                0,
+            ],
             'internal-tag-volatile' => [
                 $internalTagVolatile1 . 'Two words',
                 $internalTagVolatile2 . 'Two' . $internalTag . 'words',

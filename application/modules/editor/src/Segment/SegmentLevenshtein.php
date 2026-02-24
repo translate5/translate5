@@ -78,7 +78,7 @@ final readonly class SegmentLevenshtein
         }
 
         $charMap = [];
-        $usedPuaChars = self::collectPrivateUseAreaChars($s1 . $s2);
+        $usedPuaChars = $this->collectPrivateUseAreaChars($s1 . $s2);
         $puaCursor = 0xE000;
         $s1 = $this->removeAndProtectTags($s1, $charMap, $usedPuaChars, $puaCursor);
         $s2 = $this->removeAndProtectTags($s2, $charMap, $usedPuaChars, $puaCursor);
@@ -94,16 +94,16 @@ final readonly class SegmentLevenshtein
             ]);
         }
 
-        return self::levenshteinDistance($s1, $s2);
+        return $this->levenshteinDistance($s1, $s2);
     }
 
-    private static function levenshteinDistance(string $s1, string $s2): int
+    private function levenshteinDistance(string $s1, string $s2): int
     {
         if (function_exists('grapheme_levenshtein')) {
             return grapheme_levenshtein($s1, $s2);
         }
 
-        return self::asciiLevenshtein($s1, $s2);
+        return $this->asciiLevenshtein($s1, $s2);
     }
 
     /**
@@ -120,7 +120,6 @@ final readonly class SegmentLevenshtein
         if (str_contains($str, '<')) {
             // remove change tracking tags
             $str = $this->trackChangeTag->removeTrackChanges($str);
-            $str = $this->termTag->remove($str);
         }
 
         // find all internal tags - if any
@@ -129,9 +128,12 @@ final readonly class SegmentLevenshtein
             $placeHolders = array_keys($this->internalTag->getOriginalTags());
             foreach ($placeHolders as $placeholder) {
                 if (! array_key_exists($placeholder, $map)) {
-                    $map[$placeholder] = self::nextUnusedPrivateUseAreaChar($usedPuaChars, $puaCursor);
+                    $map[$placeholder] = $this->nextUnusedPrivateUseAreaChar($usedPuaChars, $puaCursor);
                 }
             }
+
+            //Term removing MUST be done after internalTag protection!
+            $str = $this->termTag->remove($str);
         }
 
         if (str_contains($str, '<img')) {
@@ -145,7 +147,7 @@ final readonly class SegmentLevenshtein
     /**
      * @return array<string, bool>
      */
-    private static function collectPrivateUseAreaChars(string $text): array
+    private function collectPrivateUseAreaChars(string $text): array
     {
         if (! preg_match_all('/[\x{E000}-\x{F8FF}]/u', $text, $matches)) {
             return [];
@@ -157,7 +159,7 @@ final readonly class SegmentLevenshtein
     /**
      * @throws InvalidInputForLevenshtein
      */
-    private static function nextUnusedPrivateUseAreaChar(array &$usedPuaChars, int &$puaCursor): string
+    private function nextUnusedPrivateUseAreaChar(array &$usedPuaChars, int &$puaCursor): string
     {
         while ($puaCursor <= 0xF8FF) {
             $char = function_exists('mb_chr')
@@ -175,16 +177,16 @@ final readonly class SegmentLevenshtein
         throw new InvalidInputForLevenshtein('E1777');
     }
 
-    private static function asciiLevenshtein(string $s1, string $s2): int
+    private function asciiLevenshtein(string $s1, string $s2): int
     {
         $map = [];
-        $s1 = self::utf8ToExtendedAscii($s1, $map);
-        $s2 = self::utf8ToExtendedAscii($s2, $map);
+        $s1 = $this->utf8ToExtendedAscii($s1, $map);
+        $s2 = $this->utf8ToExtendedAscii($s2, $map);
 
         return levenshtein($s1, $s2);
     }
 
-    private static function utf8ToExtendedAscii(string $str, array &$map): string
+    private function utf8ToExtendedAscii(string $str, array &$map): string
     {
         $matches = [];
         if (preg_match_all('/[\xC0-\xF7][\x80-\xBF]+/', $str, $matches)) {
