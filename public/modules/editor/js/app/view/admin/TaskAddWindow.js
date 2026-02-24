@@ -38,7 +38,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.task.UserAssocWizardViewModel',
         'Editor.view.admin.projectWizard.UploadTabPanel',
         'Editor.view.admin.TaskAddWindowViewController',
-        'Editor.view.LanguageResources.pivot.PivotWizard'
+        'Editor.view.LanguageResources.pivot.PivotWizard',
+        'Editor.store.admin.SelectableLanguages'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'

@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * Language Combo Box. name must be set in order to find out automatically the labels
  */
 Ext.define('Editor.view.LanguageCombo', {
+    requires: ['Editor.store.admin.SelectableLanguages'],
     extend: 'Ext.form.field.ComboBox',
     alias: 'widget.languagecombo',
     typeAhead: false,

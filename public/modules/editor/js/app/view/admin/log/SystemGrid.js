@@ -56,6 +56,7 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
             config,
+            languageStore = Ext.StoreMgr.get('admin.Languages'),
             levelFilter = [];
         Ext.Object.each(Editor.util.Util.prototype.errorLevel, function(k, v) {
             levelFilter.push({
@@ -84,8 +85,28 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
                         '<p><b>Trace:</b> <pre>{trace}</pre></p>',
                     '</tpl>',
                     '<tpl if="extra">',
-                        '<p><b>Extra:</b> <pre>{[Ext.String.htmlEncode(values.extra)]}</pre></p>',
-                    '</tpl>'
+                        '<p><b>Extra:</b> <pre>{[this.renderExtra(values.extra)]}</pre></p>',
+                    '</tpl>',
+                    {
+                        renderExtra: function(extra) {
+                            let value = Ext.isString(extra) ? extra : Ext.encode(extra);
+                            value = this.replaceLangIds(value);
+                            return Ext.String.htmlEncode(value);
+                        },
+                        replaceLangIds: function(value) {
+                            if (!languageStore || !Ext.isString(value)) {
+                                return value;
+                            }
+                            return value.replaceAll(/"((sourceLang|targetLang|relaisLang|lang)(uage)?(id|Id|ID)?)"\s*:\s*"(\d+)"/g, function(match, key, x, y, z, id) {
+                                let rec = languageStore.getById(Number.parseInt(id, 10));
+                                if (!rec) {
+                                    return match;
+                                }
+                                let label = rec.get('label') || rec.get('rfc5646');
+                                return '"' + key + '": "' + id + ' → ' + label + '"';
+                            });
+                        }
+                    }
                 )
             }],
             columns: [
