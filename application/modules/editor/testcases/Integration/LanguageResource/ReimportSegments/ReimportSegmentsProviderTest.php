@@ -85,13 +85,23 @@ class ReimportSegmentsProviderTest extends TestCase
         // Simulate getFilter() returning the filter mock
         $this->segmentMock->method('getFilter')->willReturn($filterMock);
 
+        $index = 1;
         // Expect addFilter to be called with a filter object matching the timestamp
-        $filterMock->expects(self::once())
+        $filterMock->expects(self::exactly(2))
             ->method('addFilter')
-            ->with(self::callback(static function ($filterObject) use ($timestamp) {
-                return $filterObject->field === 'timestamp' &&
-                    $filterObject->comparison === 'eq' &&
-                    $filterObject->value === $timestamp;
+            ->with(self::callback(static function ($filter) use (&$index, $timestamp) {
+                if ($index === 1) {
+                    $index++;
+
+                    return $filter->field === 'timestamp' &&
+                        $filter->comparison === 'eq' &&
+                        $filter->value === $timestamp;
+                }
+
+                return $filter->field === 'autoStateId' &&
+                    $filter->type === 'notInList' &&
+                    $filter->comparison === 'in' &&
+                    $filter->value === [AutoStates::BLOCKED];
             }));
 
         $result = $this->provider->getSegments($taskGuid, $filters);
@@ -125,10 +135,10 @@ class ReimportSegmentsProviderTest extends TestCase
                     $filterObject->type === 'notInList' &&
                     $filterObject->comparison === 'in' &&
                     $filterObject->value === [
+                        AutoStates::BLOCKED,
                         AutoStates::NOT_TRANSLATED,
                         AutoStates::PRETRANSLATED,
                         AutoStates::LOCKED,
-                        AutoStates::BLOCKED,
                     ];
             }));
 

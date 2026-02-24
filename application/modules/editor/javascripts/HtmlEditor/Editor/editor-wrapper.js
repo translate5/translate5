@@ -8,6 +8,10 @@ import DocumentFragment from "../Mixin/document-fragment";
 import InsertPreprocessor from "../DataCleanup/insert-preprocessor";
 import calculateNodeLength from "../Tools/calculate-node-length";
 import LanguageResolver from "../Editor/language-resolver";
+import EditorHistory from "./editor-history";
+import removeTagOnCorrespondingDeletion from "../Modifiers/remove-tag-on-corresponding-deletion.js";
+import preserveOriginalTextIfNoModifications from "../Modifiers/preserve-original-text-if-no-modifications.js";
+import addLineBreaks from "../Modifiers/add-line-breaks.js";
 // import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 export default class EditorWrapper {
@@ -39,6 +43,9 @@ export default class EditorWrapper {
 
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
+
+    // History for undo/redo operations
+    #editorHistory = new EditorHistory();
 
     /**
      * @param {HTMLElement} element
@@ -84,14 +91,20 @@ export default class EditorWrapper {
 
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions, position) => this.#removeTagOnCorrespondingDeletion(text, actions, position),
+            (text, actions, position) => removeTagOnCorrespondingDeletion(text, actions, position, this._tagsConversion),
             0
         );
 
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions, position) => this.#preserveOriginalTextIfNoModifications(text, actions, position),
+            (text, actions, position) => preserveOriginalTextIfNoModifications(text, actions, position),
             9999
+        );
+
+        this.registerModifier(
+            EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (text, actions, position) => addLineBreaks(text, actions, position),
+            9998
         );
 
         return this.#create(uiLocale, editorLocale);
@@ -106,6 +119,7 @@ export default class EditorWrapper {
      */
     resetEditor() {
         this.modifiersLastRunId = null;
+        this.#editorHistory.clear();
         this._editor.model.change(writer => {
             const root = this._editor.model.document.getRoot();
             writer.remove(writer.createRangeIn(root));
@@ -202,16 +216,20 @@ export default class EditorWrapper {
         const tagNumber = this._tagsConversion
             .getNextWhitespaceTagNumber(this.#getRawDataNode().getElementsByTagName('img'));
         const divSpanHtml = this._tagsConversion.generateWhitespaceTag(whitespaceType, tagNumber);
-        const image = this.dataTransformer.transformWhitespace(divSpanHtml)._transformed.outerHTML;
+        let newLine = this.dataTransformer.transformWhitespace(divSpanHtml)._transformed.outerHTML;
+
+        if (this._tagsConversion.isNewLineTag(divSpanHtml.className)) {
+            newLine += '<br>';
+        }
 
         if (!position) {
             const position = this._editor.model.document.selection.getFirstPosition().path[1];
 
-            const viewFragment = this._editor.data.processor.toView(image);
+            const viewFragment = this._editor.data.processor.toView(newLine);
             const modelFragment = this._editor.data.toModel(viewFragment);
             this._editor.model.insertContent(modelFragment);
 
-            const action = {type: EditorWrapper.ACTION_TYPE.INSERT, content: image, position: position, correction: 0};
+            const action = {type: EditorWrapper.ACTION_TYPE.INSERT, content: newLine, position: position, correction: 0};
             this.#triggerDataChanged([action]);
 
             return;
@@ -230,7 +248,7 @@ export default class EditorWrapper {
             start = position - 1;
         }
 
-        this.replaceContentInRange(start, end, image, false, true);
+        this.replaceContentInRange(start, end, newLine, false, true);
     }
 
     /**
@@ -574,12 +592,34 @@ export default class EditorWrapper {
     }
 
     undo() {
-        this._editor.execute('undo');
+        if (this.#editorHistory.moveToPrevious()) {
+            this.#restoreFromHistory();
+        }
     }
 
     redo() {
-        this._editor.execute('redo');
+        if (this.#editorHistory.moveToNext()) {
+            this.#restoreFromHistory();
+        }
     }
+
+    /**
+     * Restore editor state from history
+     * @private
+     */
+    #restoreFromHistory() {
+        const snapshot = this.#editorHistory.getCurrentSnapshot();
+
+        if (!snapshot) {
+            return;
+        }
+
+        this.#replaceDataInEditor(snapshot.data, snapshot.cursorPosition);
+
+        // Trigger data changed event to run modifiers
+        this.#triggerDataChanged(null, true);
+    }
+
 
     /**
      * Returns HTML node of an editor
@@ -623,9 +663,9 @@ export default class EditorWrapper {
         this.#triggerDataChanged();
     }
 
-    #triggerDataChanged(actions = null) {
+    #triggerDataChanged(actions = null, isRestoringFromHistory = false) {
         const position = this._editor.model.document.selection.getFirstPosition().path[1];
-        this.#runModifiers(actions || [{position: position, correction: 0}]);
+        this.#runModifiers(actions || [{position: position, correction: 0}], isRestoringFromHistory);
     }
 
     /**
@@ -645,10 +685,10 @@ export default class EditorWrapper {
                     && ! node.getAttribute('htmlDel')
                 ) {
                     const imagePosition = writer.createPositionBefore(node);
+                    const classes = node.getAttribute('htmlImgAttributes').classes.join(' ');
                     imagesWithPositions[imagePosition.path[1]] = {
-                        type: this._tagsConversion.getInternalTagTypeByClass(
-                            node.getAttribute('htmlImgAttributes').classes.join(' ')
-                        ),
+                        type: this._tagsConversion.getInternalTagTypeByClass(classes),
+                        isNewLine: this._tagsConversion.isNewLineTag(classes),
                         number: node.getAttribute('htmlImgAttributes').attributes['data-tag-number'],
                     };
                 }
@@ -753,6 +793,21 @@ export default class EditorWrapper {
 
     // region editor event listeners
     #addListeners(editor) {
+        editor.keystrokes.set( 'Ctrl+Z', ( keyEvtData, cancel ) => {
+            this.undo();
+            cancel();
+        }, { priority: 'high' } );
+
+        editor.keystrokes.set( 'Ctrl+Y', ( keyEvtData, cancel ) => {
+            this.redo();
+            cancel();
+        }, { priority: 'high' } );
+
+        editor.keystrokes.set( 'Ctrl+Shift+Z', ( keyEvtData, cancel ) => {
+            this.redo();
+            cancel();
+        }, { priority: 'high' } );
+
         const viewDocument = editor.editing.view.document;
         viewDocument.on(
             'enter',
@@ -1205,7 +1260,9 @@ export default class EditorWrapper {
         return result;
     }
 
-    #runModifiers(actions) {
+    #runModifiers(actions, isRestoringFromHistory = false) {
+        console.log('Running modifiers');
+
         const originalText = this.getRawData();
         let text = originalText;
         let position = actions[0]?.position || 0;
@@ -1217,6 +1274,12 @@ export default class EditorWrapper {
 
         if (text !== originalText || forceUpdate) {
             this.#replaceDataInEditor(text, position);
+        }
+
+        if (!isRestoringFromHistory) {
+            const currentData = this.getRawData();
+            const currentCursorPosition = this.getCursorPosition();
+            this.#editorHistory.saveSnapshot(currentData, currentCursorPosition);
         }
 
         this.#runAsyncModifiers();
@@ -1295,53 +1358,4 @@ export default class EditorWrapper {
         return this.dataTransformer.transformPartial(cleaned.childNodes);
     }
     //endregion
-
-    #removeTagOnCorrespondingDeletion(rawData, actions, position) {
-        const doc = RichTextEditor.stringToDom(rawData);
-
-        for (const action of actions) {
-            if (!action.type) {
-                continue;
-            }
-
-            if (!action.correspondingDeletion) {
-                continue;
-            }
-
-            const deletion = action.content[0];
-
-            let tag = deletion.toDom();
-            let parentNode;
-
-            if (!this._tagsConversion.isInternalTagNode(tag) && !this._tagsConversion.isMQMNode(tag)) {
-                parentNode = tag;
-                tag = tag.querySelector('img');
-            }
-
-            const allTags = doc.querySelectorAll('img');
-
-            for (const candidate of allTags) {
-                if (this._tagsConversion.isTrackChangesDelNode(candidate.parentNode)) {
-                    continue;
-                }
-
-                if (RichTextEditor.nodesAreSame(candidate, tag)) {
-                    candidate.parentNode.removeChild(candidate);
-                    break;
-                }
-            }
-        }
-
-        return [doc.innerHTML, position];
-    }
-
-    #preserveOriginalTextIfNoModifications(text, actions, position) {
-        const insertion = actions.find(action => action.type === 'insert');
-
-        if (text === '' && insertion !== undefined) {
-            return [insertion.content, Infinity];
-        }
-
-        return [text, position];
-    }
 }

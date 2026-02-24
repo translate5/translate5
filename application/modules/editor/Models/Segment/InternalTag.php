@@ -128,6 +128,25 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
 
     /**
+     * Protects internal tags using semantic placeholder ids based on tag type and tag number.
+     */
+    public function protectWithSemanticIds(string $segment): string
+    {
+        $this->originalTags = [];
+        $fallbackId = 1;
+
+        return $this->replace($segment, function (array $match) use (&$fallbackId): string {
+            $tag = $match[0];
+            $semanticId = $this->getSemanticPlaceholderId($tag, $fallbackId);
+            $placeholderId = $this->ensureUniquePlaceholderId($semanticId);
+            $placeholder = $this->getPlaceholderTemplate($placeholderId);
+            $this->originalTags[$placeholder] = $tag;
+
+            return $placeholder;
+        });
+    }
+
+    /**
      * Get all real (non whitespace) tags
      */
     public function getRealTags(string $segment)
@@ -140,6 +159,44 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
         //return the real tags (with cleaned index) from matches[0] by the keys from the found real tags above
         return array_values(array_intersect_key($matches[0], $realTags));
+    }
+
+    private function getSemanticPlaceholderId(string $tag, int &$fallbackId): string
+    {
+        $matches = [];
+        if (preg_match(self::REGEX_STARTTAG, $tag, $matches)) {
+            return 'open-' . $matches[1];
+        }
+        if (preg_match(self::REGEX_ENDTAG, $tag, $matches)) {
+            return 'close-' . $matches[1];
+        }
+        if (preg_match(self::REGEX_SINGLETAG, $tag, $matches)) {
+            return 'single-' . $matches[1];
+        }
+
+        return 'tag-' . $fallbackId++;
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    private function ensureUniquePlaceholderId(string $baseId): string
+    {
+        $candidateId = $baseId;
+        $placeholder = $this->getPlaceholderTemplate($candidateId);
+
+        while (isset($this->originalTags[$placeholder])) {
+            $parts = explode('-', $candidateId);
+            if (count($parts) >= 3 && ctype_digit(end($parts))) {
+                $parts[count($parts) - 1] = (string) ((int) end($parts) + 1);
+                $candidateId = implode('-', $parts);
+            } else {
+                $candidateId .= '-1';
+            }
+            $placeholder = $this->getPlaceholderTemplate($candidateId);
+        }
+
+        return $candidateId;
     }
 
     public function getRealTagMatches(string $segment): array

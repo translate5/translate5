@@ -63,21 +63,29 @@ class SegmentsProvider
             $this->segment->getFilter()->addFilter($filterObject);
         }
 
-        if ($filters[ReimportSegmentsOptions::FILTER_ONLY_EDITED] ?? false) {
-            // all loaded segments are filtered by the states
-            $filterObject = new \stdClass();
-            $filterObject->field = 'autoStateId';
-            $filterObject->type = 'notInList';
-            $filterObject->comparison = 'in';
-            $filterObject->value = [
-                AutoStates::NOT_TRANSLATED,
-                AutoStates::PRETRANSLATED,
-                AutoStates::LOCKED,
-                AutoStates::BLOCKED,
-            ];
+        $statesToFilter = [
+            AutoStates::BLOCKED,
+        ];
 
-            $this->segment->getFilter()->addFilter($filterObject);
+        if ($filters[ReimportSegmentsOptions::FILTER_ONLY_EDITED] ?? false) {
+            $statesToFilter = array_merge(
+                $statesToFilter,
+                [
+                    AutoStates::NOT_TRANSLATED,
+                    AutoStates::PRETRANSLATED,
+                    AutoStates::LOCKED,
+                ]
+            );
         }
+
+        // all loaded segments are filtered by the states
+        $filterObject = new \stdClass();
+        $filterObject->field = 'autoStateId';
+        $filterObject->type = 'notInList';
+        $filterObject->comparison = 'in';
+        $filterObject->value = $statesToFilter;
+
+        $this->segment->getFilter()->addFilter($filterObject);
 
         return new FilteredIterator($taskGuid, $this->segment);
     }

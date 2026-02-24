@@ -1021,7 +1021,11 @@ Ext.define('Editor.controller.SearchReplace', {
 
         // Function to traverse text nodes and calculate positions
         function traverseTextNodes(node) {
-            if (tagsConversion.isInternalTagNode(node) || tagsConversion.isMQMNode(node)) {
+            if (
+                tagsConversion.isInternalTagNode(node)
+                || tagsConversion.isMQMNode(node)
+                || tagsConversion.isLineBreakTag(node)
+            ) {
                 charCount += 1;
 
                 return;

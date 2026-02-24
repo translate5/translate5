@@ -385,6 +385,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
             const originalTextCleared = this.cleanupSpellcheckNodes(RichTextEditor.stringToDom(text));
             let editorContentAsText = this._getContentWithWhitespaceImagesAsText(text);
+            // Replace all new line tags to actual new line
+            editorContentAsText = editorContentAsText.replaceAll('<br>', '\n');
             editorContentAsText = this.cleanupForSpellchecking(RichTextEditor.stringToDom(editorContentAsText));
             editorContentAsText = RichTextEditor.unescapeHtml(editorContentAsText);
 
@@ -629,9 +631,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         const internalTagsPositions = [];
         const internalTagsWithPositions = this.editor.editor.getInternalTagsPositions();
         for (const position of Object.keys(internalTagsWithPositions)) {
-            // TODO use constant instead of a literal
             if (internalTagsWithPositions[position].type !== 'whitespace') {
-                internalTagsPositions.push(position);
+                internalTagsPositions.push(parseInt(position));
+            }
+
+            if (internalTagsWithPositions[position].isNewLine) {
+                // Each new line is a 2 tags now
+                internalTagsPositions.push(parseInt(position));
+                // internalTagsPositions.push(parseInt(position) + 1);
             }
         }
 
@@ -1112,7 +1119,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         const dom = RichTextEditor.stringToDom(html);
 
         for (const node of dom.childNodes) {
-            if (node.nodeName === 'IMG' && node.classList.contains('whitespace')) {
+            if (node.nodeName === 'IMG' && node.classList.contains('whitespace') && ! node.classList.contains('newline')) {
                 html = html.replace(node.outerHTML, ' ');
             }
         }

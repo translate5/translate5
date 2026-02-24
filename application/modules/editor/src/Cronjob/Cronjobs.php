@@ -83,6 +83,7 @@ class Cronjobs
         $gc->cleanUp();
         $this->doCronWorkflow('doCronPeriodical');
         $this->eventTrigger->triggerPeriodical();
+
         $this->logCall(CronEventTrigger::PERIODICAL);
     }
 
@@ -168,7 +169,7 @@ class Cronjobs
         $dbConfig = Zend_Registry::get('config')->resources->db;
 
         $optimizer = new DatabaseOptimizer(Zend_Db::factory($dbConfig));
-        $logger = Zend_Registry::get('logger')->cloneMe('core.database');
+        $logger = Zend_Registry::get('logger')->cloneMe('system.database');
         $optimizer->optimizeDaily(function (ReportDto $reportDto) use ($logger) {
             if ($reportDto->statusOk) {
                 $logger->info(

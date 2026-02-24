@@ -556,9 +556,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 
 ### Statistics
 
-| EventCode               | Context         | EventMessage                            | Description/Solution                                       |
-|:------------------------|:----------------|:----------------------------------------|:-----------------------------------------------------------|
-| <a id="E1722"></a>E1722 | Task Statistics | Multi purpose code for duration logging | Logging of the levenshtein / aggregation command duration  |
+| EventCode               | Context         | EventMessage                                                                      | Description/Solution                                                                             |
+|:------------------------|:----------------|:----------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------|
+| <a id="E1722"></a>E1722 | Task Statistics | Multi purpose code for duration logging                                           | Logging of the levenshtein / aggregation command duration                                        |
+| <a id="E1776"></a>E1776 | Task Statistics | Content given to levenshtein calculation got invalid tags: {content}              | The invalid tags must be handled by the calculation - that must be implemented!                  |
+| <a id="E1777"></a>E1777 | Task Statistics | Content given to levenshtein calculation is using all Private User Area Unicodes. | This can basically not happen since that means that really a lot of tags must be in the segment. |
 
 ### QA / AutoQA
 

@@ -515,6 +515,142 @@ class CallbacksQueue {
 
 /***/ }),
 
+/***/ "./Editor/editor-history.js":
+/*!**********************************!*\
+  !*** ./Editor/editor-history.js ***!
+  \**********************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ EditorHistory)
+/* harmony export */ });
+/**
+ * Manages undo/redo history for the editor
+ */
+class EditorHistory {
+    #history = [];
+    #historyIndex = -1;
+    #maxHistorySize = 100;
+
+    /**
+     * Save current editor state to history
+     *
+     * @param {string} data - The editor content
+     * @param {number} cursorPosition - The cursor position
+     */
+    saveSnapshot(data, cursorPosition) {
+        // If we're in the middle of history, remove all forward states
+        if (this.#historyIndex < this.#history.length - 1) {
+            this.#history = this.#history.slice(0, this.#historyIndex + 1);
+        }
+
+        // Add new state
+        this.#history.push({
+            data: data,
+            cursorPosition: cursorPosition
+        });
+
+        // Limit history size
+        if (this.#history.length > this.#maxHistorySize) {
+            this.#history.shift();
+        } else {
+            this.#historyIndex++;
+        }
+    }
+
+    /**
+     * Get snapshot at current history index
+     *
+     * @returns {{data: string, cursorPosition: number}|null}
+     */
+    getCurrentSnapshot() {
+        if (this.#historyIndex < 0 || this.#historyIndex >= this.#history.length) {
+            return null;
+        }
+
+        return this.#history[this.#historyIndex];
+    }
+
+    /**
+     * Move to previous state in history
+     *
+     * @returns {boolean} - True if moved successfully
+     */
+    moveToPrevious() {
+        if (this.#historyIndex > 0) {
+            this.#historyIndex--;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Move to next state in history
+     *
+     * @returns {boolean} - True if moved successfully
+     */
+    moveToNext() {
+        if (this.#historyIndex < this.#history.length - 1) {
+            this.#historyIndex++;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if undo is possible
+     *
+     * @returns {boolean}
+     */
+    canUndo() {
+        return this.#historyIndex > 0;
+    }
+
+    /**
+     * Check if redo is possible
+     *
+     * @returns {boolean}
+     */
+    canRedo() {
+        return this.#historyIndex < this.#history.length - 1;
+    }
+
+    /**
+     * Clear all history
+     */
+    clear() {
+        this.#history = [];
+        this.#historyIndex = -1;
+    }
+
+    /**
+     * Get current history size
+     *
+     * @returns {number}
+     */
+    size() {
+        return this.#history.length;
+    }
+
+    /**
+     * Get current history index
+     *
+     * @returns {number}
+     */
+    getCurrentIndex() {
+        return this.#historyIndex;
+    }
+}
+
+
+/***/ }),
+
 /***/ "./Editor/editor-wrapper.js":
 /*!**********************************!*\
   !*** ./Editor/editor-wrapper.js ***!
@@ -536,6 +672,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DataCleanup_insert_preprocessor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../DataCleanup/insert-preprocessor */ "./DataCleanup/insert-preprocessor.js");
 /* harmony import */ var _Tools_calculate_node_length__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../Tools/calculate-node-length */ "./Tools/calculate-node-length.js");
 /* harmony import */ var _Editor_language_resolver__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../Editor/language-resolver */ "./Editor/language-resolver.js");
+/* harmony import */ var _editor_history__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./editor-history */ "./Editor/editor-history.js");
+/* harmony import */ var _Modifiers_remove_tag_on_corresponding_deletion_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../Modifiers/remove-tag-on-corresponding-deletion.js */ "./Modifiers/remove-tag-on-corresponding-deletion.js");
+/* harmony import */ var _Modifiers_preserve_original_text_if_no_modifications_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../Modifiers/preserve-original-text-if-no-modifications.js */ "./Modifiers/preserve-original-text-if-no-modifications.js");
+/* harmony import */ var _Modifiers_add_line_breaks_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../Modifiers/add-line-breaks.js */ "./Modifiers/add-line-breaks.js");
+
+
+
+
 
 
 
@@ -577,6 +721,9 @@ class EditorWrapper {
 
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
+
+    // History for undo/redo operations
+    #editorHistory = new _editor_history__WEBPACK_IMPORTED_MODULE_10__["default"]();
 
     /**
      * @param {HTMLElement} element
@@ -622,14 +769,20 @@ class EditorWrapper {
 
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions, position) => this.#removeTagOnCorrespondingDeletion(text, actions, position),
+            (text, actions, position) => (0,_Modifiers_remove_tag_on_corresponding_deletion_js__WEBPACK_IMPORTED_MODULE_11__["default"])(text, actions, position, this._tagsConversion),
             0
         );
 
         this.registerModifier(
             EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-            (text, actions, position) => this.#preserveOriginalTextIfNoModifications(text, actions, position),
+            (text, actions, position) => (0,_Modifiers_preserve_original_text_if_no_modifications_js__WEBPACK_IMPORTED_MODULE_12__["default"])(text, actions, position),
             9999
+        );
+
+        this.registerModifier(
+            EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
+            (text, actions, position) => (0,_Modifiers_add_line_breaks_js__WEBPACK_IMPORTED_MODULE_13__["default"])(text, actions, position),
+            9998
         );
 
         return this.#create(uiLocale, editorLocale);
@@ -644,6 +797,7 @@ class EditorWrapper {
      */
     resetEditor() {
         this.modifiersLastRunId = null;
+        this.#editorHistory.clear();
         this._editor.model.change(writer => {
             const root = this._editor.model.document.getRoot();
             writer.remove(writer.createRangeIn(root));
@@ -740,16 +894,20 @@ class EditorWrapper {
         const tagNumber = this._tagsConversion
             .getNextWhitespaceTagNumber(this.#getRawDataNode().getElementsByTagName('img'));
         const divSpanHtml = this._tagsConversion.generateWhitespaceTag(whitespaceType, tagNumber);
-        const image = this.dataTransformer.transformWhitespace(divSpanHtml)._transformed.outerHTML;
+        let newLine = this.dataTransformer.transformWhitespace(divSpanHtml)._transformed.outerHTML;
+
+        if (this._tagsConversion.isNewLineTag(divSpanHtml.className)) {
+            newLine += '<br>';
+        }
 
         if (!position) {
             const position = this._editor.model.document.selection.getFirstPosition().path[1];
 
-            const viewFragment = this._editor.data.processor.toView(image);
+            const viewFragment = this._editor.data.processor.toView(newLine);
             const modelFragment = this._editor.data.toModel(viewFragment);
             this._editor.model.insertContent(modelFragment);
 
-            const action = {type: EditorWrapper.ACTION_TYPE.INSERT, content: image, position: position, correction: 0};
+            const action = {type: EditorWrapper.ACTION_TYPE.INSERT, content: newLine, position: position, correction: 0};
             this.#triggerDataChanged([action]);
 
             return;
@@ -768,7 +926,7 @@ class EditorWrapper {
             start = position - 1;
         }
 
-        this.replaceContentInRange(start, end, image, false, true);
+        this.replaceContentInRange(start, end, newLine, false, true);
     }
 
     /**
@@ -1112,12 +1270,34 @@ class EditorWrapper {
     }
 
     undo() {
-        this._editor.execute('undo');
+        if (this.#editorHistory.moveToPrevious()) {
+            this.#restoreFromHistory();
+        }
     }
 
     redo() {
-        this._editor.execute('redo');
+        if (this.#editorHistory.moveToNext()) {
+            this.#restoreFromHistory();
+        }
     }
+
+    /**
+     * Restore editor state from history
+     * @private
+     */
+    #restoreFromHistory() {
+        const snapshot = this.#editorHistory.getCurrentSnapshot();
+
+        if (!snapshot) {
+            return;
+        }
+
+        this.#replaceDataInEditor(snapshot.data, snapshot.cursorPosition);
+
+        // Trigger data changed event to run modifiers
+        this.#triggerDataChanged(null, true);
+    }
+
 
     /**
      * Returns HTML node of an editor
@@ -1161,9 +1341,9 @@ class EditorWrapper {
         this.#triggerDataChanged();
     }
 
-    #triggerDataChanged(actions = null) {
+    #triggerDataChanged(actions = null, isRestoringFromHistory = false) {
         const position = this._editor.model.document.selection.getFirstPosition().path[1];
-        this.#runModifiers(actions || [{position: position, correction: 0}]);
+        this.#runModifiers(actions || [{position: position, correction: 0}], isRestoringFromHistory);
     }
 
     /**
@@ -1183,10 +1363,10 @@ class EditorWrapper {
                     && ! node.getAttribute('htmlDel')
                 ) {
                     const imagePosition = writer.createPositionBefore(node);
+                    const classes = node.getAttribute('htmlImgAttributes').classes.join(' ');
                     imagesWithPositions[imagePosition.path[1]] = {
-                        type: this._tagsConversion.getInternalTagTypeByClass(
-                            node.getAttribute('htmlImgAttributes').classes.join(' ')
-                        ),
+                        type: this._tagsConversion.getInternalTagTypeByClass(classes),
+                        isNewLine: this._tagsConversion.isNewLineTag(classes),
                         number: node.getAttribute('htmlImgAttributes').attributes['data-tag-number'],
                     };
                 }
@@ -1291,6 +1471,21 @@ class EditorWrapper {
 
     // region editor event listeners
     #addListeners(editor) {
+        editor.keystrokes.set( 'Ctrl+Z', ( keyEvtData, cancel ) => {
+            this.undo();
+            cancel();
+        }, { priority: 'high' } );
+
+        editor.keystrokes.set( 'Ctrl+Y', ( keyEvtData, cancel ) => {
+            this.redo();
+            cancel();
+        }, { priority: 'high' } );
+
+        editor.keystrokes.set( 'Ctrl+Shift+Z', ( keyEvtData, cancel ) => {
+            this.redo();
+            cancel();
+        }, { priority: 'high' } );
+
         const viewDocument = editor.editing.view.document;
         viewDocument.on(
             'enter',
@@ -1743,7 +1938,9 @@ class EditorWrapper {
         return result;
     }
 
-    #runModifiers(actions) {
+    #runModifiers(actions, isRestoringFromHistory = false) {
+        console.log('Running modifiers');
+
         const originalText = this.getRawData();
         let text = originalText;
         let position = actions[0]?.position || 0;
@@ -1755,6 +1952,12 @@ class EditorWrapper {
 
         if (text !== originalText || forceUpdate) {
             this.#replaceDataInEditor(text, position);
+        }
+
+        if (!isRestoringFromHistory) {
+            const currentData = this.getRawData();
+            const currentCursorPosition = this.getCursorPosition();
+            this.#editorHistory.saveSnapshot(currentData, currentCursorPosition);
         }
 
         this.#runAsyncModifiers();
@@ -1833,55 +2036,6 @@ class EditorWrapper {
         return this.dataTransformer.transformPartial(cleaned.childNodes);
     }
     //endregion
-
-    #removeTagOnCorrespondingDeletion(rawData, actions, position) {
-        const doc = RichTextEditor.stringToDom(rawData);
-
-        for (const action of actions) {
-            if (!action.type) {
-                continue;
-            }
-
-            if (!action.correspondingDeletion) {
-                continue;
-            }
-
-            const deletion = action.content[0];
-
-            let tag = deletion.toDom();
-            let parentNode;
-
-            if (!this._tagsConversion.isInternalTagNode(tag) && !this._tagsConversion.isMQMNode(tag)) {
-                parentNode = tag;
-                tag = tag.querySelector('img');
-            }
-
-            const allTags = doc.querySelectorAll('img');
-
-            for (const candidate of allTags) {
-                if (this._tagsConversion.isTrackChangesDelNode(candidate.parentNode)) {
-                    continue;
-                }
-
-                if (RichTextEditor.nodesAreSame(candidate, tag)) {
-                    candidate.parentNode.removeChild(candidate);
-                    break;
-                }
-            }
-        }
-
-        return [doc.innerHTML, position];
-    }
-
-    #preserveOriginalTextIfNoModifications(text, actions, position) {
-        const insertion = actions.find(action => action.type === 'insert');
-
-        if (text === '' && insertion !== undefined) {
-            return [insertion.content, Infinity];
-        }
-
-        return [text, position];
-    }
 }
 
 
@@ -2167,6 +2321,149 @@ __webpack_require__.r(__webpack_exports__);
         return html;
     }
 });
+
+/***/ }),
+
+/***/ "./Modifiers/add-line-breaks.js":
+/*!**************************************!*\
+  !*** ./Modifiers/add-line-breaks.js ***!
+  \**************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ addLineBreaks)
+/* harmony export */ });
+/* harmony import */ var _Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Tools/string-to-dom.js */ "./Tools/string-to-dom.js");
+
+
+/**
+ * Add line breaks <br> after images with the "newline" class in the given HTML
+ * text to make the new line actually look like a new line.
+ *
+ * @param {string} text
+ * @param {Array} actions
+ * @param {int} position
+ * @returns {[string|*,undefined]}
+ */
+function addLineBreaks(text, actions, position) {
+    text = text.replaceAll(/<br>/gi, '');
+
+    // Check if the only action is inserting a single new line symbol is inserted
+    if (actions.length === 1 && actions[0].type === 'insert') {
+        const content = actions[0].content;
+
+        if (/^<img[^>]*class="[^"]*\bnewline\b[^"]*"[^>]*><br>$/.test(content)) {
+            position++;
+        }
+    }
+
+    const dom = (0,_Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__["default"])(text);
+    const brs = dom.querySelectorAll('img.newline');
+    let changed = false;
+
+    for (const br of brs) {
+        if (br.closest('del') !== null) {
+            continue;
+        }
+
+        const nextNode = br.nextSibling;
+
+        br.parentNode.insertBefore(document.createElement('br'), nextNode);
+        changed = true;
+
+        if (nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent.startsWith(' ')) {
+            nextNode.textContent = '\u00A0' + nextNode.textContent.substring(1);
+        }
+    }
+
+    return [changed ? dom.innerHTML : text, position];
+}
+
+
+/***/ }),
+
+/***/ "./Modifiers/preserve-original-text-if-no-modifications.js":
+/*!*****************************************************************!*\
+  !*** ./Modifiers/preserve-original-text-if-no-modifications.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ preserveOriginalTextIfNoModifications)
+/* harmony export */ });
+function preserveOriginalTextIfNoModifications(text, actions, position) {
+    const insertion = actions.find(action => action.type === 'insert');
+
+    if (text === '' && insertion !== undefined) {
+        return [insertion.content, Infinity];
+    }
+
+    return [text, position];
+}
+
+
+/***/ }),
+
+/***/ "./Modifiers/remove-tag-on-corresponding-deletion.js":
+/*!***********************************************************!*\
+  !*** ./Modifiers/remove-tag-on-corresponding-deletion.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ removeTagOnCorrespondingDeletion)
+/* harmony export */ });
+/* harmony import */ var _Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Tools/string-to-dom.js */ "./Tools/string-to-dom.js");
+/* harmony import */ var _Tools_compare_html_nodes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Tools/compare-html-nodes.js */ "./Tools/compare-html-nodes.js");
+
+
+
+function removeTagOnCorrespondingDeletion(rawData, actions, position, tagsConversion) {
+    const doc = (0,_Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__["default"])(rawData);
+
+    for (const action of actions) {
+        if (!action.type) {
+            continue;
+        }
+
+        if (!action.correspondingDeletion) {
+            continue;
+        }
+
+        const deletion = action.content[0];
+
+        let tag = deletion.toDom();
+        let parentNode;
+
+        if (! tagsConversion.isInternalTagNode(tag) && ! tagsConversion.isMQMNode(tag)) {
+            parentNode = tag;
+            tag = tag.querySelector('img');
+        }
+
+        const allTags = doc.querySelectorAll('img');
+
+        for (const candidate of allTags) {
+            if (tagsConversion.isTrackChangesDelNode(candidate.parentNode)) {
+                continue;
+            }
+
+            if ((0,_Tools_compare_html_nodes_js__WEBPACK_IMPORTED_MODULE_1__["default"])(candidate, tag)) {
+                candidate.parentNode.removeChild(candidate);
+
+                break;
+            }
+        }
+    }
+
+    return [doc.innerHTML, position];
+}
+
 
 /***/ }),
 
@@ -3129,6 +3426,14 @@ class TagsConversion {
         )
     }
 
+    isLineBreakTag(item) {
+        if (! this.#isAnElementNode(item)) {
+            return false;
+        }
+
+        return item.tagName === 'BR';
+    }
+
     _replaceInternalTagToImage(item, editorElement, pixelMapping) {
         let data = this._extractInternalTagsData(item, pixelMapping);
 
@@ -3502,6 +3807,10 @@ class TagsConversion {
 
     _isWhitespaceTag(className) {
         return /whitespace|nbsp|tab|space|newline|char/.test(className);
+    }
+
+    isNewLineTag(className) {
+        return /newline/.test(className);
     }
 
     #getMqmFlagNumber(element) {

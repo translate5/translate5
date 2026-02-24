@@ -34,7 +34,7 @@ use editor_Models_SegmentField;
 use editor_Models_Workflow_Step;
 use editor_Workflow_Default;
 use MittagQI\Translate5\Repository\{SegmentHistoryDataRepository, SegmentHistoryRepository};
-use MittagQI\Translate5\Segment\LevenshteinUTF8;
+use MittagQI\Translate5\Segment\SegmentLevenshtein;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
 
@@ -233,11 +233,11 @@ class LevenshteinCalcTaskHistory
             $segmentPrevStepValue = $segmentOriginalValue;
         }
 
-        $levenshteinOriginal = LevenshteinUTF8::calcDistance(
+        $levenshteinOriginal = SegmentLevenshtein::calcDistance(
             $segmentOriginalValue,
             $segmentCurrentValue
         );
-        $levenshteinPrevious = LevenshteinUTF8::calcDistance(
+        $levenshteinPrevious = SegmentLevenshtein::calcDistance(
             $segmentPrevStepValue,
             $segmentCurrentValue
         );

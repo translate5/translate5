@@ -313,6 +313,14 @@ export default class TagsConversion {
         )
     }
 
+    isLineBreakTag(item) {
+        if (! this.#isAnElementNode(item)) {
+            return false;
+        }
+
+        return item.tagName === 'BR';
+    }
+
     _replaceInternalTagToImage(item, editorElement, pixelMapping) {
         let data = this._extractInternalTagsData(item, pixelMapping);
 
@@ -686,6 +694,10 @@ export default class TagsConversion {
 
     _isWhitespaceTag(className) {
         return /whitespace|nbsp|tab|space|newline|char/.test(className);
+    }
+
+    isNewLineTag(className) {
+        return /newline/.test(className);
     }
 
     #getMqmFlagNumber(element) {

@@ -158,6 +158,21 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->calculateMatchrate($segment);
 
+            $skipMtFallbackForRepetition = false;
+            if (empty($bestMatchRateResult)) {
+                $segmentHash = $segment->getSourceMd5();
+                $master = $this->repetitionMasterSegments[$segmentHash] ?? null;
+                $rep = $this->repetitionByHash[$segmentHash] ?? null;
+                $isRepetition = $master && $master->getId() !== $segment->getId();
+                $masterIsInternalFuzzy = ! empty($rep) && $this->isInternalFuzzy($rep->target ?? '');
+
+                //if calculateMatchrate returned null for a repetition because of internal fuzzy/no master
+                // do not allow mt fallback to fill this segment in analyseAndPretranslate
+                if ($this->internalFuzzy && $isRepetition && ($masterIsInternalFuzzy || empty($rep))) {
+                    $skipMtFallbackForRepetition = true;
+                }
+            }
+
             $this->saveSegmentToInternalFuzzyTm($segment);
 
             if (! $this->pretranslate) {
@@ -166,12 +181,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
                 continue;
             }
+
             //if TM and Term pretranslation should not be used, we set it null here to trigger MT (if enabled)
             if (! $this->usePretranslateTMAndTerm) {
                 $bestMatchRateResult = null;
             }
             $useMt = empty($bestMatchRateResult) || $bestMatchRateResult->matchrate < $this->pretranslateMatchrate;
-            $mtUsed = $this->usePretranslateMT && $useMt;
+            $mtUsed = $this->usePretranslateMT && $useMt && ! $skipMtFallbackForRepetition;
 
             if ($mtUsed) {
                 $bestMatchRateResult = $this->getBestMtResult($segment);
@@ -207,9 +223,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $isRepetition = $rep
                     && $master
                     && $master->getId() !== $segment->getId()
-                    && $bestMatchRateResult->isRepetition
-                ;
-
+                    && ($bestMatchRateResult->isRepetition ?? false);
+                //set updateMe only for the master; repetitions follow this shared flag
                 if ($isMaster) {
                     //only update repetitions if the master was updated too, which is here the case
                     // set the updateMe in the shared repetition result for all repetitions
@@ -303,8 +318,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             if (array_key_exists($segmentHash, $this->repetitionByHash)) {
                 // save the repetition analysis with 102% match rate
                 $this->saveAnalysis($segment, FileBasedInterface::REPETITION_MATCH_VALUE, 0);
+                $masterResult = $this->repetitionByHash[$segmentHash];
+                if (empty($masterResult)) {
+                    return null;
+                }
+                //no direct result for this repetition, but master exists -> return it as repetition
+                $repetitionResult = clone $masterResult;
+                $repetitionResult->isRepetition = true;
 
-                return $this->repetitionByHash[$segmentHash];
+                return $repetitionResult;
             }
 
             return null;
@@ -329,12 +351,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         if (FileBasedInterface::REPETITION_MATCH_VALUE === $resultMatchRate) {
             // save the repetition analysis with 102% match rate
             $this->saveAnalysis($segment, $resultMatchRate, 0);
+            //set repetition marker on both objects, in case $bestResult is returned
+            $bestResult->isRepetition = true;
             $result->isRepetition = true;
             $result->matchrate = 0;
         }
 
         //if there is no match we can not update the target below, this means returning null
-        if (! $masterHasResult || $this->isInternalFuzzy($this->repetitionByHash[$segmentHash]->target ?? '')) {
+        $masterIsInternalFuzzy = $this->isInternalFuzzy($this->repetitionByHash[$segmentHash]->target ?? '');
+        if (! $masterHasResult || $masterIsInternalFuzzy) {
             // if the master of the repetition had no result, the repetition has no content either
             return null;
         }
@@ -966,13 +991,21 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         if (empty($rep) || ! ($rep->isMT ?? false)) {
             // if tags could not be applied, then getMtResult should be called again
+            // preserve the updateMe flag from the previous result, or set it if the master had no
+            // result at all (rep was empty) - in that case this repetition got its own independent
+            // MT result and should be allowed to update regardless of the master's outcome
+            $bestMatchRateResult->updateMe = ($rep->updateMe ?? false) || empty($rep);
             $this->repetitionByHash[$mtSegmentHash] = $bestMatchRateResult;
         }
 
         $master = $this->repetitionMasterSegments[$mtSegmentHash] ?? null;
+        $isRepetition = $master && $master->getId() !== $segment->getId();
+        //use the current stored repetition result, not the old $rep snapshot from above
+        // this keeps first repetition in a group marked as repetition too
+        $repForRepetition = $this->repetitionByHash[$mtSegmentHash] ?? null;
         //if we are processing a repetition, we have to fix the tags:
-        if ($rep && $master && $master->getId() !== $segment->getId()) {
-            $bestMatchRateResult = $this->updateTargetOfRepetition($segment, $rep) ?: $this->getMtResult($segment);
+        if ($isRepetition && $repForRepetition) {
+            $bestMatchRateResult = $this->updateTargetOfRepetition($segment, $repForRepetition) ?: $bestMatchRateResult;
             $bestMatchRateResult->isRepetition = true;
         }
 

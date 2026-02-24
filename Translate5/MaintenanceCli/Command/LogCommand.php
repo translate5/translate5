@@ -160,6 +160,13 @@ the format is:
             InputOption::VALUE_NONE,
             'Loads a distinct list of log origins from the log file.'
         );
+
+        $this->addOption(
+            'origin',
+            'o',
+            InputOption::VALUE_REQUIRED,
+            'Filter by log origin (domain) substring - wildcards are added automatically.'
+        );
     }
 
     /**
@@ -226,6 +233,7 @@ the format is:
             $s = $log->db->select()->order('id DESC');
 
             $filtered = $this->parseArgumentToSelect($s);
+            $filtered = $this->parseOriginToSelect($s) || $filtered;
             $filtered = $this->parseDateToSelect($s) || $filtered;
             $filtered = $this->parseLevelToSelect($s) || $filtered;
 
@@ -369,6 +377,9 @@ the format is:
             }
             if (! empty($this->usedFilters['domains'])) {
                 $this->io->text('  Domain(s): ' . join(', ', $this->usedFilters['domains']));
+            }
+            if (! empty($this->usedFilters['origin'])) {
+                $this->io->text('  Origin: ' . $this->usedFilters['origin']);
             }
             if (! empty($this->usedFilters['ecodes'])) {
                 $this->io->text('  Message: ' . join(' ', $this->usedFilters['message']));
@@ -517,6 +528,21 @@ the format is:
         $this->usedFilters['ecodes'] = $ecodes;
         $this->usedFilters['domains'] = $domains;
         $this->usedFilters['message'] = $message;
+
+        return true;
+    }
+
+    /**
+     * parses and adds the origin (domain) substring filter
+     */
+    protected function parseOriginToSelect(\Zend_Db_Table_Select $s): bool
+    {
+        $origin = $this->input->getOption('origin');
+        if (empty($origin)) {
+            return false;
+        }
+        $s->where('domain like ?', '%' . $origin . '%');
+        $this->usedFilters['origin'] = $origin;
 
         return true;
     }
