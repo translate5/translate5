@@ -5580,7 +5580,7 @@ The users have been informed accordingly via e-mail.<br />
             </trans-unit>
             <trans-unit id="U2VuZA==">
                 <source>Send</source>
-                <target></target>
+                <target>Send</target>
             </trans-unit>
             <trans-unit id="U2VxdWVudGllbGxlcyBBcmJlaXRlbg==">
                 <source>Sequentielles Arbeiten</source>
