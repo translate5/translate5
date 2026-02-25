@@ -37,8 +37,6 @@ Add new button "Delete all with same source + target"', '15'),
 ('2026-02-25', 'TRANSLATE-5034', 'change', 't5memory - Filter TMX on import', 'Apply filters on TMX on import time from translate5 side
 All Translate5 TMs in instance will be marked as "not converted" and matches may have lower matches.
 Language resources affected by this should be converted manually.', '15'),
-('2026-02-25', 'TRANSLATE-3543', 'change', 'Editor general, usability editor - Move "toast" messages and warnings to an extra tabular view', 'Added log for toast messages and warnings within segments editor', '15'),
 ('2026-02-25', 'TRANSLATE-5303', 'bugfix', 'LanguageResources - Microsoft translator: textType parameter', 'Add textType parameter when query microsoft api for translations.', '15'),
-('2026-02-25', 'TRANSLATE-5198', 'bugfix', 'LanguageResources - add warning on tmx import when languages not matching TM', 'Add warning on tmx import when languages not matching TM', '15'),
 ('2026-02-25', 'TRANSLATE-5038', 'bugfix', 'Editor general - selecting CP tag and text will swallow space when pasting in editor', 'FIXED: copy-pasting text with tags will respect white spaces', '15'),
 ('2026-02-25', 'TRANSLATE-4978', 'bugfix', 'Auto-QA - inconsistency check faulty', 'FIXED: missing background colors for inconsistent sources/targets in cases when there are more than 200 segments in the task', '15');

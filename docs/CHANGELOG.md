@@ -43,16 +43,10 @@ Apply filters on TMX on import time from translate5 side
 All Translate5 TMs in instance will be marked as "not converted" and matches may have lower matches.
 Language resources affected by this should be converted manually.
 
-**[TRANSLATE-3543](https://jira.translate5.net/browse/TRANSLATE-3543): Editor general, usability editor - Move "toast" messages and warnings to an extra tabular view** <br>
-Added log for toast messages and warnings within segments editor
-
 
 ### Bugfixes
 **[TRANSLATE-5303](https://jira.translate5.net/browse/TRANSLATE-5303): LanguageResources - Microsoft translator: textType parameter** <br>
 Add textType parameter when query microsoft api for translations.
-
-**[TRANSLATE-5198](https://jira.translate5.net/browse/TRANSLATE-5198): LanguageResources - add warning on tmx import when languages not matching TM** <br>
-Add warning on tmx import when languages not matching TM
 
 **[TRANSLATE-5038](https://jira.translate5.net/browse/TRANSLATE-5038): Editor general - selecting CP tag and text will swallow space when pasting in editor** <br>
 FIXED: copy-pasting text with tags will respect white spaces
