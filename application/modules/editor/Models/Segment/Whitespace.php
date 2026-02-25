@@ -116,7 +116,55 @@ class editor_Models_Segment_Whitespace
             'title' => 'Backspace (BS)',
         ],
 
-        //SPACE CHARACTERs - TODO move that whitespace types to the space type of internal tags
+        '/\x{001f}/u' => [
+            'ts' => '1f',
+            'text' => '[US]',
+            'title' => 'Information Separator One (US)',
+        ],
+        '/\x{0080}/u' => [
+            // looks like euro sign in some fonts, but is control character
+            'ts' => 'c280',
+            'text' => '[PAD]',
+            'title' => 'Padding Character (PAD)',
+        ],
+        '/\x{0081}/u' => [
+            // looks like middle dot in some fonts, but is control character
+            'ts' => 'c281',
+            'text' => '[HOP]',
+            'title' => 'High Octet Preset (HOP)',
+        ],
+        '/\x{008d}/u' => [
+            'ts' => 'c28d',
+            'text' => '[RI]',
+            'title' => 'Reverse Index (RI)',
+        ],
+        '/\x{0090}/u' => [
+            'ts' => 'c290',
+            'text' => '[DCS]',
+            'title' => 'Device Control String (DCS)',
+        ],
+        '/\x{0091}/u' => [
+            'ts' => 'c291',
+            'text' => '[PU1]',
+            'title' => 'Private Use One (PU1)',
+        ],
+        '/\x{009a}/u' => [
+            'ts' => 'c29a',
+            'text' => '[SCI]',
+            'title' => 'Single Character Introducer (SCI)',
+        ],
+        '/\x{009d}/u' => [
+            'ts' => 'c29d',
+            'text' => '[OSC]',
+            'title' => 'Operating System Command (OSC)',
+        ],
+        '/\x{009f}/u' => [
+            'ts' => 'c29f',
+            'text' => '[APC]',
+            'title' => 'Application Program Command (APC)',
+        ],
+
+        //SPACE CHARACTERs
         '/\x{0009}/u' => [
             'ts' => '09',
             'text' => '[HT]',

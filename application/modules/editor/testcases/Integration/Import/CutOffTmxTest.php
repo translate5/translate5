@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Integration\Import;
 
-use MittagQI\Translate5\T5Memory\Import\CutOffTmx;
-use PHPUnit\Framework\TestCase;
+use MittagQI\Translate5\Test\UnitTestAbstract;
+use MittagQI\Translate5\TMX\CutOffTmx;
 
-class CutOffTmxTest extends TestCase
+class CutOffTmxTest extends UnitTestAbstract
 {
     private string $tmxFile;
 
@@ -57,15 +57,38 @@ class CutOffTmxTest extends TestCase
         }
     }
 
-    public function test(): void
+    public function engineProvider(): array
     {
+        return [
+            ['tmxutils'],
+            ['php'],
+        ];
+    }
+
+    /**
+     * @dataProvider engineProvider
+     */
+    public function test(string $engine): void
+    {
+        $config = new \Zend_Config([
+            'runtimeOptions' => [
+                'LanguageResources' => [
+                    't5memory' => [
+                        'useTmxUtilsTrim' => $engine === 'tmxutils',
+                    ],
+                ],
+            ],
+        ]);
+
+        self::setConfig($config);
+
         $cutOffTmx = CutOffTmx::create();
 
         $cutOffTmx->cutOff($this->tmxFile, 5);
 
         self::assertFileExists($this->tmxFile);
         self::assertFileEquals(
-            __DIR__ . '/CutOffTmxTest/expected.tmx',
+            __DIR__ . "/CutOffTmxTest/expected-$engine.tmx",
             $this->tmxFile,
             'The cut off tmx file is not as expected.'
         );

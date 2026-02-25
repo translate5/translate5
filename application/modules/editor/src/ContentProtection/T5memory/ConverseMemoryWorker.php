@@ -35,6 +35,7 @@ use editor_Services_Manager;
 use editor_Services_T5Memory_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Status;
@@ -63,6 +64,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     private readonly LanguageResourceTaskAssocRepository $taskAssocRepository;
 
+    private readonly ActionLockService $actionLockService;
+
     public function __construct()
     {
         parent::__construct();
@@ -71,6 +74,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->languageResourceRepository = new LanguageResourceRepository();
         $this->exportService = ExportService::create();
         $this->taskAssocRepository = LanguageResourceTaskAssocRepository::create();
+        $this->actionLockService = ActionLockService::create();
     }
 
     private function restoreLangResourceMemories(): void
@@ -159,6 +163,26 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             }
         }
 
+        $lock = $this->actionLockService->getWriteLock($this->languageResource->getLangResUuid());
+
+        if (! $lock->acquire(true)) {
+            $this->log->error(
+                'E1591',
+                'Conversion: Can not acquire lock for language resource with id ' . $this->languageResourceId,
+                [
+                    'languageResource' => $this->languageResource,
+                ]
+            );
+
+            $this->resetConversionStarted();
+
+            return false;
+        }
+
+        // language resource might have been updated while waiting for the lock,
+        // so we have to get fresh one to ensure we have the latest data and status
+        $this->languageResource->refresh();
+
         $this->languageResource->markConversionStart();
 
         $this->languageResource->save();
@@ -166,6 +190,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $mime = $connector->getValidExportTypes()['TMX'];
 
         foreach ($this->memoriesBackup as $memory) {
+            // conversion is a long process so we need to refresh the lock
+            $lock->refresh();
             $exportFilename = $this->exportService->export(
                 $this->languageResource,
                 TmFileExtension::TMX,
@@ -183,6 +209,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 );
 
                 $this->resetConversionStarted();
+
+                $lock->release();
 
                 return false;
             }
@@ -206,6 +234,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 );
 
                 $this->rollback($connector);
+
+                $lock->release();
 
                 return false;
             }
@@ -237,6 +267,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         }
 
         $this->finaliseConversion($sourceLang, $targetLang);
+
+        $lock->release();
 
         return true;
     }

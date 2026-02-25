@@ -45,8 +45,8 @@ use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\ImportService;
-use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
 use MittagQI\Translate5\T5Memory\WipeMemoryService;
+use MittagQI\Translate5\TMX\Filter\TmxFilter;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -59,7 +59,7 @@ class ManualReorganizeService
         private readonly ExportService $exportService,
         private readonly ImportService $importService,
         private readonly WipeMemoryService $wipeMemoryService,
-        private readonly SameTuvFilter $sameTuvFilter,
+        private readonly TmxFilter $tmxFilter,
     ) {
     }
 
@@ -70,7 +70,7 @@ class ManualReorganizeService
             ExportService::create(),
             ImportService::create(),
             WipeMemoryService::create(),
-            SameTuvFilter::create(),
+            TmxFilter::create(),
         );
     }
 
@@ -129,7 +129,7 @@ class ManualReorganizeService
         }
 
         try {
-            $this->sameTuvFilter->filter($exportFilePath);
+            $this->tmxFilter->filter($exportFilePath, $reorganizeOptions->tmxFilterOptions);
         } catch (\Exception $e) {
             $this->logger->warn(
                 'E1314',
@@ -155,7 +155,7 @@ class ManualReorganizeService
                 $newTmName,
                 new ImportOptions(
                     stripFramingTags: StripFramingTags::None,
-                    saveDifferentTargetsForSameSource: $reorganizeOptions->saveDifferentTargetsForSameSource,
+                    tmxFilterOptions: $reorganizeOptions->tmxFilterOptions,
                 ),
             );
 

@@ -310,6 +310,8 @@ foreach (glob(getcwd() . '/application/modules/editor/Plugins/*/CLI/*Command.php
 }
 
 if (file_exists('.git')) {
+    $commands[] = new \Translate5\MaintenanceCli\Command\T5Memory\FilterTmxCommand();
+    $commands[] = new \Translate5\MaintenanceCli\Command\T5Memory\CompareTmxCommand();
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();

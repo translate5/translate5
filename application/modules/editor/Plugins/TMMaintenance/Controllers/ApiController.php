@@ -30,13 +30,15 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
-use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteSimilarDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\Enum\BatchMode;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\ErrorException;
+use MittagQI\Translate5\Plugins\TMMaintenance\Exception\InexistentSimilarDeleteTypeException;
 use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
+use MittagQI\Translate5\T5Memory\Factory\DeleteSegmentDtoFactory;
 use MittagQI\ZfExtended\Localization;
 
 class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestController
@@ -111,7 +113,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function postAction(): void
     {
         try {
-            $this->getSegmentsProcessor()->create(CreateDTO::fromRequest($this->getRequest()));
+            $this->getSegmentsProcessor()->createSegment(CreateDTO::fromRequest($this->getRequest()));
         } catch (editor_Services_Connector_Exception $exception) {
             $this->transformException($exception);
         }
@@ -119,23 +121,72 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function putAction(): void
     {
+        $languageResourceRepository = \MittagQI\Translate5\Repository\LanguageResourceRepository::create();
+        $segment = [];
+
         try {
-            $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
+            $data = $deleteData = json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
+
+            $deleteData['source'] = $data['originalState']['source'] ?? $data['source'];
+            $deleteData['target'] = $data['originalState']['target'] ?? $data['target'];
+
+            $languageResource = $languageResourceRepository->get((int) $data['languageResourceid']);
+
+            $deleteDtoFactory = DeleteSegmentDtoFactory::create();
+            $deleteDto = $deleteDtoFactory->getDeleteDTO($languageResource, $deleteData, \Zend_Registry::get('config'));
+
+            $segment = $this->getSegmentsProcessor()->update(
+                $deleteDto,
+                UpdateDTO::fromRequest($this->getRequest()),
+            );
         } catch (editor_Services_Connector_Exception $exception) {
             $this->transformException($exception);
         }
 
         $this->assignView([
-            json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR),
+            array_merge($data, $segment),
         ]);
     }
 
     public function deleteAction(): void
     {
-        $dto = DeleteDTO::fromRequest($this->getRequest());
+        $data = json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
+
+        $languageResourceRepository = \MittagQI\Translate5\Repository\LanguageResourceRepository::create();
+
+        $languageResource = $languageResourceRepository->get((int) $data['tm']);
+
+        $deleteDtoFactory = DeleteSegmentDtoFactory::create();
+        $deleteDto = $deleteDtoFactory->getDeleteDTO($languageResource, $data, \Zend_Registry::get('config'));
 
         try {
-            $this->getSegmentsProcessor()->delete($dto);
+            $this->getSegmentsProcessor()->deleteSegment($languageResource, $deleteDto);
+        } catch (editor_Services_Connector_Exception $exception) {
+            $this->transformException($exception);
+        }
+    }
+
+    public function deletesimilarAction(): void
+    {
+        $data = json_decode($this->getRequest()->getParam('data'), true, flags: JSON_THROW_ON_ERROR);
+
+        $languageResourceRepository = \MittagQI\Translate5\Repository\LanguageResourceRepository::create();
+
+        $languageResource = $languageResourceRepository->get((int) $data['tm']);
+
+        try {
+            $this->getSegmentsProcessor()->deleteSimilarSegments(
+                $languageResource,
+                DeleteSimilarDTO::fromRequest($this->getRequest()),
+                \Zend_Registry::get('config'),
+            );
+        } catch (InexistentSimilarDeleteTypeException) {
+            throw ErrorException::createResponse(
+                'E1688',
+                [
+                    Localization::trans('Ungültiger Löschtyp angegeben.'),
+                ],
+            );
         } catch (editor_Services_Connector_Exception $exception) {
             $this->transformException($exception);
         }
@@ -170,7 +221,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     private function getSegmentsProcessor(): SegmentProcessor
     {
-        return new SegmentProcessor();
+        return SegmentProcessor::create();
     }
 
     private function readLocalization(): array
@@ -261,6 +312,12 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                     Localization::trans(
                         'Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.'
                     ),
+                ],
+            ),
+            'E1742' => ErrorException::createResponse(
+                $errorCode,
+                [
+                    'Segment zu lang für Abfragen auf t5memory',
                 ],
             ),
             default => $exception,

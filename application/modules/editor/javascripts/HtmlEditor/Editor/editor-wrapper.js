@@ -1062,9 +1062,8 @@ export default class EditorWrapper {
     }
 
     #onInputTransformation(event, data, editor) {
-        const content = data.content;
-        Object.assign(content, DocumentFragment);
-        const cleaned = this.#cleanupDataOnInsertOrDrop(content.toHTMLString());
+        const html = data.dataTransfer.getData('text/html');
+        const cleaned = this.#cleanupDataOnInsertOrDrop(html);
         data.content = editor.data.htmlProcessor.toView(cleaned);
     }
 

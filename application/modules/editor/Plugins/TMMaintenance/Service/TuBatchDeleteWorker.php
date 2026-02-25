@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\BatchDeleteException;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
@@ -42,10 +43,13 @@ use ZfExtended_Worker_Abstract;
 
 class TuBatchDeleteWorker extends ZfExtended_Worker_Abstract
 {
+    private readonly LanguageResourceRepository $languageResourceRepository;
+
     public function __construct()
     {
         parent::__construct();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.languageResource.tu-batch-delete');
+        $this->languageResourceRepository = LanguageResourceRepository::create();
     }
 
     public static function queueWorker(LanguageResource $languageResource, SearchDTO $searchDto): int
@@ -59,7 +63,7 @@ class TuBatchDeleteWorker extends ZfExtended_Worker_Abstract
             return $worker->queue();
         }
 
-        throw new BatchDeleteException('E1688');
+        throw new BatchDeleteException('Could not schedule TU batch delete worker.');
     }
 
     protected function validateParameters(array $parameters): bool
@@ -82,7 +86,7 @@ class TuBatchDeleteWorker extends ZfExtended_Worker_Abstract
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
-        $languageResource = LanguageResourceRepository::create()->get((int) $params['languageResourceId']);
+        $languageResource = $this->languageResourceRepository->get((int) $params['languageResourceId']);
 
         if (editor_Services_Manager::SERVICE_T5_MEMORY !== $languageResource->getServiceType()) {
             $languageResource->setStatus(Status::AVAILABLE);
@@ -91,7 +95,27 @@ class TuBatchDeleteWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        TuBatchDeleteService::create()->deleteBatch($languageResource, $params['searchDto']);
+        $lockService = ActionLockService::create();
+
+        $lock = $lockService->getWriteLock($languageResource->getLangResUuid());
+        if (! $lock->acquire(true)) {
+            throw new BatchDeleteException('Could not acquire lock for TM: ' . $languageResource->getName());
+        }
+
+        // language resource might have been updated while waiting for the lock,
+        // so we have to get fresh one to ensure we have the latest data and status
+        $languageResource = $this->languageResourceRepository->get((int) $languageResource->getId());
+
+        try {
+            TuBatchDeleteService::create()->deleteBatch($languageResource, $params['searchDto']);
+        } catch (\Exception $e) {
+            $languageResource->setStatus(Status::NOTCHECKED);
+            $languageResource->save();
+
+            throw $e;
+        } finally {
+            $lock->release();
+        }
 
         return true;
     }

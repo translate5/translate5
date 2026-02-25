@@ -39,16 +39,21 @@ use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ContentProtection\QueryStringGuesser;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
+use MittagQI\Translate5\T5Memory\EmptyMemoryCheck;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use MittagQI\Translate5\T5Memory\FuzzySearchService;
-use MittagQI\Translate5\T5Memory\Import\CutOffTmx;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
-use MittagQI\Translate5\T5Memory\TagHandlerProvider;
+use MittagQI\Translate5\T5Memory\StatusService;
+use MittagQI\Translate5\T5Memory\TagHandler\TagHandlerProvider;
 use MittagQI\Translate5\T5Memory\WipeMemoryService;
+use MittagQI\Translate5\TMX\ConcatTmx;
+use MittagQI\Translate5\TMX\CutOffTmx;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
@@ -128,15 +133,19 @@ class FuzzySearchServiceTest extends TestCase
             PersistenceService::create(),
             $this->tagHandlerProvider,
             SegmentLengthValidator::create(),
+            StatusService::create()
         );
     }
 
     public function tearDown(): void
     {
+        $persistenceService = PersistenceService::create();
+        $this->languageResource->refresh();
+
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [] as $memory) {
             $this->t5MemoryApi->deleteTm(
                 $this->languageResource->getResource()->getUrl(),
-                $memory['filename'],
+                $persistenceService->addTmPrefix($memory['filename']),
             );
         }
 
@@ -165,8 +174,7 @@ class FuzzySearchServiceTest extends TestCase
             [$this->testFile],
             new ImportOptions(
                 StripFramingTags::None,
-                false,
-                false,
+                new TmxFilterOptions(),
             )
         );
 
@@ -256,17 +264,10 @@ class FuzzySearchServiceTest extends TestCase
                 'rawTarget' => 'Our nice 4 segment',
                 'metaData' => [
                     'timestamp' => '2016-03-23 16:24:28 CET',
-                    'Guessed' => 'Some content was unprotected to get a better match',
+                    'guessed' => true,
                 ],
             ],
             'otherMatches' => [
-                [
-                    'matchRate' => 100,
-                    'rawTarget' => 'Our nice 4 segment',
-                    'metaData' => [
-                        'timestamp' => '2016-03-23 16:24:28 CET',
-                    ],
-                ],
                 [
                     'matchRate' => 97,
                     'rawTarget' => 'Our nice 4 segment<ph id="2"/>',
@@ -287,7 +288,7 @@ class FuzzySearchServiceTest extends TestCase
                 'rawTarget' => 'Our nice 4 segment',
                 'metaData' => [
                     'timestamp' => '2016-03-23 16:24:28 CET',
-                    'Guessed' => 'Some content was unprotected to get a better match',
+                    'guessed' => true,
                 ],
             ],
             'otherMatches' => [],
@@ -320,6 +321,9 @@ class FuzzySearchServiceTest extends TestCase
             RetryService::create(),
             WipeMemoryService::create(),
             CutOffTmx::create(),
+            ConcatTmx::create(),
+            EmptyMemoryCheck::create(),
+            ExportService::create(),
         );
     }
 }

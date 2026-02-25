@@ -88,7 +88,8 @@ class IntegerProtectorTest extends TestCase
             null,
             false,
             '#',
-            1
+            1,
+            'aaa',
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -96,7 +97,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'integer with comma separator' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA==" key="aaa"/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
@@ -113,12 +114,13 @@ class IntegerProtectorTest extends TestCase
             null,
             false,
             '#.##.##0',
-            1
+            1,
+            'aaa',
         );
 
         yield 'target lang hi_IN' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="1.23.456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="1.23.456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA==" key="aaa"/>',
             'protectionDto' => $protectionDto1,
             'targetLang' => $targetLangHi,
         ];
@@ -131,12 +133,13 @@ class IntegerProtectorTest extends TestCase
             null,
             false,
             '#,###,####0.###',
-            1
+            1,
+            'aaa',
         );
 
         yield 'target format #,###,####0.###' => [
             'number' => '1,212,312,345',
-            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
+            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA==" key="aaa"/>',
             'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
@@ -149,12 +152,13 @@ class IntegerProtectorTest extends TestCase
             null,
             true,
             null,
-            1
+            1,
+            'aaa',
         );
 
         yield 'keep as is' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target="123,456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA=="/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target="123,456" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA==" key="aaa"/>',
             'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];
@@ -167,7 +171,8 @@ class IntegerProtectorTest extends TestCase
             null,
             false,
             '#',
-            1
+            1,
+            'aaa',
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -175,7 +180,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'integer with ±' => [
             'number' => '±123456',
-            'expected' => '<number type="integer" name="test-default" source="±123456" iso="±123456" target="±123456" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA"/>',
+            'expected' => '<number type="integer" name="test-default" source="±123456" iso="±123456" target="±123456" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
             'protectionDto' => $protectionDtoDash,
             'targetLang' => $targetLangDe,
         ];

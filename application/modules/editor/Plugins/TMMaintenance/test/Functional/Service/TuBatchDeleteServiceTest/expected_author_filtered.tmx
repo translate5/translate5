@@ -4,6 +4,7 @@
 <tu tuid="_1_" creationdate="20160323T152428Z" creationid="MANAGER">
       <prop type="tmgr:markup">OTMXUXLF</prop>
       <prop type="tmgr:docname">none</prop>
+      <prop type="tmgr:context">-</prop>
       <tuv xml:lang="de">
         <seg>Unser schönes 4 Segment</seg>
       </tuv>
@@ -14,6 +15,7 @@
 <tu tuid="_1_" creationdate="20250303T152428Z" creationid="MANAGER">
       <prop type="tmgr:markup">OTMXUXLF</prop>
       <prop type="tmgr:docname">none</prop>
+      <prop type="tmgr:context">-</prop>
       <tuv xml:lang="de">
         <seg>Segment mit Duplikaten</seg>
       </tuv>
@@ -24,6 +26,7 @@
 <tu tuid="_1_" creationdate="20250305T152430Z" creationid="MANAGER">
       <prop type="tmgr:markup">OTMXUXLF</prop>
       <prop type="tmgr:docname">some-file.txt</prop>
+      <prop type="tmgr:context">-</prop>
       <tuv xml:lang="de">
         <seg>Segment mit Duplikaten</seg>
       </tuv>

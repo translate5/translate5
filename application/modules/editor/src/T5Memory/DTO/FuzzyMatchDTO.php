@@ -30,9 +30,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\DTO;
 
+use MittagQI\Translate5\T5Memory\Api\Response\GetEntryResponse;
+
 class FuzzyMatchDTO
 {
     public function __construct(
+        public readonly string $tmName,
         public readonly string $source,
         public readonly string $target,
         public readonly int $matchrate,
@@ -40,5 +43,50 @@ class FuzzyMatchDTO
         public readonly ?string $rawTarget,
         public readonly int $timestamp,
     ) {
+    }
+
+    public static function fromEntry(GetEntryResponse $entry, string $tmName): self
+    {
+        return new FuzzyMatchDTO(
+            tmName: $tmName,
+            source: $entry->getSource(),
+            target: $entry->getTarget(),
+            matchrate: 100,
+            metaData: [
+                (object) [
+                    'name' => 'internalKey',
+                    'value' => $entry->getInternalKey(),
+                ],
+                (object) [
+                    'name' => 'segmentId',
+                    'value' => $entry->getSegmentId(),
+                ],
+                (object) [
+                    'name' => 'author',
+                    'value' => $entry->getAuthor(),
+                ],
+                (object) [
+                    'name' => 'documentName',
+                    'value' => $entry->getBody()['documentName'] ?? null,
+                ],
+                (object) [
+                    'name' => 'context',
+                    'value' => $entry->getBody()['context'] ?? null,
+                ],
+            ],
+            rawTarget: $entry->getTarget(),
+            timestamp: strtotime($entry->getTimestamp()),
+        );
+    }
+
+    public function getMetaField(string $field): mixed
+    {
+        foreach ($this->metaData ?: [] as $meta) {
+            if ($meta->name === $field) {
+                return $meta->value;
+            }
+        }
+
+        return null;
     }
 }

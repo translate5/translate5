@@ -76,11 +76,12 @@ class ReplaceContentProtectorTest extends TestCase
             'some text',
             true,
             'output text',
-            1
+            1,
+            'aaa',
         );
 
         self::assertSame(
-            '<number type="replace-content" name="test-default" source="some text" iso="output text:some text" target="output text" regex="AwA="/>',
+            '<number type="replace-content" name="test-default" source="some text" iso="output text:some text" target="output text" regex="AwA=" key="aaa"/>',
             (new ReplaceContentProtector($repo))->protect('some text', $sourceFormat, $sourceLang, $targetLang)
         );
     }

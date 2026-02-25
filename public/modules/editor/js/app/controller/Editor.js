@@ -676,12 +676,12 @@ Ext.define('Editor.controller.Editor', {
     //         fn: me.copySelectionWithInternalTags,
     //         scope: me
     //     },
-         paste: {
-             delegated: false,
-             priority: 5000,
-             fn: me.pasteContent,
-             scope: me
-         },
+            paste: {
+                delegated: false,
+                priority: 5000,
+                fn: me.pasteContent,
+                scope: me
+            },
         });
 
 

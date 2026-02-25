@@ -33,10 +33,12 @@ namespace MittagQI\Translate5\Test\Integration\T5Memory;
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\TmxImportPreprocessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
+use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
-use MittagQI\Translate5\TMX\TmxSymbolsFixer;
+use MittagQI\Translate5\TMX\Filter\TmxFilter;
 use PHPUnit\Framework\TestCase;
 
 class TmxImportPreprocessorTest extends TestCase
@@ -45,18 +47,23 @@ class TmxImportPreprocessorTest extends TestCase
     {
         $languageRepository = $this->createMock(LanguageRepository::class);
         $logger = $this->createMock(\ZfExtended_Logger::class);
+        $tmxFilter = $this->createMock(TmxFilter::class);
         $symbolsFixer = $this->createMock(TmxSymbolsFixer::class);
 
         $processor = new TmxImportPreprocessor(
             $languageRepository,
             [],
             $logger,
+            $tmxFilter,
             $symbolsFixer,
         );
 
         $filename = 'small.tmx';
 
-        $options = new ImportOptions(StripFramingTags::None, true, false);
+        $options = new ImportOptions(
+            StripFramingTags::None,
+            new TmxFilterOptions(),
+        );
 
         self::assertSame($filename, $processor->process($filename, 1, 2, $options));
     }
@@ -136,14 +143,31 @@ TU;
     <prop type="tmgr:markup">OTMXUXLF</prop>
     <prop type="tmgr:docname">none</prop>
     <tuv xml:lang="de-DE">
-        <seg>number</seg>
+        <seg>number $number</seg>
     </tuv>
     <tuv xml:lang="en-US">
         <seg>$number</seg>
     </tuv>
 </tu>
+
 TU;
                 }
+
+                yield <<<TU
+<tu tuid="1" creationdate="20240430T152705Z" creationid="[ONEWORD GMBH]">
+    <prop type="tmgr:segId">1</prop>
+    <prop type="t5:InternalKey">7:1</prop>
+    <prop type="tmgr:markup">OTMXUXLF</prop>
+    <prop type="tmgr:docname">none</prop>
+    <tuv xml:lang="de-DE">
+        <seg>number two</seg>
+    </tuv>
+    <tuv xml:lang="en-US">
+        <seg>two</seg>
+    </tuv>
+</tu>
+TU;
+                ;
             }
 
             public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool
@@ -164,10 +188,14 @@ TU;
                 $processor2,
             ],
             $logger,
+            TmxFilter::create(),
             $symbolsFixer,
         );
 
-        $options = new ImportOptions(StripFramingTags::None, true, false);
+        $options = new ImportOptions(
+            StripFramingTags::None,
+            new TmxFilterOptions(),
+        );
 
         $file = $service->process(__DIR__ . '/TmConversionServiceTest/small.tmx', 1, 2, $options);
 

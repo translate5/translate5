@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
 use MittagQI\Translate5\LanguageResource\Exception\CannotScheduleAlreadyStartedConversionException;
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation;
 
 /**
@@ -108,6 +109,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     public string|array $targetLangCode;
 
+    public function refresh()
+    {
+        $specificData = $this->__call('getSpecificData', []);
+        if (preg_match('/' . \editor_Services_Connector_Abstract::FUZZY_SUFFIX . '\d+$/', $specificData)) {
+            throw new \LogicException('Language resource used for internal fuzzy should never be refreshed');
+        }
+
+        parent::refresh();
+    }
+
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
      * @param editor_Models_LanguageResources_Resource $resource
@@ -123,11 +134,9 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $this->setResourceType($resource->getType());
     }
 
-    #region Conversion
-
-    public function isConversionScheduled(): bool
+    public function isImporting(): bool
     {
-        return $this->getSpecificData(self::PROTECTION_CONVERSION_SCHEDULED) !== null;
+        return $this->getStatus() === Status::IMPORT;
     }
 
     public function isConversionStarted(): bool
@@ -513,7 +522,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         array $sourceLang = [],
         array $targetLang = [],
         array $serviceTypes = [],
-        array $customers = []
+        array $customers = [],
     ): array {
         if (empty($customers)) {
             $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();

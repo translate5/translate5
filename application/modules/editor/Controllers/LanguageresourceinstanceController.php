@@ -1768,6 +1768,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
 
+        $isT5memoryService = editor_Services_Manager::SERVICE_T5_MEMORY === $this->entity->getServiceType();
+        $tmConversionState = $isT5memoryService
+            ? $tmConversionService->getConversionState($languageResourceId)->value
+            : null;
+
         foreach ($this->view->rows as $idx => &$row) {
             $penalties = $taskPenaltyDataProvider->getPenalties(
                 $taskGuid,
@@ -1779,23 +1784,37 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             );
             $row->penaltyGeneral = $penalties['penaltyGeneral'];
             $row->penaltySublang = $penalties['penaltySublang'];
+            $row->guessed = false;
+            $row->possiblyNotOptimal = false;
 
             // Omit forbidden terms
             if ($row->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION
                 && editor_Models_Terminology_Models_TermModel::isForbiddenTerm($row->metaData['status'])) {
                 unset($this->view->rows[$idx]);
             }
-        }
-        unset($row);
 
-        if (editor_Services_Manager::SERVICE_T5_MEMORY === $this->entity->getServiceType()) {
-            $this->view->tmConversionState = $tmConversionService->getConversionState($languageResourceId)->value;
+            if ($isT5memoryService) {
+                $row->tmConversionState = $tmConversionState;
 
-            foreach ($this->view->rows as &$row) {
-                $row->tmConversionState = $this->view->tmConversionState;
+                foreach ($row->metaData as $id => $meta) {
+                    if ($meta->name === 'guessed') {
+                        $row->guessed = $meta->value;
+
+                        unset($row->metaData[$id]);
+                    }
+
+                    if ($meta->name === 'possiblyNotOptimal') {
+                        $row->possiblyNotOptimal = $meta->value;
+
+                        unset($row->metaData[$id]);
+                    }
+                }
             }
         }
-        $this->view->total = count($this->view->rows = array_values($this->view->rows));
+
+        unset($row);
+        $this->view->rows = array_values($this->view->rows);
+        $this->view->total = count($this->view->rows);
     }
 
     /**
@@ -1822,7 +1841,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check provided field
         if ($field !== 'source') {
-            $field == 'target';
+            $field = 'target';
         }
 
         //checks if the current task is associated to the languageResource

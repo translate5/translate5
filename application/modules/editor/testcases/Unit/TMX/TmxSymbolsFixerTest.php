@@ -1,10 +1,36 @@
 <?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\TMX;
 
-use MittagQI\Translate5\TMX\TmxSymbolsFixer;
+use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
 use PHPUnit\Framework\TestCase;
 
 class TmxSymbolsFixerTest extends TestCase
@@ -15,7 +41,7 @@ class TmxSymbolsFixerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fixer = new TmxSymbolsFixer();
+        $this->fixer = TmxSymbolsFixer::create();
 
         // Create temporary test directory
         $this->testDir = sys_get_temp_dir() . '/tmx-fixer-test-' . uniqid();
@@ -65,9 +91,9 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("\t", $result);
-        $this->assertStringContainsString("\n", $result);
-        $this->assertStringContainsString("&#x0D;", $result);
+        self::assertStringContainsString("\t", $result);
+        self::assertStringContainsString("\n", $result);
+        self::assertStringContainsString("&#x0D;", $result);
     }
 
     /**
@@ -81,8 +107,20 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("spritzer arm.", $result);
+        $this->assertStringContainsString("spritzerarm.", $result);
         $this->assertStringNotContainsString("&#x1F;", $result);
+    }
+
+    public function testReplacesUnitSeparatorWithSpaceInTuv(): void
+    {
+        $content = "Das ist spritzer&#x1F;arm.";
+        $inputFile = $this->createTestFile($content, true);
+
+        $this->fixer->fixInvalidXmlSymbols($inputFile);
+
+        $result = file_get_contents($inputFile);
+        self::assertStringContainsString('r="utf-char" n="1f"', $result);
+        self::assertStringNotContainsString("&#x1F;", $result);
     }
 
     /**
@@ -96,7 +134,21 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("Text with separators and more", $result);
+        $this->assertStringContainsString("Textwithseparatorsandmore", $result);
+    }
+
+    public function testReplacesMultipleIllegalCharactersInTuv(): void
+    {
+        $content = "Text&#x1C;with&#x1D;separators&#x1E;and&#x1F;more";
+        $inputFile = $this->createTestFile($content, true);
+
+        $this->fixer->fixInvalidXmlSymbols($inputFile);
+
+        $result = file_get_contents($inputFile);
+        self::assertStringContainsString(
+            'Text<t5:n id="1001" r="utf-char" n="1c"/>with<t5:n id="1002" r="utf-char" n="1d"/>separators<t5:n id="1003" r="utf-char" n="1e"/>and<t5:n id="1004" r="utf-char" n="1f"/>more',
+            $result
+        );
     }
 
     /**
@@ -105,12 +157,12 @@ class TmxSymbolsFixerTest extends TestCase
     public function testRemovesNulCharacter(): void
     {
         $content = "Text&#x00;with null character";
-        $inputFile = $this->createTestFile($content);
+        $inputFile = $this->createTestFile($content, true);
 
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("Textwith null character", $result);
+        self::assertStringContainsString('r="utf-char" n="00"', $result);
     }
 
     /**
@@ -119,12 +171,12 @@ class TmxSymbolsFixerTest extends TestCase
     public function testReplacesFormFeedWithSpace(): void
     {
         $content = "Before&#x0C;After";
-        $inputFile = $this->createTestFile($content);
+        $inputFile = $this->createTestFile($content, true);
 
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("Before After", $result);
+        self::assertStringContainsString('r="utf-char" n="0c"', $result);
     }
 
     /**
@@ -133,12 +185,12 @@ class TmxSymbolsFixerTest extends TestCase
     public function testReplacesVerticalTabWithSpace(): void
     {
         $content = "Before&#x0B;After";
-        $inputFile = $this->createTestFile($content);
+        $inputFile = $this->createTestFile($content, true);
 
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("Before After", $result);
+        self::assertStringContainsString('r="utf-char" n="0b"', $result);
     }
 
     /**
@@ -154,13 +206,12 @@ class TmxSymbolsFixerTest extends TestCase
         $largeContent = str_repeat($largeContent, 100); // Make it ~2MB
 
         $inputFile = $this->createTestFile($largeContent);
-        $originalSize = filesize($inputFile);
 
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringNotContainsString("&#x1F;", $result);
-        $this->assertStringContainsString("at position", $result);
+        self::assertStringNotContainsString("&#x1F;", $result);
+        self::assertStringContainsString("at position", $result);
     }
 
     /**
@@ -175,8 +226,8 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringNotContainsString("&#x1F;", $result);
-        $this->assertStringContainsString("Text after", $result);
+        self::assertStringNotContainsString("&#x1F;", $result);
+        self::assertStringContainsString("Text after", $result);
     }
 
     /**
@@ -190,9 +241,9 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("&#x09;", $result); // TAB preserved
-        $this->assertStringNotContainsString("&#x1F;", $result); // Unit separator replaced
-        $this->assertStringContainsString("&#x0A;", $result); // LF preserved
+        self::assertStringContainsString("&#x09;", $result); // TAB preserved
+        self::assertStringNotContainsString("&#x1F;", $result); // Unit separator replaced
+        self::assertStringContainsString("&#x0A;", $result); // LF preserved
     }
 
     /**
@@ -207,11 +258,11 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         // File should still exist at the same path
-        $this->assertFileExists($originalPath);
+        self::assertFileExists($originalPath);
 
         $result = file_get_contents($originalPath);
-        $this->assertStringContainsString("Original content", $result);
-        $this->assertStringNotContainsString("&#x1F;", $result);
+        self::assertStringContainsString("Original content", $result);
+        self::assertStringNotContainsString("&#x1F;", $result);
     }
 
     /**
@@ -219,9 +270,11 @@ class TmxSymbolsFixerTest extends TestCase
      */
     public function testRemovesAllRemovableControlCharacters(): void
     {
-        $removableChars = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+        $removableChars = [
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
             0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-            0x17, 0x18, 0x19, 0x1A, 0x1B];
+            0x17, 0x18, 0x19, 0x1A, 0x1B,
+        ];
 
         $content = "Start";
         foreach ($removableChars as $char) {
@@ -229,16 +282,16 @@ class TmxSymbolsFixerTest extends TestCase
         }
         $content .= "End";
 
-        $inputFile = $this->createTestFile($content);
+        $inputFile = $this->createTestFile($content, true);
 
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertStringContainsString("StartEnd", $result);
 
         // Verify no control characters remain
         foreach ($removableChars as $char) {
-            $this->assertStringNotContainsString(sprintf("&#x%02X;", $char), $result);
+            self::assertStringContainsString(strtolower(sprintf("%02X", $char)), $result);
+            self::assertStringNotContainsString(sprintf("&#x%02X;", $char), $result);
         }
     }
 
@@ -252,7 +305,7 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertSame('', $result);
+        self::assertSame('', $result);
     }
 
     /**
@@ -266,16 +319,41 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        $this->assertSame($content, $result);
+        self::assertSame($content, $result);
     }
 
     /**
      * Helper method to create a test file
      */
-    private function createTestFile(string $content): string
+    private function createTestFile(string $content, bool $inTu = false): string
     {
         $filename = @tempnam($this->testDir, 'tmx_test_');
-        file_put_contents($filename, $content);
+        if ($inTu) {
+            file_put_contents(
+                $filename,
+                <<<TMX
+<?xml version="1.0" encoding="UTF-8" ?>
+<tmx version="1.4">
+    <body>
+        <tu tuid="1" creationdate="20230202T141425Z">
+            <prop type="tmgr:segNum">1</prop>
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">3-seg-resname.xlf</prop>
+            <prop type="tmgr:context">CONTEXT_1</prop>
+            <tuv xml:lang="en">
+                <seg>$content</seg>
+            </tuv>
+            <tuv xml:lang="de">
+                <seg>Mein Testabschnitt 1. (CONTEXT_1)</seg>
+            </tuv>
+        </tu>
+    </body>
+</tmx>
+TMX
+            );
+        } else {
+            file_put_contents($filename, $content);
+        }
 
         return $filename;
     }

@@ -37,7 +37,7 @@ class GetListDTO
     final public function __construct(
         public readonly int $tmId,
         public readonly int $limit,
-        public readonly string $offset,
+        public readonly ?string $offset,
         public readonly string $source,
         public readonly string $sourceMode,
         public readonly string $target,
@@ -66,7 +66,7 @@ class GetListDTO
         return new static(
             (int) $data['tm'],
             (int) $request->getParam('limit'),
-            isset($data['offset']) ? (string) $data['offset'] : '',
+            ! empty($data['offset']) ? (string) $data['offset'] : null,
             (string) $data['source'],
             (string) $data['sourceMode'],
             (string) $data['target'],

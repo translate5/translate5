@@ -35,15 +35,16 @@ use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\Reorganize\ManualReorganizeService;
-use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
 use MittagQI\Translate5\T5Memory\UpdateRetryService;
 use MittagQI\Translate5\Test\Fixtures\LanguageResourceFixtures;
+use MittagQI\Translate5\TMX\Filter\SameTuvFilter;
 use PHPUnit\Framework\TestCase;
 
 class ManualReorganizeServiceTest extends TestCase
@@ -109,12 +110,14 @@ class ManualReorganizeServiceTest extends TestCase
             $this->languageResource,
             __DIR__ . '/ManualReorganizeServiceTest/test.tmx',
             $tmName,
-            new ImportOptions(StripFramingTags::None),
+            new ImportOptions(
+                StripFramingTags::None,
+                new TmxFilterOptions(),
+            ),
         );
 
-        $updateService->updateWithRetryInMemory(
+        $updateService->updateWithRetry(
             $this->languageResource,
-            $tmName,
             new UpdateSegmentDTO(
                 'Eine Segment',
                 'One segment',
@@ -157,7 +160,9 @@ class ManualReorganizeServiceTest extends TestCase
             $reorganize->reorganizeTm(
                 $this->languageResource,
                 $tmName,
-                new ReorganizeOptions(false)
+                new ReorganizeOptions(
+                    new TmxFilterOptions(),
+                ),
             );
         } catch (ReorganizeException $e) {
             self::fail($e->getMessage());

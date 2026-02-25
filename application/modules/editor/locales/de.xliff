@@ -10640,6 +10640,14 @@ Um Workflow-Schritte den Job-Koordinatoren zuweisen zu können, müssen die ents
                 <source>Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.</source>
                 <target>Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.</target>
             </trans-unit>
+           <trans-unit id='RWluaWdlIEluaGFsdGUgd2FyZW4gdW5nZXNjaMO8dHp0LCB1bSBlaW5lIGJlc3NlcmUgw5xiZXJlaW5zdGltbXVuZyB6dSBlcnppZWxlbi4='>
+               <source>Some content was unprotected to get a better match.</source>
+               <target>Einige Inhalte waren ungeschützt, um eine bessere Übereinstimmung zu erzielen.</target>
+           </trans-unit>
+           <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSB3aXJkIGRlcnplaXQgdmVyYXJiZWl0ZXQuIEVzIHNpbmQgbcO2Z2xpY2hlcndlaXNlIGJlc3NlcmUgw5xiZXJlaW5zdGltbXVuZ2VuIHZlcmbDvGdiYXIu'>
+               <source>Language resource is currently being processed. Better matches might be available.</source>
+               <target>Die Sprachressource wird derzeit verarbeitet. Es sind möglicherweise bessere Übereinstimmungen verfügbar.</target>
+           </trans-unit>
             <trans-unit id='RGllIEF1ZmdhYmUgZW50aMOkbHQgbm9jaCBTZWdtZW50ZSBpbSBFbnR3dXJmc3N0YXR1cy4gw5ZmZm5lbiBTaWUgZGllIEF1ZmdhYmUgdW5kIHNldHplbiBTaWUgZGVuIFN0YXR1cyB1bS4='>
                 <source>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.</source>
                 <target>Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.</target>

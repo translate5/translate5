@@ -76,6 +76,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method string getMatchId()
  * @method void setMatchId(int $matchId)
  * @method bool getIsDefault()
+ * @method string getKey()
+ * @method void setKey(string $key)
  */
 class ContentRecognition extends ZfExtended_Models_Entity_Abstract
 {

@@ -41,6 +41,7 @@ use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Exception\SegmentUpdateCheckException;
+use MittagQI\Translate5\T5Memory\Factory\SegmentUpdateDtoFactory;
 use Zend_Config;
 use ZfExtended_Logger;
 

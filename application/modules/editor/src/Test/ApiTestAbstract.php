@@ -330,6 +330,7 @@ abstract class ApiTestAbstract extends TestCase
                 static::beforeTests();
             }
         } catch (Throwable $e) {
+            error_log($e);
             static::tearDownAfterClass();
 
             throw $e;

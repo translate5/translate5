@@ -32,30 +32,34 @@ namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector_Exception as ConnectorException;
-use Generator;
+use GuzzleHttp\Exception\RequestException;
 use LogicException;
-use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
-use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
+use MittagQI\Translate5\TMX\ConcatTmx;
+use MittagQI\Translate5\TMX\TmxIterator;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\StreamInterface;
 use Throwable;
-use XMLReader;
+use Zend_Config;
 use Zend_Registry;
 use ZfExtended_Logger;
+use ZfExtended_Utils;
 use ZipArchive;
 
 class ExportService
 {
-    private const CHUNKSIZE = 1000;
+    private const CHUNKSIZE = 10000;
 
     public function __construct(
         private readonly ZfExtended_Logger $logger,
-        private readonly ConvertT5MemoryTagServiceInterface $conversionService,
         private readonly T5MemoryApi $t5MemoryApi,
         private readonly PersistenceService $persistenceService,
+        private readonly Zend_Config $config,
+        private readonly ConcatTmx $concatTmx,
+        private readonly TmxIterator $tmxIterator,
     ) {
     }
 
@@ -66,9 +70,11 @@ class ExportService
     {
         return new self(
             Zend_Registry::get('logger')->cloneMe('editor.t5memory.export'),
-            ConvertT5MemoryTagService::create(),
             T5MemoryApi::create(),
             PersistenceService::create(),
+            Zend_Registry::get('config'),
+            ConcatTmx::create(),
+            TmxIterator::create(),
         );
     }
 
@@ -142,6 +148,10 @@ class ExportService
 
     private function composeTmxFile(LanguageResource $languageResource, ?string $tmName, bool $unprotect): ?string
     {
+        if ($this->config->runtimeOptions->LanguageResources->t5memory->downloadParallel) {
+            return $this->downloadTmx($languageResource, $tmName, $unprotect);
+        }
+
         $tmxFilename = $this->composeFilename($languageResource, TmFileExtension::TMX);
 
         try {
@@ -157,13 +167,99 @@ class ExportService
         return $tmxFilename;
     }
 
+    private function downloadTmx(
+        LanguageResource $languageResource,
+        ?string $exactTmName,
+        bool $unprotect,
+    ): ?string {
+        $memories = $this->getMemories($languageResource, $exactTmName);
+
+        if (empty($memories)) {
+            return null;
+        }
+
+        $exportDir = $this->getExportDir($languageResource, true);
+
+        $chunkNumber = 1;
+
+        $tmData = [];
+        foreach ($memories as $i => $memory) {
+            $memory = $this->persistenceService->addTmPrefix($memory);
+            $tmData[$memory] = [
+                'filePath' => $this->composeChunkFilename(
+                    $languageResource,
+                    TmFileExtension::TMX,
+                    $i + 1,
+                    $chunkNumber
+                ),
+                'startFromInternalKey' => null,
+                'part' => $i + 1,
+            ];
+        }
+
+        do {
+            $chunkNumber++;
+
+            ['success' => $responses, 'failures' => $failures] = $this->t5MemoryApi->downloadParallel(
+                $languageResource->getResource()->getUrl(),
+                $tmData,
+                self::CHUNKSIZE,
+            );
+
+            foreach ($failures as $tmName => $failure) {
+                $this->logger->exception($this->getBadGatewayException($failure, $languageResource, $tmName));
+            }
+
+            if (! empty($failures)) {
+                ZfExtended_Utils::recursiveDelete($exportDir);
+
+                throw new ExportException('Downloads failed');
+            }
+
+            foreach ($responses as $tmName => $response) {
+                if ($response->isLockingTimeoutOccurred()) {
+                    $response = $this->t5MemoryApi->fetchChunk(
+                        $languageResource->getResource()->getUrl(),
+                        $tmName,
+                        self::CHUNKSIZE,
+                        $tmData[$tmName]['startFromInternalKey'],
+                    );
+
+                    if ($response->isLockingTimeoutOccurred()) {
+                        throw new ExportException('Could not acquire lock for TM ' . $tmName);
+                    }
+                }
+
+                if (null === $response->nextInternalKey) {
+                    unset($tmData[$tmName]);
+
+                    continue;
+                }
+
+                $tmData[$tmName]['startFromInternalKey'] = $response->nextInternalKey;
+                $tmData[$tmName]['filePath'] = $this->composeChunkFilename(
+                    $languageResource,
+                    TmFileExtension::TMX,
+                    $tmData[$tmName]['part'],
+                    $chunkNumber
+                );
+            }
+        } while (! empty($tmData));
+
+        $tmxFilename = $this->composeFilename($languageResource, TmFileExtension::TMX);
+
+        $this->concatTmx->concatDirFiles($exportDir, $tmxFilename, $unprotect);
+
+        return $tmxFilename;
+    }
+
     /**
      * @return iterable<string>
      * @throws ExportException
      */
-    private function exportAllAsOneTmx(LanguageResource $languageResource, ?string $tmName, bool $unprotect): iterable
+    private function exportAllAsOneTmx(LanguageResource $languageResource, ?string $exactTmName, bool $unprotect): iterable
     {
-        $memories = $this->getMemories($languageResource, $tmName);
+        $memories = $this->getMemories($languageResource, $exactTmName);
 
         if (empty($memories)) {
             return yield from [];
@@ -229,7 +325,12 @@ class ExportService
         $firstChunk = true;
 
         foreach ($this->exportTmxChunk($languageResource, $tmName) as $stream) {
-            $iterator = $this->iterateTmx($stream, $firstChunk && $memoryNumber === 0, $writtenElements, $unprotect);
+            $iterator = $this->tmxIterator->iterateTmx(
+                $stream,
+                $firstChunk && $memoryNumber === 0,
+                $writtenElements,
+                $unprotect
+            );
 
             if ($iterator?->valid()) {
                 $atLeastOneFileRead = true;
@@ -257,82 +358,20 @@ class ExportService
         );
     }
 
-    /**
-     * @return Generator<string>|null
-     */
-    private function iterateTmx(StreamInterface $stream, bool $returnHeader, int &$writtenElements, bool $unprotect): ?Generator
+    private function exportAllAsArchive(LanguageResource $languageResource, ?string $exactTmName): ?string
     {
-        $reader = new XMLReader();
-
-        try {
-            $reader->open(Psr7StreamWrapper::register($stream));
-        } catch (Throwable $e) {
-            $this->logger->exception($e);
-
-            return null;
-        }
-
-        // suppress: namespace error : Namespace prefix t5 on n is not defined
-        $errorLevel = error_reporting();
-        error_reporting($errorLevel & ~E_WARNING);
-
-        while ($reader->read()) {
-            if ($reader->nodeType === XMLReader::ELEMENT && $reader->name === 'tu') {
-                $writtenElements++;
-
-                $tu = $reader->readOuterXML();
-
-                if ($unprotect) {
-                    $tu = $this->conversionService->convertT5MemoryTagToContent($tu);
-                }
-
-                yield $tu . PHP_EOL;
-            }
-
-            if (! $returnHeader) {
-                continue;
-            }
-
-            if ($reader->nodeType === XMLReader::ELEMENT && $reader->name === 'header') {
-                yield $reader->readOuterXML() . PHP_EOL;
-            }
-
-            if (! in_array($reader->name, ['tmx', 'body'])) {
-                continue;
-            }
-
-            if ($reader->nodeType === XMLReader::ELEMENT) {
-                // Get the opening part of the 'element' element
-                $openingPart = '<' . $reader->name;
-
-                // Get attributes of the 'element' element
-                while ($reader->moveToNextAttribute()) {
-                    $openingPart .= ' ' . $reader->name . '="' . $reader->value . '"';
-                }
-
-                // If self-closing
-                $openingPart .= $reader->isEmptyElement ? '/>' : '>';
-
-                yield $openingPart . PHP_EOL;
-            }
-        }
-
-        error_reporting($errorLevel);
-
-        $reader->close();
-    }
-
-    private function exportAllAsArchive(LanguageResource $languageResource, ?string $tmName): ?string
-    {
-        $memories = $this->getMemories($languageResource, $tmName);
+        $memories = $this->getMemories($languageResource, $exactTmName);
 
         if (empty($memories)) {
             return null;
         }
 
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+        $exportDir = APPLICATION_DATA . '/TMExport/';
         $tmpDir = $exportDir . $languageResource->getId() . '_' . uniqid() . '/';
-        @mkdir($tmpDir, recursive: true);
+
+        if (! mkdir($tmpDir, recursive: true) && ! is_dir($tmpDir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $tmpDir));
+        }
 
         $zipFilename = $this->composeFilename($languageResource, TmFileExtension::ZIP);
 
@@ -370,14 +409,94 @@ class ExportService
         return $zipFilename;
     }
 
-    private function composeFilename(LanguageResource $languageResource, TmFileExtension $extension): string
-    {
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+    private function getBadGatewayException(
+        Throwable $e,
+        LanguageResource $languageResource,
+        string $tmName,
+    ): ConnectorException {
+        $ecode = 'E1313';
 
-        if (! is_dir($exportDir)) {
-            mkdir($exportDir, recursive: true);
+        $request = null;
+        $response = null;
+
+        if ($e instanceof RequestExceptionInterface) {
+            $request = $e->getRequest();
         }
 
+        if ($e instanceof RequestException) {
+            $response = $e->getResponse();
+        }
+
+        if ($request && $request->getBody()->isSeekable()) {
+            $request->getBody()->rewind();
+        }
+
+        if ($request && $response->getBody()->isSeekable()) {
+            $response->getBody()->rewind();
+        }
+
+        $data = [
+            'service' => $languageResource->getResource()->getName(),
+            'languageResource' => $languageResource,
+            'tmName' => $tmName,
+            'error' => $e->getMessage(),
+            'uri' => $request?->getUri() ?? $languageResource->getResource()->getUrl(),
+            'request' => $request ? $request->getBody()->getContents() : '',
+            'response' => $response ? $response->getBody()->getContents() : '',
+        ];
+
+        if (str_contains($data['response'], 'needs to be organized')) {
+            $ecode = 'E1314';
+            $data['tm'] = $languageResource->getName();
+        }
+
+        if (str_contains($data['response'], 'too many open translation memory databases')) {
+            $ecode = 'E1333';
+        }
+
+        return new ConnectorException($ecode, $data, $e);
+    }
+
+    private function composeChunkFilename(
+        LanguageResource $languageResource,
+        TmFileExtension $extension,
+        int $part,
+        int $chunkNumber,
+    ): string {
+        $exportDir = $this->getExportDir($languageResource, true);
+
+        return $exportDir . sprintf('%s-%s.%s', $part, $chunkNumber, $extension->value);
+    }
+
+    private function composeFilename(
+        LanguageResource $languageResource,
+        TmFileExtension $extension,
+    ): string {
+        $exportDir = $this->getExportDir($languageResource, false);
+
         return $exportDir . sprintf('%s_%s.%s', $languageResource->getId(), uniqid(), $extension->value);
+    }
+
+    private function getExportDir(
+        LanguageResource $languageResource,
+        bool $multipleParts,
+    ): string {
+        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+
+        if (! is_dir($exportDir) && ! mkdir($exportDir, recursive: true)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $exportDir));
+        }
+
+        if (! $multipleParts) {
+            return $exportDir;
+        }
+
+        $exportDir .= $languageResource->getId() . '/';
+
+        if (! is_dir($exportDir) && ! mkdir($exportDir, recursive: true)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $exportDir));
+        }
+
+        return $exportDir;
     }
 }

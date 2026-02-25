@@ -86,6 +86,7 @@
       "author": "Created by",
       "additionalInfo": "Additional info",
       "document": "Document",
+      "context": "Context",
       "creationDate": "Creation date",
       "actions": "Actions",
       "sourceLanguage": "Source language",
@@ -95,6 +96,8 @@
     "editSource": "Edit source",
     "editTarget": "Edit target",
     "delete": "Delete",
+    "deleteBySource": "Delete all segments having same source as the current one",
+    "deleteBySourceAndTarget": "Delete all segments having same source AND target as the current one",
     "create": "Create",
     "save": "Save (CTRL + S)",
     "cancel": "Cancel (ESC)",
@@ -115,6 +118,14 @@
   "deleteSegment": {
     "title": "Delete segment",
     "text": "Do you really want to delete this segment?",
+    "bySource": {
+      "title": "Delete all segments having same source",
+      "text": "{0} - all segments having such a source will be deleted regardless of the current filtering. Proceed?"
+    },
+    "bySourceAndTarget": {
+      "title": "Delete all segments having same source AND target",
+      "text": "{0} => {1} - all segments having these source AND target will be deleted regardless of the current filtering. Proceed?"
+    },
     "yes": "Yes",
     "no": "No"
   }

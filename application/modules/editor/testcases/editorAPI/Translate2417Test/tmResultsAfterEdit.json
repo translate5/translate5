@@ -2,7 +2,7 @@
     {
         "target": "Aleks test tm update.",
         "rawTarget": "Aleks test tm update.",
-        "matchrate": 103,
+        "matchrate": 101,
         "source": "Across Language Server",
         "languageResourceType": "tm",
         "languageResourceColor": "aaff7f",
@@ -12,6 +12,8 @@
         "timestamp": "TEST_TIMESTAMP",
         "penaltyGeneral": 0,
         "penaltySublang": 0,
-        "tmConversionState": "converted"
+        "tmConversionState": "converted",
+        "guessed": false,
+        "possiblyNotOptimal": false
     }
 ]

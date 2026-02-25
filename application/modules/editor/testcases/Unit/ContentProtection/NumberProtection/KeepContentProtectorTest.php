@@ -76,11 +76,12 @@ class KeepContentProtectorTest extends TestCase
             '',
             true,
             null,
-            1
+            1,
+            'aaa',
         );
 
         self::assertSame(
-            '<number type="keep-content" name="test-default" source="some text" iso="some text" target="some text" regex="AwA="/>',
+            '<number type="keep-content" name="test-default" source="some text" iso="some text" target="some text" regex="AwA=" key="aaa"/>',
             (new KeepContentProtector($repo))->protect('some text', $sourceFormat, $sourceLang, $targetLang)
         );
     }

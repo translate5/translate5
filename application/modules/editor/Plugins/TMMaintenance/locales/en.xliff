@@ -22,6 +22,10 @@
         <source>Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.</source>
         <target>The segment you are trying to save has already been deleted by another process.</target>
     </trans-unit>
+    <trans-unit id='U2VnbWVudCB6dSBsYW5nIGbDvHIgQWJmcmFnZW4gYXVmIHQ1bWVtb3J5'>
+        <source>Segment zu lang für Abfragen auf t5memory</source>
+        <target>Segment too long for queries in t5memory</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>

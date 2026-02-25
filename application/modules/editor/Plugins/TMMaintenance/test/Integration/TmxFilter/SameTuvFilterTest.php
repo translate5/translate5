@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TMMaintenance\test\Integration\TmxFilter;
 
-use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
+use MittagQI\Translate5\TMX\Filter\SameTuvFilter;
 use PHPUnit\Framework\TestCase;
 
 class SameTuvFilterTest extends TestCase

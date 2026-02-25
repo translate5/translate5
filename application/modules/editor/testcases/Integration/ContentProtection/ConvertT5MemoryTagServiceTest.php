@@ -49,6 +49,7 @@ class ConvertT5MemoryTagServiceTest extends TestCase
         $keep1->setKeepAsIs(true);
         $keep1->setRegex('/(\s|^|\()([-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u');
         $keep1->setMatchId(2);
+        $keep1->setKey('aaa');
         $keep1->save();
 
         $this->rules[] = $keep1;
@@ -60,6 +61,7 @@ class ConvertT5MemoryTagServiceTest extends TestCase
         $keep2->setKeepAsIs(true);
         $keep2->setRegex('/(\s|^|\()([-+]?([1-9]\d+|\d))(%|°|V|mm|kbit|s|psi|bar|MPa|mA)(([\.,:;?!](\s|$))|\s|$|\))/u');
         $keep2->setMatchId(2);
+        $keep2->setKey('bbb');
         $keep2->save();
 
         $this->rules[] = $keep2;
@@ -72,6 +74,7 @@ class ConvertT5MemoryTagServiceTest extends TestCase
         $float1->setRegex('/0,0/');
         $float1->setMatchId(0);
         $float1->setFormat('#,#');
+        $float1->setKey('ccc');
         $float1->save();
 
         $this->rules[] = $float1;
@@ -84,6 +87,7 @@ class ConvertT5MemoryTagServiceTest extends TestCase
         $float2->setRegex('/0.0/');
         $float2->setMatchId(0);
         $float2->setFormat('#.#');
+        $float2->setKey('ddd');
         $float2->save();
 
         $this->rules[] = $float2;
@@ -159,12 +163,12 @@ class ConvertT5MemoryTagServiceTest extends TestCase
     {
         yield 'pair 1' => [
             'pair' => [
-                'source' => 'segment <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="20"/>V',
-                'target' => 'segment <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="20"/>V and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="15"/> and <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/>',
+                'source' => 'segment <t5:n id="2" r="aaa" n="10"/> and <t5:n id="2" r="aaa" n="15"/> and <t5:n id="2" r="aaa" n="20"/>V',
+                'target' => 'segment <t5:n id="2" r="aaa" n="20"/>V and <t5:n id="2" r="aaa" n="15"/> and <t5:n id="2" r="aaa" n="10"/>',
             ],
             'expected' => [
-                'source' => 'segment <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/> and <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="15"/> and <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>V',
-                'target' => 'segment <t5:n id="3" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1FCtObShJqwmN7cmOymzpKa4pqA4syYpsajGNyCxJtdRU0MjOkZPx8raXjEWZJCKpmYNiKqJ0dTULwUA" n="20"/>V and <t5:n id="2" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="15"/> and <t5:n id="1" r="09eIKa6Jq4nR0NSI1tWOtdeINtS1jI1J0a6JSdHU1NCIjtHTsbayV4wFqVPR1KwBUTUxmpr6pQA=" n="10"/>',
+                'source' => 'segment <t5:n id="1" r="aaa" n="10"/> and <t5:n id="2" r="aaa" n="15"/> and <t5:n id="3" r="bbb" n="20"/>V',
+                'target' => 'segment <t5:n id="3" r="bbb" n="20"/>V and <t5:n id="2" r="aaa" n="15"/> and <t5:n id="1" r="aaa" n="10"/>',
             ],
         ];
 
@@ -174,8 +178,19 @@ class ConvertT5MemoryTagServiceTest extends TestCase
                 'target' => 'string 0.0 string',
             ],
             'expected' => [
-                'source' => 'string <t5:n id="1" r="0zfQMdAHAA==" n="0,0"/> string',
-                'target' => 'string <t5:n id="1" r="0zfQMdAHAA==" n="0.0"/> string',
+                'source' => 'string <t5:n id="1" r="ccc" n="0,0"/> string',
+                'target' => 'string <t5:n id="1" r="ccc" n="0.0"/> string',
+            ],
+        ];
+
+        yield 'pair with utf-char tag' => [
+            'pair' => [
+                'source' => 'string 0,0 [] string',
+                'target' => 'string 0.0 [] string',
+            ],
+            'expected' => [
+                'source' => 'string <t5:n id="2" r="ccc" n="0,0"/> [<t5:n id="1001" r="utf-char" n="0b"/>] string',
+                'target' => 'string <t5:n id="2" r="ccc" n="0.0"/> [<t5:n id="1001" r="utf-char" n="0b"/>] string',
             ],
         ];
     }

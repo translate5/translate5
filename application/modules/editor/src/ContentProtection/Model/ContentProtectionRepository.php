@@ -64,6 +64,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceCont
 use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
+use Zend_Db_Table_Row;
 use Zend_Db_Table_Select;
 use ZfExtended_Factory;
 
@@ -431,6 +432,65 @@ class ContentProtectionRepository
         return $hashes;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function getRegexToKeyMap(): array
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'recognition' => ContentRecognitionTable::TABLE_NAME,
+                ],
+                ['recognition.regex', 'recognition.key']
+            )
+        ;
+
+        $rows = $this->db->fetchAll($select);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['regex']] = $row['key'];
+        }
+
+        return $map;
+    }
+
+    public function findRecognitionByKey(string $key): ?ContentRecognition
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'recognition' => ContentRecognitionTable::TABLE_NAME,
+                ],
+                ['recognition.*']
+            )
+            ->where('recognition.key = ?', $key)
+            ->limit(1);
+
+        $row = $this->db->fetchRow($select);
+
+        if (! $row) {
+            return null;
+        }
+
+        $recognition = new ContentRecognition();
+        $recognition->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $recognition->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $recognition;
+    }
+
     public function findRecognitionByRegex(string $regex): ?ContentRecognition
     {
         $select = $this->db
@@ -452,7 +512,7 @@ class ContentProtectionRepository
 
         $recognition = new ContentRecognition();
         $recognition->init(
-            new \Zend_Db_Table_Row(
+            new Zend_Db_Table_Row(
                 [
                     'table' => $recognition->db,
                     'data' => $row,

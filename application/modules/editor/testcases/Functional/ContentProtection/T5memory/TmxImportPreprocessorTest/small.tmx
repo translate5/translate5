@@ -10,11 +10,11 @@
             <tuv xml:lang="de-DE">
                 <seg>Temperaturklasse, maximale Oberflächentemperatur &lt; 135 °C; 275 °F</seg>
             </tuv>
-            <tuv xml:lang="it-IT">
+            <tuv xml:lang="bg-BG">
                 <seg>Classe di temperatura, temperatura superficiale massima &lt; 135 °C; 275 °F</seg>
             </tuv>
         </tu>
-        <tu tuid="2" creationdate="20240628T093631Z" creationid="SABRINA LUWICH">
+        <tu tuid="2" creationdate="20240628T093632Z" creationid="SABRINA LUWICH">
             <prop type="tmgr:segId">3</prop>
             <prop type="t5:InternalKey">7:1</prop>
             <prop type="tmgr:markup">OTMXUXLF</prop>
@@ -22,7 +22,7 @@
             <tuv xml:lang="de-DE">
                 <seg>**hallo** <t5:n id="1" r="04+LSdFWCA12UdEHAA==" n="SOME_TEXT"/></seg>
             </tuv>
-            <tuv xml:lang="it-IT">
+            <tuv xml:lang="bg-BG">
                 <seg>**ola** <t5:n id="1" r="04+LSdFWCA12UdEHAA==" n="OTHER_TEXT"/></seg>
             </tuv>
         </tu>

@@ -96,6 +96,7 @@ class FloatProtector extends AbstractProtector
             $float->format('#.#', $targetLang->getRfc5646()),
             $float->format($protectionDto->outputFormat, $targetLang->getRfc5646()),
             $this->encodeRegex($protectionDto->regex),
+            $protectionDto->key,
         );
     }
 }

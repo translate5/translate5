@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
@@ -39,19 +39,25 @@ use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\FuzzySearchService;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\MemoryNameGenerator;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
 use MittagQI\Translate5\T5Memory\SegmentContext;
-use MittagQI\Translate5\T5Memory\TagHandlerProvider;
+use MittagQI\Translate5\T5Memory\StatusService;
+use MittagQI\Translate5\T5Memory\TagHandler\TagHandlerProvider;
 use MittagQI\Translate5\T5Memory\UpdateSegmentService;
+use MittagQI\Translate5\TMX\ConcatTmx;
+use MittagQI\Translate5\TMX\TmxIterator;
 
 /**
  * T5memory / T5Memory Connector
@@ -102,7 +108,11 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
 
     private readonly TagHandlerProvider $tagHandlerProvider;
 
+    private readonly StatusService $statusService;
+
     protected readonly SegmentContext $segmentContext;
+
+    private readonly ActionLockService $lockService;
 
     public function __construct()
     {
@@ -119,9 +129,11 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
         $this->t5MemoryApi = T5MemoryApi::create();
         $this->exportService = new ExportService(
             $this->logger,
-            ConvertT5MemoryTagService::create(),
             $this->t5MemoryApi,
-            $this->persistenceService
+            $this->persistenceService,
+            $this->config,
+            ConcatTmx::create(),
+            TmxIterator::create(),
         );
 
         $this->reorganizeService = ReorganizeService::create();
@@ -133,7 +145,9 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
         $this->queryCache = QueryCache::create();
         $this->updateSegmentService = UpdateSegmentService::create();
         $this->tagHandlerProvider = TagHandlerProvider::create();
+        $this->statusService = StatusService::create();
         $this->segmentContext = SegmentContext::create();
+        $this->lockService = ActionLockService::create();
     }
 
     public function connectTo(
@@ -204,7 +218,7 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
                 $this->languageResource,
                 $name,
                 $fileinfo['tmp_name'],
-                ImportOptions::fromParams($params)->stripFramingTags
+                StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None
             );
         } catch (\Exception $e) {
             $this->logger->error('E1304', 't5memory: could not create prefilled TM', [
@@ -221,56 +235,66 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
     }
 
     /**
-     * @return iterable<string>
+     * @return string[]
      */
-    private function getImportFilesFromUpload(?array $fileInfo): iterable
+    private function getImportFilesFromUpload(?array $fileInfo): array
     {
         if (null === $fileInfo) {
-            return yield from [];
+            return [];
         }
 
         $validator = new Zend_Validate_File_IsCompressed();
         if (! $validator->isValid($fileInfo['tmp_name'])) {
-            return yield $fileInfo['tmp_name'];
+            return [$fileInfo['tmp_name']];
         }
 
         $zip = new ZipArchive();
         if (! $zip->open($fileInfo['tmp_name'])) {
             $this->logger->error('E1596', 't5memory: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
 
-            return yield from [];
+            return [];
         }
 
-        $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
+        $newPath = sys_get_temp_dir()
+            . DIRECTORY_SEPARATOR
+            . 't5memory_import_'
+            . pathinfo($fileInfo['name'], PATHINFO_FILENAME)
+            . '_'
+            . bin2hex(random_bytes(8));
 
         if (! $zip->extractTo($newPath)) {
             $this->logger->error('E1597', 't5memory: Content from zip file could not be extracted.');
             $zip->close();
 
-            return yield from [];
+            return [];
         }
 
         $zip->close();
 
+        $files = [];
         foreach (editor_Utils::generatePermutations('tmx') as $patter) {
-            yield from glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($patter)) ?: [];
+            $files[] = glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($patter)) ?: [];
         }
+
+        return array_merge(...$files);
     }
 
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
         $customerId = current($this->languageResource->getCustomers());
-        $params[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $this->config->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
+
+        $options = new ImportOptions(
+            stripFramingTags: StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None,
+            tmxFilterOptions: TmxFilterOptions::fromConfig($this->getConfig()),
+            resegmentTmx: (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
+            customerId: $customerId ? (int) $customerId : null
+        );
 
         try {
             $this->importService->importTmx(
                 $this->languageResource,
                 $this->getImportFilesFromUpload($fileinfo),
-                ImportOptions::fromParams($params, $customerId ? (int) $customerId : null),
-                $params['tmName'] ?? null,
+                $options,
             );
         } catch (\Exception $e) {
             $this->logger->error('E1304', 't5memory: could not import TMX', [
@@ -320,14 +344,33 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
             $updateOptions?->saveToDisk && ! $this->isInternalFuzzy(),
             (bool) $updateOptions?->saveDifferentTargetsForSameSource,
             (bool) $updateOptions?->recheckOnUpdate,
+            $this->isInternalFuzzy(),
         );
 
-        $this->updateSegmentService->update(
-            $this->languageResource,
-            $segment,
-            $this->config,
-            $updateOptions,
-        );
+        $lock = $this->lockService->getWriteLock($this->languageResource->getLangResUuid());
+
+        if (! $lock->acquire(true)) {
+            throw new editor_Services_Connector_Exception('E1377', [
+                'status' => 'Locked',
+            ]);
+        }
+
+        if (! $this->isInternalFuzzy()) {
+            // language resource might have been updated while waiting for the lock,
+            // so we have to refresh it to ensure we have the latest data and status
+            $this->languageResource->refresh();
+        }
+
+        try {
+            $this->updateSegmentService->update(
+                $this->languageResource,
+                $segment,
+                $this->config,
+                $updateOptions,
+            );
+        } finally {
+            $lock->release();
+        }
     }
 
     private function isLockingTimeoutOccurred(?object $error): bool
@@ -363,11 +406,11 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
     public function query(
         editor_Models_Segment $segment,
         int $pretranslateMatchrate = 0,
-        bool $pretranslation = false
+        bool $pretranslation = false,
     ): editor_Services_ServiceResult {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
-        $context = $this->segmentContext->getContext($segment);
+        $context = $this->segmentContext->getContext($segment, true);
 
         //TODO final implemenation: get prefix and other key relevant information from underlying api instance
         $key = [
@@ -418,16 +461,46 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
         // we have to set the default source here to fill the be added internal tags
         $resultList->setDefaultSource($queryString);
 
-        $matches = $this->fuzzySearchService->query(
-            $languageResource,
-            $queryString,
-            $context,
-            $fileName,
-            $this->calculateMatchRate($segment),
-            $config,
-            $this->isInternalFuzzy(),
-            $pretranslation,
-        );
+        $lockId = $languageResource->getLangResUuid();
+
+        if ($this->isInternalFuzzy()) {
+            $lockId .= '_internalFuzzy';
+        }
+
+        if ($pretranslation) {
+            $lock = $this->lockService->getWriteLock($lockId);
+            $lock->acquire(true);
+        } else {
+            $lock = $this->lockService->getReadLock($lockId);
+            $lock->acquireRead();
+        }
+
+        if (! $lock->isAcquired()) {
+            throw new editor_Services_Connector_Exception('E1377', [
+                'status' => 'Locked',
+            ]);
+        }
+
+        if (! $this->isInternalFuzzy()) {
+            // language resource might have been updated while waiting for the lock,
+            // so we have to refresh it to ensure we have the latest data and status
+            $this->languageResource->refresh();
+        }
+
+        try {
+            $matches = $this->fuzzySearchService->query(
+                $languageResource,
+                $queryString,
+                $context,
+                $fileName,
+                $this->calculateMatchRate($segment),
+                $config,
+                $this->isInternalFuzzy(),
+                $pretranslation,
+            );
+        } finally {
+            $lock->release();
+        }
 
         $skipWorseMatches = false;
 
@@ -494,6 +567,18 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
 
+        $lock = $this->lockService->getReadLock($this->languageResource->getLangResUuid());
+
+        if (! $lock->acquireRead()) {
+            throw new editor_Services_Connector_Exception('E1377', [
+                'status' => 'Locked',
+            ]);
+        }
+
+        // language resource might have been updated while waiting for the lock,
+        // so we have to refresh it to ensure we have the latest data and status
+        $this->languageResource->refresh();
+
         if ($this->languageResource->isConversionStarted()) {
             return $resultList;
         }
@@ -515,7 +600,7 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
                 $tmOffset = null;
             }
 
-            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName)) {
+            if ($this->reorganizeService->isReorganizingAtTheMoment($this->languageResource, $tmName, ! $this->isInternalFuzzy())) {
                 continue;
             }
 
@@ -534,11 +619,7 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
                 $tmName,
             )) {
                 $options = new ReorganizeOptions(
-                    $this->config
-                        ->runtimeOptions
-                        ->LanguageResources
-                        ->t5memory
-                        ->saveDifferentTargetsForSameSource
+                    TmxFilterOptions::fromConfig($this->config),
                 );
                 $this->reorganizeService->reorganizeTm(
                     $this->languageResource,
@@ -682,8 +763,16 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
 
         $resp = $this->api->getResponse();
 
-        if ($resp->getStatus() == 404
-            || $resp->getStatus() == 500 && str_contains($resp->getBody(), 'not found(error 48)')) {
+        $success = null !== $resp
+            && (
+                $resp->getStatus() === 404
+                || (
+                    $resp->getStatus() === 500
+                    && str_contains($resp->getBody(), 'not found(error 48)')
+                )
+            );
+
+        if ($success) {
             $onSuccess && $onSuccess();
 
             // if the result was a 404, then there is nothing to delete,
@@ -752,37 +841,10 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
                 : LanguageResourceStatus::ERROR;
         }
 
-        if ($this->languageResource->isConversionStarted()) {
-            return LanguageResourceStatus::CONVERTING;
-        }
-
-        // let's check the internal state before calling API for status as import worker might not have run yet
-        if ($this->languageResource->getStatus() === LanguageResourceStatus::IMPORT) {
-            return LanguageResourceStatus::IMPORT;
-        }
-
-        $tmName = $tmName ?: $this->persistenceService->getLastWritableMemory($this->languageResource);
-
-        if (empty($tmName)) {
-            $this->lastStatusInfo = 'The internal stored filename is invalid';
-
-            return LanguageResourceStatus::NOCONNECTION;
-        }
-
-        // TODO remove after fully migrated to t5memory v0.5.x
-
-        $status = $this->t5MemoryApi->getStatus(
-            $this->languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName)
+        return $this->statusService->getStatus(
+            $this->languageResource,
+            $tmName,
         );
-
-        if ($status->successful()) {
-            return $status->status;
-        }
-
-        $this->lastStatusInfo = $status->getErrorMessage();
-
-        return LanguageResourceStatus::ERROR;
     }
 
     public function isEmpty(): bool
@@ -833,12 +895,12 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
             $isContext = false;
             foreach ($metaData as $data) {
                 //exact-exact match
-                if ($data->name == "documentName" && $data->value == $filename) {
+                if ($data->name === "documentName" && $data->value === $filename) {
                     $isExacExac = true;
                 }
 
-                //context metch
-                if ($data->name == "context" && $data->value == $context) {
+                //context match
+                if ($context !== '-' && $data->name === "context" && $data->value === $context) {
                     $isContext = true;
                 }
             }

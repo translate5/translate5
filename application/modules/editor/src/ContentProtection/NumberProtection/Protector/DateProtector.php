@@ -102,6 +102,7 @@ class DateProtector extends AbstractProtector
             $date->format('Y-m-d'),
             $date->format($protectionDto->outputFormat),
             $this->encodeRegex($protectionDto->regex),
+            $protectionDto->key,
         );
     }
 }

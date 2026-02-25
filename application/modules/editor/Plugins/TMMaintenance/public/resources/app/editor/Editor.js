@@ -55,8 +55,12 @@ Ext.define('Ext.translate5.Editor', {
         location.record.set('isSaving', true);
         location.record.set(this.config.dataIndex, data.data);
         location.record.set(this.config.editingDataIndex, data.data);
+        location.record.set('originalState', {
+            'source': location.record.getModified('source'),
+            'target': location.record.getModified('target'),
+        });
         location.record.save({
-            success: function () {
+            success: function (record) {
                 location.record.set('isSaving', false);
                 location.view.refresh();
                 this.currentEditingRecord = null;

@@ -126,5 +126,68 @@ $font-size: 15px;
     &.close-go-next {
       background-image: url("/modules/editor/images/arrow_down_nosave.png");
     }
+
+    &.delete-by-same-source {
+      background-image: url("/modules/editor/images/trash-arrow-left.svg");
+      background-repeat: no-repeat;
+      width: 17px;
+      height: 17px;
+      background-size: contain;
+    }
+
+    &.delete-by-same-source-and-target {
+      background-image: url("/modules/editor/images/trash-arrow-both.svg");
+      background-repeat: no-repeat;
+      width: 17px;
+      height: 17px;
+      background-size: contain;
+    }
   }
+}
+
+.internal-tag {
+  &.number {
+    span {
+      &.short {
+        display: none;
+      }
+
+      &.full {
+        display: inline;
+
+        &::after {
+          content: attr(data-source);
+          color: #000;
+          display: inline;
+          white-space: nowrap;
+          padding-top: 3px;
+        }
+      }
+    }
+
+    > .full {
+      display: inline;
+    }
+
+    width: 0;
+    height: 0;
+    display: inline;
+    border: none;
+    color: transparent;
+    user-select: none;
+    box-sizing: border-box;
+    word-break: break-all;
+  }
+}
+
+.target,
+.type-target,
+.alike-target-field {
+  div.internal-tag.number .full::after {
+    content: attr(data-target);
+  }
+}
+
+.number + .number {
+  margin-left: 1px;
 }

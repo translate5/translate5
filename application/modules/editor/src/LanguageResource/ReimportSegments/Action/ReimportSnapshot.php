@@ -34,6 +34,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagService;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
@@ -62,6 +63,7 @@ class ReimportSnapshot
         private readonly ConvertT5MemoryTagServiceInterface $tmConversionService,
         private readonly FlushMemoryService $flushMemoryService,
         private readonly UpdateSegmentService $updateSegmentService,
+        private readonly ActionLockService $actionLockService,
     ) {
     }
 
@@ -75,6 +77,7 @@ class ReimportSnapshot
             ConvertT5MemoryTagService::create(),
             FlushMemoryService::create(),
             \Zend_Registry::get('integration.segment.update'),
+            ActionLockService::create(),
         );
     }
 
@@ -84,6 +87,12 @@ class ReimportSnapshot
         int $languageResourceId,
         array $failedSegmentsIds = []
     ): ReimportSegmentsResult {
+        $lock = $this->actionLockService->getWriteLockWithId($languageResourceId);
+
+        if (! $lock->acquire(true)) {
+            throw new \LogicException(sprintf('Could not acquire lock for language resource %d', $languageResourceId));
+        }
+
         $languageResource = $this->languageResourceRepository->get($languageResourceId);
         $result = $this->reimportWithRetry($task, $languageResource, $runId, $failedSegmentsIds);
         $this->addFinalizationLog($result, $task, $languageResource);

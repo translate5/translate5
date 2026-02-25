@@ -54,16 +54,24 @@ namespace MittagQI\Translate5\Test\Integration\ContentProtection;
 
 use editor_Models_Import_FileParser_Tag as Tag;
 use editor_Models_Import_FileParser_WhitespaceTag;
+use editor_Models_Languages as Languages;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
+use MittagQI\Translate5\ContentProtection\NumberProtection\NumberProtectorProvider;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\ProtectionTagsFilter;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
@@ -199,7 +207,7 @@ class ContentProtectorTest extends UnitTestAbstract
      */
     public function testProtect(string $node, string $expected, EntityHandlingMode $entityHandling): void
     {
-        $contentProtector = ContentProtector::create(new Whitespace());
+        $contentProtector = $this->getContentProtector();
 
         self::assertEquals($expected, $contentProtector->protect($node, true, 5, 6, $entityHandling));
     }
@@ -211,7 +219,7 @@ class ContentProtectorTest extends UnitTestAbstract
         self::assertSame(
             '123.456,789 Übersetzungsbüro [ ] 24translate 15/09/23 and 19/10/24',
             $contentProtector->unprotect(
-                '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
+                '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" key="aaa"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
                 false
             )
         );
@@ -230,13 +238,13 @@ class ContentProtectorTest extends UnitTestAbstract
     {
         yield 'whitespace right after number' => [
             'text' => 'string 123,456.789 mm',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA"/><char ts="c2a0" length="1"/>mm',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/><char ts="c2a0" length="1"/>mm',
             'entityHandling' => EntityHandlingMode::Restore,
         ];
 
         yield 'tag like entity <goba>' => [
             'text' => 'string <goba> string',
-            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;" regex="U46xSc9PSoyxUwYA"/> string',
+            'expected' => 'string <number type="keep-content" name="Goba" source="&lt;goba&gt;" iso="&lt;goba&gt;" target="&lt;goba&gt;" regex="U46xSc9PSoyxUwYA" key="aaa"/> string',
             'entityHandling' => EntityHandlingMode::Restore,
         ];
 
@@ -254,7 +262,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
-            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B"/>',
+            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B" key="aaa"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B" key="aaa"/>',
             'entityHandling' => EntityHandlingMode::Restore,
         ];
 
@@ -272,7 +280,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         yield '&lt; in text' => [
             'text' => 'string &lt; 123,456.789',
-            'expected' => 'string &lt; <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA"/>',
+            'expected' => 'string &lt; <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/>',
             'entityHandling' => EntityHandlingMode::Off,
         ];
     }
@@ -299,7 +307,7 @@ class ContentProtectorTest extends UnitTestAbstract
     public function testProtectAndConvert(string $segment, string $converted, int $finalTagIdent): void
     {
         $shortTagIdent = 1;
-        $contentProtector = ContentProtector::create(new Whitespace());
+        $contentProtector = $this->getContentProtector();
 
         self::assertSame(
             $converted,
@@ -311,7 +319,7 @@ class ContentProtectorTest extends UnitTestAbstract
     public function protectAndConvertProvider(): iterable
     {
         $number = '2023-10-20';
-        $convertedNumber = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222072656765783d22505579354459417744467947346b34694a4134307a424b626967306f4d62766a4949586d666c3247586e36346774447a337036453069547435744a4b71756166345a3847566f736d35426f6b593042416c3334316b593535714536755a483442222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default Y-m-d" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
+        $convertedNumber = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222072656765783d22505579354459417744467947346b34694a4134307a424b626967306f4d62766a4949586d666c3247586e36346774447a337036453069547435744a4b71756166345a3847566f736d35426f6b593042416c3334316b593535714536755a48344222206b65793d22616161222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default Y-m-d" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
 
         yield 'Protect date' => [
             'segment' => "string $number string",
@@ -329,7 +337,7 @@ class ContentProtectorTest extends UnitTestAbstract
         ];
 
         $numberIdentTwo = '2023-10-30';
-        $convertedNumberIdentTwo = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3330222069736f3d22323032332d31302d333022207461726765743d2233302f31302f3233222072656765783d22505579354459417744467947346b34694a4134307a424b626967306f4d62766a4949586d666c3247586e36346774447a337036453069547435744a4b71756166345a3847566f736d35426f6b593042416c3334316b593535714536755a483442222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default Y-m-d" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-30" data-target="30/10/23" class="full"></span></div>';
+        $convertedNumberIdentTwo = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3330222069736f3d22323032332d31302d333022207461726765743d2233302f31302f3233222072656765783d22505579354459417744467947346b34694a4134307a424b626967306f4d62766a4949586d666c3247586e36346774447a337036453069547435744a4b71756166345a3847566f736d35426f6b593042416c3334316b593535714536755a48344222206b65793d22616161222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default Y-m-d" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-30" data-target="30/10/23" class="full"></span></div>';
 
         yield 'Protect 2 dates' => [
             'segment' => "$number string $numberIdentTwo",
@@ -353,7 +361,7 @@ class ContentProtectorTest extends UnitTestAbstract
     public function testConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
     {
         $shortTagIdent = 1;
-        $contentProtector = ContentProtector::create(new Whitespace());
+        $contentProtector = $this->getContentProtector();
 
         self::assertSame($converted, $contentProtector->convertToInternalTags($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
@@ -361,8 +369,8 @@ class ContentProtectorTest extends UnitTestAbstract
 
     public function internalTagsProvider(): iterable
     {
-        $tagN = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $convertedN = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $tagN = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdXVMIg21LWMrQGSRrHRBiCmMZAyBItYxmrCFRgCRY1gopoaGjF6IKNUNDVrNHRgLBBVE6OpqQ8A" key="aaa"/>';
+        $convertedN = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222072656765783d22303965494b61364a71346e52304e534953616b32716458564d496732314c574d72514753527248524269436d4d5a417942497459786d724346526743525931676f706f61476a4636494b4e554e4456724e4852674c42425645364f707151384122206b65793d22616161222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         yield [
             'segment' => "$tagN string",
@@ -404,7 +412,7 @@ class ContentProtectorTest extends UnitTestAbstract
     public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
     {
         $shortTagIdent = 1;
-        $contentProtector = ContentProtector::create(new Whitespace());
+        $contentProtector = $this->getContentProtector();
 
         self::assertEquals($xmlChunks, $contentProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
@@ -412,8 +420,8 @@ class ContentProtectorTest extends UnitTestAbstract
 
     public function internalTagsInChunksProvider(): iterable
     {
-        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20" regex="09eIKa6Jq4nR0NSISak2qdXVMIg21LWMrQGSRrHRBiCmMZAyBItYxmrCFRgCRY1gopoaGjF6IKNUNDVrNHRgLBBVE6OpqQ8A" key="aaa"/>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222072656765783d22303965494b61364a71346e52304e534953616b32716458564d496732314c574d72514753527248524269436d4d5a417942497459786d724346526743525931676f706f61476a4636494b4e554e4456724e4852674c42425645364f707151384122206b65793d22616161222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         $parsedTag1 = new NumberTag();
         $parsedTag1->originalContent = $tag1;
@@ -496,5 +504,65 @@ class ContentProtectorTest extends UnitTestAbstract
             'xmlChunks' => ['Text mit ', $bTag, '0', $bCloseTag, ' in tags gab Probleme.'],
             'finalTagIdent' => 2,
         ];
+    }
+
+    private function getContentProtector(): ContentProtector
+    {
+        $numberRepository = new class() extends ContentProtectionRepository {
+            private readonly ContentProtectionRepository $repository;
+
+            public function __construct()
+            {
+                parent::__construct(
+                    \Zend_Db_Table::getDefaultAdapter(),
+                    LanguageRepository::create(),
+                );
+                $this->repository = ContentProtectionRepository::create();
+            }
+
+            public function getAllForSource(
+                Languages $sourceLang,
+                Languages $targetLang,
+                bool $useCache = true
+            ): iterable {
+                $dtos = $this->repository->getAllForSource($sourceLang, $targetLang, $useCache);
+
+                foreach ($dtos as $dto) {
+                    yield new ContentProtectionDto(
+                        $dto->type,
+                        $dto->name,
+                        $dto->regex,
+                        $dto->matchId,
+                        $dto->format,
+                        $dto->keepAsIs,
+                        $dto->outputFormat,
+                        $dto->priority,
+                        'aaa',
+                    );
+                }
+            }
+        };
+        $languageRepository = LanguageRepository::create();
+        $logger = $this->createMock(\ZfExtended_Logger::class);
+        $numberProtectorProvider = NumberProtectorProvider::create();
+
+        $numberProtector = new NumberProtector(
+            $numberRepository,
+            $languageRepository,
+            $logger,
+            $numberProtectorProvider,
+        );
+
+        $contentProtector = new ContentProtector(
+            [
+                $numberProtector,
+                WhitespaceProtector::create(),
+            ],
+            [
+                ProtectionTagsFilter::create(),
+            ]
+        );
+
+        return $contentProtector;
     }
 }

@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\T5Memory\Api\Response;
 final class MatchDTO
 {
     public function __construct(
+        public readonly string $tmName,
         public readonly string $source,
         public readonly string $target,
         public readonly int $segmentId,
@@ -59,6 +60,7 @@ final class MatchDTO
     public static function fromArray(array $data): self
     {
         return new self(
+            tmName: $data['tmName'],
             source: $data['source'] ?? '',
             target: $data['target'] ?? '',
             segmentId: (int) ($data['segmentId'] ?? 0),
@@ -88,6 +90,7 @@ final class MatchDTO
     public function withSkippedTags(array $tags): self
     {
         return new self(
+            tmName: $this->tmName,
             source: $this->source,
             target: $this->target,
             segmentId: $this->segmentId,
@@ -113,6 +116,7 @@ final class MatchDTO
     public function makeNotOptimal(): self
     {
         return new self(
+            tmName: $this->tmName,
             source: $this->source,
             target: $this->target,
             segmentId: $this->segmentId,

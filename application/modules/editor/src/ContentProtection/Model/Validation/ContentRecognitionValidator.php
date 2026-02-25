@@ -94,6 +94,10 @@ class ContentRecognitionValidator extends ValidatorWithContext
 
         $this->addValidator('keepAsIs', 'boolean');
         $this->addValidator('enabled', 'boolean', allowNull: true);
+        $this->addValidator('key', 'stringLength', [
+            'min' => 3,
+            'max' => 3,
+        ]);
     }
 
     public function isValid(array $data)

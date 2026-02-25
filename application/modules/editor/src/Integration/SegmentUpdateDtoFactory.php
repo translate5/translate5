@@ -55,7 +55,7 @@ class SegmentUpdateDtoFactory
     public static function create(): self
     {
         return new self([
-            \MittagQI\Translate5\T5Memory\SegmentUpdateDtoFactory::class,
+            \MittagQI\Translate5\T5Memory\Factory\SegmentUpdateDtoFactory::class,
             DummyFileTm\SegmentUpdateDtoFactory::class,
         ]);
     }

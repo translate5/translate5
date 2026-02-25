@@ -55,7 +55,11 @@ class T5NTag
 
     public function getRegex(): string
     {
-        return gzinflate(base64_decode($this->rule));
+        try {
+            return (string) @gzinflate(base64_decode($this->rule));
+        } catch (\Throwable) {
+            return '';
+        }
     }
 
     public static function fullTagRegex(): string

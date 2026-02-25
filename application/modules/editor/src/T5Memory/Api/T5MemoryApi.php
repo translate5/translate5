@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\T5Memory\Api;
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Http\Client\Exception\HttpException;
 use JsonException;
 use MittagQI\Translate5\HTTP\ClientFactory;
@@ -50,8 +51,11 @@ use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
 use MittagQI\Translate5\T5Memory\Api\Exception\UnsuccessfulRequestException;
 use MittagQI\Translate5\T5Memory\Api\Request\CloneTmRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\ConcordanceSearchCountRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\ConcordanceSearchRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\CreateEmptyTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\CreateTmRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\DeleteEntryRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\DeleteTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\DownloadTmRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\DownloadTmxChunkRequest;
@@ -64,10 +68,14 @@ use MittagQI\Translate5\T5Memory\Api\Request\PingRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ReorganizeRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\ResourcesRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\SaveTmsRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\SegmentIndexRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\StatusRequest;
 use MittagQI\Translate5\T5Memory\Api\Request\UpdateRequest;
 use MittagQI\Translate5\T5Memory\Api\Response\CloneTmResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\ConcordanceSearchCountResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\ConcordanceSearchResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\CreateTmResponse;
+use MittagQI\Translate5\T5Memory\Api\Response\DeleteEntryResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\DownloadTmResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\DownloadTmxChunkResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\FuzzySearchResponse;
@@ -77,10 +85,12 @@ use MittagQI\Translate5\T5Memory\Api\Response\ImportTmxResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\MemoryListResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\Response;
+use MittagQI\Translate5\T5Memory\Api\Response\SegmentIndexResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\StatusResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\UpdateResponse;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -113,6 +123,156 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
             SegmentLengthValidator::create(),
             SegmentUpdateResultValidator::create(),
         );
+    }
+
+    public function deleteEntry(
+        string $baseUrl,
+        string $tmName,
+        int $recordKey,
+        int $targetKey,
+        int $segmentId,
+    ): DeleteEntryResponse {
+        $request = new DeleteEntryRequest(
+            $baseUrl,
+            $tmName,
+            $recordKey,
+            $targetKey,
+            $segmentId,
+        );
+        $response = $this->sendRequest($request);
+
+        return DeleteEntryResponse::fromResponse($response);
+    }
+
+    /**
+     * @param array<string> $tmNames
+     *
+     * @return array{responses: array<string, ConcordanceSearchCountResponse>, failures: array<string, \Throwable>}
+     */
+    public function concordanceSearchCountParallel(string $baseUrl, array $tmNames, SearchDTO $searchDTO): array
+    {
+        $requests = [];
+
+        foreach ($tmNames as $tmName) {
+            $requests[$tmName] = new ConcordanceSearchCountRequest(
+                $baseUrl,
+                $tmName,
+                $searchDTO,
+            );
+        }
+
+        ['responses' => $responses, 'failures' => $failures] = $this->client->poolAsync($requests);
+
+        $countResponses = [];
+        foreach ($responses as $tmName => $response) {
+            $countResponses[$tmName] = ConcordanceSearchCountResponse::fromResponse($response);
+        }
+
+        foreach ($failures as $tmName => $exception) {
+            if (! $exception instanceof RequestException) {
+                continue;
+            }
+
+            $response = $exception->getResponse();
+
+            if (null === $response) {
+                continue;
+            }
+
+            $countResponse = ConcordanceSearchCountResponse::fromResponse($response);
+
+            if (! str_contains($countResponse->getErrorMessage(), 'Invalid JSON response')) {
+                $countResponse[$tmName] = $countResponse;
+                unset($failures[$tmName]);
+            }
+        }
+
+        return [
+            'responses' => $countResponses,
+            'failures' => $failures,
+        ];
+    }
+
+    public function concordanceSearchCount(
+        string $baseUrl,
+        string $tmName,
+        SearchDTO $searchDTO,
+    ): ConcordanceSearchCountResponse {
+        $request = new ConcordanceSearchCountRequest(
+            $baseUrl,
+            $tmName,
+            $searchDTO,
+        );
+
+        $response = $this->client->sendRequest($request);
+
+        return ConcordanceSearchCountResponse::fromResponse($response);
+    }
+
+    public function concordanceSearch(
+        string $baseUrl,
+        string $tmName,
+        SearchDTO $searchDTO,
+        ?string $searchPosition = null,
+        ?int $numResults = null,
+    ): ConcordanceSearchResponse {
+        $request = new ConcordanceSearchRequest(
+            $baseUrl,
+            $tmName,
+            $searchDTO,
+            $searchPosition,
+            $numResults,
+        );
+
+        $response = $this->client->sendRequest($request);
+
+        return ConcordanceSearchResponse::fromResponse($response);
+    }
+
+    public function getSegmentIndex(string $baseUrl, string $tmName): SegmentIndexResponse
+    {
+        $request = new SegmentIndexRequest($baseUrl, $tmName);
+        $response = $this->sendRequest($request);
+
+        return SegmentIndexResponse::fromResponse($response);
+    }
+
+    /**
+     * @param array<string, array{filePath: string, startFromInternalKey: string|null}> $tmData
+     * @return array{success: array<string, DownloadTmxChunkResponse>, failures: array<string, \Throwable>}
+     */
+    public function downloadParallel(string $baseUrl, array $tmData, int $chunkSize): array
+    {
+        $requests = [];
+        $options = [];
+
+        foreach ($tmData as $tmName => ['filePath' => $filePath, 'startFromInternalKey' => $startFromInternalKey]) {
+            $requests[$tmName] = new DownloadTmxChunkRequest(
+                $baseUrl,
+                $tmName,
+                $chunkSize,
+                $startFromInternalKey,
+            );
+
+            $options[$tmName] = [
+                RequestOptions::SINK => $filePath,
+            ];
+        }
+
+        ['responses' => $responses, 'failures' => $failures] = $this->client->poolAsync($requests, 10, $options);
+
+        $success = [];
+        foreach ($responses as $tmName => $response) {
+            $success[$tmName] = DownloadTmxChunkResponse::fromResponse(
+                $response,
+                $tmData[$tmName]['startFromInternalKey'],
+            );
+        }
+
+        return [
+            'success' => $success,
+            'failures' => $failures,
+        ];
     }
 
     /**
@@ -148,7 +308,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
 
         $fuzzySearchResponses = [];
         foreach ($responses as $tmName => $response) {
-            $fuzzySearchResponses[$tmName] = FuzzySearchResponse::fromResponse($response);
+            $fuzzySearchResponses[$tmName] = FuzzySearchResponse::fromResponse($response, $tmName);
         }
 
         foreach ($failures as $tmName => $exception) {
@@ -162,7 +322,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
                 continue;
             }
 
-            $fuzzyResponse = FuzzySearchResponse::fromResponse($response);
+            $fuzzyResponse = FuzzySearchResponse::fromResponse($response, $tmName);
 
             if (! str_contains($fuzzyResponse->getErrorMessage(), 'Invalid JSON response')) {
                 $fuzzySearchResponses[$tmName] = $fuzzyResponse;
@@ -202,7 +362,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
         );
         $response = $this->client->sendRequest($request);
 
-        return FuzzySearchResponse::fromResponse($response);
+        return FuzzySearchResponse::fromResponse($response, $tmName);
     }
 
     public function ping(string $baseUrl): bool
@@ -287,7 +447,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
      */
     public function reorganizeTm(string $baseUrl, string $tmName, ReorganizeOptions $reorganizeOptions): void
     {
-        $request = new ReorganizeRequest($baseUrl, $tmName, $reorganizeOptions->saveDifferentTargetsForSameSource);
+        $request = new ReorganizeRequest($baseUrl, $tmName, $reorganizeOptions->tmxFilterOptions->preserveTargets);
 
         $this->sendRequest($request);
     }
@@ -311,7 +471,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
             $filename,
             $stream,
             $importOptions->stripFramingTags,
-            $importOptions->saveDifferentTargetsForSameSource
+            $importOptions->tmxFilterOptions->preserveTargets,
         );
 
         try {
@@ -408,10 +568,14 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
     {
         $chunk = $this->fetchChunk($baseUrl, $tmName, $chunkSize);
 
+        $chunk->chunk->rewind();
+
         yield $chunk->chunk;
 
         while ($chunk->nextInternalKey !== null) {
             $chunk = $this->fetchChunk($baseUrl, $tmName, $chunkSize, $chunk->nextInternalKey);
+
+            $chunk->chunk->rewind();
 
             yield $chunk->chunk;
         }
@@ -488,7 +652,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
      * @throws InvalidResponseStructureException
      * @throws HttpException
      */
-    private function fetchChunk(
+    public function fetchChunk(
         string $baseUrl,
         string $tmName,
         int $chunkSize,
@@ -500,15 +664,16 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
             $request = new DownloadTmxChunkRequest($baseUrl, $tmName, $chunkSize, $startFromInternalKey);
             $response = $this->sendRequest($request);
 
+            $downloadResponse = DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
             // Retry on timeout error if not the last retry
-            if ($this->isTimeoutErrorOccurred($response) && $timeElapsed < $this->getMaxWaitingTimeForALockSeconds()) {
+            if ($downloadResponse->isLockingTimeoutOccurred() && $timeElapsed < $this->getMaxWaitingTimeForALockSeconds()) {
                 sleep($this->getRetryDelaySeconds());
                 $timeElapsed += $this->getRetryDelaySeconds();
 
                 continue;
             }
 
-            return DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
+            return $downloadResponse;
         }
     }
 
@@ -518,7 +683,7 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
      */
     private function getStreamFromFile(string $filePath)
     {
-        $stream = fopen($filePath, 'r');
+        $stream = fopen($filePath, 'rb');
 
         if (false === $stream) {
             throw new RuntimeException('Could not open file: ' . $filePath);
@@ -590,26 +755,6 @@ class T5MemoryApi implements HasVersionInterface, FetchesStatusInterface, SavesT
 
             throw new HttpException($error, $request, $response);
         }
-    }
-
-    protected function tryParseResponseAsJson(ResponseInterface $response): array
-    {
-        try {
-            return json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return [];
-        }
-    }
-
-    protected function isTimeoutErrorOccurred(ResponseInterface $response): bool
-    {
-        if ($response->getStatusCode() === 200) {
-            return false;
-        }
-
-        $data = $this->tryParseResponseAsJson($response);
-
-        return 506 === (int) ($data['ReturnValue'] ?? 0);
     }
 
     protected function sanitizeTmName(string $tmName): string

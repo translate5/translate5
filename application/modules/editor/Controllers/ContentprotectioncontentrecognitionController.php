@@ -31,6 +31,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
+use MittagQI\Translate5\ContentProtection\UniqueKeyGenerator;
 use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Sanitizer\Type;
 
@@ -161,6 +162,11 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
 
         if (in_array($this->entity->getType(), NumberProtector::nonKeepAsIsTypes())) {
             $this->entity->setKeepAsIs(false);
+        }
+
+        if (in_array('regex', $this->data, true)) {
+            $keyGenerator = UniqueKeyGenerator::create();
+            $this->entity->setKey($keyGenerator->getUniqueKey());
         }
     }
 

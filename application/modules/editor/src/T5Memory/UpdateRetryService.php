@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\T5Memory;
 
 use DatetimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_Connector_Abstract;
 use editor_Services_Connector_Exception;
 use editor_Services_Exceptions_NoService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
@@ -40,9 +39,11 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateExceptio
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentErroneousException;
 use MittagQI\Translate5\T5Memory\Api\Exception\SegmentTooLongException;
+use MittagQI\Translate5\T5Memory\Api\Response\FindDTO;
 use MittagQI\Translate5\T5Memory\Api\Response\UpdateResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Exception\SegmentUpdateCheckException;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
@@ -59,6 +60,7 @@ class UpdateRetryService
         private readonly CreateMemoryService $createMemoryService,
         private readonly FlushMemoryService $flushMemoryService,
         private readonly MemoryNameGenerator $memoryNameGenerator,
+        private readonly DeleteSegmentService $deleteSegmentService,
         private readonly ZfExtended_Logger $logger,
     ) {
     }
@@ -73,6 +75,7 @@ class UpdateRetryService
             CreateMemoryService::create(),
             FlushMemoryService::create(),
             new MemoryNameGenerator(),
+            DeleteSegmentService::create(),
             \Zend_Registry::get('logger')->cloneMe('editor.t5memory.update'),
         );
     }
@@ -93,24 +96,30 @@ class UpdateRetryService
         UpdateSegmentDTO $dto,
         UpdateOptions $updateOptions,
         Zend_Config $config,
-    ): void {
-        if ($languageResource->isConversionStarted()) {
+    ): FindDTO {
+        if ($languageResource->isImporting()) {
             throw new editor_Services_Connector_Exception('E1512', [
-                'status' => Status::CONVERTING,
+                'status' => Status::IMPORT,
                 'service' => $languageResource->getResource()->getName(),
                 'languageResource' => $languageResource,
             ]);
         }
 
-        $tmName = $this->persistenceService->getWritableMemory($languageResource);
+        if (! $updateOptions->isInternalFuzzy) {
+            $this->deleteSegmentService->deleteDuplicates($languageResource, $dto);
+        }
 
-        $this->updateWithRetryInMemory(
+        $tmData = $this->persistenceService->getWritableMemoryObject($languageResource);
+
+        $segment = $this->updateWithRetryInMemory(
             $languageResource,
-            $tmName,
+            $tmData['filename'],
             $dto,
             $updateOptions,
             $config,
         );
+
+        return $segment->withPartId($tmData['id']);
     }
 
     /**
@@ -119,17 +128,30 @@ class UpdateRetryService
      * @throws SegmentUpdateException
      * @throws SegmentUpdateCheckException
      */
-    public function updateWithRetryInMemory(
+    private function updateWithRetryInMemory(
         LanguageResource $languageResource,
         string $tmName,
         UpdateSegmentDTO $dto,
         UpdateOptions $updateOptions,
         Zend_Config $config,
-    ): void {
-        // TODO This is a huge domain leak - refactor needed
-        $isInternalFuzzy = str_contains($tmName, editor_Services_Connector_Abstract::FUZZY_SUFFIX);
+    ): FindDTO {
+        if ($languageResource->isConversionStarted()) {
+            throw new editor_Services_Connector_Exception('E1512', [
+                'status' => Status::CONVERTING,
+                'service' => $languageResource->getResource()->getName(),
+                'languageResource' => $languageResource,
+            ]);
+        }
 
-        if ($this->reorganizeService->isReorganizingAtTheMoment($languageResource, $tmName)) {
+        if ($languageResource->isImporting()) {
+            throw new editor_Services_Connector_Exception('E1512', [
+                'status' => Status::IMPORT,
+                'service' => $languageResource->getResource()->getName(),
+                'languageResource' => $languageResource,
+            ]);
+        }
+
+        if ($this->reorganizeService->isReorganizingAtTheMoment($languageResource, $tmName, ! $updateOptions->isInternalFuzzy)) {
             throw new editor_Services_Connector_Exception('E1512', [
                 'status' => Status::REORGANIZE_IN_PROGRESS,
                 'service' => $languageResource->getResource()->getName(),
@@ -166,23 +188,27 @@ class UpdateRetryService
                     $updateOptions->recheckOnUpdate
                 );
 
-                return;
+                return FindDTO::fromArray($response->getBody());
             }
 
-            if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName)) {
-                $options = new ReorganizeOptions($updateOptions->saveDifferentTargetsForSameSource);
+            if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName, ! $updateOptions->isInternalFuzzy)) {
+                $options = new ReorganizeOptions(
+                    new TmxFilterOptions(
+                        preserveTargets: $updateOptions->saveDifferentTargetsForSameSource
+                    ),
+                );
                 $this->reorganizeService->reorganizeTm(
                     $languageResource,
                     $tmName,
                     $options,
-                    $isInternalFuzzy,
+                    $updateOptions->isInternalFuzzy,
                 );
             } elseif ($response->isMemoryOverflown($config)) {
                 if (! $response->isBlockOverflown($config)) {
                     $this->persistenceService->setMemoryReadonly(
                         $languageResource,
                         $tmName,
-                        $isInternalFuzzy
+                        $updateOptions->isInternalFuzzy
                     );
                 }
 
@@ -196,7 +222,7 @@ class UpdateRetryService
 
                 $this->addOverflowLog($languageResource, $response->getErrorMessage());
 
-                if (! $isInternalFuzzy) {
+                if (! $updateOptions->isInternalFuzzy) {
                     $this->flushMemoryService->flush($languageResource, $tmName);
                 }
 
@@ -214,7 +240,7 @@ class UpdateRetryService
                 $this->persistenceService->addMemoryToLanguageResource(
                     $languageResource,
                     $newName,
-                    $isInternalFuzzy,
+                    $updateOptions->isInternalFuzzy,
                 );
                 $tmName = $newName;
             } elseif ($response->isLockingTimeoutOccurred()) {

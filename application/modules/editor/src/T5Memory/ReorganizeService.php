@@ -75,6 +75,7 @@ class ReorganizeService
         ResponseInterface $response,
         LanguageResource $languageResource,
         string $tmName,
+        bool $refreshLanguageResource = true,
     ): bool {
         if (str_contains($response->getErrorMessage() ?: '', 'Failed to load tm')) {
             return false;
@@ -88,7 +89,7 @@ class ReorganizeService
         $errorSupposesReorganizing = in_array($response->getCode(), $errorCodes);
         // Check if error codes contains any of the values
         $needsReorganizing = $errorSupposesReorganizing &&
-            ! $this->isReorganizingAtTheMoment($languageResource, $tmName);
+            ! $this->isReorganizingAtTheMoment($languageResource, $tmName, $refreshLanguageResource);
 
         if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($languageResource, $tmName)) {
             $this->logger->warn(
@@ -208,8 +209,15 @@ class ReorganizeService
         }
     }
 
-    public function isReorganizingAtTheMoment(LanguageResource $languageResource, string $tmName): bool
-    {
+    public function isReorganizingAtTheMoment(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $refreshLanguageResource = true,
+    ): bool {
+        if ($refreshLanguageResource) {
+            $languageResource->refresh();
+        }
+
         if ($languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS) {
             return $this->getCurrentAttemptsCount($languageResource, $tmName) > 0;
         }
@@ -222,13 +230,16 @@ class ReorganizeService
         return $status->status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
-    public function waitReorganizeFinished(LanguageResource $languageResource, string $tmName): bool
-    {
+    public function waitReorganizeFinished(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false,
+    ): bool {
         $elapsedTime = 0;
         $sleepTime = 5;
 
         while ($elapsedTime < $this->getReorganizeWaitingTimeSeconds()) {
-            if (! $this->isReorganizingAtTheMoment($languageResource, $tmName)) {
+            if (! $this->isReorganizingAtTheMoment($languageResource, $tmName, ! $isInternalFuzzy)) {
                 return true;
             }
 

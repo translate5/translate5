@@ -32,8 +32,6 @@ namespace MittagQI\Translate5\T5Memory;
 
 class SegmentContext
 {
-    private const SEGMENT_NR_CONTEXT_PREFIX = 'SegmentNr: ';
-
     public function __construct(
         private readonly \Zend_Config $config,
     ) {
@@ -46,13 +44,19 @@ class SegmentContext
         );
     }
 
-    public function getContext(\editor_Models_Segment $segment): string
+    public function getContext(\editor_Models_Segment $segment, bool $randomise = false): string
     {
-        if ($this->config->runtimeOptions->LanguageResources->t5memory->import?->skipContext) {
-            return '-';
+        $placeholder = '-';
+
+        if ($randomise) {
+            // provide random string if no context is available to make t5memory return better matches
+            // not clear why it helps
+            $placeholder = bin2hex(random_bytes(8));
+        }
+        if ($this->config->runtimeOptions->LanguageResources->t5memory?->skipContext) {
+            return $placeholder;
         }
 
-        return $segment->meta()->getSegmentDescriptor()
-            ?: self::SEGMENT_NR_CONTEXT_PREFIX . $segment->getSegmentNrInTask();
+        return $segment->meta()->getSegmentDescriptor() ?: $placeholder;
     }
 }

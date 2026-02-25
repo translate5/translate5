@@ -33,6 +33,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_T5Memory_Service;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -101,7 +102,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
         $config = \Zend_Registry::get('config');
         $reorganizeOptions = new ReorganizeOptions(
-            (bool) $config->runtimeOptions->LanguageResources->t5memory->saveDifferentTargetsForSameSource,
+            TmxFilterOptions::fromConfig($config),
         );
 
         foreach ($languageResources as $languageResource) {

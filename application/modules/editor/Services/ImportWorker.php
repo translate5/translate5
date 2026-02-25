@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 
 /***
@@ -79,11 +80,25 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $this->languageResource->load($params['languageResourceId']);
 
-        while ($this->languageResource->isConversionStarted()) {
-            sleep(30);
-            // Refresh the language resource to get the latest status
-            $this->languageResource->refresh();
+        $lockService = ActionLockService::create();
+
+        $lock = $lockService->getWriteLock($this->languageResource->getLangResUuid());
+
+        if (! $lock->acquire(true)) {
+            $this->log->error(
+                'E1377',
+                'ImportWorker: Can not acquire lock for language resource with id ' . $params['languageResourceId'],
+                [
+                    'languageResource' => $this->languageResource,
+                ]
+            );
+
+            return false;
         }
+
+        // language resource might have been updated while waiting for the lock,
+        // so we have to get fresh one to ensure we have the latest data and status
+        $this->languageResource->refresh();
 
         $connector = $this->getConnector($this->languageResource);
 
@@ -99,6 +114,8 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
             $this->languageResource->save();
 
             return false;
+        } finally {
+            $lock->release();
         }
 
         // Must be reloaded because the status or additional info can be changed in addTem/addAdditionalTm
