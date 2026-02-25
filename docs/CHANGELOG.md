@@ -24,6 +24,41 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
+
+## [7.34.5] - 2026-02-24
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5305](https://jira.translate5.net/browse/TRANSLATE-5305): InstantTranslate - Instant-Translate: Link filename to download** <br>
+On finished Instant-Translate files the filename is now also clickable to download the file.
+
+**[TRANSLATE-5290](https://jira.translate5.net/browse/TRANSLATE-5290): Translate5 CLI - Add hosting backup check as system requirement module** <br>
+Add hosting backup check as system requirement module
+
+**[TRANSLATE-5210](https://jira.translate5.net/browse/TRANSLATE-5210): Editor general - Make new line tags actually look like new line** <br>
+[🆕 Feature] New line tag now actually have a line break so content is actually looks like a new line
+
+
+### Bugfixes
+**[TRANSLATE-5302](https://jira.translate5.net/browse/TRANSLATE-5302): LanguageResources - Google resource: invalid default option for format** <br>
+Fix default options for google format api parameter.
+
+**[TRANSLATE-5286](https://jira.translate5.net/browse/TRANSLATE-5286): Task Management - live updateing of levenshtein and post-editing time statistics does not seem to work** <br>
+Fix the calculation of the levenshtein distance of segments with internal tags.
+
+**[TRANSLATE-5282](https://jira.translate5.net/browse/TRANSLATE-5282): translate5 AI - TQE: quota exceeded error not handled** <br>
+Detect and log error when LLM quota is exceeded.
+
+**[TRANSLATE-5269](https://jira.translate5.net/browse/TRANSLATE-5269): MatchAnalysis & Pretranslation - use internal fuzzies switch broken** <br>
+Disabling internal fuzzy will pre-translate segments marked as internal fuzzy on analysis run.
+
+**[TRANSLATE-5256](https://jira.translate5.net/browse/TRANSLATE-5256): t5memory - Reimport pushes all segment to the TM** <br>
+[🐞 Fix] Fixed ignorance of blocked segments in reimport to TM process
+
+
 ## [7.34.4] - 2026-02-17
 
 ### Important Notes:
