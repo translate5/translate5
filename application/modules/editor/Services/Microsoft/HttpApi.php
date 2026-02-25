@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Integration\Microsoft\Enum\TextType;
+
 class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpApiAbstract
 {
     public function __construct(editor_Services_Microsoft_Resource $resource)
@@ -40,8 +42,13 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
      * @throws Zend_Http_Client_Exception
      * @throws editor_Services_Exceptions_InvalidResponse
      */
-    public function search(mixed $text, string $sourceLang, string $targetLang, bool $useDictionary = false): bool
-    {
+    public function search(
+        mixed $text,
+        string $sourceLang,
+        string $targetLang,
+        bool $useDictionary = false,
+        ?TextType $textType = null
+    ): bool {
         $path = $useDictionary ? '/dictionary/lookup' : '/translate';
         $this->getHttp('POST', $path);
 
@@ -57,10 +64,16 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
 
         $this->http->setRawData(json_encode($requestBody));
 
-        $this->http->setParameterGet([
+        $queryParams = [
             'from' => $sourceLang,
             'to' => $targetLang,
-        ]);
+        ];
+
+        if (! $useDictionary && ! is_null($textType)) {
+            $queryParams['textType'] = $textType->value;
+        }
+
+        $this->http->setParameterGet($queryParams);
 
         return $this->processResponse($this->http->request());
     }

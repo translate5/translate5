@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Integration\Microsoft\Enum\TextType;
 use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 
 class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abstract
@@ -85,7 +86,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
 
         $this->tagHandler->setCurrentSegment($segment);
 
-        if ($this->queryApi($this->tagHandler->prepareQuery($queryString))) {
+        if ($this->queryApi($this->tagHandler->prepareQuery($queryString), false, TextType::Html)) {
             $results = $this->api->getResult();
             foreach ($results as $segmentResults) {
                 //a single response is the same as for batch processing:
@@ -104,9 +105,18 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @param boolean $useDictionary
      * @return boolean
      */
-    protected function queryApi($searchString, $useDictionary = false): bool
-    {
-        return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
+    protected function queryApi(
+        $searchString,
+        $useDictionary = false,
+        ?TextType $textType = null,
+    ): bool {
+        return $this->api->search(
+            $searchString,
+            $this->languageResource->getSourceLangCode(),
+            $this->languageResource->getTargetLangCode(),
+            $useDictionary,
+            $textType
+        );
     }
 
     protected function getResponseData(): mixed
@@ -128,12 +138,12 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
 
         //query either with dictionary or without as fallback
         // $useDictionary may be set to false by the search itself, if the languages do not support a dictionary lookup
-        if ($this->queryApi($searchString, $useDictionary)) {
+        if ($this->queryApi($searchString, $useDictionary, TextType::Html)) {
             $results = $this->api->getResult();
             $hasNoDictResults = $useDictionary
                 && (empty($results) || empty($results[0]) || empty($results[0]->translations));
             //if there was no dictionary translation we call it again without dictionary
-            if ($hasNoDictResults && $this->queryApi($searchString)) {
+            if ($hasNoDictResults && $this->queryApi($searchString, false, TextType::Html)) {
                 $useDictionary = false; //set to false for further processing of the data
             }
         }
@@ -208,7 +218,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      */
     protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool
     {
-        $result = $this->api->search($queryStrings, $sourceLang, $targetLang);
+        $result = $this->api->search($queryStrings, $sourceLang, $targetLang, false, TextType::Html);
         if ($result) {
             return $result;
         }
