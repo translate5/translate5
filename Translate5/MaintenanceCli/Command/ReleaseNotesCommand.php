@@ -34,9 +34,11 @@ use JiraRestApi\Issue\IssueService;
 use JiraRestApi\Issue\Version;
 use JiraRestApi\JiraException;
 use JiraRestApi\Project\ProjectService;
+use JsonMapper_Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Utils;
 
 class ReleaseNotesCommand extends Translate5AbstractCommand
@@ -44,10 +46,10 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
     /**
      * Translate5 JIRA Project key
      */
-    public const PROJECT_KEY = 'TRANSLATE';
+    public const string PROJECT_KEY = 'TRANSLATE';
 
     // the name of the command (the part after "bin/console")
-    public const NEW_FEATURE = 'new feature';
+    public const string NEW_FEATURE = 'new feature';
 
     protected static $defaultName = 'release:notes';
 
@@ -130,7 +132,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         }
         $this->loadIssues();
 
-        $url = \Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl;
+        $url = Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl;
         $this->io->text([
             '<info>URL to list and modify issues of this release</info>',
             parse_url($url, PHP_URL_SCHEME) . '://' .
@@ -138,7 +140,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             self::PROJECT_KEY . '%20and%20fixVersion%20%3D%20%22' . $this->releaseVersion->id . '%22',
         ]);
 
-        if (! $this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
+        if (! $this->io->confirm('Does the important release notes contain all API / GUI relevant changes?')) {
             return self::SUCCESS;
         }
 
@@ -182,9 +184,8 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
 
     /**
      * Asks the user for the configuration to access JIRA
-     * @param boolean $askCredentials
      */
-    protected function initConfig($askCredentials = false)
+    protected function initConfig(bool $askCredentials = false): void
     {
         $conf = [
             'jiraHost' => 'https://jira.translate5.net',
@@ -198,8 +199,8 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
 
         if ($askCredentials) {
             //IMPORTANT: currently no auth needed, since all data is publically available
-            //$conf['jiraUser'] = $this->io->ask('Please enter JIRA username (is NOT stored locally)');
-            //$conf['jiraPassword'] = $this->io->ask('Please enter JIRA password (is NOT stored locally)');
+            $conf['jiraUser'] = $this->io->ask('Please enter JIRA username (is NOT stored locally)');
+            $conf['jiraPassword'] = $this->io->ask('Please enter JIRA password (is NOT stored locally)');
         }
 
         $this->jiraConf = new ArrayConfiguration($conf);
@@ -210,7 +211,7 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
      * which version the release notes should be queried and created:
      * @throws JiraException
      */
-    protected function askReleaseVersion()
+    protected function askReleaseVersion(): void
     {
         $unreleasedProjects = [];
         $proj = new ProjectService($this->jiraConf);
@@ -236,7 +237,13 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         $this->releaseVersion = $unreleasedProjects[$version];
     }
 
-    protected function loadIssues()
+    /**
+     * @throws JsonMapper_Exception
+     * @throws Zend_Exception
+     * @throws JiraException
+     * @throws Exception
+     */
+    protected function loadIssues(): void
     {
         $jql = 'project = ' . self::PROJECT_KEY . ' and fixVersion = "' . $this->releaseVersion->name . '"';
 
@@ -269,7 +276,8 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             // and investigate the Issue Type Links
             switch ($issue->fields->issuetype->id) {
                 case 1: //Bug
-                case 8: //Technical Task (should never occur, since technical task should be used in hidden projects only for reference)
+                case 8: //Technical Task (should never occur, since technical task should be
+                    // used in hidden projects only for reference)
                     $this->issues['fix'][$issue->key] = $item;
 
                     break;
@@ -282,12 +290,13 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
                 case 3: //Task
                 case 4: //Improvement
                 case 5: //Sub Task
-                case 10000: //Todo
+                case 10000: //type Todo
                     $this->issues['change'][$issue->key] = $item;
 
                     break;
                 default:
-                    throw new Exception('Jira provides an unknown issue type in issue ' . $issue->key . ' ' . print_r($issue->fields->issuetype, 1));
+                    throw new Exception('Jira provides an unknown issue type in issue '
+                        . $issue->key . ' ' . print_r($issue->fields->issuetype, 1));
             }
         }
 
@@ -395,7 +404,11 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             $this->releaseVersion->name
         ) . '-' . date('Y-m-d', time());
         $filename = APPLICATION_ROOT . '/application/modules/editor/database/sql-changelog-' . $version . '.sql';
-        $this->io->success('Created SQL changelog file ' . $filename);
+        if (file_exists($filename)) {
+            $this->io->success('Updated SQL changelog file ' . $filename);
+        } else {
+            $this->io->success('Created SQL changelog file ' . $filename);
+        }
         file_put_contents($filename, $sql);
 
         return $filename;
@@ -420,33 +433,30 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         }
         $importantNotes = join("\n", $importantNotes);
 
-        $md = "\n\n## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
-
-        if (! empty($this->issues[self::NEW_FEATURE])) {
-            $md .= "\n### Added\n";
-        }
-        foreach ($this->issues[self::NEW_FEATURE] as $row) {
-            $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - ' . $row->summary . "** <br>\n" . $row->description . "\n\n";
-        }
-
-        if (! empty($this->issues['change'])) {
-            $md .= "\n### Changed\n";
-        }
-        foreach ($this->issues['change'] as $row) {
-            $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - ' . $row->summary . "** <br>\n" . $row->description . "\n\n";
-        }
-
-        if (! empty($this->issues['fix'])) {
-            $md .= "\n### Bugfixes\n";
-        }
-        foreach ($this->issues['fix'] as $row) {
-            $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - ' . $row->summary . "** <br>\n" . $row->description . "\n\n";
-        }
+        $md = $this->createMarkDownSection($version, $date, $importantNotes);
 
         $filename = APPLICATION_ROOT . '/docs/CHANGELOG.md';
         $content = file_get_contents($filename);
         if (mb_strpos($content, '[' . $version . ']') !== false) {
-            $this->io->warning('Check the changelog! A version ' . $version . ' does exist already!');
+            $question = 'Check the changelog! A version ' . $version . ' does exist already! '
+                . 'Overwrite that version section?';
+            if ($this->io->confirm($question)) {
+                $quotedVersion = preg_quote($version, '/');
+                if (preg_match(
+                    '/(?:^|\n)## \[' . $quotedVersion . '][^\n]*\n/',
+                    $content,
+                    $match,
+                    PREG_OFFSET_CAPTURE
+                )
+                ) {
+                    $start = (int) $match[0][1];
+                    $next = mb_strpos($content, "\n## [", $start + 1);
+                    $end = $next === false ? mb_strlen($content) : $next;
+                    $content = substr_replace($content, '', $start, $end - $start + 2);
+                }
+            } else {
+                $this->io->warning('Same version section added again. Please fix CHANGELOG.md file manually');
+            }
         }
         $lastPos = mb_strpos($content, "\n## [");
         $this->io->success('Updated changelog file ' . $filename);
@@ -455,7 +465,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         return $filename;
     }
 
-    protected function makeSqlRow($row, $type, $date, $groups)
+    protected function makeSqlRow($row, $type, $date, $groups): string
     {
         //using only the issue nr, not the issue text
         $issue = $row->key;
@@ -488,7 +498,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
      */
     protected function linkIssue(string $issue, bool $plain = false): string
     {
-        $url = str_replace('{0}', '$1', \Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl);
+        $url = str_replace('{0}', '$1', Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl);
         if (! $plain) {
             $url = '[$1](' . $url . ')';
         }
@@ -519,14 +529,60 @@ BUILD=$patch
             unlink($releaseVersionFile);
         }
 
+        $issuePrefix = $this->prefixReleaseIssue();
+
         $cmds = [
             'git add ' . $md,
             'git add ' . $sql,
-            'git commit -m "change log and submodules release ' . $this->releaseVersion->name
+            'git commit -m "' . $issuePrefix . 'change log and submodules release ' . $this->releaseVersion->name
                 . '" application/modules/editor/PrivatePlugins library/ZfExtended ' . $sql . ' ' . $md,
             'git push',
         ];
 
         return file_put_contents($releaseVersionFile, join(";\n", $cmds)) > 0;
+    }
+
+    private function prefixReleaseIssue(): string
+    {
+        $description = (string) ($this->releaseVersion->description ?? '');
+        if (preg_match('/MITTAGQI-\d+/', $description, $match)) {
+            return $match[0] . ': ';
+        }
+
+        return '';
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    private function createMarkDownSection(string $version, string $date, string $importantNotes): string
+    {
+        $md = "## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
+
+        if (! empty($this->issues[self::NEW_FEATURE])) {
+            $md .= "\n### Added\n";
+        }
+        foreach ($this->issues[self::NEW_FEATURE] as $row) {
+            $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - '
+                . $row->summary . "** <br>\n" . $row->description . "\n\n";
+        }
+
+        if (! empty($this->issues['change'])) {
+            $md .= "\n### Changed\n";
+        }
+        foreach ($this->issues['change'] as $row) {
+            $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - '
+                . $row->summary . "** <br>\n" . $row->description . "\n\n";
+        }
+
+        if (! empty($this->issues['fix'])) {
+            $md .= "\n### Bugfixes\n";
+        }
+        foreach ($this->issues['fix'] as $row) {
+            $md .= '**' . $this->linkIssue($row->key) . ': ' . $row->components . ' - '
+                . $row->summary . "** <br>\n" . $row->description . "\n\n";
+        }
+
+        return $md;
     }
 }

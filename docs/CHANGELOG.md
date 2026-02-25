@@ -15,16 +15,6 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 
 
 
-
-
-
-
-
-
-
-
-
-
 ## [7.34.5] - 2026-02-24
 
 ### Important Notes:
