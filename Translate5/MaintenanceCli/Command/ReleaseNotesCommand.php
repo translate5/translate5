@@ -199,8 +199,8 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
 
         if ($askCredentials) {
             //IMPORTANT: currently no auth needed, since all data is publically available
-            $conf['jiraUser'] = $this->io->ask('Please enter JIRA username (is NOT stored locally)');
-            $conf['jiraPassword'] = $this->io->ask('Please enter JIRA password (is NOT stored locally)');
+//            $conf['jiraUser'] = $this->io->ask('Please enter JIRA username (is NOT stored locally)');
+//            $conf['jiraPassword'] = $this->io->ask('Please enter JIRA password (is NOT stored locally)');
         }
 
         $this->jiraConf = new ArrayConfiguration($conf);
