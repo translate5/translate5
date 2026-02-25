@@ -35,16 +35,21 @@ use editor_Services_Connector_Exception;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\T5Memory\Api\Contract\FuzzyInterface;
 use MittagQI\Translate5\T5Memory\Api\Response\FuzzySearchResponse;
 use MittagQI\Translate5\T5Memory\Api\Response\MatchDTO;
 use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ContentProtection\QueryStringGuesser;
+use MittagQI\Translate5\T5Memory\Contract\TagHandlerProviderInterface;
 use MittagQI\Translate5\T5Memory\DTO\FuzzyMatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\ReorganizeException;
+use MittagQI\Translate5\T5Memory\TagHandler\PassThroughTagHandlerProvider;
+use MittagQI\Translate5\T5Memory\TagHandler\TagHandlerProvider;
 use Psr\Http\Client\RequestExceptionInterface;
 use Throwable;
 use Zend_Config;
@@ -60,8 +65,9 @@ class FuzzySearchService
         private readonly QueryStringGuesser $queryStringGuesser,
         private readonly FuzzyInterface $api,
         private readonly PersistenceService $persistenceService,
-        private readonly TagHandlerProvider $tagHandlerProvider,
+        private readonly TagHandlerProviderInterface $tagHandlerProvider,
         private readonly SegmentLengthValidator $segmentLengthValidator,
+        private readonly StatusService $statusService,
     ) {
     }
 
@@ -76,11 +82,28 @@ class FuzzySearchService
             PersistenceService::create(),
             TagHandlerProvider::create(),
             SegmentLengthValidator::create(),
+            StatusService::create(),
+        );
+    }
+
+    public static function createForDeleteSegmentService(): self
+    {
+        return new self(
+            ReorganizeService::create(),
+            RetryService::create(),
+            Zend_Registry::get('logger')->cloneMe('editor.t5memory.fuzzy-search'),
+            QueryStringGuesser::create(),
+            T5MemoryApi::create(),
+            PersistenceService::create(),
+            PassThroughTagHandlerProvider::create(),
+            SegmentLengthValidator::create(),
+            StatusService::create(),
         );
     }
 
     /**
      * @return iterable<FuzzyMatchDTO>
+     * @throws editor_Services_Connector_Exception
      */
     public function query(
         LanguageResource $languageResource,
@@ -127,7 +150,7 @@ class FuzzySearchService
         [$responses, $hasSkippedTms] = $this->lookup(
             $languageResource,
             array_column(
-                $languageResource->getSpecificData('memories', parseAsArray: true),
+                $languageResource->getSpecificData('memories', parseAsArray: true) ?: [],
                 'filename'
             ),
             $query,
@@ -135,6 +158,8 @@ class FuzzySearchService
             $fileName,
             $config,
             $isInternalFuzzy,
+            false,
+            $pretranslation,
         );
 
         $matches = [];
@@ -159,7 +184,17 @@ class FuzzySearchService
 
         $currentBestMatch = null;
 
+        $foundInternalKeys = [];
+
         foreach ($iterator as $found) {
+            $key = $found->segmentId . ':' . $found->internalKey;
+            if (isset($foundInternalKeys[$key])) {
+                // skip duplicate internal keys
+                continue;
+            }
+
+            $foundInternalKeys[$key] = true;
+
             $target = $tagHandler->restoreInFuzzyResult($found->target, $found->skippedTags, false);
             $hasTargetErrors = $tagHandler->hasRestoreErrors();
 
@@ -186,6 +221,7 @@ class FuzzySearchService
             }
 
             $match = new FuzzyMatchDTO(
+                tmName: $found->tmName,
                 source: $source,
                 target: $target,
                 matchrate: $matchRate,
@@ -311,19 +347,42 @@ class FuzzySearchService
         }
     }
 
-    private function getQueryableMemories(LanguageResource $languageResource, array $memories): array
-    {
+    private function getQueryableMemories(
+        LanguageResource $languageResource,
+        array $memories,
+        bool $isInternalFuzzy
+    ): array {
         $tms = [];
         foreach ($memories as $memory) {
-            if ($this->reorganizeService->isReorganizingAtTheMoment($languageResource, $memory)) {
+            $status = $this->statusService->getStatus($languageResource, $memory);
+
+            if (
+                Status::REORGANIZE_IN_PROGRESS === $status
+                || $this->reorganizeService->isReorganizingAtTheMoment($languageResource, $memory, ! $isInternalFuzzy)
+            ) {
                 if (! $this->retryService->canWaitLongTaskFinish()) {
                     continue;
                 }
 
-                $this->reorganizeService->waitReorganizeFinished(
+                $reorganised = $this->reorganizeService->waitReorganizeFinished(
                     $languageResource,
                     $memory,
+                    $isInternalFuzzy,
                 );
+
+                if (! $reorganised) {
+                    continue;
+                }
+
+                if (! $isInternalFuzzy) {
+                    $languageResource->refresh();
+                }
+
+                $status = $this->statusService->getStatus($languageResource, $memory);
+            }
+
+            if (Status::AVAILABLE !== $status) {
+                continue;
             }
 
             $tms[] = $memory;
@@ -334,6 +393,7 @@ class FuzzySearchService
 
     /**
      * @return array{FuzzySearchResponse[], bool}
+     * @throws editor_Services_Connector_Exception
      */
     private function lookup(
         LanguageResource $languageResource,
@@ -344,15 +404,24 @@ class FuzzySearchService
         Zend_Config $config,
         bool $isInternalFuzzy,
         bool $hasSkippedTms = false,
+        bool $pretranslation = false,
     ): array {
         $count = count($memories);
-        $memories = $this->getQueryableMemories($languageResource, $memories);
+        $memories = $this->getQueryableMemories($languageResource, $memories, $isInternalFuzzy);
         $memories = array_map(
             fn ($memory) => $this->persistenceService->addTmPrefix($memory),
             $memories
         );
 
         $hasSkippedTms = $hasSkippedTms || count($memories) < $count;
+
+        if ($hasSkippedTms && $pretranslation) {
+            throw $this->getBadGatewayException(
+                new Exception('Pretranslation cannot be performed when some TMs are being reorganized'),
+                $languageResource,
+                '',
+            );
+        }
 
         ['responses' => $responses, 'failures' => $failures] = $this->api->fuzzyParallel(
             $languageResource->getResource()->getUrl(),
@@ -368,7 +437,7 @@ class FuzzySearchService
 
         foreach ($responses as $tmName => $response) {
             // currently reorganizing tm can't be here as it is filtered before in self::getQueryableMemories
-            if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName)) {
+            if ($this->reorganizeService->needsReorganizing($response, $languageResource, $tmName, $isInternalFuzzy)) {
                 unset($responses[$tmName]);
 
                 try {
@@ -427,6 +496,14 @@ class FuzzySearchService
             $this->logger->exception($this->getBadGatewayException($failure, $languageResource, $tmName));
         }
 
+        if (! empty($failure) && $pretranslation) {
+            throw $this->getBadGatewayException(
+                new Exception('Pretranslation cannot be performed when some TMs are failing'),
+                $languageResource,
+                implode(', ', array_keys($failures))
+            );
+        }
+
         if (! empty($retryTms)) {
             [$retryResponses, $hasSkippedTms] = $this->lookup(
                 $languageResource,
@@ -437,6 +514,7 @@ class FuzzySearchService
                 $config,
                 $isInternalFuzzy,
                 $hasSkippedTms,
+                $pretranslation,
             );
 
             foreach ($retryResponses as $tmName => $response) {
@@ -456,12 +534,9 @@ class FuzzySearchService
         Zend_Config $config,
         bool $isInternalFuzzy
     ): void {
-        $saveDifferentTargetsForSameSource = (bool) $config
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
-        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
+        $reorganizeOptions = new ReorganizeOptions(
+            TmxFilterOptions::fromConfig($config),
+        );
 
         if ($isInternalFuzzy || $this->retryService->canWaitLongTaskFinish()) {
             $this->reorganizeService->reorganizeTm(
@@ -519,16 +594,16 @@ class FuzzySearchService
 
         if ($found->guessed()) {
             $item = new \stdClass();
-            $item->name = 'Guessed';
-            $item->value = 'Some content was unprotected to get a better match';
+            $item->name = 'guessed';
+            $item->value = true;
 
             $result[] = $item;
         }
 
         if ($found->possiblyNotOptimal) {
             $item = new \stdClass();
-            $item->name = 'Possibly not optimal';
-            $item->value = 'Language resource is currently being processed. Better matches might be available.';
+            $item->name = 'possiblyNotOptimal';
+            $item->value = true;
 
             $result[] = $item;
         }

@@ -57,8 +57,8 @@ class RetryService
     {
         $elapsedTime = 0;
         $maxWaitingTime = $this->getMaxWaitingTimeSeconds($canWaitLong);
-        $state = WaitCallState::Retry;
-        $result = null;
+
+        [$state, $result] = $callback();
 
         while ($elapsedTime < $maxWaitingTime && $state === WaitCallState::Retry) {
             sleep($this->getRetryDelaySeconds());

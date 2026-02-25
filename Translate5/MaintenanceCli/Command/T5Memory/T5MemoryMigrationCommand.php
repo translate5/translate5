@@ -35,12 +35,14 @@ use editor_Services_T5Memory_Service as Service;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Operation\CloneLanguageResourceOperation;
 use MittagQI\Translate5\LanguageResource\Operation\DeleteLanguageResourceOperation;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\ImportService;
@@ -229,8 +231,12 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             return self::SUCCESS;
         }
 
-        $stripFramingTagsOnImport = $this->getStripTagsOnImport($input);
         $targetResourceId = $this->getTargetResourceId($targetUrl);
+        $importOptions = new ImportOptions(
+            stripFramingTags: $this->getStripTagsOnImport($input),
+            tmxFilterOptions: TmxFilterOptions::fromConfig(Zend_Registry::get('config')),
+            forceLongWait: true,
+        );
 
         $cloneLanguageResource = $input->getOption(self::OPTION_CLONE_LANGUAGE_RESOURCE);
 
@@ -253,6 +259,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             return self::SUCCESS;
         }
 
+        $lockService = ActionLockService::create();
+
         foreach ($languageResourcesData as $languageResourceData) {
             $progressBar->advance();
 
@@ -261,6 +269,23 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
             $languageResource->markConversionStart();
             $languageResource->save();
+
+            $lock = $lockService->getWriteLock($languageResource->getLangResUuid());
+
+            if (! $lock->acquire()) {
+                $processingErrors[] = [
+                    'language resource id' => $languageResource->getId(),
+                    'message' => 'Could not acquire lock for language resource',
+                ];
+                $languageResource->resetConversionMarks();
+                $languageResource->save();
+
+                continue;
+            }
+
+            // language resource might have been updated while waiting for the lock,
+            // so we have to get fresh one to ensure we have the latest data and status
+            $languageResource->refresh();
 
             $logger->info('E0000', 'Language resource migrate start: {tm}', [
                 'languageResource' => $languageResource,
@@ -279,6 +304,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 $languageResource->resetConversionMarks();
                 $languageResource->save();
 
+                $lock->release();
+
                 continue;
             }
 
@@ -291,7 +318,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 $this->importOrCreateEmpty(
                     $languageResource,
                     $filenameWithPath,
-                    $stripFramingTagsOnImport
+                    $importOptions,
                 );
             } catch (Throwable $e) {
                 $processingErrors[] = [
@@ -303,6 +330,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             } finally {
                 $languageResource->resetConversionMarks();
                 $languageResource->save();
+
+                $lock->release();
             }
 
             $logger->info('E0000', 'Language resource migrate finish: {tm}', [
@@ -468,7 +497,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private function importOrCreateEmpty(
         LanguageResource $languageResource,
         string $filenameWithPath,
-        StripFramingTags $stripFramingTagsOnImport
+        ImportOptions $importOptions,
     ): void {
         if (! $this->t5MemoryApi->ping($languageResource->getResource()->getUrl())) {
             throw new RuntimeException('Target t5memory endpoint is not reachable');
@@ -487,13 +516,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $this->importService->importTmx(
             $languageResource,
             [$filenameWithPath],
-            new ImportOptions(
-                stripFramingTags: $stripFramingTagsOnImport,
-                resegmentTmx: false,
-                saveDifferentTargetsForSameSource: false,
-                protectContent: false,
-                forceLongWait: true,
-            ),
+            $importOptions,
         );
     }
 

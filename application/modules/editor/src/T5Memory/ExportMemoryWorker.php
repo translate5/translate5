@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\T5Memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use Exception;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\Repository\QueuedExportRepository;
 use ZfExtended_Factory;
@@ -48,10 +49,19 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
 
     private LanguageResource $languageResource;
 
+    private readonly QueuedExportRepository $queuedExportRepository;
+
+    private readonly ExportService $exportService;
+
+    private readonly ActionLockService $actionLockService;
+
     public function __construct()
     {
         parent::__construct();
         $this->log = \Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.export');
+        $this->queuedExportRepository = QueuedExportRepository::create();
+        $this->exportService = ExportService::create();
+        $this->actionLockService = ActionLockService::create();
     }
 
     public static function queueExportWorker(LanguageResource $languageResource, string $mime, string $exportFolder): int
@@ -118,24 +128,42 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
             return true;
         }
 
-        $queueModel = QueuedExportRepository::create()->findByWorkerId((int) $this->workerModel->getId());
+        $queueModel = $this->queuedExportRepository->findByWorkerId((int) $this->workerModel->getId());
 
         if (null === $queueModel) {
             throw new Exception('Export failed: No queue model found');
         }
 
-        $exportService = ExportService::create();
-
         mkdir($this->exportFolder, 0777, true);
+
+        $lock = $this->actionLockService->getReadLock($this->languageResource->getLangResUuid(), 30 * 60);
+
+        if (! $lock->acquireRead(true)) {
+            $this->log->error(
+                'E1377',
+                'ExportMemoryWorker: Can not acquire lock for language resource with id ' . $this->languageResource->getId(),
+                [
+                    'languageResource' => $this->languageResource,
+                ]
+            );
+
+            return false;
+        }
+
+        // language resource might have been updated while waiting for the lock,
+        // so we have to refresh it to ensure we have the latest data and status
+        $this->languageResource->refresh();
 
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
-        $file = $exportService->export(
+        $file = $this->exportService->export(
             $this->languageResource,
             TmFileExtension::fromMimeType($this->mime, $memories > 1),
         );
 
         if (null === $file || ! file_exists($file)) {
+            $lock->release();
+
             throw new Exception('Export failed: Nothing was exported');
         }
 
@@ -148,8 +176,12 @@ class ExportMemoryWorker extends ZfExtended_Worker_Abstract
         rename($file, $filePath);
 
         if (! file_exists($filePath)) {
+            $lock->release();
+
             throw new Exception('Export failed: Moving file to export dir failed');
         }
+
+        $lock->release();
 
         $queueModel->setResultFileName("{$queueModel->getResultFileName()}.$extension");
         $queueModel->setLocalFileName($filename);

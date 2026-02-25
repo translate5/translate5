@@ -36,12 +36,14 @@ use MittagQI\Translate5\Plugins\TMMaintenance\Service\TuBatchDeleteService;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
+use MittagQI\Translate5\T5Memory\Enum\SearchMode;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\ImportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
-use MittagQI\Translate5\T5Memory\TmxFilter\SameTuvFilter;
 use MittagQI\Translate5\Test\Fixtures\LanguageResourceFixtures;
+use MittagQI\Translate5\TMX\Filter\SameTuvFilter;
 use PHPUnit\Framework\TestCase;
 
 class TuBatchDeleteServiceTest extends TestCase
@@ -93,6 +95,7 @@ class TuBatchDeleteServiceTest extends TestCase
             [self::$testFile],
             new ImportOptions(
                 StripFramingTags::None,
+                new TmxFilterOptions(),
                 forceLongWait: true,
             ),
         );
@@ -103,23 +106,28 @@ class TuBatchDeleteServiceTest extends TestCase
             $this->languageResource,
             new SearchDTO(
                 source: '',
-                sourceMode: '',
+                sourceMode: SearchMode::Contains,
+                sourceCaseSensitive: true,
                 target: '',
-                targetMode: '',
+                targetMode: SearchMode::Contains,
+                targetCaseSensitive: true,
                 sourceLanguage: '',
                 targetLanguage: '',
                 author: 'OTHER MANAGER',
-                authorMode: 'exact',
+                authorMode: SearchMode::Exact,
+                authorCaseSensitive: true,
                 creationDateFrom: 0,
                 creationDateTo: 0,
                 additionalInfo: '',
-                additionalInfoMode: '',
+                additionalInfoMode: SearchMode::Contains,
+                additionalInfoCaseSensitive: true,
                 document: '',
-                documentMode: '',
+                documentMode: SearchMode::Contains,
+                documentCaseSensitive: true,
                 context: '',
-                contextMode: '',
+                contextMode: SearchMode::Contains,
+                contextCaseSensitive: true,
                 onlyCount: false,
-                caseSensitive: true,
             ),
         );
 
@@ -138,10 +146,10 @@ class TuBatchDeleteServiceTest extends TestCase
             $tmx
         );
 
-        self::assertSame(
-            file_get_contents(__DIR__ . '/TuBatchDeleteServiceTest/expected_author_filtered.tmx'),
+        self::assertStringEqualsFile(
+            __DIR__ . '/TuBatchDeleteServiceTest/expected_author_filtered.tmx',
             $tmx,
-            'The filtered TMX file is not as expected.',
+            'The filtered TMX file is not as expected.'
         );
     }
 }

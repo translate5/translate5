@@ -28,13 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace LanguageResource\ReimportSegments\Action;
+namespace MittagQI\Translate5\Test\Unit\LanguageResource\ReimportSegments\Action;
 
 use DateTimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment as Segment;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ContentProtection\T5memory\ConvertT5MemoryTagServiceInterface;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\Integration\SegmentUpdate\UpdateSegmentDTO;
 use MittagQI\Translate5\Integration\UpdateSegmentService;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
@@ -47,6 +48,7 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\FlushMemoryService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Lock\LockInterface;
 use Zend_Config;
 use ZfExtended_Logger;
 
@@ -68,6 +70,8 @@ class ReimportSnapshotTest extends TestCase
 
     private UpdateSegmentService|MockObject $updateSegmentService;
 
+    private ActionLockService|MockObject $actionLockService;
+
     protected function setUp(): void
     {
         $this->reimportSegmentRepositoryMock = $this->createMock(ReimportSegmentRepositoryInterface::class);
@@ -77,6 +81,12 @@ class ReimportSnapshotTest extends TestCase
         $this->tmConversionServiceMock = $this->createMock(ConvertT5MemoryTagServiceInterface::class);
         $this->flushMemoryService = $this->createMock(FlushMemoryService::class);
         $this->updateSegmentService = $this->createMock(UpdateSegmentService::class);
+        $this->actionLockService = $this->createMock(ActionLockService::class);
+
+        $lockMock = $this->createMock(LockInterface::class);
+        $lockMock->method('acquire')->willReturn(true);
+
+        $this->actionLockService->method('getWriteLockWithId')->willReturn($lockMock);
 
         $this->reimportSegments = new ReimportSnapshot(
             reimportSegmentRepository: $this->reimportSegmentRepositoryMock,
@@ -86,6 +96,7 @@ class ReimportSnapshotTest extends TestCase
             tmConversionService: $this->tmConversionServiceMock,
             flushMemoryService: $this->flushMemoryService,
             updateSegmentService: $this->updateSegmentService,
+            actionLockService: $this->actionLockService,
         );
     }
 

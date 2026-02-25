@@ -39,9 +39,9 @@ use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\BatchDeleteException;
 use MittagQI\Translate5\Plugins\TMMaintenance\TmxFilter\SearchFilter;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
-use MittagQI\Translate5\T5Memory\CreateMemoryService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\ImportService;
@@ -60,7 +60,6 @@ class TuBatchDeleteService
         private readonly SearchFilter $searchFilter,
         private readonly \Zend_Config $config,
         private readonly T5MemoryApi $api,
-        private readonly CreateMemoryService $createMemoryService,
         private readonly PersistenceService $persistenceService,
     ) {
     }
@@ -74,7 +73,6 @@ class TuBatchDeleteService
             SearchFilter::create(),
             Zend_Registry::get('config'),
             T5MemoryApi::create(),
-            CreateMemoryService::create(),
             PersistenceService::create(),
         );
     }
@@ -113,24 +111,16 @@ class TuBatchDeleteService
 
         $specificDataMemoriesBackup = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
 
-        $newMemory = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource);
-
         // reset memories, so that only the new empty memory is used for import
         $languageResource->addSpecificData('memories', []);
 
-        $this->persistenceService->addMemoryToLanguageResource($languageResource, $newMemory);
-
         $tmpDir = APPLICATION_DATA . '/' . bin2hex(random_bytes(8));
-        @mkdir($tmpDir, 0777, true);
+        if (! mkdir($tmpDir, 0777, true) && ! is_dir($tmpDir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $tmpDir));
+        }
         $importFile = $tmpDir . '/' . basename($tmxFilePath);
 
         copy($tmxFilePath, $importFile);
-
-        $saveDifferentTargetsForSameSource = (bool) $this->config
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
 
         try {
             $this->importService->importTmx(
@@ -138,7 +128,7 @@ class TuBatchDeleteService
                 [$importFile],
                 new ImportOptions(
                     stripFramingTags: StripFramingTags::None,
-                    saveDifferentTargetsForSameSource: $saveDifferentTargetsForSameSource,
+                    tmxFilterOptions: TmxFilterOptions::fromConfig($this->config),
                     protectContent: false,
                     forceLongWait: true,
                 ),
@@ -186,7 +176,10 @@ class TuBatchDeleteService
         $url = $languageResource->getResource()->getUrl();
 
         foreach ($memories as $memory) {
-            $this->api->deleteTm($url, $memory);
+            $this->api->deleteTm(
+                $url,
+                $this->persistenceService->addTmPrefix($memory),
+            );
         }
     }
 

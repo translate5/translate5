@@ -31,13 +31,12 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Plugins\TMMaintenance\TmxFilter;
 
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
+use MittagQI\Translate5\T5Memory\Enum\SearchMode;
 use MittagQI\Translate5\T5Memory\Exception\TmxFilterException;
 use XMLReader;
 
 class SearchFilter
 {
-    private const EXACT_SEARCH = 'exact';
-
     public static function create(): self
     {
         return new self();
@@ -45,8 +44,8 @@ class SearchFilter
 
     public function filter(string $tmxFile, SearchDTO $searchDTO): void
     {
-        $reader = new XMLReader();
-        if (! $reader->open($tmxFile)) {
+        $reader = XMLReader::open($tmxFile);
+        if (! $reader) {
             throw new TmxFilterException('Could not open TMX file ' . $tmxFile);
         }
 
@@ -184,12 +183,12 @@ class SearchFilter
         if ('' !== $searchDTO->author) {
             $searchAuthor = $searchDTO->author;
 
-            if (! $searchDTO->caseSensitive) {
+            if (! $searchDTO->authorCaseSensitive) {
                 $author = strtolower($author);
                 $searchAuthor = strtolower($searchAuthor);
             }
 
-            if ($searchDTO->authorMode === self::EXACT_SEARCH && $author === $searchAuthor) {
+            if ($searchDTO->authorMode === SearchMode::Exact && $author === $searchAuthor) {
                 return true;
             }
 
@@ -199,12 +198,12 @@ class SearchFilter
         if ('' !== $searchDTO->document) {
             $searchDocument = $searchDTO->document;
 
-            if (! $searchDTO->caseSensitive) {
+            if (! $searchDTO->documentCaseSensitive) {
                 $docname = strtolower($docname);
                 $searchDocument = strtolower($searchDocument);
             }
 
-            if ($searchDTO->documentMode === self::EXACT_SEARCH && $docname === $searchDocument) {
+            if ($searchDTO->documentMode === SearchMode::Exact && $docname === $searchDocument) {
                 return true;
             }
 
@@ -214,12 +213,12 @@ class SearchFilter
         if ('' !== $searchDTO->context) {
             $searchContext = $searchDTO->context;
 
-            if (! $searchDTO->caseSensitive) {
+            if (! $searchDTO->contextCaseSensitive) {
                 $context = strtolower($context);
                 $searchContext = strtolower($searchContext);
             }
 
-            if ($searchDTO->contextMode === self::EXACT_SEARCH && $context === $searchContext) {
+            if ($searchDTO->contextMode === SearchMode::Exact && $context === $searchContext) {
                 return true;
             }
 
@@ -229,12 +228,12 @@ class SearchFilter
         if ('' !== $searchDTO->source) {
             $searchSource = $searchDTO->source;
 
-            if (! $searchDTO->caseSensitive) {
+            if (! $searchDTO->sourceCaseSensitive) {
                 $sourceSegment = strtolower($sourceSegment);
                 $searchSource = strtolower($searchSource);
             }
 
-            if ($searchDTO->sourceMode === self::EXACT_SEARCH && $sourceSegment === $searchSource) {
+            if ($searchDTO->sourceMode === SearchMode::Exact && $sourceSegment === $searchSource) {
                 return true;
             }
 
@@ -244,12 +243,12 @@ class SearchFilter
         if ('' !== $searchDTO->target) {
             $searchTarget = $searchDTO->target;
 
-            if (! $searchDTO->caseSensitive) {
+            if (! $searchDTO->targetCaseSensitive) {
                 $targetSegment = strtolower($targetSegment);
                 $searchTarget = strtolower($searchTarget);
             }
 
-            if ($searchDTO->targetMode === self::EXACT_SEARCH && $targetSegment === $searchTarget) {
+            if ($searchDTO->targetMode === SearchMode::Exact && $targetSegment === $searchTarget) {
                 return true;
             }
 

@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\T5Memory\DTO;
 class ReorganizeOptions
 {
     public function __construct(
-        public readonly bool $saveDifferentTargetsForSameSource,
+        public readonly TmxFilterOptions $tmxFilterOptions,
     ) {
     }
 }

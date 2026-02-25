@@ -136,7 +136,7 @@ class NumberProtector implements ProtectorInterface
     public static function fullTagRegex(): string
     {
         return sprintf(
-            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s*(regex="(.+)")?\s?\/>/U',
+            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)" regex="(.+)"\s*(key="(.+)")?\s?\/>/U',
             self::TAG_NAME
         );
     }
@@ -161,7 +161,7 @@ class NumberProtector implements ProtectorInterface
         return (bool) preg_match(self::fullTagRegex(), $tag);
     }
 
-    public static function getTagUniqueKey(string $tag): string
+    public static function getTagComparisonKey(string $tag): string
     {
         preg_match(self::fullTagRegex(), $tag, $matches);
 
@@ -413,7 +413,7 @@ class NumberProtector implements ProtectorInterface
         $wholeTag = $xml->getChunk($key);
         $shortTagNumber = $shortTagIdent;
 
-        $uniqueKey = self::getTagUniqueKey($wholeTag);
+        $uniqueKey = self::getTagComparisonKey($wholeTag);
 
         if ($collectTagNumbers) {
             $shortcutNumberMap[$uniqueKey][] = $shortTagNumber;

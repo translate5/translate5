@@ -90,7 +90,8 @@ class DateProtectorTest extends TestCase
             'Y/d/m',
             false,
             'd.m.y',
-            1
+            1,
+            'aaa'
         );
 
         $targetLangDe = new editor_Models_Languages();
@@ -99,14 +100,14 @@ class DateProtectorTest extends TestCase
 
         yield 'date' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA" key="aaa"/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
 
         yield 'target lang de-DE' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA" key="aaa"/>',
             'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
@@ -119,12 +120,13 @@ class DateProtectorTest extends TestCase
             'Y/d/m',
             false,
             'Y*m*d',
-            1
+            1,
+            'aaa'
         );
 
         yield 'date. target format Y*m*d' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA" key="aaa"/>',
             'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
@@ -137,12 +139,13 @@ class DateProtectorTest extends TestCase
             'Y/d/m',
             true,
             null,
-            1
+            1,
+            'aaa'
         );
 
         yield 'date. keep as is' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target="2023/18/07" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA"/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target="2023/18/07" regex="049JikmpNqmN0dcwiDbUtYytAZJGsdEGIKYxkDIEi1jGaiJUGAKFjeDCSfoA" key="aaa"/>',
             'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];
@@ -166,7 +169,8 @@ class DateProtectorTest extends TestCase
             'Y/d/m',
             false,
             'Y-m-d',
-            1
+            1,
+            'aaa'
         );
         $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
 
@@ -192,7 +196,8 @@ class DateProtectorTest extends TestCase
             'Y/d/m',
             false,
             null,
-            1
+            1,
+            'aaa'
         );
         $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
 

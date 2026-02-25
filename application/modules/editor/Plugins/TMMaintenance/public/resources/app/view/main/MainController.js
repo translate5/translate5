@@ -150,6 +150,90 @@ Ext.define('TMMaintenance.view.main.MainController', {
         );
     },
 
+    onDeleteBy: function(grid, location) {
+        const vm = this.getViewModel(),
+            l10n = vm.data.l10n,
+            type = location.tool.type,
+            store = location.grid.getStore(),
+            rec = location.record,
+            src = rec.get('source'),
+            trg = rec.get('target'),
+            emo = '<em style="font-weight: 700;">',
+            emc = '</em>';
+
+        const normalizeText = (value) => {
+            if (!value) {
+                return value;
+            }
+
+            // Parse the HTML and replace special tag divs with the span.short title wrapped in angle brackets
+            const container = document.createElement('div');
+            container.innerHTML = value;
+
+            const candidates = container.querySelectorAll('div.open, div.close, div.single');
+            candidates.forEach(div => {
+                const short = div.querySelector('span.short[title]');
+                if (!short) {
+                    return;
+                }
+
+                const title = short.getAttribute('title') || '';
+                // Create a text node with <title> so when serialized via innerHTML it becomes &lt;title&gt;
+                const replacement = document.createTextNode(`##${title}##`);
+                if (div.parentNode) {
+                    div.parentNode.replaceChild(replacement, div);
+                }
+            });
+
+            return container.innerHTML;
+        };
+
+        const normalizedSrc = normalizeText(src);
+        const normalizedTrg = normalizeText(trg);
+
+        var queryFn, title, message;
+
+        if (type === 'same-source') {
+            title = l10n.deleteSegment.bySource.title;
+            message = Ext.String.format(l10n.deleteSegment.bySource.text, emo + src + emc);
+            queryFn = rec => normalizeText(rec.get('source')) === normalizedSrc;
+        } else {
+            title = l10n.deleteSegment.bySourceAndTarget.title;
+            message = Ext.String.format(l10n.deleteSegment.bySourceAndTarget.text, emo + src + emc, emo + trg + emc)
+            queryFn = rec => normalizeText(rec.get('source')) === normalizedSrc && normalizeText(rec.get('target')) === normalizedTrg;
+        }
+
+        // Show confirmation prompt
+        Ext.Msg.confirm(title, message, proceed => {
+
+            // If deletion cancelled - do nothing
+            if ('no' === proceed) {
+                return;
+            }
+
+            // Else do deletion
+            Ext.Ajax.request({
+                method: 'POST',
+                url: '/editor/plugins_tmmaintenance_api/delete-similar',
+                params: {
+                    data: JSON.stringify({
+                        tm: vm.get('selectedTm'),
+                        type: type,
+                        source: src,
+                        target: trg,
+                        metaData: rec.get('metaData')
+                    })
+                },
+                success: xhr => {
+                    store.queryBy(queryFn).each(rec => store.remove(rec));
+                },
+                failure: xhr => {
+                    this.showServerError(Ext.JSON.decode(xhr.responseText, true))
+                }
+            });
+        });
+    },
+
     onEditSource: function(grid, gridLocation) {
         this.startEdit(gridLocation.record, 'source');
     },

@@ -76,11 +76,12 @@ class IPAddressProtectorTest extends TestCase
             '',
             true,
             null,
-            1
+            1,
+            'aaa',
         );
 
         self::assertSame(
-            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1" regex="AwA="/>',
+            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1" regex="AwA=" key="aaa"/>',
             (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, $sourceLang, $targetLang)
         );
     }

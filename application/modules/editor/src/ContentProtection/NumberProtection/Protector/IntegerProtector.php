@@ -98,6 +98,7 @@ class IntegerProtector extends FloatProtector
             $sign . $integer,
             $sign . $this->getTargetInteger($integer, $protectionDto->outputFormat),
             $this->encodeRegex($protectionDto->regex),
+            $protectionDto->key,
         );
     }
 

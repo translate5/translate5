@@ -37,6 +37,8 @@ use Psr\Http\Message\StreamInterface;
 
 class DownloadTmxChunkResponse
 {
+    use LockingTimeoutTrait;
+
     public function __construct(
         public readonly ?string $nextInternalKey,
         public readonly StreamInterface $chunk
@@ -65,5 +67,27 @@ class DownloadTmxChunkResponse
         }
 
         return new self($nextInternalKey, $response->getBody());
+    }
+
+    public function getCode(): int
+    {
+        $data = $this->tryParseResponseAsJson();
+
+        return (int) ($data['ReturnValue'] ?? 0);
+    }
+
+    protected function tryParseResponseAsJson(): array
+    {
+        $this->chunk->rewind();
+
+        try {
+            $chunk = json_decode((string) $this->chunk, true, flags: JSON_THROW_ON_ERROR);
+
+            $this->chunk->rewind();
+
+            return is_array($chunk) ? $chunk : [];
+        } catch (\JsonException) {
+            return [];
+        }
     }
 }

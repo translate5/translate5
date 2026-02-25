@@ -12,7 +12,9 @@
         "timestamp": "TEST_TIMESTAMP",
         "penaltyGeneral": 0,
         "penaltySublang": 0,
-        "tmConversionState": "converted"
+        "tmConversionState": "converted",
+        "guessed": false,
+        "possiblyNotOptimal": false
     },{
         "target": "Seamlessly integrate Across in your processes",
         "rawTarget": "Seamlessly integrate Across in your processes",
@@ -26,6 +28,8 @@
         "timestamp": "TEST_TIMESTAMP",
         "penaltyGeneral": 0,
         "penaltySublang": 0,
-        "tmConversionState": "converted"
+        "tmConversionState": "converted",
+        "guessed": false,
+        "possiblyNotOptimal": false
     }
 ]

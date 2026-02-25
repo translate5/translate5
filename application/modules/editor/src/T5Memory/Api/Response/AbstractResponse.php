@@ -45,8 +45,6 @@ abstract class AbstractResponse implements ResponseInterface
         $this->code = (int) ($body['returnValue'] ?? $body['ReturnValue'] ?? 0);
     }
 
-    abstract public static function fromResponse(PsrResponseInterface $response): AbstractResponse;
-
     public function getBody(): array
     {
         return $this->body;

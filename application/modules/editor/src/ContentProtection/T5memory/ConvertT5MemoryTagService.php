@@ -32,14 +32,23 @@ namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
+use MittagQI\Translate5\T5Memory\TMX\CharacterReplacer;
 
 class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
 {
+    /**
+     * @var array<string, string>|null
+     */
+    private ?array $regexToKeyMap = null;
+
     public function __construct(
         private readonly ContentProtector $contentProtector,
+        private readonly CharacterReplacer $characterReplacer,
         private readonly \ZfExtended_Logger $logger,
+        private readonly ContentProtectionRepository $contentProtectionRepository,
     ) {
     }
 
@@ -47,12 +56,15 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
     {
         return new self(
             ContentProtector::create($whitespace ?: \ZfExtended_Factory::get(Whitespace::class)),
+            CharacterReplacer::create(),
             \Zend_Registry::get('logger')->cloneMe('editor.content_protection'),
+            ContentProtectionRepository::create(),
         );
     }
 
     public function convertT5MemoryTagToContent(string $string): string
     {
+        $string = $this->characterReplacer->revertToInvalidXmlCharacters($string);
         preg_match_all(T5NTag::fullTagRegex(), $string, $tags, PREG_SET_ORDER);
 
         if (empty($tags)) {
@@ -72,14 +84,15 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
 
     public function convertContentTagToT5MemoryTag(string $queryString, bool $isSource, &$numberTagMap = []): string
     {
+        $currentId = 1;
         $queryString = $this->contentProtector->unprotect($queryString, $isSource, NumberProtector::alias());
+        $queryString = $this->characterReplacer->replaceInvalidXmlCharacters($queryString, $currentId);
         $regex = NumberProtector::fullTagRegex();
 
         if (! preg_match($regex, $queryString)) {
             return $queryString;
         }
 
-        $currentId = 1;
         $queryString = preg_replace_callback(
             $regex,
             function (array $tagProps) use (&$currentId, &$numberTagMap, $isSource) {
@@ -90,16 +103,19 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
                         'E1625',
                         "Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate"
                     );
-                    $tagProps = array_pad($tagProps, 7, '');
+                    $tagProps = array_pad($tagProps, 8, '');
                 }
 
-                unset($tagProps[5]);
+                unset($tagProps[6]);
 
-                $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target', 'regex'], $tagProps);
+                $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target', 'regex', 'key'], $tagProps);
 
-                if (empty($tagProps['regex'])) {
+                if (empty($tagProps['key'])) {
                     // for BC reasons, we use the name as regex
-                    $tagProps['regex'] = base64_encode($tagProps['name']);
+                    $realRegex = isset($tagProps['regex'])
+                        ? gzinflate(base64_decode($tagProps['regex']))
+                        : $tagProps['name'];
+                    $tagProps['key'] = $this->getRegexToKeyMap()[$realRegex] ?? $tagProps['regex'] ?? $tagProps['name'];
                 }
 
                 $protectedContent = $isSource ? $tagProps['source'] : $tagProps['target'];
@@ -107,19 +123,19 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
                 $protectedContent = html_entity_decode($protectedContent);
 
                 if ($isSource) {
-                    if (! isset($numberTagMap[$tagProps['regex']][$tag]['ids'])) {
-                        $numberTagMap[$tagProps['regex']][$tag]['ids'] = new \SplQueue();
+                    if (! isset($numberTagMap[$tagProps['key']][$tag]['ids'])) {
+                        $numberTagMap[$tagProps['key']][$tag]['ids'] = new \SplQueue();
                     }
-                    $numberTagMap[$tagProps['regex']][$tag]['ids']->enqueue($currentId);
+                    $numberTagMap[$tagProps['key']][$tag]['ids']->enqueue($currentId);
                 } else {
-                    $ids = $numberTagMap[$tagProps['regex']][$tag]['ids'] ?? null;
+                    $ids = $numberTagMap[$tagProps['key']][$tag]['ids'] ?? null;
 
                     $currentId = null !== $ids && ! $ids->isEmpty() ? $ids->dequeue() : $currentId;
                 }
 
-                $numberTagMap[$tagProps['regex']][$tag]['protectedContent'][$protectedContent][] = $currentId;
+                $numberTagMap[$tagProps['key']][$tag]['protectedContent'][$protectedContent][] = $currentId;
 
-                $t5nTag = new T5NTag($currentId, $tagProps['regex'], $protectedContent);
+                $t5nTag = new T5NTag($currentId, $tagProps['key'], $protectedContent);
 
                 $currentId++;
 
@@ -165,6 +181,15 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
         ];
     }
 
+    private function getRegexToKeyMap(): array
+    {
+        if (null === $this->regexToKeyMap) {
+            $this->regexToKeyMap = $this->contentProtectionRepository->getRegexToKeyMap();
+        }
+
+        return $this->regexToKeyMap;
+    }
+
     private function collapseTmxTags(string $segment): string
     {
         return preg_replace('#<(ph|bpt|ept) ([^>]*)>(.*)</\1>#U', '<$1 $2/>', $segment);
@@ -177,6 +202,6 @@ class ConvertT5MemoryTagService implements ConvertT5MemoryTagServiceInterface
 
     private function unprotectHtmlEntities(string $text): string
     {
-        return preg_replace('/¿¿¿(\w{2,8})¿¿¿/', '&\1;', $text);
+        return preg_replace('/¿¿¿(\w{2,8})¿¿¿/u', '&\1;', $text);
     }
 }

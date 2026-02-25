@@ -32,13 +32,16 @@ namespace MittagQI\Translate5\Integration\SegmentUpdate;
 
 class UpdateSegmentDTO
 {
+    public readonly string $userName;
+
     public function __construct(
         public readonly string $source,
         public readonly string $target,
         public readonly string $fileName,
         public readonly int $timestamp,
-        public readonly string $userName,
+        string $userName,
         public readonly string $context,
     ) {
+        $this->userName = strtoupper($userName);
     }
 }

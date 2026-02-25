@@ -73,7 +73,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
         return str_replace(
             ':tag',
             NumberProtector::TAG_NAME,
-            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s" regex="%s"/>'
+            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s" regex="%s" key="%s"/>'
         );
     }
 
@@ -114,6 +114,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
             htmlspecialchars($number),
             htmlspecialchars($number, ENT_COMPAT),
             $this->encodeRegex($protectionDto->regex),
+            $protectionDto->key,
         );
     }
 

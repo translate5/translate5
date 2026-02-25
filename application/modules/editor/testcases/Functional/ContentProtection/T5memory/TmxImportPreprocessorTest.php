@@ -37,8 +37,16 @@ use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-use MittagQI\Translate5\T5Memory\TmxImportPreprocessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\AddFakeContextProcessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionProcessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
+use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
+use MittagQI\Translate5\TMX\Filter\TmxFilter;
+use MittagQI\Translate5\TMX\TmxUtilsWrapper;
 use PHPUnit\Framework\TestCase;
 
 class TmxImportPreprocessorTest extends TestCase
@@ -78,6 +86,7 @@ class TmxImportPreprocessorTest extends TestCase
         $keep1->setKeepAsIs(true);
         $keep1->setRegex('/(\s|^|\()([-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u');
         $keep1->setMatchId(2);
+        $keep1->setKey('aaa');
         $keep1->save();
 
         $this->rules[] = $keep1;
@@ -89,6 +98,7 @@ class TmxImportPreprocessorTest extends TestCase
         $keep2->setKeepAsIs(true);
         $keep2->setRegex('/(\s|^|\()([-+]?([1-9]\d+|\d))(%|°|V|mm|kbit|s|psi|bar|MPa|mA)(([\.,:;?!](\s|$))|\s|$|\))/u');
         $keep2->setMatchId(2);
+        $keep2->setKey('bbb');
         $keep2->save();
 
         $this->rules[] = $keep2;
@@ -125,17 +135,53 @@ class TmxImportPreprocessorTest extends TestCase
         }
     }
 
-    public function testConvertTMXForImport(): void
+    /**
+     * @dataProvider useTmxUtilsProvider
+     */
+    public function testConvertTMXForImport(bool $useTmxUtils): void
     {
-        $service = TmxImportPreprocessor::create();
+        $service = new TmxImportPreprocessor(
+            LanguageRepository::create(),
+            [
+                RemoveCompromisedSegmentsProcessor::create(),
+                ContentProtectionProcessor::create(),
+                TranslationUnitResegmentProcessor::create(),
+                AddFakeContextProcessor::create(),
+            ],
+            \Zend_Registry::get('logger')->cloneMe('test.t5memory.tmx-import-preprocessing'),
+            new TmxFilter(
+                TmxUtilsWrapper::create(),
+                new \Zend_Config([
+                    'runtimeOptions' => [
+                        'LanguageResources' => [
+                            't5memory' => [
+                                'useTmxUtilsFilter' => $useTmxUtils,
+                            ],
+                        ],
+                    ],
+                ])
+            ),
+            TmxSymbolsFixer::create(),
+        );
 
         $file = $service->process(
             __DIR__ . '/TmxImportPreprocessorTest/small.tmx',
             (int) $this->sourceLang->getId(),
             (int) $this->targetLang->getId(),
-            new ImportOptions(StripFramingTags::None, false, false)
+            new ImportOptions(
+                StripFramingTags::None,
+                new TmxFilterOptions(),
+            )
         );
 
         self::assertFileEquals(__DIR__ . '/TmxImportPreprocessorTest/expected_small.tmx', $file);
+    }
+
+    public function useTmxUtilsProvider(): array
+    {
+        return [
+            'without tmx-utils' => [false],
+            'with tmx-utils' => [true],
+        ];
     }
 }

@@ -422,7 +422,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     protected function getBestResult(editor_Models_Segment $segment, bool $saveAnalysis = true): ?stdClass
     {
         $bestMatchRateResult = null;
-        $bestMatchRate = null;
+        $bestMatchRate = 0;
 
         $termModel = new editor_Models_Terminology_Models_TermModel();
         $termArray = [];
@@ -487,12 +487,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     continue;
                 }
 
-                // If the matchrate is the same between matches from one connector,
-                // we only check for a new best match if it is from a termcollection
-                if ($bestResultCurrentConnector->matchrate == $match->matchrate && ! $isTermCollection) {
-                    continue;
-                }
-
                 if ($isTermCollection) {
                     // Prevent forbidden terms from being best matches
                     if (editor_Models_Terminology_Models_TermModel::isForbiddenTerm($match->metaData['status'])) {
@@ -521,13 +515,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
                 // if match of another TM has the same >=100 matchrate,
                 // use the newer one but exclude internal fuzzies, since they are always newer here
-                $current100MatchIsNewer = $bestResultCurrentConnector->matchrate === $bestMatchRate
+                $current100MatchIsNewer = $bestResultCurrentConnector->matchrate >= $bestMatchRate
                     && $bestMatchRate >= 100
                     && $match->timestamp > $bestMatchRateResult->timestamp
                     && ! $connector->isInternalFuzzy();
 
                 // if we have the same fuzzy rate, the one from an internal fuzzy is the better one
-                $internalFuzzyIsBetter = $bestResultCurrentConnector->matchrate === $bestMatchRate
+                $internalFuzzyIsBetter = $bestResultCurrentConnector->matchrate >= $bestMatchRate
                     && $bestMatchRate < 100
                     && $connector->isInternalFuzzy();
                 //CRUCIAL: very ugly: this is ensured in the analysis grouping due the fact that the fuzzy connector
@@ -535,8 +529,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 // and analysis entries with the same matchrate the later one (higher id) is used.
 
                 // but do not compare agains the mt results
-                if (($currentIsBetter || $current100MatchIsNewer || $internalFuzzyIsBetter) && ! $isMtResource
-                ) {
+                if (($currentIsBetter || $current100MatchIsNewer || $internalFuzzyIsBetter) && ! $isMtResource) {
                     $bestMatchRateResult = $match;
                     $bestMatchRateResult->internalLanguageResourceid = $languageResourceId;
                 }

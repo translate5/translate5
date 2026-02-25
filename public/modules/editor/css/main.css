@@ -1422,6 +1422,13 @@ a.x-btn span.task-confirmation {
     background-size: contain;
 }
 
+.ico-tm-problem {
+    background-image: url(../images/exclamation.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
 .ico-tm-converseTm {
     background-image: url(../images/svg/database-error.svg);
     background-repeat: no-repeat;

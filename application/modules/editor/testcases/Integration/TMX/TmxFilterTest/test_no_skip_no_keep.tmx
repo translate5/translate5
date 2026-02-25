@@ -1,0 +1,49 @@
+<tmx version="1.4">
+<header creationtoolversion="0.6.108" gitCommit="498ba722 * updated to 0.6.108 * added support to open tms from 0.7" segtype="sentence" adminlang="en-us" srclang="de-DE" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
+<body>
+<tu tuid="4" creationdate="20160323T152429Z" creationid="manager1">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">docname</prop>
+            <prop type="tmgr:context">context3</prop>
+            <tuv xml:lang="de">
+                <seg>Unser schönes 4 Segment</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Our nice 4 <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> segment</seg>
+            </tuv>
+        </tu>
+<tu tuid="2" creationdate="20170323T152418Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">docname</prop>
+            <prop type="tmgr:context">context1</prop>
+            <tuv xml:lang="de">
+                <seg>Unser schönes 4 Segment</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Our nice 4 <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> segment 1</seg>
+            </tuv>
+        </tu>
+<tu tuid="2" creationdate="20170323T152428Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">docname</prop>
+            <prop type="tmgr:context">context2</prop>
+            <tuv xml:lang="de">
+                <seg>Unser schönes 4 Segment</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Our nice 4 <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> segment 1</seg>
+            </tuv>
+        </tu>
+<tu tuid="3" creationdate="20170323T152429Z" creationid="manager">
+            <prop type="tmgr:markup">OTMXUXLF</prop>
+            <prop type="tmgr:docname">docname2</prop>
+            <prop type="tmgr:context">context2</prop>
+            <tuv xml:lang="de">
+                <seg>Unser schönes 4 Segment</seg>
+            </tuv>
+            <tuv xml:lang="en">
+                <seg>Our nice 4 <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="10"/> segment 1</seg>
+            </tuv>
+        </tu>
+</body>
+</tmx>

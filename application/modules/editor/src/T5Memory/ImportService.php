@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;
 use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
@@ -41,7 +42,9 @@ use MittagQI\Translate5\T5Memory\Enum\ImportStatusEnum;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInErrorException;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInReorganizeException;
-use MittagQI\Translate5\T5Memory\Import\CutOffTmx;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
+use MittagQI\Translate5\TMX\ConcatTmx;
+use MittagQI\Translate5\TMX\CutOffTmx;
 use Psr\Http\Client\ClientExceptionInterface;
 use RuntimeException;
 use Zend_Config;
@@ -50,6 +53,8 @@ use ZfExtended_Logger;
 
 class ImportService
 {
+    private const MAX_RETRY_ATTEMPTS = 3;
+
     public function __construct(
         private readonly Zend_Config $config,
         private readonly ZfExtended_Logger $logger,
@@ -61,6 +66,9 @@ class ImportService
         private readonly RetryService $waitingService,
         private readonly WipeMemoryService $wipeMemoryService,
         private readonly CutOffTmx $cutOffTmx,
+        private readonly ConcatTmx $concatTmx,
+        private readonly EmptyMemoryCheck $emptyMemoryCheck,
+        private readonly ExportService $exportService,
     ) {
     }
 
@@ -77,71 +85,135 @@ class ImportService
             RetryService::create(),
             WipeMemoryService::create(),
             CutOffTmx::create(),
+            ConcatTmx::create(),
+            EmptyMemoryCheck::create(),
+            ExportService::create(),
         );
     }
 
     /**
+     * @param string[] $files
+     *
      * @throws ClientExceptionInterface
      * @throws Exception\UnableToCreateMemoryException
      * @throws ImportResultedInErrorException
      */
     public function importTmx(
         LanguageResource $languageResource,
-        iterable $files,
+        array $files,
         ImportOptions $importOptions,
-        ?string $tmName = null,
     ): void {
-        foreach ($files as $file) {
-            try {
-                $importFilename = $this->tmxImportPreprocessor->process(
-                    $file,
-                    (int) $languageResource->getSourceLang(),
-                    (int) $languageResource->getTargetLang(),
-                    $importOptions
-                );
-            } catch (RuntimeException $e) {
-                $this->logger->error(
-                    'E1590',
-                    'Conversion: Error in process of TMX file conversion',
-                    [
-                        'file' => $file,
-                        'reason' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                        'languageResource' => $languageResource,
-                    ]
-                );
-                $languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
-                $languageResource->save();
+        if (empty($files)) {
+            return;
+        }
 
+        $file = $files[0];
+
+        $hasNotEmptyMemory = $this->emptyMemoryCheck->hasNotEmptyMemory($languageResource);
+
+        if ($hasNotEmptyMemory) {
+            $exportedFile = $this->exportService->export($languageResource, TmFileExtension::TMX);
+
+            if (null === $exportedFile) {
+                throw new ImportResultedInErrorException('Cannot process current memory state for import.');
+            }
+
+            $files[] = $exportedFile;
+        }
+
+        if (count($files) > 1) {
+            $file = APPLICATION_DATA . '/TmxImportPreprocessing/concat_' . uniqid() . '.tmx';
+
+            $this->concatTmx->concat(
+                $files,
+                $file,
+                unprotect: false, // everything is unprotected either way
+            );
+        }
+
+        try {
+            $importFilename = $this->tmxImportPreprocessor->process(
+                $file,
+                (int) $languageResource->getSourceLang(),
+                (int) $languageResource->getTargetLang(),
+                $importOptions
+            );
+
+            if ($file !== $importFilename) {
+                @unlink($file);
+            }
+        } catch (RuntimeException $e) {
+            $this->logger->error(
+                'E1590',
+                'Conversion: Error in process of TMX file conversion',
+                [
+                    'file' => $file,
+                    'reason' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'languageResource' => $languageResource,
+                ]
+            );
+            $languageResource->setStatus(LanguageResourceStatus::NOTCHECKED);
+            $languageResource->save();
+
+            throw $e;
+        }
+
+        try {
+            $tmName = $this->persistenceService->getLastWritableMemory($languageResource);
+        } catch (\editor_Services_Connector_Exception $e) {
+            // If there is no writable memory (E1564), we create a new one
+            if (1564 !== $e->getCode()) {
                 throw $e;
             }
 
-            if (! $tmName) {
-                try {
-                    $tmName = $this->persistenceService->getLastWritableMemory($languageResource);
-                } catch (\editor_Services_Connector_Exception $e) {
-                    // If there is no writable memory (E1564), we create a new one
-                    if (1564 !== $e->getCode()) {
-                        throw $e;
-                    }
+            $tmName = null;
+        }
 
-                    $tmName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource);
-                    $this->persistenceService->addMemoryToLanguageResource($languageResource, $tmName);
-                }
-            }
+        $memoriesBackup = [];
 
+        if ($hasNotEmptyMemory) {
+            $memoriesBackup = $languageResource->getSpecificData('memories', true);
+
+            // Delete current memories
+            $languageResource->addSpecificData('memories', []);
+
+            $tmName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource, $tmName);
+            $this->persistenceService->addMemoryToLanguageResource($languageResource, $tmName);
+        }
+
+        if (null === $tmName) {
+            $tmName = $this->createMemoryService->createEmptyMemoryWithRetry($languageResource);
+            $this->persistenceService->addMemoryToLanguageResource($languageResource, $tmName);
+        }
+
+        try {
             $this->importTmxInMemory(
                 $languageResource,
                 $importFilename,
-                $tmName ?: $this->persistenceService->getWritableMemory($languageResource),
+                $tmName,
                 $importOptions,
             );
+        } catch (\Throwable $e) {
+            $languageResource->addSpecificData('memories', $memoriesBackup);
+            $languageResource->save();
 
-            unlink($importFilename);
+            throw $e;
+        }
+
+        @unlink($importFilename);
+
+        foreach ($memoriesBackup as $memory) {
+            $this->t5MemoryApi->deleteTm(
+                $languageResource->getResource()->getUrl(),
+                $this->persistenceService->addTmPrefix($memory['filename']),
+            );
         }
     }
 
     /**
+     * Raw TMX import without preprocessing.
+     *
      * @throws ClientExceptionInterface
      * @throws Exception\UnableToCreateMemoryException
      * @throws ImportResultedInErrorException
@@ -186,6 +258,7 @@ class ImportService
         string $importFilename,
         string $tmName,
         ImportOptions $importOptions,
+        int $tries = 0,
     ): void {
         $gotLock = false;
         $tmName = $this->persistenceService->addTmPrefix($tmName);
@@ -238,12 +311,25 @@ class ImportService
 
         switch ($status->status) {
             case ImportStatusEnum::Terminated:
-                $this->logger->warn('E1304', 't5memory: TMX import was terminated. Retrying.', [
+                if ($tries >= self::MAX_RETRY_ATTEMPTS) {
+                    $this->logger->error(
+                        'E1305',
+                        't5memory: TMX import was terminated maximum number of times',
+                        [
+                            'languageResource' => $languageResource,
+                            'apiError' => $status->getBody(),
+                        ]
+                    );
+
+                    throw new ImportResultedInErrorException();
+                }
+
+                $this->logger->info('E1304', 't5memory: TMX import was terminated. Retrying.', [
                     'languageResource' => $languageResource,
                     'apiError' => $status->getBody(),
                 ]);
 
-                $this->importTmxIntoMemory($languageResource, $importFilename, $tmName, $importOptions);
+                $this->importTmxIntoMemory($languageResource, $importFilename, $tmName, $importOptions, $tries + 1);
 
                 break;
 

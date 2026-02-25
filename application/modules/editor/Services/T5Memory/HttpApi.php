@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
-use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
+use MittagQI\Translate5\T5Memory\Enum\SearchMode;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 
 /**
@@ -54,26 +54,6 @@ class editor_Services_T5Memory_HttpApi extends editor_Services_Connector_HttpApi
     public function __construct()
     {
         $this->persistenceService = new PersistenceService(Zend_Registry::get('config'));
-    }
-
-    /**
-     * This method creates a new memory.
-     * @throws Zend_Exception
-     */
-    public function createEmptyMemory($memory, $sourceLanguage): ?string
-    {
-        $data = new stdClass();
-        $data->name = $this->persistenceService->addTmPrefix($memory);
-        $data->sourceLang = $sourceLanguage;
-
-        $http = $this->getHttp('POST');
-        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
-
-        if ($this->processResponse($http->request())) {
-            return $data->name;
-        }
-
-        return null;
     }
 
     /**
@@ -231,60 +211,6 @@ class editor_Services_T5Memory_HttpApi extends editor_Services_Connector_HttpApi
         return $this->processResponse($http->request());
     }
 
-    public function deleteBatch(
-        string $tmName,
-        SearchDTO $searchDTO,
-        bool $saveDifferentTargetsForSameSource,
-    ): bool {
-        $data = $this->getSearchData($searchDTO);
-        $data[UpdateOptions::SAVE_DIFFERENT_TARGETS_FOR_SAME_SOURCE] = $saveDifferentTargetsForSameSource ? '1' : '0';
-        $http = $this->getHttpWithMemory('POST', $tmName, '/entriesdelete');
-        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
-
-        return $this->processResponse($http->request());
-    }
-
-    /**
-     * This method updates (or adds) a memory proposal in the memory.
-     * Note: This method updates an existing proposal when a proposal with the same key information
-     * (source text, language, segment number, and document name) exists.
-     *
-     * @throws JsonException
-     * @throws Zend_Http_Client_Exception
-     */
-    public function update(
-        string $source,
-        string $target,
-        string $userName,
-        string $context,
-        string $timestamp,
-        string $filename,
-        string $tmName,
-        bool $saveDifferentTargetsForSameSource,
-        bool $save2disk = true,
-    ): bool {
-        $this->error = null;
-
-        $http = $this->getHttpWithMemory('POST', $tmName, 'entry');
-        $json = $this->getUpdateJson(__FUNCTION__, $source, $target);
-
-        if (null !== $this->error) {
-            return false;
-        }
-
-        $json->documentName = $filename; // 101 doc match
-        $json->author = $userName;
-        $json->timeStamp = $timestamp;
-        $json->context = $context; //INFO: this is segment stuff
-        // t5memory does not understand boolean parameters, so we have to convert them to 0/1
-        $json->save2disk = $save2disk ? '1' : '0';
-        $json->saveDifferentTargetsForSameSource = $saveDifferentTargetsForSameSource ? '1' : '0';
-
-        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
-
-        return $this->processResponse($http->request());
-    }
-
     /***
      * Update text values ($source/$target) to the current tm memory
      * @throws Zend_Http_Client_Exception
@@ -311,20 +237,6 @@ class editor_Services_T5Memory_HttpApi extends editor_Services_Connector_HttpApi
         $json->saveDifferentTargetsForSameSource = $saveDifferentTargetsForSameSource ? '1' : '0';
 
         $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
-
-        return $this->processResponse($http->request());
-    }
-
-    public function deleteEntry(string $tmName, int $segmentId, int $recordKey, int $targetKey): bool
-    {
-        $request = [
-            'recordKey' => $recordKey,
-            'targetKey' => $targetKey,
-            'segmentId' => $segmentId,
-        ];
-
-        $http = $this->getHttpWithMemory('POST', $tmName, 'entrydelete');
-        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -389,33 +301,35 @@ class editor_Services_T5Memory_HttpApi extends editor_Services_Connector_HttpApi
         return $json;
     }
 
-    private function getSearchData(SearchDTO $searchDTO, ?string $searchPosition = null, ?int $numResults = null): array
+    private function getSearchData(SearchDTO $dto, ?string $searchPosition = null, ?int $numResults = null): array
     {
         // Please note that "SENSETIVE" here is a typo in the t5memory API, so please do not change it to "SENSITIVE"
-        $caseSensitive = $searchDTO->caseSensitive ? 'CASESENSETIVE' : 'CASEINSENSETIVE';
-        $searchOptions = ', ' . $caseSensitive;
-
         return [
-            'source' => $searchDTO->source,
-            'sourceSearchMode' => $searchDTO->sourceMode . $searchOptions,
-            'target' => $searchDTO->target,
-            'targetSearchMode' => $searchDTO->targetMode . $searchOptions,
-            'sourceLang' => $searchDTO->sourceLanguage,
-            'targetLang' => $searchDTO->targetLanguage,
-            'document' => $searchDTO->document,
-            'documentSearchMode' => $searchDTO->documentMode . $searchOptions,
-            'author' => $searchDTO->author,
-            'authorSearchMode' => $searchDTO->authorMode . $searchOptions,
-            'addInfo' => $searchDTO->additionalInfo,
-            'addInfoSearchMode' => $searchDTO->additionalInfoMode . $searchOptions,
-            'context' => $searchDTO->context,
-            'contextSearchMode' => $searchDTO->contextMode . $searchOptions,
-            'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
-            'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
-            'onlyCountSegments' => $searchDTO->onlyCount ? '1' : '0',
+            'source' => $dto->source,
+            'sourceSearchMode' => $this->getSearchMode($dto->sourceMode, $dto->sourceCaseSensitive),
+            'target' => $dto->target,
+            'targetSearchMode' => $this->getSearchMode($dto->targetMode, $dto->targetCaseSensitive),
+            'sourceLang' => $dto->sourceLanguage,
+            'targetLang' => $dto->targetLanguage,
+            'document' => $dto->document,
+            'documentSearchMode' => $this->getSearchMode($dto->documentMode, $dto->documentCaseSensitive),
+            'author' => $dto->author,
+            'authorSearchMode' => $this->getSearchMode($dto->authorMode, $dto->authorCaseSensitive),
+            'addInfo' => $dto->additionalInfo,
+            'addInfoSearchMode' => $this->getSearchMode($dto->additionalInfoMode, $dto->additionalInfoCaseSensitive),
+            'context' => $dto->context,
+            'contextSearchMode' => $this->getSearchMode($dto->contextMode, $dto->contextCaseSensitive),
+            'timestampSpanStart' => gmdate(self::DATE_FORMAT, $dto->creationDateFrom),
+            'timestampSpanEnd' => gmdate(self::DATE_FORMAT, $dto->creationDateTo),
+            'onlyCountSegments' => $dto->onlyCount ? '1' : '0',
             'searchPosition' => (string) $searchPosition,
             'numResults' => $numResults,
         ];
+    }
+
+    private function getSearchMode(SearchMode $mode, bool $caseSensitive): string
+    {
+        return $mode->value . ', ' . ($caseSensitive ? 'CASESENSETIVE' : 'CASEINSENSETIVE');
     }
 
     /**

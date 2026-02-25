@@ -384,7 +384,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $shortcutNumberMapKey = $result;
 
             if (NumberProtector::isNumberTag($result)) {
-                $shortcutNumberMapKey = NumberProtector::getTagUniqueKey($result);
+                $shortcutNumberMapKey = NumberProtector::getTagComparisonKey($result);
             }
 
             if (! array_key_exists($shortcutNumberMapKey, $shortcutNumberMap)) {
@@ -853,7 +853,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * then.
      * @return string the generated tag as string
      */
-    public function makeAdditionalHtmlTag(int $shortTag, string $type = 'single'): string
+    public function makeAdditionalHtmlTag(int $shortTag, string $htmlTag, string $type = 'single'): string
     {
         $tag = match ($type) {
             'open' => empty($this->leftTag) ? $this->leftTag = ZfExtended_Factory::get(editor_ImageTag_Left::class) : $this->leftTag,
@@ -861,9 +861,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             default => empty($this->singleTag) ? $this->singleTag = ZfExtended_Factory::get(editor_ImageTag_Single::class) : $this->singleTag,
         };
 
+        preg_match('#original="([gxA-Fa-f0-9]*)"#U', $htmlTag, $tagMatch);
+        $originalTag = $htmlTag;
+        if (isset($tagMatch[1])) {
+            $originalTag = pack('H*', $tagMatch[1]);
+        }
+
         return $tag?->getHtmlTag([
-            'class' => self::IGNORE_CLASS,
-            'text' => '&lt;AdditionalTagFromTM/&gt;',
+            'class' => self::encodeTagContent($originalTag) . ' ' . self::IGNORE_CLASS,
+            'text' => 'AdditionalTagFromTM: ' . htmlspecialchars($originalTag, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
             'id' => self::IGNORE_ID_PREFIX . $shortTag,
             'shortTag' => $shortTag,
         ]);

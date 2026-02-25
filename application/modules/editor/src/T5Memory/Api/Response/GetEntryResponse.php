@@ -72,4 +72,19 @@ class GetEntryResponse extends AbstractResponse
     {
         return $this->getBody()['timestamp'] ?? '';
     }
+
+    public function getSegmentId(): int
+    {
+        return (int) ($this->getBody()['segmentId'] ?? 0);
+    }
+
+    public function getInternalKey(): string
+    {
+        return $this->getBody()['internalKey'] ?? '';
+    }
+
+    public function getAuthor(): string
+    {
+        return $this->getBody()['author'] ?? '';
+    }
 }

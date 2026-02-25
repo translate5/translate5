@@ -1,6 +1,8 @@
 includes:
 	- .phpstan/baseline.php
 parameters:
+	parallel:
+		processTimeout: 3600.0
 	universalObjectCratesClasses:
 		- Zend_Config
 		- Zend_View

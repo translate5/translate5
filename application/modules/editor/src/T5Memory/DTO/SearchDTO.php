@@ -26,30 +26,45 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
 namespace MittagQI\Translate5\T5Memory\DTO;
 
-class SearchDTO
+use MittagQI\Translate5\T5Memory\Enum\SearchMode;
+
+final readonly class SearchDTO
 {
+    public string $source;
+
+    public string $target;
+
     final public function __construct(
-        public readonly string $source,
-        public readonly string $sourceMode,
-        public readonly string $target,
-        public readonly string $targetMode,
-        public readonly string $sourceLanguage,
-        public readonly string $targetLanguage,
-        public readonly string $author,
-        public readonly string $authorMode,
-        public readonly int $creationDateFrom,
-        public readonly int $creationDateTo,
-        public readonly string $additionalInfo,
-        public readonly string $additionalInfoMode,
-        public readonly string $document,
-        public readonly string $documentMode,
-        public readonly string $context,
-        public readonly string $contextMode,
-        public readonly bool $onlyCount,
-        public readonly bool $caseSensitive,
+        string $source,
+        public SearchMode $sourceMode,
+        public bool $sourceCaseSensitive,
+        string $target,
+        public SearchMode $targetMode,
+        public bool $targetCaseSensitive,
+        public string $sourceLanguage,
+        public string $targetLanguage,
+        public string $author,
+        public SearchMode $authorMode,
+        public bool $authorCaseSensitive,
+        public int $creationDateFrom,
+        public int $creationDateTo,
+        public string $additionalInfo,
+        public SearchMode $additionalInfoMode,
+        public bool $additionalInfoCaseSensitive,
+        public string $document,
+        public SearchMode $documentMode,
+        public bool $documentCaseSensitive,
+        public string $context,
+        public SearchMode $contextMode,
+        public bool $contextCaseSensitive,
+        public bool $onlyCount,
     ) {
+        $this->source = preg_replace('/&(?!#?[a-zA-Z0-9]+;)/', '&amp;', $source);
+        $this->target = preg_replace('/&(?!#?[a-zA-Z0-9]+;)/', '&amp;', $target);
     }
 
     public static function fromArray(array $data): static
@@ -57,22 +72,61 @@ class SearchDTO
         return new static(
             $data['source'],
             $data['sourceMode'],
+            $data['caseSensitive'],
             $data['target'],
             $data['targetMode'],
+            $data['caseSensitive'],
             $data['sourceLanguage'],
             $data['targetLanguage'],
             $data['author'],
             $data['authorMode'],
+            $data['caseSensitive'],
             $data['creationDateFrom'],
             $data['creationDateTo'],
             $data['additionalInfo'],
             $data['additionalInfoMode'],
+            $data['caseSensitive'],
             $data['document'],
             $data['documentMode'],
+            $data['caseSensitive'],
             $data['context'],
             $data['contextMode'],
-            $data['onlyCount'],
             $data['caseSensitive'],
+            $data['onlyCount'],
+        );
+    }
+
+    public static function searchExactSegment(
+        string $source,
+        string $target,
+        string $author,
+        string $document,
+        string $context,
+    ): static {
+        return new static(
+            source: $source,
+            sourceMode: SearchMode::Exact,
+            sourceCaseSensitive: true,
+            target: $target,
+            targetMode: SearchMode::Exact,
+            targetCaseSensitive: true,
+            sourceLanguage: '',
+            targetLanguage: '',
+            author: $author,
+            authorMode: SearchMode::Exact,
+            authorCaseSensitive: false,
+            creationDateFrom: 0,
+            creationDateTo: time() + 86400,
+            additionalInfo: '',
+            additionalInfoMode: SearchMode::Contains,
+            additionalInfoCaseSensitive: false,
+            document: $document,
+            documentMode: SearchMode::Exact,
+            documentCaseSensitive: true,
+            context: $context,
+            contextMode: SearchMode::Exact,
+            contextCaseSensitive: true,
+            onlyCount: false,
         );
     }
 }

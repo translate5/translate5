@@ -86,6 +86,15 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
 
                         break;
                 }
+
+                $originalTag = implode(
+                    $this->xmlparserUnusableTags->getChunks(
+                        $opener['openerKey'],
+                        $opener['isSingle'] ? 1 : ($key - $opener['openerKey'] + 1)
+                    )
+                );
+                $originalTagContent = \editor_Models_Segment_InternalTag::encodeTagContent($originalTag);
+
                 $this->xmlparserUnusableTags->replaceChunk(
                     $opener['openerKey'],
                     '',
@@ -93,6 +102,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
                 );
 
                 $replace .= ' mid="additional-' . ($this->additionalTagCount++);
+                $replace .= '" original="' . $originalTagContent;
 
                 if ($tag === 'bpt' || $tag === 'ept') {
                     $replace .= '" rid="' . ($opener['attributes']['i'] ?? $this->additionalTagCount);
@@ -220,7 +230,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
                     $number = ++$shortTagNr;
                 }
 
-                return $this->utilities->internalTag->makeAdditionalHtmlTag($number, $type);
+                return $this->utilities->internalTag->makeAdditionalHtmlTag($number, $matches[0], $type);
             },
             $segment
         );

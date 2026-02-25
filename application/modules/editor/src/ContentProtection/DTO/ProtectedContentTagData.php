@@ -29,17 +29,22 @@ class ProtectedContentTagData
     {
         preg_match(NumberProtector::fullTagRegex(), $tag, $data);
 
-        if (count($data) < 6) {
-            throw new \InvalidArgumentException('Invalid protected content tag: ' . $tag);
+        return self::fromMatch($data);
+    }
+
+    public static function fromMatch(array $match): self
+    {
+        if (count($match) < 6) {
+            throw new \InvalidArgumentException('Invalid protected content tag: ' . $match[0]);
         }
 
         return new self(
-            $data[1],
-            $data[2],
-            $data[3],
-            $data[4],
-            $data[5],
-            $data[7] ?? null,
+            $match[1],
+            $match[2],
+            $match[3],
+            $match[4],
+            $match[5],
+            $match[7] ?? null,
         );
     }
 

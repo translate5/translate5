@@ -40,14 +40,14 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateExceptio
 use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Plugins\TMMaintenance\Exception\BatchDeleteException;
-use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
-use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
-use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
-use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\Plugins\TMMaintenance\TagHandler\T5MemoryXliff;
+use MittagQI\Translate5\Plugins\TMMaintenance\TagHandler\TagHandlerProvider;
+use MittagQI\Translate5\T5Memory\Api\Response\FindDTO;
+use MittagQI\Translate5\T5Memory\ConcordanceSearchService;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\PersistenceService;
-use MittagQI\Translate5\T5Memory\ReorganizeService;
+use MittagQI\Translate5\T5Memory\StatusService;
 use MittagQI\Translate5\T5Memory\UpdateRetryService;
 
 /**
@@ -71,13 +71,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
 
     private readonly ConvertT5MemoryTagServiceInterface $tmConversionService;
 
-    private readonly ReorganizeService $reorganizeService;
-
     private readonly UpdateRetryService $updateRetryService;
 
     private readonly PersistenceService $persistenceService;
 
-    private readonly T5MemoryApi $t5MemoryApi;
+    private readonly StatusService $statusService;
+
+    private readonly ConcordanceSearchService $concordanceSearchService;
 
     public function __construct()
     {
@@ -96,10 +96,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         \ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
         $this->t5MemoryConnector = new T5MemoryConnector();
         $this->tmConversionService = ConvertT5MemoryTagService::create();
-        $this->reorganizeService = ReorganizeService::create();
         $this->updateRetryService = UpdateRetryService::create();
         $this->persistenceService = PersistenceService::create();
-        $this->t5MemoryApi = T5MemoryApi::create();
+        $this->statusService = StatusService::create();
+        $this->concordanceSearchService = ConcordanceSearchService::createWithTagHandlerProvider(
+            TagHandlerProvider::create(),
+        );
 
         parent::__construct();
     }
@@ -154,7 +156,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
             $context,
             $timestamp,
             $fileName,
-            $memoryName,
         );
     }
 
@@ -163,105 +164,31 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
      * so this method was added to be able to update a memory entry without an SegmentModel
      */
     public function updateSegment(
-        int $memoryId,
-        int $segmentId,
-        int $segmentRecordKey,
-        int $segmentTargetKey,
         string $source,
         string $target,
         string $userName,
         string $context,
         int $timestamp,
         string $fileName,
-    ): void {
-        $memoryName = $this->getMemoryNameById($memoryId);
-
-        $this->assertMemoryAvailable($memoryName);
-
-        $successful = $this->api->getEntry($memoryName, $segmentRecordKey, $segmentTargetKey);
-
-        if (! $successful) {
-            throw new \editor_Services_Connector_Exception('E1611');
-        }
-
-        $result = $this->api->getResult();
-
-        if ($segmentId !== $result->segmentId) {
-            throw new \editor_Services_Connector_Exception('E1612');
-        }
-
-        $this->deleteEntry($memoryId, $segmentId, $segmentRecordKey, $segmentTargetKey);
-
+    ): FindDTO {
         $source = $this->tagHandler->prepareQuery($source);
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($target, false);
 
-        $this->updateSegmentInMemory(
+        return $this->updateSegmentInMemory(
             $source,
             $target,
             $userName,
             $context,
             $timestamp,
             $fileName,
-            $memoryName,
         );
-    }
-
-    public function deleteEntry(int $memoryId, int $segmentId, int $recordKey, int $targetKey): void
-    {
-        $memoryName = $this->getMemoryNameById($memoryId);
-
-        $this->assertMemoryAvailable($memoryName);
-
-        $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
-
-        $response = ApiResponse::fromContentAndStatus(
-            $this->api->getResponse()->getBody(),
-            $this->api->getResponse()->getStatus(),
-        );
-
-        if (
-            ! $successful
-            && $this->reorganizeService->needsReorganizing($response, $this->languageResource, $memoryName)
-        ) {
-            $saveDifferentTargetsForSameSource = (bool) $this->config
-                ->runtimeOptions
-                ->LanguageResources
-                ->t5memory
-                ->saveDifferentTargetsForSameSource;
-            $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
-
-            $this->reorganizeService->reorganizeTm($this->languageResource, $memoryName, $reorganizeOptions);
-
-            $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
-        }
-
-        if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-            $retries = 0;
-
-            while ($retries < $this->getMaxRequestRetries() && ! $successful) {
-                sleep($this->getRetryDelaySeconds());
-                $retries++;
-
-                $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
-            }
-        }
-
-        if (! $successful) {
-            throw new \editor_Services_Connector_Exception('E1688', [
-                'languageResource' => $this->languageResource,
-                'error' => $this->api->getError(),
-            ]);
-        }
     }
 
     public function deleteBatch(SearchDTO $dto): bool
     {
         try {
             TuBatchDeleteWorker::queueWorker($this->languageResource, $dto);
-
-            $this->languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
-            $this->languageResource->save();
         } catch (BatchDeleteException $e) {
             $this->logger->error(
                 'E1688',
@@ -301,204 +228,18 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         SearchDTO $searchDTO,
         int $amountOfResults = self::CONCORDANCE_SEARCH_NUM_RESULTS,
     ): \editor_Services_ServiceResult {
-        $offsetTmId = null;
-        $recordKey = null;
-        $targetKey = null;
-        $tmOffset = null;
-
-        if (null !== $offset) {
-            @[$offsetTmId, $recordKey, $targetKey] = explode(':', (string) $offset);
-        }
-
-        if ('' !== $offsetTmId && null === $recordKey && null === $targetKey) {
-            throw new \editor_Services_Connector_Exception('E1565', compact('offset'));
-        }
-
-        if (null !== $recordKey && null !== $targetKey) {
-            $tmOffset = $recordKey . ':' . $targetKey;
-        }
-
-        $isSource = $field === 'source';
-
-        $resultList = new \editor_Services_ServiceResult();
-        $resultList->setLanguageResource($this->languageResource);
-
-        $results = [];
-        $resultsCount = 0;
-
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-        $saveDifferentTargetsForSameSource = (bool) $this->config
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
-        $reorganizeOptions = new ReorganizeOptions($saveDifferentTargetsForSameSource);
-
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-        $ids = array_column($memories, 'id');
-
-        foreach ($memories as ['filename' => $tmName, 'id' => $id]) {
-            // check if current memory was searched through in prev request
-            if ('' !== $offsetTmId && $id < $offsetTmId) {
-                continue;
-            }
-
-            $this->assertMemoryAvailable($tmName);
-
-            $segmentIdsGenerated = $this->areSegmentIdsGenerated($tmName);
-            $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
-
-            $response = ApiResponse::fromContentAndStatus(
-                $this->api->getResponse()->getBody(),
-                $this->api->getResponse()->getStatus(),
-            );
-
-            if (
-                (! $segmentIdsGenerated && ! $this->isMemoryEmpty($this->languageResource, $tmName))
-                || $this->reorganizeService->needsReorganizing($response, $this->languageResource, $tmName)
-            ) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
-
-                $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
-            }
-
-            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $retries = 0;
-
-                while ($retries < $this->getMaxRequestRetries() && ! $successful) {
-                    sleep($this->getRetryDelaySeconds());
-                    $retries++;
-
-                    $successful = $this->api->search($tmName, $tmOffset, $amountOfResults, $searchDTO);
-                }
-            }
-
-            if (! $successful) {
-                $this->logger->exception($this->getBadGatewayException($tmName));
-
-                continue;
-            }
-
-            // In case we have at least one successful search, we reset the reorganize attempts
-            $this->reorganizeService->resetReorganizeAttempts($this->languageResource, $tmName);
-
-            /** @var ?object{results: array, NewSearchPosition: string} $result */
-            $result = $this->api->getResult();
-
-            if (empty($result) || empty($result->results)) {
-                // Reset the TM offset to start from the beginning of the next TM
-                $tmOffset = null;
-
-                continue;
-            }
-
-            if (in_array(0, array_column($result->results, 'segmentId'), true)) {
-                $this->reorganizeService->reorganizeTm($this->languageResource, $tmName, $reorganizeOptions);
-            }
-
-            $data = array_map(
-                static function ($item) use ($id) {
-                    $item->internalKey = $id . ':' . $item->internalKey;
-
-                    return $item;
-                },
-                $result->results
-            );
-            $results[] = $data;
-            $resultsCount += count($result->results);
-            $nextOffset = $result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null;
-
-            // If there is no search position in the result, and there is next memory
-            // we need to set the next offset to the next memory
-            if (! $nextOffset && $id < max($ids)) {
-                $filtered = array_filter($ids, static fn ($num) => $num > $id);
-                $nextOffset = reset($filtered) . ':1:1';
-            }
-
-            $resultList->setNextOffset($nextOffset);
-
-            // if we get enough results then response them
-            /** @var int $resultsCount */
-            if ($amountOfResults <= $resultsCount) {
-                break;
-            }
-        }
-
-        $results = array_merge(...$results);
-
-        if (empty($results)) {
-            $resultList->setNextOffset(null);
-
-            return $resultList;
-        }
-
-        $this->tagHandler->setQuerySegment($searchString);
-
-        foreach ($results as $result) {
-            $resultList->addResult(
-                $this->tagHandler->restoreInResult($result->target, $isSource),
-                0,
-                $this->getMetaData($result)
-            );
-            $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource));
-        }
-
-        return $resultList;
-    }
-
-    private function isMemoryEmpty(LanguageResource $languageResource, string $tmName): bool
-    {
-        $response = $this->t5MemoryApi->downloadTmx(
-            $languageResource->getResource()->getUrl(),
-            $this->persistenceService->addTmPrefix($tmName),
-            1
+        return $this->concordanceSearchService->query(
+            $this->languageResource,
+            $searchDTO,
+            $offset,
+            $this->getConfig(),
+            $amountOfResults,
         );
-
-        foreach ($response as $stream) {
-            $content = $stream->getContents();
-
-            if (str_contains($content, '<tu ')) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public function countSegments(SearchDTO $searchDTO): int
     {
-        $amount = 0;
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        foreach ($memories as ['filename' => $tmName]) {
-            $this->assertMemoryAvailable($tmName);
-
-            $successful = $this->api->search($tmName, '', 0, $searchDTO);
-
-            if (! $successful && $this->isLockingTimeoutOccurred($this->api->getError())) {
-                $retries = 0;
-
-                while ($retries < $this->getMaxRequestRetries() && ! $successful) {
-                    sleep($this->getRetryDelaySeconds());
-                    $retries++;
-
-                    $successful = $this->api->search($tmName, '', 0, $searchDTO);
-                }
-            }
-
-            $result = $this->api->getResult();
-
-            if (empty($result->NumOfFoundSegments)) {
-                $this->logger->exception($this->getBadGatewayException($tmName));
-
-                continue;
-            }
-
-            $amount += $result->NumOfFoundSegments;
-        }
-
-        return $amount;
+        return $this->concordanceSearchService->countSegments($this->languageResource, $searchDTO, $this->getConfig());
     }
 
     /***
@@ -517,28 +258,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         LanguageResource $languageResource = null,
         ?string $tmName = null,
     ): string {
-        if ($this->languageResource->isConversionStarted()) {
-            return LanguageResourceStatus::CONVERTING;
-        }
-
-        if ($this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS) {
-            return LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-        }
-
-        if ($tmName) {
-            return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
-        }
-
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-        foreach ($memories as ['filename' => $name]) {
-            $status = $this->t5MemoryConnector->getStatus($resource, $languageResource, $name);
-
-            if ($status !== LanguageResourceStatus::AVAILABLE) {
-                return $status;
-            }
-        }
-
-        return LanguageResourceStatus::AVAILABLE;
+        return $this->statusService->getStatus($this->languageResource, $tmName);
     }
 
     private function updateSegmentInMemory(
@@ -548,8 +268,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         string $context,
         int $timestamp,
         string $fileName,
-        string $memoryName,
-    ): void {
+    ): FindDTO {
         [$source, $target] = $this->tmConversionService->convertPair(
             $source,
             $target,
@@ -579,9 +298,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         );
 
         try {
-            $this->updateRetryService->updateWithRetryInMemory(
+            return $this->updateRetryService->updateWithRetry(
                 $this->languageResource,
-                $memoryName,
                 $dto,
                 $options,
                 $this->getConfig(),
@@ -596,114 +314,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
         }
     }
 
-    private function isLockingTimeoutOccurred(?object $error): bool
-    {
-        if (null === $error) {
-            return false;
-        }
-
-        return $error->returnValue === 506;
-    }
-
-    /**
-     * Helper function to get the metadata which should be shown in the GUI out of a single result
-     *
-     * @return \stdClass[]
-     */
-    private function getMetaData(object $found): array
-    {
-        $nameToShow = [
-            'segmentId',
-            'documentName',
-            'matchType',
-            'author',
-            'timestamp',
-            'context',
-            'additionalInfo',
-            'internalKey',
-            'sourceLang',
-            'targetLang',
-        ];
-        $result = [];
-
-        foreach ($nameToShow as $name) {
-            if (property_exists($found, $name)) {
-                $item = new \stdClass();
-                $item->name = $name;
-                $item->value = $found->{$name};
-                if ($name === 'timestamp') {
-                    // if date before unix time provided in TMX t5memory will not save time at all.
-                    // and later that will result in lots of issues on our side.
-                    // so we preserve segments but mark them as old as who knows how valid they actually are
-                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value) ?: 0);
-                }
-                $result[] = $item;
-            }
-        }
-
-        return $result;
-    }
-
-    private function getBadGatewayException(string $tmName = ''): \editor_Services_Connector_Exception
-    {
-        $ecode = 'E1313';
-        $error = $this->api->getError();
-        $data = [
-            'service' => $this->getResource()->getName(),
-            'languageResource' => $this->languageResource ?? '',
-            'tmName' => $tmName,
-            'error' => $error,
-        ];
-        if (strpos($error->error ?? '', 'needs to be organized') !== false) {
-            $ecode = 'E1314';
-            $data['tm'] = $this->languageResource->getName();
-        }
-
-        if (strpos($error->error ?? '', 'too many open translation memory databases') !== false) {
-            $ecode = 'E1333';
-        }
-
-        return new \editor_Services_Connector_Exception($ecode, $data);
-    }
-
-    // Need to move this region to a dedicated class while refactoring connector
-    private function getMemoryNameById(int $memoryId): ?string
-    {
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-
-        foreach ($memories as $memory) {
-            if ($memory['id'] === $memoryId) {
-                return $memory['filename'];
-            }
-        }
-
-        // TODO add error code
-        throw new \editor_Services_Connector_Exception('E1564', [
-            'name' => $this->languageResource->getName(),
-        ]);
-    }
-
-    private function areSegmentIdsGenerated(string $tmName): bool
-    {
-        $successful = $this->api->status($tmName);
-
-        if (! $successful) {
-            return false;
-        }
-
-        $result = $this->api->getResult();
-
-        if (! isset($result->segmentIndex)) {
-            // This means memory is not loaded into RAM
-            // So call for a fake segment to force t5memory to load memory into RAM and call for status again
-            $this->api->getEntry($tmName, 7, 1);
-            $this->api->status($tmName);
-            $result = $this->api->getResult();
-        }
-
-        return $result->segmentIndex > 0;
-    }
-
     private function assertMemoryAvailable(string $memoryName): void
     {
         $status = $this->getStatus($this->resource, $this->languageResource, $memoryName);
@@ -714,15 +324,5 @@ class MaintenanceService extends \editor_Services_Connector_Abstract
                 'status' => $status,
             ]);
         }
-    }
-
-    protected function getMaxRequestRetries(): int
-    {
-        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestMaxRetries;
-    }
-
-    protected function getRetryDelaySeconds(): int
-    {
-        return (int) $this->config->runtimeOptions->LanguageResources->t5memory->requestRetryDelaySeconds;
     }
 }

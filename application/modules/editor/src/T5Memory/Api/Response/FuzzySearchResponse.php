@@ -35,7 +35,16 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 
 class FuzzySearchResponse extends AbstractResponse
 {
-    public static function fromResponse(PsrResponseInterface $response): self
+    public function __construct(
+        public readonly string $tmName,
+        array $body,
+        ?string $errorMessage,
+        int $statusCode,
+    ) {
+        parent::__construct($body, $errorMessage, $statusCode);
+    }
+
+    public static function fromResponse(PsrResponseInterface $response, string $tmName): self
     {
         $content = self::getContent($response);
         $errorMsg = null;
@@ -52,6 +61,7 @@ class FuzzySearchResponse extends AbstractResponse
         }
 
         return new self(
+            $tmName,
             $body,
             $errorMsg,
             $response->getStatusCode(),
@@ -64,7 +74,9 @@ class FuzzySearchResponse extends AbstractResponse
     public function getMatches(): array
     {
         return array_map(
-            static fn (array $item): MatchDTO => MatchDTO::fromArray($item),
+            fn (array $item): MatchDTO => MatchDTO::fromArray(array_merge($item, [
+                'tmName' => $this->tmName,
+            ])),
             $this->getBody()['results'] ?? []
         );
     }

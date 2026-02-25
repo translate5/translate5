@@ -38,8 +38,10 @@ use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Segment\TagRepair\Xliff\GuessExtraTags;
 use MittagQI\Translate5\Segment\TagRepair\Xliff\XliffTagRepairer;
 use MittagQI\Translate5\T5Memory\ContentProtection\DiffProtector;
+use MittagQI\Translate5\T5Memory\Contract\TagHandlerInterface;
+use MittagQI\Translate5\T5Memory\TMX\CharacterReplacer;
 
-class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
+class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff implements TagHandlerInterface
 {
     protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g><number>';
 
@@ -48,11 +50,21 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
     private readonly ConvertT5MemoryTagServiceInterface $conversionService;
 
     /**
-     * @var array<string, array<string, \SplQueue<int>>>
+     * @var array<string, array<string, array{ids: \SplQueue<int>, protectedContent: array<string, int[]>}>>
+     *     [
+     *         'abc' => [
+     *             '<number type="integer" name="default simple" source="10" iso="10" target="10" regex="09eIKa6Jq4n" key="abc"/>' => [
+     *                 'ids' => \SplQueue<int>, queue of tag ids in order of appearance
+     *                 'protectedContent' => [
+     *                    '10' => [1], 10 is protected content, [1] are the tag ids that protect this content (enqueued above)
+     *                 ]
+     *             ]
+     *         ]
+     *     ]
      */
     private array $contentProtectionTagMap = [];
 
-    private readonly ContentProtectionRepository $contentProtectionRepository;
+    protected readonly ContentProtectionRepository $contentProtectionRepository;
 
     private readonly NumberProtectorProvider $numberProtectorProvider;
 
@@ -60,7 +72,11 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     private readonly LanguageRepository $languageRepository;
 
+    private readonly CharacterReplacer $characterReplacer;
+
     private Zend_Config $config;
+
+    private readonly XliffTagRepairer $guessTagRepairer;
 
     public function __construct(array $options = [])
     {
@@ -71,7 +87,9 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         $this->numberProtectorProvider = NumberProtectorProvider::create();
         $this->diffProtector = DiffProtector::create();
         $this->languageRepository = LanguageRepository::create();
+        $this->characterReplacer = CharacterReplacer::create();
         $this->config = \Zend_Registry::get('config');
+        $this->guessTagRepairer = XliffTagRepairer::createWithRepairers([new GuessExtraTags()]);
     }
 
     /**
@@ -92,8 +110,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
         if ($this->config->runtimeOptions->LanguageResources->t5memory->guessUnrecognizedTagsFromTm ?? false) {
             $resultString = strip_tags($this->replaceTagsWithContent($resultString), self::ALLOWED_TAGS);
-            $tagRepair = XliffTagRepairer::createWithRepairers([new GuessExtraTags()]);
-            $resultString = $tagRepair->repairTranslation($this->getQuerySegment(), $resultString);
+            $resultString = $this->guessTagRepairer->repairTranslation($this->getQuerySegment(), $resultString);
         }
 
         $resultString = parent::restoreInResult($resultString, $isSource);
@@ -134,13 +151,14 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         ?editor_Models_Languages $targetLang,
         array $skippedTags = [],
     ): string {
+        $resultString = $this->characterReplacer->revertToInvalidXmlCharacters($resultString);
+
         $t5nTagRegex = T5NTag::fullTagRegex();
 
         if (! preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
             return $resultString;
         }
 
-        $protectionDtos = [];
         $contentProtectionTags = [];
 
         foreach ($matches as $match) {
@@ -203,46 +221,84 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                 }
             }
 
-            foreach ($tags as ['tag' => $tag, 'render' => $render]) {
-                if (null === $sourceLang || null === $targetLang) {
-                    // no language found, so we just unprotect the content
-                    $resultString = str_replace($render, $tag->content, $resultString);
-
-                    continue;
-                }
-
-                if (! isset($protectionDtos[$rule])) {
-                    $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
-
-                    $protectionDtos[$rule] = null === $recognition
-                        ? ContentProtectionDto::fake(
-                            DiffProtector::getType(),
-                            'Missing rule - in TM only',
-                            $tag->getRegex(),
-                        )
-                        : ContentProtectionDto::fake(
-                            $recognition->getType(),
-                            $recognition->getName() . ' - in TM only',
-                            $recognition->getRegex(),
-                        );
-                }
-
-                $dto = $protectionDtos[$rule];
-
-                $resultString = str_replace(
-                    $render,
-                    $this->getProtector($dto->type)->protect(
-                        $tag->content,
-                        $dto,
-                        $sourceLang,
-                        $targetLang,
-                    ),
-                    $resultString
-                );
-            }
+            $resultString = $this->restoreTmOnlyProtectionTags($tags, $sourceLang, $targetLang, $resultString, $rule);
         }
 
         return $resultString;
+    }
+
+    /**
+     * @param array{tag: T5NTag, render: string}[] $tags
+     * @throws \MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException
+     */
+    protected function restoreTmOnlyProtectionTags(
+        array $tags,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+        mixed $resultString,
+        string $rule
+    ): string {
+        $protectionDtos = [];
+
+        foreach ($tags as ['tag' => $tag, 'render' => $render]) {
+            if (null === $sourceLang || null === $targetLang) {
+                // no language found, so we just unprotect the content
+                $resultString = str_replace($render, $tag->content, $resultString);
+
+                continue;
+            }
+
+            $dto = $this->getProtectionDto($protectionDtos, $rule, $tag);
+
+            $resultString = str_replace(
+                $render,
+                $this->getProtector($dto->type)->protect(
+                    $tag->content,
+                    $dto,
+                    $sourceLang,
+                    $targetLang,
+                ),
+                $resultString
+            );
+        }
+
+        return $resultString;
+    }
+
+    protected function getProtectionDto(array &$protectionDtos, string $rule, T5NTag $tag): ContentProtectionDto
+    {
+        if (! isset($protectionDtos[$rule])) {
+            $foundWithKey = true;
+            $recognition = $this->contentProtectionRepository->findRecognitionByKey($tag->rule);
+
+            if (null === $recognition) {
+                $foundWithKey = false;
+                $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
+            }
+
+            $fakeDto = $foundWithKey
+                ? ContentProtectionDto::fakeKey(
+                    DiffProtector::getType(),
+                    'Missing rule - in TM only',
+                    $tag->getRegex(),
+                )
+                : ContentProtectionDto::fakeRegex(
+                    DiffProtector::getType(),
+                    'Missing rule - in TM only',
+                    $tag->rule,
+                );
+
+            $protectionDtos[$rule] = null === $recognition
+                ? $fakeDto
+                : ContentProtectionDto::dummy(
+                    $recognition->getType(),
+                    $recognition->getName() . ' - in TM only',
+                    $recognition->getRegex(),
+                    $recognition->getKey(),
+                );
+        }
+
+        return $protectionDtos[$rule];
     }
 
     protected function convertQuery(string $queryString, bool $isSource): string

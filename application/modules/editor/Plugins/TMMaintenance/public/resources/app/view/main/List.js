@@ -96,11 +96,15 @@ Ext.define('TMMaintenance.view.main.List', {
             bind: {
                 text: '{l10n.list.columns.actions}',
             },
+            align: 'center',
             cell: {
                 bind: {
                     hidden: '{!record.metaData.internalKey}'
                 },
                 userCls: 'editor-tools',
+                toolDefaults: {
+                    margin: '0 8 10 0',
+                },
                 tools: {
                     delete: {
                         iconCls: 'x-fa fa-trash-alt',
@@ -183,6 +187,24 @@ Ext.define('TMMaintenance.view.main.List', {
                             tooltip: '{l10n.list.closeGoToNext}',
                         },
                     },
+                    deleteBySource: {
+                        iconCls: 'icon delete-by-same-source',
+                        handler: 'onDeleteBy',
+                        type: 'same-source',
+                        bind: {
+                            hidden: '{record.isEditing}',
+                            tooltip: '{l10n.list.deleteBySource}',
+                        },
+                    },
+                    deleteBySourceAndTarget: {
+                        iconCls: 'icon delete-by-same-source-and-target',
+                        handler: 'onDeleteBy',
+                        type: 'same-source-and-target',
+                        bind: {
+                            hidden: '{record.isEditing}',
+                            tooltip: '{l10n.list.deleteBySourceAndTarget}',
+                        },
+                    },
                 },
             },
         },
@@ -232,9 +254,19 @@ Ext.define('TMMaintenance.view.main.List', {
             groupable: false,
         },
         {
+            tpl: '{metaData.context}',
+            xtype: 'templatecolumn',
+            flex: 1,
+            bind: {
+                text: '{l10n.list.columns.context}',
+            },
+            groupable: false,
+        },
+        {
             tpl: '{metaData.additionalInfo}',
             xtype: 'templatecolumn',
             flex: 1,
+            hidden: true,
             bind: {
                 text: '{l10n.list.columns.additionalInfo}',
             },

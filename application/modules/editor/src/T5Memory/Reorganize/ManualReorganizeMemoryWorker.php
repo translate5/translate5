@@ -32,9 +32,11 @@ namespace MittagQI\Translate5\T5Memory\Reorganize;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
+use MittagQI\Translate5\Integration\ActionLockService;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Exception\ScheduleWorkerException;
 use Zend_Registry;
 use ZfExtended_Factory;
@@ -42,10 +44,16 @@ use ZfExtended_Worker_Abstract;
 
 class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
 {
+    private readonly ActionLockService $actionLockService;
+
+    private readonly LanguageResourceRepository $languageResourceRepository;
+
     public function __construct()
     {
         parent::__construct();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.languageResource.tm.reorganize');
+        $this->actionLockService = ActionLockService::create();
+        $this->languageResourceRepository = LanguageResourceRepository::create();
     }
 
     public static function queueWorker(LanguageResource $languageResource, string $tmName, bool $isInternalFuzzy): int
@@ -83,7 +91,7 @@ class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
-        $languageResource = LanguageResourceRepository::create()->get((int) $params['languageResourceId']);
+        $languageResource = $this->languageResourceRepository->get((int) $params['languageResourceId']);
 
         if (editor_Services_Manager::SERVICE_T5_MEMORY !== $languageResource->getServiceType()) {
             $languageResource->setStatus(Status::AVAILABLE);
@@ -94,20 +102,36 @@ class ManualReorganizeMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        $reorganizeService = ManualReorganizeService::create();
+        $lock = $this->actionLockService->getWriteLock($languageResource->getLangResUuid());
 
-        $saveDifferentTargetsForSameSource = (bool) Zend_Registry::get('config')
-            ->runtimeOptions
-            ->LanguageResources
-            ->t5memory
-            ->saveDifferentTargetsForSameSource;
+        if (! $lock->acquire(true)) {
+            $this->log->error(
+                'E1377',
+                'ManualReorganizeMemoryWorker: Can not acquire lock for language resource with id ' . $languageResource->getId(),
+                [
+                    'languageResource' => $languageResource,
+                ]
+            );
+
+            return false;
+        }
+
+        // language resource might have been updated while waiting for the lock,
+        // so we have to get fresh one to ensure we have the latest data and status
+        $languageResource = $this->languageResourceRepository->get((int) $params['languageResourceId']);
+
+        $reorganizeService = ManualReorganizeService::create();
 
         $reorganizeService->reorganizeTm(
             $languageResource,
             $params['tmName'],
-            new ReorganizeOptions($saveDifferentTargetsForSameSource),
+            new ReorganizeOptions(
+                TmxFilterOptions::fromConfig(Zend_Registry::get('config')),
+            ),
             (bool) $params['isInternalFuzzy'],
         );
+
+        $lock->release();
 
         return true;
     }

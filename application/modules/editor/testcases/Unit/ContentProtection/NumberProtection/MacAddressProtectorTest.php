@@ -76,11 +76,12 @@ class MacAddressProtectorTest extends TestCase
             '',
             true,
             null,
-            1
+            1,
+            'aaa',
         );
 
         self::assertSame(
-            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="aa:bb:cc:11:22:33" target="aa:bb:cc:11:22:33" regex="AwA="/>',
+            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="aa:bb:cc:11:22:33" target="aa:bb:cc:11:22:33" regex="AwA=" key="aaa"/>',
             (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, $sourceLang, $targetLang)
         );
     }

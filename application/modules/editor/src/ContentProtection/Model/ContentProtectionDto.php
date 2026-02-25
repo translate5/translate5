@@ -52,26 +52,18 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\Model;
 
-/**
- * @property-read string $type
- * @property-read string $name
- * @property-read string $regex
- * @property-read int $matchId
- * @property-read ?string $format
- * @property-read bool $keepAsIs
- * @property-read int $priority
- */
 class ContentProtectionDto
 {
     public function __construct(
-        public string $type,
-        public string $name,
-        public string $regex,
-        public int $matchId,
-        public ?string $format,
-        public bool $keepAsIs,
-        public ?string $outputFormat,
-        public int $priority,
+        public readonly string $type,
+        public readonly string $name,
+        public readonly string $regex,
+        public readonly int $matchId,
+        public readonly ?string $format,
+        public readonly bool $keepAsIs,
+        public readonly ?string $outputFormat,
+        public readonly int $priority,
+        public readonly string $key,
     ) {
     }
 
@@ -86,10 +78,11 @@ class ContentProtectionDto
             (bool) $row['keepAsIs'],
             $row['outputFormat'] ?? null,
             (int) $row['priority'],
+            $row['key'] ?? '',
         );
     }
 
-    public static function fake(string $type, string $name, string $regex): self
+    public static function fakeKey(string $type, string $name, string $regex): self
     {
         return new self(
             $type,
@@ -100,6 +93,37 @@ class ContentProtectionDto
             true,
             null,
             1,
+            'fake_' . $type,
+        );
+    }
+
+    public static function fakeRegex(string $type, string $name, string $key): self
+    {
+        return new self(
+            $type,
+            $name,
+            'fake_' . $type,
+            0,
+            null,
+            true,
+            null,
+            1,
+            $key,
+        );
+    }
+
+    public static function dummy(string $type, string $name, string $regex, string $key): self
+    {
+        return new self(
+            $type,
+            $name,
+            $regex,
+            0,
+            null,
+            true,
+            null,
+            1,
+            $key,
         );
     }
 }

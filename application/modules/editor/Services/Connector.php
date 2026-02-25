@@ -204,7 +204,7 @@ class editor_Services_Connector implements ExportAdapterInterface
      * Invoke the query resource action so the MT logger can be used
      * @throws ReflectionException
      */
-    protected function _query(editor_Models_Segment $segment): editor_Services_ServiceResult
+    protected function _query(editor_Models_Segment $segment, ...$args): editor_Services_ServiceResult
     {
         $this->queryDurationLogger->startQuery();
         $isBatchRequest = $this->batchEnabled && $this->adapter->isBatchQuery();
@@ -212,7 +212,7 @@ class editor_Services_Connector implements ExportAdapterInterface
         if ($isBatchRequest) {
             $serviceResult = $this->getCachedResult($segment);
         } else {
-            $serviceResult = $this->adapter->query($segment);
+            $serviceResult = $this->adapter->query($segment, ...$args);
         }
         $this->queryDurationLogger->stopQuery($isBatchRequest);
         //log the MT ussage when there are mt results

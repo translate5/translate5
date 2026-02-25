@@ -33,7 +33,9 @@ namespace MittagQI\Translate5\LanguageResource\ReimportSegments;
 use DateTimeImmutable;
 use editor_Models_Task_AbstractWorker;
 use MittagQI\Translate5\LanguageResource\ReimportSegments\Action\ReimportSnapshot;
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
+use MittagQI\Translate5\T5Memory\StatusService;
 use Throwable;
 use ZfExtended_ErrorCodeException;
 
@@ -47,6 +49,8 @@ class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
 
     private ReimportSegmentsQueue $reimportSegmentsQueue;
 
+    private StatusService $statusService;
+
     public function __construct()
     {
         parent::__construct();
@@ -54,6 +58,7 @@ class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         $this->languageResourceRepository = new LanguageResourceRepository();
         $this->loggerProvider = new ReimportSegmentsLoggerProvider();
         $this->reimportSegmentsQueue = new ReimportSegmentsQueue();
+        $this->statusService = StatusService::create();
     }
 
     protected function validateParameters(array $parameters): bool
@@ -69,6 +74,19 @@ class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         $currentRun = $params['currentRun'] ?? 0;
         $segmentsToImport = $params['reimportOnlyIds'] ?? [];
 
+        if ($this->shouldWait($languageResourceId)) {
+            $this->reimportSegmentsQueue->queueReimportDelayed(
+                $this->task->getTaskGuid(),
+                $languageResourceId,
+                $runId,
+                $currentRun,
+                new DateTimeImmutable('+ 15 minutes'),
+                $segmentsToImport,
+            );
+
+            return true;
+        }
+
         $result = ReimportSnapshot::create()->reimport($this->task, $runId, $languageResourceId, $segmentsToImport);
 
         if (! empty($result->failedSegmentIds) && $currentRun < self::MAX_RETRIES) {
@@ -83,6 +101,20 @@ class ReimportSegmentsWorker extends editor_Models_Task_AbstractWorker
         }
 
         return true;
+    }
+
+    private function shouldWait(int $languageResourceId): bool
+    {
+        $languageResource = $this->languageResourceRepository->get($languageResourceId);
+
+        $waitStatuses = [
+            Status::IMPORT,
+            Status::REORGANIZE_IN_PROGRESS,
+        ];
+
+        $status = $this->statusService->getStatus($languageResource);
+
+        return in_array($status, $waitStatuses, true);
     }
 
     protected function handleWorkerException(Throwable $workException): void

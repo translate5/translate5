@@ -66,6 +66,8 @@ class ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest extends Tes
 
     private LanguageResource $languageResource;
 
+    private string $copy = __DIR__ . '/ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest/Test_TM_COPY.tmx';
+
     /**
      * @var string[]
      */
@@ -76,9 +78,10 @@ class ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest extends Tes
         $this->languageResource = new LanguageResource();
         $className = explode('\\', static::class);
         $className = array_pop($className);
-        $this->languageResource->setName($className);
+        $this->languageResource->setName($className . '_' . uniqid());
         $this->languageResource->setResourceId('editor_Services_T5Memory_1');
         $this->languageResource->setResourceType('tm');
+        $this->languageResource->createLangResUuid();
         $this->languageResource->setServiceType('editor_Services_T5Memory');
         $this->languageResource->setServiceName(editor_Services_T5Memory_Service::NAME);
         $this->languageResource->save();
@@ -111,29 +114,30 @@ class ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest extends Tes
 
     public function tearDown(): void
     {
+        @unlink($this->copy);
+
+        $this->languageResource->delete();
+
         foreach ($this->memoriesToDelete as $memory) {
             if (! $this->connector->deleteMemory($memory)) {
                 self::fail('Could not delete memory: ' . $memory);
             }
         }
-
-        $this->languageResource->delete();
     }
 
     public function test(): void
     {
         $tmFilename = __DIR__ . '/ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest/Test_TM.tmx';
-        $copy = __DIR__ . '/ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest/Test_TM_COPY.tmx';
 
         // file will be deleted in addTm call
-        copy($tmFilename, $copy);
+        copy($tmFilename, $this->copy);
 
         $mime = $this->connector->getValidExportTypes()['TMX'];
 
         $fileinfo = [
-            'tmp_name' => $copy,
+            'tmp_name' => $this->copy,
             'type' => $mime,
-            'name' => basename($copy),
+            'name' => basename($this->copy),
         ];
 
         // add the TM first time to store name in t5memory
@@ -155,7 +159,7 @@ class ConnectorCreatesNextTmIfCurrentNameAlreadyExistsInT5MemoryTest extends Tes
         $this->languageResource->addSpecificData('memories', []);
         $this->languageResource->save();
 
-        copy($tmFilename, $copy);
+        copy($tmFilename, $this->copy);
 
         self::assertTrue($this->connector->addTm($fileinfo, [
             'createNewMemory' => true,

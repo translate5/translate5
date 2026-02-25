@@ -45,6 +45,7 @@ class UpdateOptions
         public readonly bool $saveToDisk,
         public readonly bool $saveDifferentTargetsForSameSource,
         public readonly bool $recheckOnUpdate,
+        public readonly bool $isInternalFuzzy = false,
     ) {
     }
 

@@ -82,6 +82,7 @@ class IsLanguageResourceHasEmptyMemoryTest extends TestCase
         $this->languageResource->setName($className);
         $this->languageResource->setResourceId('editor_Services_T5Memory_1');
         $this->languageResource->setResourceType('tm');
+        $this->languageResource->createLangResUuid();
         $this->languageResource->setServiceType('editor_Services_T5Memory');
         $this->languageResource->setServiceName(editor_Services_T5Memory_Service::NAME);
         $this->languageResource->save();
@@ -122,14 +123,13 @@ class IsLanguageResourceHasEmptyMemoryTest extends TestCase
 
     public function tearDown(): void
     {
+        $this->languageResource->delete();
+
         if ($this->t5memoryName) {
             if (! $this->connector->deleteMemory($this->t5memoryName)) {
                 self::fail('Could not delete memory: ' . $this->t5memoryName);
             }
         }
-
-        $this->languageResource->delete();
-        $this->languageResource->delete();
     }
 
     public function test(): void

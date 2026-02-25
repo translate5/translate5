@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace LanguageResource\ReimportSegments\Action;
+namespace MittagQI\Translate5\Test\Unit\LanguageResource\ReimportSegments\Action;
 
 use DateTimeImmutable;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;

@@ -127,7 +127,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				  let tooltip = '';
 
 				  if ('not-converted' === record.get('tmConversionState')) {
-					  className = 'ico-tm-converseTm';
+					  className = 'ico-tm-problem';
 					  tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
 				  }
 
@@ -141,9 +141,29 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 					  tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
 				  }
 
-				  if ('' !== tooltip) {
-					  tooltip = '<div style="' + style + '" class="' + className + '"></div>' + tooltip + '<br/><br/>';
-				  }
+                  if ('' !== tooltip) {
+                      tooltip = '<div style="' + style + '" class="' + className + '"></div>' + tooltip;
+                  }
+
+                  if (record.get('guessed') || record.get('possiblyNotOptimal')) {
+                      className = 'ico-tm-problem';
+                  }
+
+                  if (record.get('guessed')) {
+                      tooltip += ('' !== tooltip ? '<br/>' : '')
+                          + '<div style="' + style + '" class="ico-tm-problem"></div>'
+                          + Editor.data.l10n.matches.t5memory.guessed;
+                  }
+
+                  if (record.get('possiblyNotOptimal')) {
+                      tooltip += ('' !== tooltip ? '<br/>' : '')
+                          + '<div style="' + style + '" class="ico-tm-problem"></div>'
+                          + Editor.data.l10n.matches.t5memory.possiblyNotOptimal;
+                  }
+
+                  if ('' !== tooltip) {
+                      tooltip += '<br/><br/>';
+                  }
 
 				  meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(attrTpl.applyTemplate({
 					  title: tooltip + me.strings.atributeTooltipMsg,
@@ -154,11 +174,17 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				  }))+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon-shown';
 
-				  return meta.rowIndex + 1 + (
-					  record.get('tmConversionState') && 'converted' !== record.get('tmConversionState')
-						  ? '<div style="' + style + '" class="' + className + '"></div>'
-						  : ''
-				  );
+                  let icon = '';
+
+                  if (
+                      'converted' !== record.get('tmConversionState')
+                      || record.get('guessed')
+                      || record.get('possiblyNotOptimal')
+                  ) {
+                      icon += '<div style="' + style + '" class="' + className + '"></div>';
+                  }
+
+				  return meta.rowIndex + 1 + icon;
               },
           },{
 	          xtype: 'gridcolumn',

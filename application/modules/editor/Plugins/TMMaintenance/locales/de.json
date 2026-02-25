@@ -86,6 +86,7 @@
       "author": "Erstellt von",
       "additionalInfo": "Zusätzliche Info",
       "document": "Dokumentname",
+      "context": "Kontext",
       "creationDate": "Erstellungsdatum",
       "actions": "Aktionen",
       "sourceLanguage": "Quellsprache",
@@ -95,6 +96,8 @@
     "editSource": "Quellsegment bearbeiten",
     "editTarget": "Ziel bearbeiten",
     "delete": "Löschen",
+    "deleteBySource": "Löschen Sie alle Segmente, die dieselbe Quelle wie das aktuelle Segment haben.",
+    "deleteBySourceAndTarget": "Löschen Sie alle Segmente, die dieselbe Quelle UND dasselbe Ziel wie das aktuelle Segment haben.",
     "create": "Neu anlegen",
     "save": "Speichern (STRG + S)",
     "cancel": "Abbrechen (ESC)",
@@ -115,6 +118,14 @@
   "deleteSegment": {
     "title": "Löschen",
     "text": "Wollen Sie das Segment wirklich löschen?",
+    "bySource": {
+      "title": "Alle Segmente mit derselben Quelle löschen",
+      "text": "{0} – Alle Segmente mit einer solchen Quelle werden unabhängig von der aktuellen Filterung gelöscht. Fortfahren?"
+    },
+    "bySourceAndTarget": {
+      "title": "Löschen Sie alle Segmente, die dieselbe Quelle UND dasselbe Ziel haben.",
+      "text": "{0} => {1} – Alle Segmente mit dieser Quelle UND diesem Ziel werden unabhängig von der aktuellen Filterung gelöscht. Fortfahren?"
+    },
     "yes": "Ja",
     "no": "Nein"
   }

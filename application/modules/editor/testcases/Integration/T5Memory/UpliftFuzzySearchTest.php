@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Integration\T5Memory;
 
+use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\T5Memory\Api\Contract\FuzzyInterface;
 use MittagQI\Translate5\T5Memory\Api\Response\FuzzySearchResponse;
 use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
@@ -60,7 +61,8 @@ use MittagQI\Translate5\T5Memory\FuzzySearchService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\ReorganizeService;
 use MittagQI\Translate5\T5Memory\RetryService;
-use MittagQI\Translate5\T5Memory\TagHandlerProvider;
+use MittagQI\Translate5\T5Memory\StatusService;
+use MittagQI\Translate5\T5Memory\TagHandler\TagHandlerProvider;
 use PHPUnit\Framework\TestCase;
 
 class UpliftFuzzySearchTest extends TestCase
@@ -78,8 +80,11 @@ class UpliftFuzzySearchTest extends TestCase
         $persistenceService = $this->createMock(PersistenceService::class);
         $tagHandlerProvider = TagHandlerProvider::create();
         $segmentLengthValidator = SegmentLengthValidator::create();
+        $statusService = $this->createMock(StatusService::class);
 
         $api->method('fuzzyParallel')->willReturnOnConsecutiveCalls(...$fuzzyMatches);
+
+        $statusService->method('getStatus')->willReturn(Status::AVAILABLE);
 
         $fuzzySearchService = new FuzzySearchService(
             $reorganizeService,
@@ -90,6 +95,7 @@ class UpliftFuzzySearchTest extends TestCase
             $persistenceService,
             $tagHandlerProvider,
             $segmentLengthValidator,
+            $statusService,
         );
 
         $resource = $this->createConfiguredMock(\editor_Models_LanguageResources_Resource::class, [
@@ -136,7 +142,7 @@ class UpliftFuzzySearchTest extends TestCase
             $guessed = false;
 
             foreach ($match->metaData as $metaData) {
-                if ($metaData->name === 'Guessed') {
+                if ($metaData->name === 'guessed') {
                     $guessed = true;
                 }
             }
@@ -152,11 +158,12 @@ class UpliftFuzzySearchTest extends TestCase
                 [
                     'responses' => [
                         't5memory_test' => new FuzzySearchResponse(
+                            'test-tm',
                             [
                                 'results' => [
                                     [
-                                        'source' => '2023-09-15 and <t5:n id="1" r="ZGVmYXVsdCBZLW0tZA==" n="2024-10-19"/>',
-                                        'target' => '2023-09-15 and <t5:n id="1" r="ZGVmYXVsdCBZLW0tZA==" n="2024-10-19"/>',
+                                        'source' => '2023-09-15 and <t5:n id="1" r="bbb" n="2024-10-19"/>',
+                                        'target' => '2023-09-15 and <t5:n id="1" r="bbb" n="2024-10-19"/>',
                                         'segmentId' => 147995,
                                         'documentName' => 'none',
                                         'sourceLang' => 'de-DE',
@@ -180,11 +187,12 @@ class UpliftFuzzySearchTest extends TestCase
                 [
                     'responses' => [
                         't5memory_test' => new FuzzySearchResponse(
+                            'test-tm',
                             [
                                 'results' => [
                                     [
-                                        'source' => '2023-09-15 and <t5:n id="1" r="ZGVmYXVsdCBZLW0tZA==" n="2024-10-19"/>',
-                                        'target' => '2023-09-15 and <t5:n id="1" r="ZGVmYXVsdCBZLW0tZA==" n="2024-10-19"/>',
+                                        'source' => '2023-09-15 and <t5:n id="1" r="bbb" n="2024-10-19"/>',
+                                        'target' => '2023-09-15 and <t5:n id="1" r="bbb" n="2024-10-19"/>',
                                         'segmentId' => 147995,
                                         'documentName' => 'none',
                                         'sourceLang' => 'de-DE',
@@ -207,11 +215,11 @@ class UpliftFuzzySearchTest extends TestCase
                 ],
             ],
             'segment' => <<<HTML
-<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222f number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>
+<div class="single 3c6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d30392d3135222069736f3d22323032332d30392d313522207461726765743d22392f31352f3233222072656765783d225a47566d595856736443425a4c5730745a413d3d22206b65793d22616161222f3e number internal-tag ownttip"><span title="&lt;3/&gt; CP: default Y-m-d" class="short">&lt;3/&gt;</span><span data-originalid="number" data-length="7" data-source="2023-09-15" data-target="9/15/23" class="full"></span></div> and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222072656765783d225a47566d595856736443425a4c5730745a413d3d22206b65793d22626262222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>
 HTML,
             'expected' => [
-                'source' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
-                'target' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
+                'source' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222072656765783d225a47566d595856736443425a4c5730745a413d3d22206b65793d22626262222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
+                'target' => '2023-09-15 and <div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032342d31302d3139222069736f3d22323032342d31302d313922207461726765743d2231302f31392f3234222072656765783d225a47566d595856736443425a4c5730745a413d3d22206b65793d22626262222f number internal-tag ownttip"><span title="&lt;4/&gt; CP: default Y-m-d" class="short">&lt;4/&gt;</span><span data-originalid="number" data-length="8" data-source="2024-10-19" data-target="10/19/24" class="full"></span></div>',
             ],
         ];
 
@@ -220,11 +228,12 @@ HTML,
                 [
                     'responses' => [
                         't5memory_test' => new FuzzySearchResponse(
+                            'test-tm',
                             [
                                 'results' => [
                                     [
-                                        'source' => 'Heute ist der 12. Oktober <t5:n id="1" r="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" n="2025"/>.',
-                                        'target' => 'Nulla sodales libero proin 12. platea <t5:n id="1" r="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" n="2025"/>.',
+                                        'source' => 'Heute ist der 12. Oktober <t5:n id="1" r="aaa" n="2025"/>.',
+                                        'target' => 'Nulla sodales libero proin 12. platea <t5:n id="1" r="aaa" n="2025"/>.',
                                         'segmentId' => 147995,
                                         'documentName' => 'none',
                                         'sourceLang' => 'de-DE',
@@ -248,11 +257,12 @@ HTML,
                 [
                     'responses' => [
                         't5memory_test' => new FuzzySearchResponse(
+                            'test-tm',
                             [
                                 'results' => [
                                     [
-                                        'source' => 'Heute ist der 12. Oktober <t5:n id="1" r="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" n="2025"/>.',
-                                        'target' => 'Nulla sodales libero proin 12. platea <t5:n id="1" r="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" n="2025"/>.',
+                                        'source' => 'Heute ist der 12. Oktober <t5:n id="1" r="aaa" n="2025"/>.',
+                                        'target' => 'Nulla sodales libero proin 12. platea <t5:n id="1" r="aaa" n="2025"/>.',
                                         'segmentId' => 147995,
                                         'documentName' => 'none',
                                         'sourceLang' => 'de-DE',
@@ -275,11 +285,11 @@ HTML,
                 ],
             ],
             'segment' => <<<HTML
-Heute ist der <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d223132222069736f3d22313222207461726765743d223132222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip" style=""><span class="short" title="&lt;1/&gt; CP: default simple" style="">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="12" data-target="12" style=""></span></div>. Oktober <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip" style=""><span class="short" title="&lt;2/&gt; CP: default simple" style="">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="4" data-source="2025" data-target="2025" style=""></span></div>.
+Heute ist der <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d223132222069736f3d22313222207461726765743d223132222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip" style=""><span class="short" title="&lt;1/&gt; CP: default simple" style="">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="12" data-target="12" style=""></span></div>. Oktober <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c77494122206b65793d22616161222f number internal-tag ownttip" style=""><span class="short" title="&lt;2/&gt; CP: default simple" style="">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="4" data-source="2025" data-target="2025" style=""></span></div>.
 HTML,
             'expected' => [
-                'source' => 'Heute ist der 12. Oktober <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default simple" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="2025" data-target="2025" class="full"></span></div>.',
-                'target' => 'Nulla sodales libero proin 12. platea <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default simple" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="2025" data-target="2025" class="full"></span></div>.',
+                'source' => 'Heute ist der 12. Oktober <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c77494122206b65793d22616161222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default simple" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="2025" data-target="2025" class="full"></span></div>.',
+                'target' => 'Nulla sodales libero proin 12. platea <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232303235222069736f3d223230323522207461726765743d2232303235222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c77494122206b65793d22616161222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default simple" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="2025" data-target="2025" class="full"></span></div>.',
             ],
         ];
     }
