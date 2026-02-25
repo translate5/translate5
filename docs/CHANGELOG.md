@@ -14,6 +14,52 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
 
+## [7.35.0] - 2026-02-25
+
+### Important Notes:
+#### [TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034)
+IMPORTANT FOR INSTALLATIONS WHERE CONTENT PROTECTION IS USED!
+Due to the feature all TMs using Content Protection rules are listed as "not converted" and conversion should be started afterwards.
+On Premise clients: please handle manually after the update. 
+Hosting clients: is done and ensured by MittagQI.
+ 
+
+
+### Changed
+**[TRANSLATE-5192](https://jira.translate5.net/browse/TRANSLATE-5192): t5memory - Repair wrong Tags for 100% Matches** <br>
+[🆕 Feature] added tags guessing when in response from t5memory we have excess tags. 
+
+**[TRANSLATE-5140](https://jira.translate5.net/browse/TRANSLATE-5140): t5memory - Use dash as context instead of segment number in task** <br>
+Use dash as context instead of segment number in task
+
+**[TRANSLATE-5103](https://jira.translate5.net/browse/TRANSLATE-5103): t5memory - Improve deletion of Segments in Maintenance** <br>
+Improve deletion of Segments in Maintenance:
+Improve deletion of singular segments
+Add new button "Delete all with same source"
+Add new button "Delete all with same source + target"
+
+**[TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034): t5memory - Filter TMX on import** <br>
+Apply filters on TMX on import time from translate5 side
+All Translate5 TMs in instance will be marked as "not converted" and matches may have lower matches.
+Language resources affected by this should be converted manually.
+
+**[TRANSLATE-3543](https://jira.translate5.net/browse/TRANSLATE-3543): Editor general, usability editor - Move "toast" messages and warnings to an extra tabular view** <br>
+Added log for toast messages and warnings within segments editor
+
+
+### Bugfixes
+**[TRANSLATE-5303](https://jira.translate5.net/browse/TRANSLATE-5303): LanguageResources - Microsoft translator: textType parameter** <br>
+Add textType parameter when query microsoft api for translations.
+
+**[TRANSLATE-5198](https://jira.translate5.net/browse/TRANSLATE-5198): LanguageResources - add warning on tmx import when languages not matching TM** <br>
+Add warning on tmx import when languages not matching TM
+
+**[TRANSLATE-5038](https://jira.translate5.net/browse/TRANSLATE-5038): Editor general - selecting CP tag and text will swallow space when pasting in editor** <br>
+FIXED: copy-pasting text with tags will respect white spaces
+
+**[TRANSLATE-4978](https://jira.translate5.net/browse/TRANSLATE-4978): Auto-QA - inconsistency check faulty** <br>
+FIXED: missing background colors for inconsistent sources/targets in cases when there are more than 200 segments in the task
+
 
 ## [7.34.5] - 2026-02-24
 
