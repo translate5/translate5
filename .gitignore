@@ -6,6 +6,8 @@
 /data/dummyTm_*
 /data/lock*
 /data/TMConversion
+/data/ReimportSegments
+/data/reorganize
 /data/TMExport
 /data/TmxImportPreprocessing
 /data/l10n

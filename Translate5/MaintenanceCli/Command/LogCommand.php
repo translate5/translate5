@@ -73,7 +73,10 @@ class LogCommand extends Translate5AbstractCommand
     {
         $this
         // the short description shown while running "php bin/console list"
-            ->setDescription('Query the translate5 log. Short cut logx shows todays errors and warnings only')
+            ->setDescription(
+                'Query the translate5 log. Short cut logx shows errors and warnings only of the last 24h.'
+                . 'logy all of the last 24h'
+            )
 
         // the full command description shown when running the command with
         // the "--help" option
@@ -180,12 +183,12 @@ the format is:
         $this->initTranslate5AppOrTest();
 
         if ($input->getFirstArgument() === 'logx') {
-            $input->setOption('since', 'today');
+            $input->setOption('since', '-24 hours');
             $input->setOption('level', 7);
         }
 
         if ($input->getFirstArgument() === 'logy') {
-            $input->setOption('since', 'today');
+            $input->setOption('since', '-24 hours');
         }
 
         if ($input->getOption('list-origin')) {
