@@ -11,6 +11,62 @@
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./DataCleanup/copy-preprocessor.js":
+/*!******************************************!*\
+  !*** ./DataCleanup/copy-preprocessor.js ***!
+  \******************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ copyPreprocessor)
+/* harmony export */ });
+/* harmony import */ var _Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Tools/string-to-dom.js */ "./Tools/string-to-dom.js");
+
+
+/**
+ *
+ *
+ * @param {string} html
+ * @param {TagsConversion} tagsConversion
+ * @param {DataTransformer} dataTransformer
+ * @returns {string}
+ */
+function copyPreprocessor(html, tagsConversion, dataTransformer) {
+    const dom = (0,_Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__["default"])(html);
+
+    const tags = dom.querySelectorAll('img');
+
+    if (! tags.length) {
+        return html;
+    }
+
+    for (const tag of tags) {
+        if (! tagsConversion.isWhitespaceNode(tag)) {
+            continue;
+        }
+
+        let div = document.createElement('div');
+        div.appendChild(tag.cloneNode(true));
+
+        const reversed = dataTransformer.reverseTransform(div)?.data;
+
+        if (! reversed) {
+            tag.parentNode.removeChild(tag);
+
+            continue;
+        }
+
+        tag.parentNode.insertBefore((0,_Tools_string_to_dom_js__WEBPACK_IMPORTED_MODULE_0__["default"])(reversed).firstChild, tag);
+        tag.parentNode.removeChild(tag);
+    }
+
+    return dom.innerHTML;
+}
+
+/***/ }),
+
 /***/ "./DataCleanup/insert-preprocessor.js":
 /*!********************************************!*\
   !*** ./DataCleanup/insert-preprocessor.js ***!
@@ -676,6 +732,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Modifiers_remove_tag_on_corresponding_deletion_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../Modifiers/remove-tag-on-corresponding-deletion.js */ "./Modifiers/remove-tag-on-corresponding-deletion.js");
 /* harmony import */ var _Modifiers_preserve_original_text_if_no_modifications_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../Modifiers/preserve-original-text-if-no-modifications.js */ "./Modifiers/preserve-original-text-if-no-modifications.js");
 /* harmony import */ var _Modifiers_add_line_breaks_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../Modifiers/add-line-breaks.js */ "./Modifiers/add-line-breaks.js");
+/* harmony import */ var _DataCleanup_copy_preprocessor_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../DataCleanup/copy-preprocessor.js */ "./DataCleanup/copy-preprocessor.js");
+
 
 
 
@@ -1486,6 +1544,12 @@ class EditorWrapper {
             cancel();
         }, { priority: 'high' } );
 
+        // Haven't been able to achieve this with ClipboardPipeline.OutputTransformation event,
+        // so just adding a listener to the editor's view element
+        this.getEditorViewNode().addEventListener('copy', (event) => {
+            this.#onCopy(event, editor);
+        });
+
         const viewDocument = editor.editing.view.document;
         viewDocument.on(
             'enter',
@@ -1743,6 +1807,16 @@ class EditorWrapper {
         const html = data.dataTransfer.getData('text/html');
         const cleaned = this.#cleanupDataOnInsertOrDrop(html);
         data.content = editor.data.htmlProcessor.toView(cleaned);
+    }
+
+    #onCopy(event, editor) {
+        const html = event.clipboardData.getData('text/html');
+
+        const processed = (0,_DataCleanup_copy_preprocessor_js__WEBPACK_IMPORTED_MODULE_14__["default"])(html, this._tagsConversion, this.dataTransformer);
+
+        if (html !== processed) {
+            event.clipboardData.setData('text/html', processed);
+        }
     }
 
     #onDrop() {

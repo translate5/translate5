@@ -12,6 +12,7 @@ import EditorHistory from "./editor-history";
 import removeTagOnCorrespondingDeletion from "../Modifiers/remove-tag-on-corresponding-deletion.js";
 import preserveOriginalTextIfNoModifications from "../Modifiers/preserve-original-text-if-no-modifications.js";
 import addLineBreaks from "../Modifiers/add-line-breaks.js";
+import copyPreprocessor from "../DataCleanup/copy-preprocessor.js";
 // import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 export default class EditorWrapper {
@@ -808,6 +809,12 @@ export default class EditorWrapper {
             cancel();
         }, { priority: 'high' } );
 
+        // Haven't been able to achieve this with ClipboardPipeline.OutputTransformation event,
+        // so just adding a listener to the editor's view element
+        this.getEditorViewNode().addEventListener('copy', (event) => {
+            this.#onCopy(event, editor);
+        });
+
         const viewDocument = editor.editing.view.document;
         viewDocument.on(
             'enter',
@@ -1065,6 +1072,16 @@ export default class EditorWrapper {
         const html = data.dataTransfer.getData('text/html');
         const cleaned = this.#cleanupDataOnInsertOrDrop(html);
         data.content = editor.data.htmlProcessor.toView(cleaned);
+    }
+
+    #onCopy(event, editor) {
+        const html = event.clipboardData.getData('text/html');
+
+        const processed = copyPreprocessor(html, this._tagsConversion, this.dataTransformer);
+
+        if (html !== processed) {
+            event.clipboardData.setData('text/html', processed);
+        }
     }
 
     #onDrop() {
