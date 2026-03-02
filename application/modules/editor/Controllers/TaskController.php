@@ -1112,7 +1112,17 @@ class editor_TaskController extends ZfExtended_RestController
      */
     public function putAction()
     {
-        $this->entity->load($this->_getParam('id'));
+        try {
+            $this->entity->load($this->_getParam('id'));
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1774' => 'Projects are not editable.',
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1774', [
+                Localization::trans('Requested task not found. Probably it was deleted by another user.'),
+            ]);
+        }
 
         if ($this->entity->isProject()) {
             //project modification is not allowed. This will be changed in future.
