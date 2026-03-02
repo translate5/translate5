@@ -65,8 +65,8 @@ class editor_Segment_Whitespace_Check
 
     public function __construct(editor_Models_Task $task, editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment)
     {
-        // Get field text with tags rendered into placeholders
-        $fieldRenderedText = $fieldTags->renderReplaced(TagSequence::MODE_ORIGINAL);
+        // We are using SPELLCHECK mode here since it renders whitespace-tags with their real content
+        $fieldRenderedText = $fieldTags->renderReplaced(TagSequence::MODE_SPELLCHECK);
 
         // Detect space at the beginning
         if (str_starts_with($fieldRenderedText, ' ')) {

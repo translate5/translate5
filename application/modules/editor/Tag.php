@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\ReplacedRenderingConfig;
 use MittagQI\ZfExtended\Tools\Markup;
 use PHPHtmlParser\Dom;
 use PHPHtmlParser\Dom\Node\AbstractNode;
@@ -1041,12 +1042,12 @@ class editor_Tag
      * Renders the replaced contents what usually means without markup
      * (only internal tags may have markup depending on the mode)
      */
-    public function renderReplaced(string $mode): string
+    public function renderReplaced(string $mode, ?ReplacedRenderingConfig $config): string
     {
         $html = '';
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
-                $html .= $child->renderReplaced($mode);
+                $html .= $child->renderReplaced($mode, $config);
             }
         }
 

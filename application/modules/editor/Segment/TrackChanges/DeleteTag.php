@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\ReplacedRenderingConfig;
+
 /**
  * Represents a TrackChanges Delete Tag like <del class="trackchanges ownttip deleted"> ... </del>
  */
@@ -42,7 +44,7 @@ final class editor_Segment_TrackChanges_DeleteTag extends editor_Segment_TrackCh
      * Renders the replaced contents
      * what must be an empty string for del-tags (not bring present in textual content)
      */
-    public function renderReplaced(string $mode): string
+    public function renderReplaced(string $mode, ?ReplacedRenderingConfig $config): string
     {
         return '';
     }

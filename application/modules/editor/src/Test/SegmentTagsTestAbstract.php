@@ -128,7 +128,7 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
         // rendering replaced stripped should match the field-text with trackchanges stripped!
-        $this->assertEquals($tags->getFieldText(true), $tags->renderReplaced());
+        $this->assertEquals($tags->getFieldText(true), $tags->renderReplaced(TagSequence::MODE_STRIPPED));
         // test the replaced rendering with the labeled whitespace placeholders
         if ($replacedLabeled !== null) {
             $this->assertEquals($replacedLabeled, $tags->renderReplaced(TagSequence::MODE_LABELED));

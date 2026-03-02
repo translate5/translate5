@@ -30,14 +30,18 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.HtmlCleanup', {
     /**
-     * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen und alle internen Tags
+     * Cleans the segment-markup, Removes all tags but internal tags, removes any other residues from editing
+     * @param {string} html
+     * @returns {string}
      */
-    cleanForLiveEditing: function (html) {
+    cleanAndReduce: function (html) {
         return this.cleanAllEditingTags(this.cleanInvisibleCharacters(html));
     },
 
     /**
-     * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen
+     * Removes invisible chars that may were added by TrackChanges processing
+     * @param {string} html
+     * @returns {string}
      */
     cleanInvisibleCharacters: function (html) {
         return html.replace(/\u200B|\uFEFF/g, '');
@@ -47,6 +51,8 @@ Ext.define('Editor.util.HtmlCleanup', {
      * Cleans all editing tags added by the frontend: <ins, <del, <mark, invisible chars band the duplicatesave-images
      * Cleans also term-tagger, spellchecker and qm-tags
      * The cleaning of the latter expects the contents of those tags not to be complex HTML-structures, if this is the case, the code must be rewritten from a (fast) regex type to a complex markup parser
+     * @param {string} html
+     * @returns {string}
      */
     cleanAllEditingTags: function (html) {
         html = this.cleanProtectInternalTags(html); // UGLY: stripping the tags with regex is prone to corrupt the structure of interleaving tags so we protect them
@@ -64,6 +70,8 @@ Ext.define('Editor.util.HtmlCleanup', {
 
     /**
      * TODO: used by RowEditorColumnParts. needed there or replacable with cleanAllEditingTags ??
+     * @param {string} html
+     * @returns {string}
      */
     cleanForSaveEditorContent: function (html) {
         html = this.cleanDuplicateSaveImgTags(html);
@@ -80,18 +88,28 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * or open predeceeded by such a construct will be reduced to one split.
 	 * Open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed
 	 * by the author
-	 * @param {string} html
+	 * @param {string} html segment markup
+     * @param {string} field segment field the markup uriginates from
 	 * @param {string} splitKey defaults to "<t5split>"
 	 * @param {Boolean} stripWhitespace if set, all internal whitespace tags are removed
+     * @param {Boolean} renderNumbers if set, all protected contents / numbers replaced with their contents
+     * @param {Boolean} renderPlaceables if set, all internal are placeables are replaced with their contents
 	 * @return {string} the cleaned html with split-values
 	 */
-	cleanAndSplitInternalTags: function(html, splitKey, stripWhitespace){
-        if (!splitKey) {
+    cleanAndSplitInternalTags: function (html, field, splitKey, stripWhitespace, renderNumbers = true, renderPlaceables = true) {
+        if (! splitKey) {
             splitKey = '<t5split>';
         }
 
+        // replace protected contents / numbers
+        if (renderNumbers) {
+            html = this.replaceNumbers(html, (field && field.toLowerCase().includes('target')));
+        }
+
         // replace Placeables
-        html = this.replacePlaceables(html, splitKey);
+        if (renderPlaceables) {
+            html = this.replacePlaceables(html, splitKey);
+        }
 
         if (stripWhitespace) {
             // strip whitespace-tags, just split
@@ -204,7 +222,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 
     cleanQmTags: function (html) {
         // remove quality-management tags
-        return this.cleanByTagAndClassWithContent(html, '', 'img', 'qmflag')
+        return this.cleanByTagAndClassWithContent(html, '', 'img', 'qmflag');
     },
 
     cleanSpellcheckTags: function (html) {
@@ -224,7 +242,7 @@ Ext.define('Editor.util.HtmlCleanup', {
      * For now, only images will be correctly cleaned as tags without end-tags
      */
     cleanByTagAndClassWithContent: function (html, replacement, tagName, className) {
-        let regex = (tagName == 'img') ?
+        let regex = (tagName === 'img') ?
             new RegExp('<' + tagName + '[^>]* class="' + this.cleanCreateClassSelector(className) + '"[^>]*>', 'ig')
             : new RegExp('<' + tagName + '[^>]* class="' + this.cleanCreateClassSelector(className) + '"[^>]*>.*?<\/' + tagName + '>', 'ig');
 
@@ -256,15 +274,18 @@ Ext.define('Editor.util.HtmlCleanup', {
     cleanHtmlTags: function(html, allowed){
         // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
         allowed = (((allowed || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
-        var tags = /<\/?([a-z0-9]*)\b[^>]*>?/gi, comments = /<!--[\s\S]*?-->/gi, before;
+        var tags = /<\/?([a-z0-9]*)\b[^>]*>?/gi,
+            comments = /<!--[\s\S]*?-->/gi,
+            before,
+            replacer = function (p0, p1){
+                return allowed.indexOf('<' + p1.toLowerCase() + '>') > -1 ? p0 : '';
+            };
         // removes tha '<' char at the end of the string to replicate PHP's behaviour
         html = (html.substring(html.length - 1) === '<') ? html.substring(0, html.length - 1) : html;
         // recursively remove tags to ensure that the returned string doesn't contain forbidden tags html previous passes (e.g. '<<bait/>switch/>')
         while (true) {
             before = html;
-            html = before.replace(comments, '').replace(tags, function (p0, p1){
-                return allowed.indexOf('<' + p1.toLowerCase() + '>') > -1 ? p0 : '';
-            });
+            html = before.replace(comments, '').replace(tags, replacer);
             // return once no more tags are removed
             if (before === html){
                 return html;
@@ -273,7 +294,31 @@ Ext.define('Editor.util.HtmlCleanup', {
     },
 
     /**
-     * Replaces Placeables with the placeablöe text and wraps the placeable with the given split-value
+     * Replaces Number-tags with their content
+     * @param {string} html
+     * @param {Boolean} isTarget
+     * @return {string}: the replaced html
+     */
+    replaceNumbers: function (html, isTarget = true) {
+
+        return html.replace(/<div[^>]+number[^>]+internal-tag[^>]+>.+?<\/div>/ig, function (internalTag) {
+
+            let search = isTarget ?
+                /<span[^>]+full[^>]+data-target\s*=\s*"(.+?)">/ig : /<span[^>]+full[^>]+data-source\s*=\s*"(.+?)">/ig,
+                matches = search.exec(internalTag);
+
+            if (matches.length === 2) {
+                return '<span class="t5number">' + matches[1] + '</span>';
+            }
+            // should not happen
+            console.log('ERROR - invaid structure of internal tag: ', internalTag);
+
+            return '';
+        });
+    },
+
+    /**
+     * Replaces Placeables with the placeable text and wraps the placeable with the given split-value
      * @param {string} html
      * @param {string} splitKey defaults to "<t5split>"
      * @return {string}: the replaced html with split-values
@@ -288,7 +333,6 @@ Ext.define('Editor.util.HtmlCleanup', {
             if (matches.length === 2) {
                 return splitKey + '<span class="t5placeable">' + matches[1] + '</span>' + splitKey;
             }
-
             // should not happen
             console.log('ERROR - invaid structure of internal tag: ', internalTag);
 

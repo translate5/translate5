@@ -60,11 +60,13 @@ use editor_Segment_Tag;
  * This Class mimics in PHP what happens in Editor.util.HtmlCleanup cleanAndSplitInternalTags
  * It removes trackchanges, terminology and all internal tags, replaces them with strip-placeholders,
  * removes the whitespace-tags if wanted,  * and splits the content where the internal tags have been
+ * Will Usually be used for targets but also can handle sources (second param)
  */
 class TagCleanup
 {
     public function __construct(
-        private bool $stripWhitespace = false
+        private bool $stripWhitespace = false,
+        private bool $isTarget = true,
     ) {
     }
 
@@ -107,8 +109,18 @@ class TagCleanup
 
     private function createPlaceHolder(editor_Segment_Internal_Tag $tag): string
     {
-        if ($tag->isPlaceable() || $tag->isNumber() || $tag->isSpecialCharacter()) {
-            return $tag->getReplacedContent();
+        try {
+            if ($tag->isNumber()) {
+                return $tag->getNumberContent(! $this->isTarget);
+            }
+            if ($tag->isPlaceable()) {
+                return $tag->getPlaceableContent();
+            }
+            if ($tag->isSpecialCharacter()) {
+                return $tag->getSpecialCharContent();
+            }
+        } catch (\Throwable $e) {
+            error_log('ERROR rendering tags: ' . $e->getMessage());
         }
         if ($tag->isWhitespace()) {
             if ($this->stripWhitespace) {

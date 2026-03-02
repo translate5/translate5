@@ -45,6 +45,8 @@ class editor_Models_Segment_Whitespace
         'char',
     ];
 
+    public const NON_BREAKING_HYPHEN = '‑';
+
     /**
      * general replacement character for unknown characters (U+FFFD)
      */
@@ -81,23 +83,8 @@ class editor_Models_Segment_Whitespace
     public const LABEL_CHARACTER = '□';
 
     /**
-     * Return search and replace map
-     */
-    protected array $protectedWhitespaceMap = [
-        'search' => [
-            "\r\n",
-            "\n",
-            "\r",
-        ],
-        'replace' => [
-            '<hardReturn/>',
-            '<softReturn/>',
-            '<macReturn/>',
-        ],
-    ];
-
-    /**
-     * List of unicode characters to be protected
+     * List of unicode special characters to be protected
+     * These will be rendered as internla-tag tags of subtype "char"
      * @var array
      */
     public const PROTECTED_CHARACTERS = [
@@ -272,7 +259,7 @@ class editor_Models_Segment_Whitespace
         ],
         '/\x{2011}/u' => [
             'ts' => 'e28091',
-            'text' => '‑',
+            'text' => self::NON_BREAKING_HYPHEN,
             'title' => 'Non-Breaking Hyphen (‑)',
         ],
         '/\x{2028}/u' => [
@@ -304,6 +291,35 @@ class editor_Models_Segment_Whitespace
             'ts' => 'efbbbf',
             'text' => '[BOM]',
             'title' => 'Zero Width No-Break Space (BOM, ZWNBSP)',
+        ],
+    ];
+
+    /**
+     * Restores the real content the special-character tag represents
+     * Usually this is an empty string because there is no real "normal" character
+     */
+    public static function getRealContentFromText(string $tagText, string $default = ''): string
+    {
+        if ($tagText === self::NON_BREAKING_HYPHEN) {
+            return self::NON_BREAKING_HYPHEN;
+        }
+
+        return $default;
+    }
+
+    /**
+     * Return search and replace map
+     */
+    protected array $protectedWhitespaceMap = [
+        'search' => [
+            "\r\n",
+            "\n",
+            "\r",
+        ],
+        'replace' => [
+            '<hardReturn/>',
+            '<softReturn/>',
+            '<macReturn/>',
         ],
     ];
 

@@ -93,14 +93,21 @@ abstract class TagSequence implements JsonSerializable
     public const MODE_STRIPPED = 'stripped';
 
     /**
-     * Mode for the replaced rendering: Strip all Markup, use "labeled" contents (e.g. "↵" nfor newline tags)
+     * Mode for the replaced rendering:
+     * Strip all Markup, use "labeled" contents (e.g. "↵" nfor newline tags)
      */
     public const MODE_LABELED = 'labeled';
 
     /**
-     * Mode for the replaced rendering: Strip all Markup, render whitespace-tags & special chars in their original form
+     * Mode for the replaced rendering:
+     * Replaces the tags based on a processing Configuration (ReplacedRenderingConfig)
      */
-    public const MODE_ORIGINAL = 'original';
+    public const MODE_PROCESSED = 'processed';
+
+    /**
+     * Mode for the replaced rendering:
+     */
+    public const MODE_SPELLCHECK = 'spellcheck';
 
     /**
      * Defines the error-domain to log
@@ -411,19 +418,20 @@ abstract class TagSequence implements JsonSerializable
     /**
      * Renders the tag-sequence in replaced mode, what means with markup stripped
      * and some special adjustments depending on the mode
+     * @param ReplacedRenderingConfig|null $config Can only be used in conjunction with mode ::MODE_PROCESSED
      * @throws \Zend_Exception
-     * @throws ZfExtended_ErrorCodeException
+     * @throws editor_Models_Segment_Exception
      */
-    public function renderReplaced(string $mode = self::MODE_STRIPPED): string
+    public function renderReplaced(string $mode, ?ReplacedRenderingConfig $config = null): string
     {
         // nothing to do without tags
         if ($this->numTags() === 0) {
             return $this->text;
         }
-        // create holder and render it's children
+        // create holder and render its children
         $holder = $this->createRenderingHolder();
 
-        return $holder->renderReplaced($mode);
+        return $holder->renderReplaced($mode, $config);
     }
 
     /**
@@ -434,8 +442,8 @@ abstract class TagSequence implements JsonSerializable
     {
         $this->sort();
         // first, clone our tags to have a disposable rendering model. This may split some tags that are allowed to overlap into "subtags" (like mqm)
+        /** @var editor_Segment_Tag[] $clones */
         $clones = [];
-        /* @var $clones editor_Segment_Tag[] */
         foreach ($this->tags as $tag) {
             $tag->addRenderingClone($clones);
         }

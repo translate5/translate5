@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Segment_Internal_ContentTag as ContentTag;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
+use MittagQI\Translate5\Tag\ReplacedRenderingConfig;
 use MittagQI\Translate5\Tag\TagSequence;
 use MittagQI\ZfExtended\Tools\Markup;
 use PHPHtmlParser\Dom\Node\AbstractNode;
@@ -38,6 +39,12 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * Represents an Internal tag
  * Example <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
  * The inner Content Tags are stored as special Tags editor_Segment_Internal_ContentTag
+ * There are generally 4 types of internal-tags:
+ * a) Whitespace tags: wrapping several whitespace-chars (newline, space, tab ...)
+ * b) Special Characters: Representing normally unrenderable special characters
+ * b) Number tags / protected content: Representing usually numbers like dates, floats, numberings, currencies
+ *    and will usually have a dífferent source/target content encoded in data-aatributes
+ * c) Markup: These will represent single tags or chunks of Markup
  */
 final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 {
@@ -322,6 +329,11 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return $this->isSingle() && $this->hasClass(NumberProtector::TAG_NAME);
     }
 
+    public function isMarkup(): bool
+    {
+        return ! $this->isWhitespace() && ! $this->isSpecialCharacter() && ! $this->isNumber();
+    }
+
     /**
      * Retrieves the original index of the internal tag within the segment
      */
@@ -435,31 +447,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return Markup::unescapeAllQuotes($this->shortTag->getText());
     }
 
-    /**
-     * Retrieves the shown Content/Markup of an placeable, number-tag or special char
-     * For number-tags, this may differs if for source/target
-     */
-    public function getReplacedContent(bool $isSource = true): string
-    {
-        if ($this->isPlaceable()) {
-            return Markup::unescape($this->fullTag->getContent());
-        }
-        if ($this->isSpecialCharacter()) {
-            // special characters will only be rendered if they have a textual representation,
-            // @see editor_Models_Segment_Whitespace::PROTECTED_CHARACTERS
-            $text = $this->fullTag->getContent();
-
-            return str_starts_with($text, '[') ? '' : $text;
-        }
-        if ($this->isNumber()) {
-            $dataAttrib = $isSource ? 'source' : 'target';
-
-            return $this->fullTag->getData($dataAttrib);
-        }
-
-        return $this->fullTag->getText();
-    }
-
     /* *************************************** Overwritten Tag API *************************************** */
 
     /**
@@ -523,6 +510,74 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
+     * Number tags will represent content based if we want the source or the target
+     * @throws Exception
+     */
+    public function getNumberContent(bool $isSource): string
+    {
+        if (! $this->isNumber()) {
+            throw new Exception('You can call ::getNumberContent only for number-tags');
+        }
+        $dataAttrib = $isSource ? 'source' : 'target';
+        $content = $this->fullTag->getData($dataAttrib);
+
+        if ($content === null) {
+            throw new Exception(
+                'Invalid internal number tag / protected content: data-attribute “data-' . $dataAttrib . '” not found.'
+            );
+        }
+
+        return $content;
+    }
+
+    /**
+     * Returns the represented content of Placeables
+     * @throws Exception
+     */
+    public function getPlaceableContent(): string
+    {
+        if (! $this->isPlaceable()) {
+            throw new Exception('You can call ::getPlaceableContent only for placables');
+        }
+
+        return Markup::unescape($this->fullTag->getContent());
+    }
+
+    /**
+     * Creates the represented content for special chars
+     * special characters will only be rendered if they have a textual representation ...
+     * @see editor_Models_Segment_Whitespace::PROTECTED_CHARACTERS
+     * @throws Exception
+     */
+    public function getSpecialCharContent(): string
+    {
+        if (! $this->isSpecialCharacter()) {
+            throw new Exception('You can call ::getNumberContent only for number-tags');
+        }
+
+        return editor_Models_Segment_Whitespace::getRealContentFromText($this->fullTag->getContent());
+    }
+
+    /**
+     * Creates the represented content for whitespace-tags
+     * @throws Exception
+     */
+    public function getWhitespaceContent(): string
+    {
+        if ($this->isNewline()) {
+            return "\n";
+        } elseif ($this->isTab()) {
+            return "\t";
+        } elseif ($this->isNbsp()) {
+            return " ";
+        } elseif ($this->isSpace()) {
+            return ' ';
+        }
+
+        throw new Exception('You can call ::getWhitespaceContent only for whitespace-tags');
+    }
+
+    /**
      * This renders our inner HTML
      */
     public function renderChildren(array $skippedTypes = null): string
@@ -541,7 +596,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     /**
      * Renders the replaced contents what differs for internal tags depending on the mode
      */
-    public function renderReplaced(string $mode): string
+    public function renderReplaced(string $mode, ?ReplacedRenderingConfig $config): string
     {
         $content = '';
         // QUIRK: is the feature with length-attributes for whitespace-tags still in use ?
@@ -549,8 +604,10 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
             return '';
         } elseif ($mode === TagSequence::MODE_LABELED) {
             $content = $this->getLabeledContent();
-        } elseif ($mode === TagSequence::MODE_ORIGINAL) {
-            $content = $this->getOriginalContent();
+        } elseif ($mode === TagSequence::MODE_SPELLCHECK) {
+            $content = $this->getSpellcheckContent();
+        } elseif ($mode === TagSequence::MODE_PROCESSED && $config !== null) {
+            $content = $this->getProcessedContent($config);
         }
         $length = $this->getDataLength();
         if ($length === 1) {
@@ -583,30 +640,69 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
-     * Provides the content for the replaced original mode
+     * Provides the content for the replaced spellcheck mode
+     * Whitespace will be returned in it's original form
+     * Numbers/protected content: Here dash-characters are used as they do not result in spellcheck-error
+     * Initially, the idea was to use dash-character sequence of the same length
+     * as protected number (e.g. '5,600' => '-----'), but the way of how number-tags
+     * are processed during offsets calculation for spellcheck highlighting in browser
+     * works in a way that assumes that a fixed-length placeholder should be used, see
+     * controller/SegmentQualitiesBase.js:applyCustomMatches(), so just '---' is used here and there
      */
-    private function getOriginalContent(): string
+    private function getSpellcheckContent(): string
     {
         if ($this->isSpecialCharacter()) {
             return '□';
-        } elseif ($this->isNewline()) {
-            return "\n";
-        } elseif ($this->isTab()) {
-            return "\t";
-        } elseif ($this->isNbsp()) {
-            return " ";
-        } elseif ($this->isSpace()) {
-            return ' ';
+        } elseif ($this->isWhitespace()) {
+            return $this->getWhitespaceContent();
         } elseif ($this->isNumber()) {
-            // Here dash-characters are used as they do not result in spellcheck-error
-            // Initially, the idea was to use dash-character sequence of the same length
-            // as protected number (e.g. '5,600' => '-----'), but the way of how number-tags
-            // are processed during offsets calculation for spellcheck highlighting in browser
-            // works in a way that assumes that a fixed-length placeholder should be used, see
-            // controller/SegmentQualitiesBase.js:applyCustomMatches(), so just '---' is used here and there
             return '---';
         }
 
+        return '';
+    }
+
+    /**
+     * Renders the tags with a configurable replaced content
+     * @throws Exception
+     */
+    private function getProcessedContent(?ReplacedRenderingConfig $config): string
+    {
+        if ($this->isPlaceable()) {
+            if ($config->placeablesAsPlaceholder) {
+                return $config->placeablePlaceholder;
+            }
+
+            return $this->getPlaceableContent();
+        } elseif ($this->isNumber()) {
+            if ($config->numbersAsPlaceholder) {
+                return $config->numberPlaceholder;
+            }
+
+            return $this->getNumberContent($config->isForSource);
+        } elseif ($this->isSpecialCharacter()) {
+            if ($config->specialcharsAsPlaceholder) {
+                return $config->specialcharPlaceholder;
+            }
+
+            return $this->getSpecialCharContent();
+        } elseif ($this->isWhitespace()) {
+            if ($config->whitespaceAsPlaceholder) {
+                return $config->whitespacePlaceholder;
+            }
+
+            return $this->getWhitespaceContent();
+        }
+        // we are an internal tag representing markup
+        if ($this->isSingular() && $config->singleTagsAsPlaceholder) {
+            return $config->singleTagPlaceholder;
+        } elseif ($this->isOpening() && $config->pairedTagsAsPlaceholder) {
+            return $config->openerTagPlaceholder;
+        } elseif ($this->isClosing() && $config->pairedTagsAsPlaceholder) {
+            return $config->closerTagPlaceholder;
+        }
+
+        // we will return any replaced markup as empty string ...
         return '';
     }
 

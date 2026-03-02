@@ -308,7 +308,7 @@ class Check
     {
         // Get target text with all tags being either stripped or
         // replaced with their original contents (in case of whitespace)
-        $targetText = $target->renderReplaced(TagSequence::MODE_ORIGINAL);
+        $targetText = $target->renderReplaced(TagSequence::MODE_SPELLCHECK);
 
         // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
         // Return string applicable to be sent to LanguageTool

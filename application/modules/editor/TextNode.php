@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\ReplacedRenderingConfig;
+
 /**
  * represents an HTML TextNode as PHP-Object
  * A text node has an empty Node-name and will render only it's text content
@@ -139,7 +141,7 @@ final class editor_TextNode extends editor_Tag
     /**
      * Text-nodes have to return their text-contents in replaced (stripped) rendering
      */
-    public function renderReplaced(string $mode): string
+    public function renderReplaced(string $mode, ?ReplacedRenderingConfig $config): string
     {
         return $this->text;
     }
