@@ -146,18 +146,18 @@ final class TerminologyProvider
                     foreach ($termsGroup as $terms) {
                         $sourceTerm = $terms['source'][0];
                         $targetTerm = null;
-                        if (! array_key_exists('target', $terms)) {
-                            // there can be terms without target which indicates no translation exists
-                            // for the current target-language
-                            break;
-                        }
-                        foreach ($terms['target'] as $target) {
-                            if (in_array($target['status'], $acceptedStates, true)) {
-                                $targetTerm = $target;
+                        // there can be terms without target which indicates no translation exists
+                        // for the current target-language
+                        if (array_key_exists('target', $terms)) {
+                            foreach ($terms['target'] as $target) {
+                                if (in_array($target['status'], $acceptedStates, true)) {
+                                    $targetTerm = $target;
 
-                                break;
+                                    break;
+                                }
                             }
                         }
+
                         if ($targetTerm !== null) {
                             $result[$sourceTerm['term']] = $targetTerm['term'];
                         }
@@ -165,7 +165,7 @@ final class TerminologyProvider
                 }
             }
 
-            // error_log($this->pluginName . 'Terminology for segment ' . $segment->getId() . ":\n\n"
+            // error_log("\n" . $this->pluginName . ' Terminology for segment ' . $segment->getId() . ":\n\n"
             //    . print_r($result, true) . "\n");
 
             return $result;
