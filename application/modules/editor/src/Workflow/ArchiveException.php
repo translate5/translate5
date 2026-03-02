@@ -39,5 +39,6 @@ class ArchiveException extends \ZfExtended_ErrorCodeException
         'E1399' => 'No task taskLifetimeDays configuration defined.',
         'E1400' => 'Task could not backuped there fore it also was not deleted.',
         'E1401' => 'Could not zip the export of the task',
+        'E1778' => 'Task could not be locked for deletion!',
     ];
 }
