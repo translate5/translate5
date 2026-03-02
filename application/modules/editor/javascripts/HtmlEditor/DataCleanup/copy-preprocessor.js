@@ -18,7 +18,7 @@ export default function copyPreprocessor(html, tagsConversion, dataTransformer) 
     }
 
     for (const tag of tags) {
-        if (! tagsConversion.isWhitespaceNode(tag)) {
+        if (! tagsConversion.isInternalTagNode(tag)) {
             continue;
         }
 
