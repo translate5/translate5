@@ -125,6 +125,10 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         this.editor.insertSymbol(symbol);
     },
 
+    insertData: function (data) {
+        this.editor.addDataT5Format(data);
+    },
+
     undo: function() {
         this.editor.undo();
     },
