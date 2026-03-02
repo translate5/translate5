@@ -93,7 +93,7 @@ class TmxSymbolsFixerTest extends TestCase
         $result = file_get_contents($inputFile);
         self::assertStringContainsString("\t", $result);
         self::assertStringContainsString("\n", $result);
-        self::assertStringContainsString("&#x0D;", $result);
+        self::assertStringContainsString("\r", $result);
     }
 
     /**
@@ -121,6 +121,20 @@ class TmxSymbolsFixerTest extends TestCase
         $result = file_get_contents($inputFile);
         self::assertStringContainsString('r="utf-char" n="1f"', $result);
         self::assertStringNotContainsString("&#x1F;", $result);
+    }
+
+    public function testReplacesHtmlEntities(): void
+    {
+        $content = "Das ist spritzer &nbsp; arm. &euro; &amp;";
+        $inputFile = $this->createTestFile($content, true);
+
+        $this->fixer->fixInvalidXmlSymbols($inputFile);
+
+        $result = file_get_contents($inputFile);
+        self::assertStringContainsString(' ', $result);
+        self::assertStringContainsString('€', $result);
+        self::assertStringContainsString('&amp;', $result);
+        self::assertStringNotContainsString("&nbsp;", $result);
     }
 
     /**
@@ -241,9 +255,9 @@ class TmxSymbolsFixerTest extends TestCase
         $this->fixer->fixInvalidXmlSymbols($inputFile);
 
         $result = file_get_contents($inputFile);
-        self::assertStringContainsString("&#x09;", $result); // TAB preserved
+        self::assertStringContainsString("	", $result); // TAB preserved
         self::assertStringNotContainsString("&#x1F;", $result); // Unit separator replaced
-        self::assertStringContainsString("&#x0A;", $result); // LF preserved
+        self::assertStringContainsString("\n", $result); // LF preserved
     }
 
     /**
