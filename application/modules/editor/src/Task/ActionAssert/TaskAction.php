@@ -40,4 +40,5 @@ enum TaskAction: string
     case Update = 'update';
     case View = 'view';
     case Confirm = 'confirm';
+    case Export = 'export';
 }

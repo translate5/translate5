@@ -28,37 +28,52 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Task\ActionAssert\Permission;
+namespace MittagQI\Translate5\Task\ActionAssert\Permission\Assert;
 
+use BackedEnum;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ClientRestrictedPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ConfirmPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\CoordinatorGroupUserPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\ExportPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\FinishPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\OpenPermissionAssert;
-use MittagQI\Translate5\Task\ActionAssert\Permission\Assert\UserHasJobInTaskPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\NoAccessToTaskException;
 use MittagQI\Translate5\Task\ActionAssert\TaskAction;
 
 /**
- * @extends ActionPermissionAssert<TaskAction, Task>
+ * @implements PermissionAssertInterface<TaskAction, Task>
  */
-final class TaskActionPermissionAssert extends ActionPermissionAssert
+final class ExportPermissionAssert implements PermissionAssertInterface
 {
-    /**
-     * @codeCoverageIgnore
-     */
     public static function create(): self
     {
-        return new self([
-            ExportPermissionAssert::create(),
-            ClientRestrictedPermissionAssert::create(),
-            CoordinatorGroupUserPermissionAssert::create(),
-            UserHasJobInTaskPermissionAssert::create(),
-            OpenPermissionAssert::create(),
-            ConfirmPermissionAssert::create(),
-            FinishPermissionAssert::create(),
-        ]);
+        return new self(
+        );
+    }
+
+    public function supports(BackedEnum $action): bool
+    {
+        return $action === TaskAction::Export;
+    }
+
+    public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
+    {
+        if ($context->actor->isAdmin()) {
+            return;
+        }
+
+        if ($context->actor->isPm()) {
+            return;
+        }
+
+        if ($context->actor->isPmLight() && $object->getPmGuid() === $context->actor->getUserGuid()) {
+            return;
+        }
+
+        if (
+            $context->actor->isClientPm()
+            && in_array((int) $object->getCustomerId(), $context->actor->getCustomersArray(), true)
+        ) {
+            return;
+        }
+
+        throw new NoAccessToTaskException($object);
     }
 }

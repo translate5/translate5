@@ -1839,6 +1839,12 @@ class editor_TaskController extends ZfExtended_RestController
 
         $this->getAction();
 
+        $this->taskActionPermissionAssert->assertGranted(
+            TaskAction::Export,
+            $this->entity,
+            new PermissionAssertContext($this->authenticatedUser)
+        );
+
         $diff = (bool) $this->getRequest()->getParam('diff');
 
         // an export may be handled by plugins
