@@ -43,6 +43,10 @@ function copyPreprocessor(html, tagsConversion, dataTransformer) {
     }
 
     for (const tag of tags) {
+        if (! tagsConversion.isInternalTagNode(tag)) {
+            continue;
+        }
+
         let div = document.createElement('div');
         div.appendChild(tag.cloneNode(true));
 
