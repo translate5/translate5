@@ -191,7 +191,7 @@ class TermTaggerTagsFixer
         $children = [];
         foreach ($this->tags as $idx => $tag) {
             if ($tag->order !== $termTag->order &&
-                $this->isRelevant($tag) &&
+                $this->isRelevant($tag, true, $termTag) &&
                 $tag->startIndex >= $termTag->startIndex &&
                 $tag->endIndex <= $termTag->endIndex &&
                 $tag->parentOrder === $termTag->order
@@ -208,7 +208,7 @@ class TermTaggerTagsFixer
         $children = [];
         foreach ($this->tags as $idx => $tag) {
             if ($tag->order !== $termTag->order &&
-                $this->isRelevant($tag, false) &&
+                $this->isRelevant($tag, false, $termTag) &&
                 (($tag->startIndex > $termTag->startIndex &&
                         $tag->startIndex < $termTag->endIndex &&
                         $tag->endIndex > $termTag->endIndex) ||
@@ -225,11 +225,20 @@ class TermTaggerTagsFixer
 
     /**
      * Only Trackchanges or Internal tag may cause Problems, MQM are just marker-images
+     * Internal tags are allowed inside terminology if they are whitespace-tags that are not on the term-tag-boundary ...
      */
-    private function isRelevant(editor_Segment_Tag $tag, bool $withInternal = true): bool
+    private function isRelevant(editor_Segment_Tag $tag, bool $withInternal, editor_Segment_Tag $wrappingTag): bool
     {
         return $tag->getType() === editor_Segment_Tag::TYPE_TRACKCHANGES ||
-            ($withInternal && $tag->getType() === editor_Segment_Tag::TYPE_INTERNAL);
+            (
+                $withInternal &&
+                $tag->getType() === editor_Segment_Tag::TYPE_INTERNAL &&
+                (
+                    // only whitespace on the boundry will be relevant (= removed/relocated)
+                    $tag->isWhitespace() === false || // @phpstan-ignore-line We do know it's an internal tag here ...
+                    ($tag->startIndex === $wrappingTag->startIndex || $tag->endIndex === $wrappingTag->endIndex)
+                )
+            );
     }
 
     /**

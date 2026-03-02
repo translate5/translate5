@@ -203,6 +203,33 @@ class SegmentTermTagsRepairTest extends SegmentTagsTestAbstract
         $this->createTermTagsRepairTest($expected, $expected);
     }
 
+    public function testFaultyTermTags23(): void
+    {
+        // whitespace on the boundry of a term-tag will be relocated ... <6/> is a space
+        $original = 'Coś jeszcze <term1><6/>Priključek czeka</term1> na Ciebie';
+        $expected = 'Coś jeszcze <6/><term1>Priključek czeka</term1> na Ciebie';
+        $this->createTermTagsRepairTest($original, $expected);
+        $this->createTermTagsRepairTest($expected, $expected);
+    }
+
+    public function testValidTermTags1(): void
+    {
+        // whitespace in the middle of a term-tag will be allowed ... <6/> is a space
+        $original = 'Coś jeszcze <term1>Priključek<6/>czeka</term1> na Ciebie';
+        $expected = 'Coś jeszcze <term1>Priključek<6/>czeka</term1> na Ciebie';
+        $this->createTermTagsRepairTest($original, $expected);
+        $this->createTermTagsRepairTest($expected, $expected);
+    }
+
+    public function testValidTermTags2(): void
+    {
+        // whitespace in the middle of a term-tag will be allowed ... <7/> is a newline (debatable semantically ...)
+        $original = 'Coś jeszcze <term1>Priključek<7/>czeka</term1> na Ciebie';
+        $expected = 'Coś jeszcze <term1>Priključek<7/>czeka</term1> na Ciebie';
+        $this->createTermTagsRepairTest($original, $expected);
+        $this->createTermTagsRepairTest($expected, $expected);
+    }
+
     protected function createTermTagsRepairTest(string $original, string $expected): void
     {
         $segmentId = rand(111111, 999999);
