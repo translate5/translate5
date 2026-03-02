@@ -205,7 +205,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
                         // Foreach quality - apply false positive styles
                         for (const quality of data[field]) {
-                            Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(quality.id, quality.falsePositive);
+                            Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(quality.id, quality.falsePositive, rec);
                         }
 
                     // Else if we're going to apply styles for other quality types (only spellcheck-qualities currently)

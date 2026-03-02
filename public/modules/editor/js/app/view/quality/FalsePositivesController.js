@@ -54,10 +54,10 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
          * @param {int} qualityId
          * @param {boolean} falsePositive
          */
-        applyFalsePositiveStyle: function(qualityId, falsePositive) {
+        applyFalsePositiveStyle: function(qualityId, falsePositive, rec) {
             // Get quality tags/nodes
             var tags = document.querySelectorAll('[data-t5qid="' + qualityId + '"]'),
-                tip = Editor.data.l10n.falsePositives.hover, cell, row, rid, rec;
+                tip = Editor.data.l10n.falsePositives.hover, cell, row, rid;
 
             // If found - update data-t5qfp="" attribute
             tags.forEach(tag => {
@@ -79,7 +79,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                     // Get record
                     row = cell.closest('table.x-grid-item');
                     rid = row.getAttribute('data-recordid');
-                    rec = Ext.getCmp(row.getAttribute('data-boundview')).getStore().getByInternalId(rid);
+                    rec = Ext.getCmp(row.getAttribute('data-boundview')).getStore().getByInternalId(rid) || rec;
 
                     // Update source, so that updated value will be picked by segmenteditor once opened
                     tag.removeAttribute('id');
