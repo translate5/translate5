@@ -36,24 +36,38 @@ use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Translate5\MaintenanceCli\Command\Translate5AbstractCommand;
 
-class ScheduleConversionForAllCommand extends Command
+class ScheduleConversionForAllCommand extends Translate5AbstractCommand
 {
     protected static $defaultName = 't5memory:conversion:scheduleForAll';
 
+    /**
+     * @throws \Zend_Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->initInputOutput($input, $output);
+        $this->initTranslate5();
         $languageResourceRepository = LanguageResourceRepository::create();
         $tmConversionService = TmConversionService::create();
 
         $lrs = $languageResourceRepository->getAllByServiceName(\editor_Services_T5Memory_Service::NAME);
 
+        $counter = 0;
         foreach ($lrs as $lr) {
             if (ConversionState::NotConverted !== $tmConversionService->getConversionState((int) $lr->getId())) {
                 continue;
             }
 
+            $counter++;
             $tmConversionService->scheduleConversion((int) $lr->getId());
+        }
+
+        if ($counter === 0) {
+            $this->io->warning('No conversions scheduled.');
+        } else {
+            $this->io->success('Conversion scheduled for ' . $counter . ' language resources.');
         }
 
         return Command::SUCCESS;
