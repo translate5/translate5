@@ -54,6 +54,12 @@ class StatisticsSqliteInitCommand extends Translate5AbstractCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Display raw output (no table formatting)'
+            )
+            ->addOption(
+                're-create',
+                null,
+                InputOption::VALUE_NONE,
+                'Drop existing statistics tables before creation'
             );
         ;
     }
@@ -120,6 +126,11 @@ PRIMARY KEY (taskGuid,segmentId,workflowStepName)
         ];
 
         foreach ($tableSql as $tableName => $sql) {
+            if ($this->input->getOption('re-create')) {
+                $this->io->warning('Deleted existing table: ' . $tableName);
+                $db->query('DROP TABLE IF EXISTS ' . $tableName);
+            }
+
             if ($db->tableExists($tableName)) {
                 $this->io->writeln('SQLite table already exists: ' . $tableName);
 
@@ -129,7 +140,7 @@ PRIMARY KEY (taskGuid,segmentId,workflowStepName)
             $db->query(sprintf($sql, $tableName));
 
             if ($db->tableExists($tableName)) {
-                $this->io->writeln('SQLite table created successfully: ' . $tableName);
+                $this->io->success('SQLite table created successfully: ' . $tableName);
             } else {
                 $this->io->error('Create SQLite table ' . $tableName . ' FAILED');
 
@@ -150,7 +161,7 @@ PRIMARY KEY (taskGuid,segmentId,workflowStepName)
                 }
             }
             if (! empty($msg)) {
-                $this->io->info('Statistics data aggregation skipped: ' . $msg);
+                $this->io->warning('Statistics data aggregation skipped: ' . $msg);
 
                 return self::SUCCESS;
             }
