@@ -161,13 +161,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $entity = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
         $entity->load($this->languageResource->getId());
 
-        // If major langs should be used
-        if ($useMajorLangs) {
-            $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-            $taskMajorSourceLangId = $language->findMajorLanguageById($this->sourceLang);
-            $taskMajorTargetLangId = $language->findMajorLanguageById($this->targetLang);
-        }
-
         /***
          * Search the current term collection with given query string. All fuzzy languages will be included in the
          * search.('en' as search language will result with search using 'en','en-US','en-GB' etc.)
@@ -177,8 +170,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
          */
         $searchCollection = ZfExtended_Factory::get(SearchCollection::class, [
             $entity->getId(),
-            $useMajorLangs ? $taskMajorSourceLangId : $this->sourceLang,
-            $useMajorLangs ? $taskMajorTargetLangId : $this->targetLang,
+            $this->sourceLang,
+            $this->targetLang,
+            $useMajorLangs,
             $this->config?->runtimeOptions->terminology->usedTermProcessStatus?->toArray(),
         ]);
         $searchCollection->setSearchField($field);

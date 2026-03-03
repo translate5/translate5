@@ -90,9 +90,32 @@ class SearchCollection
         private int $collectionId,
         private int $sourceLang,
         private int $targetLang,
+        private bool|array $useMajorLangs = false,
         private ?array $processStatus = null,
     ) {
         $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
+
+        // Load utils for array_group_by() fn to be defined
+        class_exists(\editor_Utils::class);
+
+        // If major langs should be used
+        if ($useMajorLangs) {
+            // Spoof $sourceLang and $targetLang with their major languages
+            // while keeping $this->sourceLang and $this->targetLang intact
+            // because those are the task's ones, and we need those in the
+            // ORDER BY clause for task lang and then task lang's major lang
+            // to be prioritised ones as otherwise sublanguage penalties detection
+            // will work incorrect
+            $sourceLang = $languageModel->findMajorLanguageById($sourceLang);
+            $targetLang = $languageModel->findMajorLanguageById($targetLang);
+
+            // Remember major langs - to be further used to build
+            // ORDER BY FIND_IN_SET(`languageId`, 'majorLang,sourceLang') DESC
+            // so that the very first source term found will have the best possible
+            // language from the sublanguage penalties calculation perspective
+            // Why first: see the comment inside $this->search()
+            $this->useMajorLangs = compact('sourceLang', 'targetLang');
+        }
 
         // get source and target language fuzzy
         $this->sourceLangauges = $languageModel->getFuzzyLanguages($sourceLang, 'id', true);
@@ -142,6 +165,11 @@ class SearchCollection
             $single['default' . $this->searchField] = '';
             if (! empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
                 $single['default' . $this->searchField] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0]['term'];
+
+                // Language of a very first term is picked here as default,
+                // and the sublanguage penalties calculation relies on it,
+                // so the languageId of the very first term should be the best
+                // possible one among the ones we have in terminology
                 $single['default' . $this->searchField . 'LanguageId'] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0]['languageId'];
             }
         }
@@ -159,6 +187,12 @@ class SearchCollection
 
         // Get the langauges base on term search source
         $langauges = $this->searchField === self::SEARCH_SOURCE ? $this->sourceLangauges : $this->targetLangauges;
+
+        // Set the sequence of languages ids to be used in
+        // ORDER BY FIND_IN_SET(`languageId`, 'taskMajorLang,taskLang') DESC
+        $langPriorityDESC = $this->searchField === self::SEARCH_SOURCE
+            ? "'{$this->useMajorLangs['sourceLang']},$this->sourceLang'"
+            : "'{$this->useMajorLangs['targetLang']},$this->targetLang'";
 
         $compareWith = '=';
 
@@ -179,9 +213,16 @@ class SearchCollection
             ->where('collectionId = ?', $this->collectionId)
             ->where('languageId IN(?)', $langauges)
             ->where('processStatus IN(?)', $this->processStatus)
-            ->group('termEntryTbxId');
+            ->order(["FIND_IN_SET(`languageId`, $langPriorityDESC) DESC"]);
 
-        return $db->fetchAll($s)->toArray();
+        // Don't use GROUP BY as it's uncertain which row's data survive
+        // so we can't rely on the languageId from that data. Instead, we
+        // do the grouping on php level and pick the first result in each group
+        // as the results inside group are in the right order
+        $data = $db->getAdapter()->query($s)->fetchAll();
+        $data = array_values(\array_group_by($data, 'termEntryTbxId'));
+
+        return array_column($data, 0);
     }
 
     /**
