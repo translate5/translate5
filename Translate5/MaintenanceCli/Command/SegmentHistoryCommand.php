@@ -113,9 +113,14 @@ The single versions are showing only the values different to the current one! Th
         $autoStates = new editor_Models_Segment_AutoStates();
         $this->autoStateMap = array_flip($autoStates->getStateMap());
 
-        $taskGuid = $this->findTaskGuid();
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
+        $taskGuid = $this->findTaskGuid($task);
 
         $segment = $this->findSegment($taskGuid);
+        if ($taskGuid === null) {
+            //only segment id was passed as argument
+            $task->loadByTaskGuid($segment->getTaskGuid());
+        }
 
         $history = SegmentHistoryRepository::create();
         $historyEntries = array_reverse($history->loadBySegmentId((int) $segment->getId()));
@@ -130,9 +135,9 @@ The single versions are showing only the values different to the current one! Th
 
         $this->io->section("General segment information");
         $this->io->text([
-            '<info>Segment ID:</info> <options=bold>' . $segment->getId() . '</>',
-            '<info>Nr in Task:</info> <options=bold>' . $segment->getSegmentNrInTask() . '</>',
-            ' <info>Task GUID:</info> <options=bold>' . $segment->getTaskGuid() . '</>',
+            '<info>    Segment ID:</info> <options=bold>' . $segment->getId() . '</>',
+            '<info>    Nr in Task:</info> <options=bold>' . $segment->getSegmentNrInTask() . '</>',
+            '<info>Task ID / GUID:</info> <options=bold>' . $task->getId() . ' / ' . $segment->getTaskGuid() . '</>',
         ]);
         foreach ($historyEntries as $entry) {
             $this->showSegment((object) $entry, $segment);
@@ -257,14 +262,13 @@ The single versions are showing only the values different to the current one! Th
      * returns the taskGuid to given option --task, null if option was not given
      * @throws ReflectionException
      */
-    protected function findTaskGuid(): ?string
+    protected function findTaskGuid(editor_Models_Task $task): ?string
     {
         $taskId = $this->input->getOption('task');
 
         if (empty($taskId)) {
             return null;
         }
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
 
         try {
             if (is_numeric($taskId)) {
