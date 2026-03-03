@@ -12,6 +12,29 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 - PATCH version change: Only bug fixes and small enhancements
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
+## [7.35.2] - 2026-03-03
+
+### Important Notes:
+#### [TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034)
+7.35.x: IMPORTANT FOR INSTALLATIONS WHERE CONTENT PROTECTION IS USED!
+Due to the feature all TMs using Content Protection rules are listed as "not converted" and conversion should be started afterwards.
+On Premise clients: please handle manually after the update. 
+Hosting clients: is done and ensured by MittagQI.
+ 
+
+
+### Changed
+**[TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034): t5memory - Filter TMX on import** <br>
+7.35.2: conversion script did fail for empty TMs
+7.35.0: Apply filters on TMX on import time from translate5 side
+All Translate5 TMs in instance will be marked as "not converted" and matches may have lower matches.
+Language resources affected by this should be converted manually.
+
+
+### Bugfixes
+**[TRANSLATE-5292](https://jira.translate5.net/browse/TRANSLATE-5292): MatchAnalysis & Pretranslation - 104 match faulty** <br>
+FIXED: sublanguage penalties detection problem for TermCollections, caused by usage of terms having not the best matching languages possible
+
 
 ## [7.35.1] - 2026-03-02
 
