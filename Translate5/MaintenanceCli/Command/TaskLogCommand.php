@@ -257,7 +257,7 @@ class TaskLogCommand extends Translate5AbstractCommand
             $last = end($rows);
             $this->summary['last'] = $last['created'];
             $this->summary['first'] = reset($rows)['created'];
-            $this->lastFoundId = $last['id'];
+            $this->lastFoundId = (int) $last['id'];
         }
         $ecodes = [];
         $this->summary['levels'] = array_fill_keys(array_keys(LogCommand::LEVELS), 0);
