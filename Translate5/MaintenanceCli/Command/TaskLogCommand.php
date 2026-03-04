@@ -26,8 +26,11 @@
  END LICENSE AND COPYRIGHT
  */
 
+declare(strict_types=1);
+
 namespace Translate5\MaintenanceCli\Command;
 
+use editor_Models_Logger_Task;
 use JsonException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,76 +38,58 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LogCommand extends Translate5AbstractCommand
+class TaskLogCommand extends Translate5AbstractCommand
 {
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'log';
-
-    public const LEVELS = [
-        1 => '<fg=red;options=bold>FATAL</>',
-        2 => '<fg=red>ERROR</>',
-        4 => '<fg=yellow>WARN </>',
-        8 => '<fg=blue>INFO </>',
-        16 => 'DEBUG',
-        32 => 'TRACE',
-    ];
+    protected static $defaultName = 'task:log';
 
     /**
      * Tracking the used filters for the summary.
-     * @var array
      */
-    protected $usedFilters = [];
+    protected array $usedFilters = [];
 
-    protected $summary = [];
+    protected array $summary = [];
 
     /**
      * flag if summary should be shown or not
-     * @var boolean
      */
-    protected $withSummary = true;
+    protected bool $withSummary = true;
 
     /**
      * Tracking the last found id for reach run with --follow
-     * @var integer
      */
-    protected $lastFoundId = 0;
+    protected int $lastFoundId = 0;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-        // the short description shown while running "php bin/console list"
-            ->setDescription(
-                'Query the translate5 log. Short cut logx shows errors and warnings only of the last 24h.'
-                . 'logy all of the last 24h'
-            )
-
-        // the full command description shown when running the command with
-        // the "--help" option
+            ->setDescription('Query the log entries of a specific task.')
             ->setHelp(
-                'Tool to query, investigate and purge the translate5 system log. By default a list of log entries and a summary is shown.
-
-list output example:
-  2020-09-07 09:26:11 FATAL E1027 (#123) core → PHP E_ERROR: Uncaught Error: Call to undefined method XyZ in foo.php:121
-the format is:
-  log timestamp       level ecode (#ID)  app.domain → message'
+                'Tool to query and investigate the task log. By default a list of log entries and a summary is shown.'
             );
 
-        $this->setAliases(['logx', 'logy']);
-
-        $this->addArgument('filter', InputArgument::OPTIONAL, 'Provide keywords to filter output. EXXXX is recognized as ecodes, text.text.text as domains and all other is searched in message. If keyword is only one Number, it is assumed that is a log ID an only that entry is shown.');
+        $this->addArgument('taskIdentifier', InputArgument::REQUIRED, TaskCommand::IDENTIFIER_DESCRIPTION);
+        $this->addArgument(
+            'filter',
+            InputArgument::OPTIONAL,
+            'Provide keywords to filter output. EXXXX is recognized as ecodes, text.text.text as domains '
+            . 'and all other is searched in message. If keyword is only one Number, it is assumed that is a log ID '
+            . 'an only that entry is shown.'
+        );
 
         $this->addOption(
             'level',
             'L',
             InputOption::VALUE_REQUIRED,
-            'Filtering for specific level(s). If given as string, only the level given as string is shown. Given as integer: filtering for all levels as bitmask.'
+            'Filtering for specific level(s). If given as string, only the level given as string is shown. '
+            . 'Given as integer: filtering for all levels as bitmask.'
         );
 
         $this->addOption(
             'follow',
             'f',
             InputOption::VALUE_NONE,
-            'Show the most recent log entries, and continuously print new entries as they are appended to the log. Do not show a summary.'
+            'Show the most recent log entries, and continuously print new entries as they are appended '
+            . 'to the log. Do not show a summary.'
         );
 
         $this->addOption(
@@ -125,7 +110,8 @@ the format is:
             'until',
             'u',
             InputOption::VALUE_REQUIRED,
-            'Shows log data until the given point in time (strtotime parsable string). If the parameter starts with a "+" it is automatically added to the since date.'
+            'Shows log data until the given point in time (strtotime parsable string). '
+                . 'If the parameter starts with a "+" it is automatically added to the since date.'
         );
 
         $this->addOption(
@@ -151,13 +137,6 @@ the format is:
         );
 
         $this->addOption(
-            'purge',
-            null,
-            InputOption::VALUE_NONE,
-            'Warning: purges the logs found be the given filters. Is asking for confirmation of not used with -q|--quiet or -n|--no-interaction.'
-        );
-
-        $this->addOption(
             'list-origin',
             null,
             InputOption::VALUE_NONE,
@@ -173,30 +152,33 @@ the format is:
     }
 
     /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     * @throws \Zend_Exception
+     * @throws \ReflectionException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
 
-        if ($input->getFirstArgument() === 'logx') {
-            $input->setOption('since', '-24 hours');
-            $input->setOption('level', 7);
-        }
+        $task = TaskCommand::findTaskFromArgument(
+            $this->io,
+            $input->getArgument('taskIdentifier')
+        );
 
-        if ($input->getFirstArgument() === 'logy') {
-            $input->setOption('since', '-24 hours');
+        if ($task === null) {
+            return self::FAILURE;
         }
 
         if ($input->getOption('list-origin')) {
-            $log = new \ZfExtended_Models_Log();
-            $s = $log->db->select()->from($log->db, ['domain', 'count(*) as cnt'])->group('domain');
+            $log = \ZfExtended_Factory::get(editor_Models_Logger_Task::class);
+            $s = $log->db->select()
+                ->from($log->db, ['domain', 'count(*) as cnt'])
+                ->where('taskGuid = ?', $task->getTaskGuid())
+                ->group('domain');
             $origins = $log->db->fetchAll($s)->toArray();
             if (empty($origins)) {
-                $this->io->error("No log origins to get origins from found.");
+                $this->io->error('No log origins to get origins from found.');
 
                 return self::FAILURE;
             }
@@ -214,26 +196,30 @@ the format is:
 
         $this->withSummary = ! $input->getOption('no-summary');
         if ($this->withSummary) {
-            $this->writeTitle('Query Translate5 log.');
+            $this->writeTitle('Query task log.');
+            $this->io->text('Task: ' . $task->getTaskName() . ' (' . $task->getTaskGuid() . ')');
         }
 
-        $log = new \ZfExtended_Models_Log();
+        $log = \ZfExtended_Factory::get(editor_Models_Logger_Task::class);
 
         $filter = $this->input->getArgument('filter');
         if (is_numeric($filter)) {
             try {
                 $log->load($filter);
-                $this->showDetail((array) $log->getDataObject());
+                if ($log->getTaskGuid() === $task->getTaskGuid()) {
+                    $this->showDetail((array) $log->getDataObject());
 
-                return 0;
+                    return self::SUCCESS;
+                }
             } catch (\Exception $e) {
                 //just proceed with normal filtering if no log entry with that ID found
             }
         }
 
-        //defining always the --follow loop but break it, if not using following
         while (true) {
-            $s = $log->db->select()->order('id DESC');
+            $s = $log->db->select()
+                ->where('taskGuid = ?', $task->getTaskGuid())
+                ->order('id DESC');
 
             $filtered = $this->parseArgumentToSelect($s);
             $filtered = $this->parseOriginToSelect($s) || $filtered;
@@ -241,12 +227,11 @@ the format is:
             $filtered = $this->parseLevelToSelect($s) || $filtered;
 
             $limit = $input->getOption('last');
-            if ($limit !== false) { // if === false, then it was not given at all
-                $s->limit($limit ?? 5); //if $limit is null, then it was given empty, so defaulting to 5
+            if ($limit !== false) {
+                $s->limit($limit ?? 5);
             }
 
             if ($input->getOption('follow')) {
-                //on first run we respect limit, after that not anymore to get all logs in the 2 second gap
                 if ($this->lastFoundId > 0) {
                     $s->reset($s::LIMIT_COUNT);
                 }
@@ -256,48 +241,13 @@ the format is:
             } else {
                 $this->processResults($log, $s);
                 $this->summary($filtered);
-                $this->purgeList($log, $s);
 
-                return 0;
+                return self::SUCCESS;
             }
         }
     }
 
-    /**
-     * When using with --purge the single record is deleted
-     */
-    protected function purgeOne(\ZfExtended_Models_Log $log)
-    {
-        if (! $this->input->getOption('purge') || $this->summary['count'] === 0) {
-            return;
-        }
-        if (! $this->input->isInteractive() || $this->io->confirm('Really delete that log record?', false)) {
-            $log->delete();
-            $this->io->success('Above shown log record deleted!');
-        }
-    }
-
-    /**
-     * When using with --purge the single record is deleted
-     */
-    protected function purgeList(\ZfExtended_Models_Log $log, \Zend_Db_Table_Select $s)
-    {
-        if (! $this->input->getOption('purge') || $this->summary['count'] === 0) {
-            return;
-        }
-        if (! $this->input->isInteractive() || $this->io->confirm('Really delete that log records?', false)) {
-            //a little bit hacky: prevent logged config changes from deletion
-            $s->where('eventCode != ?', 'E1324');
-            $where = $s->getPart($s::WHERE);
-            $log->db->delete(is_array($where) ? join(' ', $where) : $where);
-            $this->io->success('Above shown log record(s) deleted!');
-        }
-    }
-
-    /**
-     * searches for log entries and process them
-     */
-    protected function processResults(\ZfExtended_Models_Log $log, \Zend_Db_Table_Select $s)
+    protected function processResults(editor_Models_Logger_Task $log, \Zend_Db_Table_Select $s): void
     {
         $summaryOnly = $this->input->getOption('summary-only');
         $rows = $log->db->fetchAll($s)->toArray();
@@ -307,34 +257,31 @@ the format is:
             $last = end($rows);
             $this->summary['last'] = $last['created'];
             $this->summary['first'] = reset($rows)['created'];
-            $this->lastFoundId = $last['id'];
+            $this->lastFoundId = (int) $last['id'];
         }
         $ecodes = [];
-        $this->summary['levels'] = array_fill_keys(array_keys(self::LEVELS), 0);
+        $this->summary['levels'] = array_fill_keys(array_keys(LogCommand::LEVELS), 0);
         if ($this->withSummary && ! $summaryOnly && ! $this->input->getOption('follow')) {
             $this->io->section('Found log entries:');
         }
         foreach ($rows as $row) {
-            //find out max used eventCode
             if (empty($ecodes[$row['eventCode']])) {
                 $ecodes[$row['eventCode']] = 1;
             } else {
                 $ecodes[$row['eventCode']]++;
             }
-            $this->summary['levels'][$row['level']]++;
+            if (isset($this->summary['levels'][$row['level']])) {
+                $this->summary['levels'][$row['level']]++;
+            }
             if ($summaryOnly) {
                 continue;
             }
             if ($this->input->getOption('all')) {
                 $this->showDetail($row);
             } else {
-                $idBlock = '(# ' . $row['id'];
-                if ($row['duplicates'] > 0) {
-                    $idBlock .= ' <options=bold>*' . $row['duplicates'] . '</>';
-                }
-                $idBlock .= ') ';
+                $idBlock = '(# ' . $row['id'] . ') ';
                 $this->io->text($row['created'] . ' ' .
-                    self::LEVELS[$row['level']] . ' <options=bold>' . $row['eventCode'] . '</> ' . $idBlock .
+                    LogCommand::LEVELS[$row['level']] . ' <options=bold>' . $row['eventCode'] . '</> ' . $idBlock .
                     OutputFormatter::escape((string) $row['domain']) . ' → ' .
                     OutputFormatter::escape((string) str_replace("\n", ' ', $row['message'])));
             }
@@ -351,7 +298,7 @@ the format is:
         }
     }
 
-    protected function summary(bool $usedFilter)
+    protected function summary(bool $usedFilter): void
     {
         if (! $this->withSummary) {
             return;
@@ -367,7 +314,7 @@ the format is:
                 if ($count == 0) {
                     continue;
                 }
-                $this->io->text('  ' . self::LEVELS[$key] . ': ' . $count);
+                $this->io->text('  ' . LogCommand::LEVELS[$key] . ': ' . $count);
             }
         } else {
             $this->io->success('No log entries found!');
@@ -399,10 +346,6 @@ the format is:
         }
     }
 
-    /**
-     * parses and adds the level filter(s)
-     * @return boolean
-     */
     protected function parseLevelToSelect(\Zend_Db_Table_Select $s): bool
     {
         $level = $this->input->getOption('level');
@@ -443,10 +386,6 @@ the format is:
         return false;
     }
 
-    /**
-     * parses and adds the date filters
-     * @return boolean
-     */
     protected function parseDateToSelect(\Zend_Db_Table_Select $s): bool
     {
         $result = false;
@@ -486,10 +425,6 @@ the format is:
         return $result;
     }
 
-    /**
-     * parses the argument for valid filter strings and applies them. Returns boolean if filters are applied
-     * @return boolean
-     */
     protected function parseArgumentToSelect(\Zend_Db_Table_Select $s): bool
     {
         $filter = $this->input->getArgument('filter');
@@ -535,9 +470,6 @@ the format is:
         return true;
     }
 
-    /**
-     * parses and adds the origin (domain) substring filter
-     */
     protected function parseOriginToSelect(\Zend_Db_Table_Select $s): bool
     {
         $origin = $this->input->getOption('origin');
@@ -550,43 +482,23 @@ the format is:
         return true;
     }
 
-    /**
-     * Prints a config entry with all details
-     */
     protected function showDetail(array $row)
     {
         $out = [
             '         <info>id:</> ' . (string) $row['id'],
-            '      <info>level:</> ' . (string) self::LEVELS[$row['level']],
+            '      <info>level:</> ' . (string) LogCommand::LEVELS[$row['level']],
             '    <info>created:</> ' . (string) $row['created'],
-            ' <info>duplicates:</> <options=bold>' . (string) $row['duplicates'] . '</>',
-            '       <info>last:</> ' . (string) $row['last'],
+            '      <info>state:</> ' . OutputFormatter::escape((string) $row['state']),
             '      <info>ecode:</> <options=bold>' . OutputFormatter::escape((string) $row['eventCode']) . '</>',
             '     <info>domain:</> ' . OutputFormatter::escape((string) $row['domain']),
             '    <info>message:</> ' . OutputFormatter::escape((string) $row['message']),
-            ' <info>appVersion:</> ' . OutputFormatter::escape((string) $row['appVersion']),
-            '<info>file (line):</> ' . $this->linkIDE(OutputFormatter::escape((string) $row['file'] . ' (' . $row['line'] . ')'), $row['file'], $row['line']),
         ];
 
-        if ($row['duplicates'] == 0) {
-            unset($out[3]);
-            unset($out[4]);
-        }
-
-        if (! empty($row['httpHost'])) {
-            $out[] = '       <info>Host:</> ' . OutputFormatter::escape((string) $row['httpHost']);
-        }
-        if (! empty($row['url'])) {
-            $out[] = '        <info>URL:</> ' . OutputFormatter::escape((string) $row['method'] . ' ' . $row['url']);
-        }
-        if (! empty($row['userGuid'])) {
-            $out[] = '       <info>User:</> ' . OutputFormatter::escape((string) $row['userLogin'] . ' (' . $row['userGuid'] . ')');
-        }
         if (! empty($row['worker'])) {
             $out[] = '     <info>Worker:</> ' . OutputFormatter::escape((string) $row['worker']);
         }
-        if (! empty($row['trace'])) {
-            $out[] = '      <info>Trace:</> ' . preg_replace('/((#[0-9]+) |\([0-9]+\))/', "<options=bold>$0</>", $this->formatTrace((string) $row['trace']));
+        if (! empty($row['authUserGuid'])) {
+            $out[] = '       <info>User:</> ' . OutputFormatter::escape((string) $row['authUser'] . ' (' . $row['authUserGuid'] . ')');
         }
         if (! empty($row['extra'])) {
             $out[] = '      <info>Extra:</> ' . $this->prepareExtra($row['extra']);
@@ -596,9 +508,6 @@ the format is:
         $this->io->text($out);
     }
 
-    /**
-     * returns the extra parameter prepared for output
-     */
     protected function prepareExtra(string $extra): string
     {
         try {
@@ -615,28 +524,5 @@ the format is:
         $extra = json_encode($extra, JSON_PRETTY_PRINT);
 
         return OutputFormatter::escape((string) $extra);
-    }
-
-    protected function formatTrace(string $trace): string
-    {
-        $trace = OutputFormatter::escape($trace);
-
-        return preg_replace_callback('/#[0-9]+ ([^( ]+)\(([0-9]+)\):/', function ($matches) {
-            return $this->linkIDE($matches[0], $matches[1], $matches[2]);
-        }, $trace);
-    }
-
-    protected function linkIDE(string $text, ?string $file, ?int $line): string
-    {
-        if (is_null($file) && is_null($line)) {
-            return $text;
-        }
-        if (! \ZfExtended_Utils::isDevelopment() || ! str_starts_with($file, APPLICATION_ROOT)) {
-            return $text;
-        }
-        $file = urlencode(str_replace(APPLICATION_ROOT, '', $file));
-        $url = OutputFormatter::escape((string) 'phpstorm://open?file=' . $file . '&line=' . $line);
-
-        return '<href=' . $url . '>✎</> ' . $text;
     }
 }

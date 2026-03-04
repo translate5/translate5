@@ -12,7 +12,126 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 - PATCH version change: Only bug fixes and small enhancements
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
+## [7.35.2] - 2026-03-03
 
+### Important Notes:
+#### [TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034)
+7.35.x: IMPORTANT FOR INSTALLATIONS WHERE CONTENT PROTECTION IS USED!
+Due to the feature all TMs using Content Protection rules are listed as "not converted" and conversion should be started afterwards.
+On Premise clients: please handle manually after the update. 
+Hosting clients: is done and ensured by MittagQI.
+ 
+
+
+### Changed
+**[TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034): t5memory - Filter TMX on import** <br>
+7.35.2: conversion script did fail for empty TMs
+7.35.0: Apply filters on TMX on import time from translate5 side
+All Translate5 TMs in instance will be marked as "not converted" and matches may have lower matches.
+Language resources affected by this should be converted manually.
+
+
+### Bugfixes
+**[TRANSLATE-5292](https://jira.translate5.net/browse/TRANSLATE-5292): MatchAnalysis & Pretranslation - 104 match faulty** <br>
+FIXED: sublanguage penalties detection problem for TermCollections, caused by usage of terms having not the best matching languages possible
+
+
+## [7.35.1] - 2026-03-02
+
+### Important Notes:
+#### [TRANSLATE-5286](https://jira.translate5.net/browse/TRANSLATE-5286)
+Due a bug the statistics DB was broken.
+Please re-init it with:
+t5 statistics:sqlite:init --re-create --aggregate
+this will run a longer time.
+ 
+
+
+### Changed
+**[TRANSLATE-5326](https://jira.translate5.net/browse/TRANSLATE-5326): Editor general - Segment markup: Allow whitespace-tags in terminology-tags** <br>
+FIX: allow whitespace-tags in terminology tags as valid segment markup
+
+**[TRANSLATE-5313](https://jira.translate5.net/browse/TRANSLATE-5313): t5memory - T5Memory &nbsp; crashes import** <br>
+Decode html entities on TMX import to prevent import errors
+
+
+### Bugfixes
+**[TRANSLATE-5330](https://jira.translate5.net/browse/TRANSLATE-5330): t5memory - Concordance search fails in certain cases** <br>
+[🐞 Fix] Fix concordance search error which rarely might have occurred in certain cases
+
+**[TRANSLATE-5329](https://jira.translate5.net/browse/TRANSLATE-5329): translate5 AI - Do not relay on no alikes on TQE segment check** <br>
+Fix for a problem where noAllikes flag was evaluated on single segment TQE check.
+
+**[TRANSLATE-5327](https://jira.translate5.net/browse/TRANSLATE-5327): Editor general - Cannot read properties of undefined (reading 'replace') error** <br>
+[🐞 Fix] Fixed warning in console when saving segment
+
+**[TRANSLATE-5321](https://jira.translate5.net/browse/TRANSLATE-5321): Workflows - Adjust Email Headers for certain Outlook Versions having Problems with encoded headers** <br>
+ENHANCEMENT: Avoid typographical quotes in mail-subjects to avoid encoding the headers which lead to problems in some outlook versions
+
+**[TRANSLATE-5316](https://jira.translate5.net/browse/TRANSLATE-5316): Auto-QA - RootCause: can't access property "set", rec is undefined** <br>
+FIXED: improved segment grid record detection (to apply false-positivity styling for when needed)
+
+**[TRANSLATE-5315](https://jira.translate5.net/browse/TRANSLATE-5315): Editor general - Multiple issues with copy/paste content with tags** <br>
+[🐞 Fix] Fixed issues with copy/paste with tags 
+
+**[TRANSLATE-5314](https://jira.translate5.net/browse/TRANSLATE-5314): Authentication - Session overflow on heavy API access** <br>
+On installations with API usage (for example with t5connect) to much sessions are produced with to long lifetime leading to problems with the session table.
+
+**[TRANSLATE-5309](https://jira.translate5.net/browse/TRANSLATE-5309): TermTagger integration - BUG in Terminology Provider for OpenAI and InstantTranslate** <br>
+FIX: Terminology in certain cases was not evalueted completely for a segment in OpenAI & InstantTranslate requests
+
+**[TRANSLATE-5286](https://jira.translate5.net/browse/TRANSLATE-5286): Task Management - live updateing of levenshtein and post-editing time statistics does not seem to work** <br>
+Fix the calculation of the levenshtein distance of segments with internal tags.
+
+**[TRANSLATE-5277](https://jira.translate5.net/browse/TRANSLATE-5277): Task Management - improve info message about deleted task** <br>
+Made error message when task is not found more user-friendly
+
+**[TRANSLATE-5206](https://jira.translate5.net/browse/TRANSLATE-5206): LanguageResources, translate5 AI - Adding examples to a prompt faulty** <br>
+FIXED: problem with discarding changes, validating examplesets and made blue Save-button to save examplesets-changes (if any) as well
+
+**[TRANSLATE-5155](https://jira.translate5.net/browse/TRANSLATE-5155): translate5 AI - angle brackets in prompts not shown in UI and break other prompts** <br>
+Encode html entities in prompt messages.
+
+
+## [7.35.0] - 2026-02-25
+
+### Important Notes:
+#### [TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034)
+IMPORTANT FOR INSTALLATIONS WHERE CONTENT PROTECTION IS USED!
+Due to the feature all TMs using Content Protection rules are listed as "not converted" and conversion should be started afterwards.
+On Premise clients: please handle manually after the update. 
+Hosting clients: is done and ensured by MittagQI.
+ 
+
+
+### Changed
+**[TRANSLATE-5192](https://jira.translate5.net/browse/TRANSLATE-5192): t5memory - Repair wrong Tags for 100% Matches** <br>
+[🆕 Feature] added tags guessing when in response from t5memory we have excess tags. 
+
+**[TRANSLATE-5140](https://jira.translate5.net/browse/TRANSLATE-5140): t5memory - Use dash as context instead of segment number in task** <br>
+Use dash as context instead of segment number in task
+
+**[TRANSLATE-5103](https://jira.translate5.net/browse/TRANSLATE-5103): t5memory - Improve deletion of Segments in Maintenance** <br>
+Improve deletion of Segments in Maintenance:
+Improve deletion of singular segments
+Add new button "Delete all with same source"
+Add new button "Delete all with same source + target"
+
+**[TRANSLATE-5034](https://jira.translate5.net/browse/TRANSLATE-5034): t5memory - Filter TMX on import** <br>
+Apply filters on TMX on import time from translate5 side
+All Translate5 TMs in instance will be marked as "not converted" and matches may have lower matches.
+Language resources affected by this should be converted manually.
+
+
+### Bugfixes
+**[TRANSLATE-5303](https://jira.translate5.net/browse/TRANSLATE-5303): LanguageResources - Microsoft translator: textType parameter** <br>
+Add textType parameter when query microsoft api for translations.
+
+**[TRANSLATE-5038](https://jira.translate5.net/browse/TRANSLATE-5038): Editor general - selecting CP tag and text will swallow space when pasting in editor** <br>
+FIXED: copy-pasting text with tags will respect white spaces
+
+**[TRANSLATE-4978](https://jira.translate5.net/browse/TRANSLATE-4978): Auto-QA - inconsistency check faulty** <br>
+FIXED: missing background colors for inconsistent sources/targets in cases when there are more than 200 segments in the task
 
 
 ## [7.34.5] - 2026-02-24

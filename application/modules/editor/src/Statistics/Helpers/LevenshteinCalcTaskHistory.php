@@ -152,10 +152,6 @@ readonly class LevenshteinCalcTaskHistory
                 $segmentIdsLastEditPending[$v['segmentId']] = 1;
             }
 
-            if ($v['levenshteinOriginal'] > 0 || $v['levenshteinPrevious'] > 0) {
-                continue;
-            }
-
             $this->updateLevenshteinDistances(
                 $v['segmentId'],
                 $v['segmentCurrentValue'],
@@ -173,8 +169,7 @@ readonly class LevenshteinCalcTaskHistory
             }
 
             $v = $this->db->fetchRow(
-                'SELECT workflowStepNr,UNIX_TIMESTAMP(timestamp) AS timestamp FROM LEK_segments WHERE id=' . $segmentId .
-                ' AND levenshteinOriginal=0  AND levenshteinPrevious=0'
+                'SELECT workflowStepNr,UNIX_TIMESTAMP(timestamp) AS timestamp FROM LEK_segments WHERE id=' . $segmentId
             );
             if (empty($v)) {
                 continue;

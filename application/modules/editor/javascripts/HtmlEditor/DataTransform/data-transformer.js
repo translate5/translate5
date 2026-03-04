@@ -203,6 +203,10 @@ export default class DataTransformer {
                 continue;
             }
 
+            if (this._tagsConversion.isLineBreakTag(item)) {
+                continue;
+            }
+
             // other elements like spellcheck nodes etc.
             if (item.childNodes.length) {
                 result += this.#reverseTransformItems(item);

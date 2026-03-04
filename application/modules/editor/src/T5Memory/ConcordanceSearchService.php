@@ -272,6 +272,9 @@ class ConcordanceSearchService
 
         /** @var FindDTO $result */
         foreach ($results as $result) {
+            // we need to prepare query for each result to properly set tag handler state, otherwise we can't restore tags in result properly
+            // because source will be empty in tag handler
+            $tagHandler->prepareQuery($result->source);
             $resultList->addResult(
                 $tagHandler->restoreInResult($result->target, false),
                 0,

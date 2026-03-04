@@ -63,14 +63,27 @@ class TmxSymbolsFixer
         $insideTuv = false;
 
         while ($line = fgets($inputHandle)) {
-            $insideTuv = strrpos($line, '<tuv') || $insideTuv;
+            $oneLineTuv = strrpos($line, '<tuv') && strrpos($line, '</tuv>');
+            $insideTuv = $oneLineTuv || strrpos($line, '<tuv') || $insideTuv;
 
-            if (strrpos($line, '</tuv>')) {
+            if (! $oneLineTuv && strrpos($line, '</tuv>')) {
                 $insideTuv = false;
             }
 
             // Replace character references in the content
             $processed = $this->characterReplacer->replaceInvalidXmlCharacters($line, preserve: $insideTuv);
+
+            if ($oneLineTuv) {
+                $insideTuv = false;
+            }
+
+            $fixHtmlEntitiesCallback = function (array $matches) {
+                return htmlentities(html_entity_decode($matches[0]), ENT_XML1, 'UTF-8');
+            };
+
+            $htmlEntitiesPattern = '/&[a-zA-Z0-9#]+;/';
+
+            $processed = preg_replace_callback($htmlEntitiesPattern, $fixHtmlEntitiesCallback, $processed);
 
             // Write processed content to output
             fwrite($outputHandle, $processed);

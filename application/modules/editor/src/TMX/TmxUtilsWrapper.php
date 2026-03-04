@@ -41,6 +41,9 @@ class TmxUtilsWrapper
 
     ) {
         $this->tmxUtilsPath = realpath(__DIR__ . '/binary/tmx-utils');
+        if (! is_executable($this->tmxUtilsPath)) {
+            chmod($this->tmxUtilsPath, 0755);
+        }
     }
 
     public static function create(): self

@@ -110,6 +110,17 @@ class StatisticsInspectCommand extends TaskCommand
         );
 
         $this->io->section('KPI statistics summary');
+
+        //add labels
+        $kpiStatistics['levenshteinStart'] = str_pad((string) $kpiStatistics['levenshteinStart'], 10)
+            . 'ø distance before start of the workflow';
+        $kpiStatistics['levenshteinPrevious'] = str_pad((string) $kpiStatistics['levenshteinPrevious'], 10)
+            . 'ø distance in workflow step';
+        $kpiStatistics['levenshteinOriginal'] = str_pad((string) $kpiStatistics['levenshteinOriginal'], 10)
+            . 'ø distance since start of workflow';
+        $kpiStatistics['levenshteinEnd'] = str_pad((string) $kpiStatistics['levenshteinEnd'], 10)
+            . 'ø distance after end of workflow';
+
         $this->writeAssoc($kpiStatistics);
 
         return self::SUCCESS;

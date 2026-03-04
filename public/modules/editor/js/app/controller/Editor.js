@@ -1795,14 +1795,17 @@ Ext.define('Editor.controller.Editor', {
      * Pasting our own content must be handled special to insert correct tags
      */
     pasteContent: function(e){
-        var me = this,
-            plug = me.getEditPlugin(),
+        const plug = this.getEditPlugin(),
             record = plug.context ? plug.context.record : null,
             mainEditor = plug?.editor?.mainEditor;
 
         // If the user is fast enough to close the window and after this use ctr + v to paste the content,
         // the event will be fired but the row editor will not exist anymore
         if (!record) {
+            return;
+        }
+
+        if (!mainEditor) {
             return;
         }
 
@@ -1815,34 +1818,34 @@ Ext.define('Editor.controller.Editor', {
         e.stopPropagation();
         e.preventDefault();
 
-        var segmentId = record.get('id'),
-            internalClip = me.copiedSelectionWithTagHandling || {},
+        const segmentId = record.get('id'),
+            internalClipboardData = this.copiedSelectionWithTagHandling || {},
             clipboard = (e.browserEvent.clipboardData || window.clipboardData),
             clipboardText = clipboard.getData('Text'),
             clipboardHtml = clipboard.getData('text/html'),
-            textMatch = clipboardText === internalClip.selDataText,
+            textMatch = clipboardText === internalClipboardData.selDataText,
 
             // The clipboardHtml adds meta information like charset and so on, so we just check if
             // the stored one is a substring of the one in the clipboard
-            htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
+            htmlMatch = clipboardHtml.includes(internalClipboardData.selDataHtml);
 
         // When making a copy in translate5, we store the content in an internal variable and in the clipboard
         // If neither the text or html clipboard content matches the internally stored content,
         // that means that the pasted content comes from outside and we insert just text:
-        if (me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-            mainEditor?.insertSymbol(Ext.String.htmlEncode(clipboardText));
-            me.copiedSelectionWithTagHandling = null;
-        } else {
-            // To insert tags, the copy/cut from segment must be the same
-            // as the paste to segment, so that tags are not moved between segments
-            mainEditor?.insertSymbol(Ext.String.htmlEncode(
-                internalClip[
-                    segmentId === internalClip.selSegmentId
-                        ? 'selDataHtml'
-                        : 'selDataText'
-                ]
-            ));
-         }
+        if (this.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
+            mainEditor.insertSymbol(RichTextEditor.escapeHtml(clipboardText));
+            this.copiedSelectionWithTagHandling = null;
+
+            return;
+        }
+
+        mainEditor.insertData(
+            internalClipboardData[
+                segmentId === internalClipboardData.selSegmentId
+                    ? 'selDataHtml'
+                    : 'selDataText'
+            ]
+        );
     },
 
     /**

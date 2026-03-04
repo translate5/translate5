@@ -42,6 +42,7 @@ use ReflectionException;
 use stdClass;
 use Zend_Db_Statement_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -99,7 +100,13 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$this->task]);
             $dryRun = 'KEPT - DRYRUN; ';
             if (! $parameters['keepTasks']) {
-                $remover->remove();
+                try {
+                    $remover->remove();
+                } catch (ZfExtended_Models_Entity_Conflict $e) {
+                    throw new ArchiveException('E1778', [
+                        'task' => $this->task,
+                    ], $e);
+                }
                 $dryRun = '';
             }
             $this->log->info(

@@ -1004,12 +1004,20 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
 
-            if (($sourceEdit && $isSourceMrkMissing) || ($hasTargets && (empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== '0'))) {
+            if ($sourceEdit && $isSourceMrkMissing) {
+                $this->throwSegmentationException('E1775', [
+                    'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
+                    'mid' => $mid,
+                ]);
+            }
+
+            if ($hasTargets && (empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== '0')) {
                 $this->throwSegmentationException('E1067', [
                     'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
                     'mid' => $mid,
                 ]);
             }
+
             if (empty($this->currentTarget) || empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== "0") {
                 $targetChunksOriginal = $targetChunks = [];
                 $currentTarget = '';

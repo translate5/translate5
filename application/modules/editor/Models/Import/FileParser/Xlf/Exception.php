@@ -35,6 +35,7 @@ class editor_Models_Import_FileParser_Xlf_Exception extends editor_Models_Import
 
     protected static $localErrorCodes = [
         'E1067' => 'MRK/SUB tag of source not found in target with Mid: "{mid}"',
+        'E1775' => 'MRK/SUB tag of source not found in target with Mid: "{mid}", please disable source-editing to import the task',
         'E1068' => 'MRK/SUB tag of target not found in source with Mid(s): "{mids}"',
         'E1069' => 'There is other content as whitespace outside of the mrk tags. Found content: {content}',
         'E1070' => 'SUB tag of {field} is not unique due missing ID in the parent node and is ignored as separate segment therefore.',
