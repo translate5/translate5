@@ -7836,7 +7836,7 @@ Synchronization always takes place in one direction: source data -&gt; target
             </trans-unit>
             <trans-unit id="ZWRpdG9yLW9ubHktb3ZlcnJpZGU=">
                 <source>editor-only-override</source>
-                <target>Editor</target>
+                <target>Enable task overview (Only in editor-only mode)</target>
             </trans-unit>
             <trans-unit id="ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk">
                 <source>engineName_SDLLanguageCloud</source>

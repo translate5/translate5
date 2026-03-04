@@ -7840,7 +7840,7 @@ Die Synchronisierung erfolgt immer in eine Richtung: Quelldaten-&gt; Ziel
             </trans-unit>
             <trans-unit id="ZWRpdG9yLW9ubHktb3ZlcnJpZGU=">
                 <source>editor-only-override</source>
-                <target>Editor</target>
+                <target>Taskübersicht anzeigen (nur im Editor only mode)</target>
             </trans-unit>
             <trans-unit id="ZW5naW5lTmFtZV9TRExMYW5ndWFnZUNsb3Vk">
                 <source>engineName_SDLLanguageCloud</source>
