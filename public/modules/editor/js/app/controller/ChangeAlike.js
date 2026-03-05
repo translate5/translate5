@@ -526,8 +526,6 @@ Ext.define('Editor.controller.ChangeAlike', {
             }
         }
 
-        me.cleanUpAlikeSegments();
-
         Editor.MessageBox.addSuccess(Ext.String.format(me.messages.alikesScheduled, data.total));
 
         return;
