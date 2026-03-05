@@ -1089,15 +1089,27 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorCloneTask: function (task, event) {
         var me = this,
-            isDefaultTask = task.get('taskType') === 'default';
+            isStandaloneTask = task.getId() === parseInt(task.get('projectId'));
         Ext.Ajax.request({
             url: Editor.data.restpath + 'task/' + task.getId() + '/clone',
             method: 'post',
             scope: me,
             success: function (response) {
-                if(isDefaultTask) {
-                    //we have to reload the project overview since the id of the shown project was changing
-                    me.getProjectProjectStore().load();
+                if (isStandaloneTask) {
+                    // Cloning a standalone task moves the source task under a real project wrapper,
+                    // so the current project hash must be recalculated from the reloaded source task.
+                    if (me.isProjectPanelActive()) {
+                        Editor.model.admin.Task.load(task.getId(), {
+                            preventDefaultHandler: true,
+                            success: function (updatedTask) {
+                                me.getProjectProjectStore().load({
+                                    callback: function () {
+                                        me.getProjectPanel().getController().redirectFocus(updatedTask, true);
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
                 else if (me.isProjectPanelActive()) {
                     me.getProjectTaskGrid().getStore().load();
