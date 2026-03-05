@@ -11,7 +11,67 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 - MINOR version change: New features and smaller UI / Usability changes (pointed to in important release notes)
 - PATCH version change: Only bug fixes and small enhancements
 
-All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
+All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.## [7.35.3] - 2026-03-05
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4898](https://jira.translate5.net/browse/TRANSLATE-4898): t5memory - Add retry if t5memory rejects request due to restart** <br>
+Added proper handling of the error if t5memory rejects request due to scheduled restart
+
+
+### Changed
+**[TRANSLATE-5267](https://jira.translate5.net/browse/TRANSLATE-5267): Editor general - Add highlighting a comment by click on segment in the grid** <br>
+[:gear:  Improvement] Comment in the left "Comments" panel is now highlighted when clicked on the segment 
+
+**[TRANSLATE-5090](https://jira.translate5.net/browse/TRANSLATE-5090): t5memory - Introduce settings for TMX filter and tmx-utils** <br>
+Introduce settings for TMX filter and tmx-utils
+
+**[TRANSLATE-5088](https://jira.translate5.net/browse/TRANSLATE-5088): t5memory - Improve segment filtering on TMX import** <br>
+Improve segment filtering on TMX import
+
+**[TRANSLATE-5087](https://jira.translate5.net/browse/TRANSLATE-5087): t5memory - Check for duplicates on segment updates** <br>
+Check for duplicates on segment updates
+
+**[TRANSLATE-5073](https://jira.translate5.net/browse/TRANSLATE-5073): t5memory - Improve fuzzy and concordance search results providing** <br>
+Improve fuzzy and concordance search results providing
+
+**[TRANSLATE-5050](https://jira.translate5.net/browse/TRANSLATE-5050): t5memory - Redo TMX export in parallel** <br>
+TMX will exported in parallel parts form t5memory
+
+**[TRANSLATE-4845](https://jira.translate5.net/browse/TRANSLATE-4845): Content Protection - Make t5n tags smaller to save segment space on t5memory side** <br>
+t5n tags on t5memory side will become smaller so that longer segments may be saved into memory
+
+**[TRANSLATE-3764](https://jira.translate5.net/browse/TRANSLATE-3764): InstantTranslate - make runtimeOptions.InstantTranslate.user.defaultLanguages possible in UI** <br>
+translate5 - 7.2.0: Default selected languages for instant translate are configurable.
+translate5 - 7.35.3: Fix availability of new config for new installations too (was working only for udpated installations)
+
+
+### Bugfixes
+**[TRANSLATE-5340](https://jira.translate5.net/browse/TRANSLATE-5340): Content Protection - Key is not generated for new Content protection rules** <br>
+Fix key generation of Content protection rules
+
+**[TRANSLATE-5339](https://jira.translate5.net/browse/TRANSLATE-5339): Translate5 CLI - Warn on CLI execution as root to prevent permission problems** <br>
+In order to prevent permission problems in the file system the CLI tools are printing a confirm warning when running as root.
+
+**[TRANSLATE-5335](https://jira.translate5.net/browse/TRANSLATE-5335): Repetition editor - Master segment saved twice on repetition editor confirm** <br>
+Fix events on repetition editor actions
+
+**[TRANSLATE-5310](https://jira.translate5.net/browse/TRANSLATE-5310): Content Protection, MatchAnalysis & Pretranslation - blocked segments are processed with Content Protection** <br>
+Do not process blocked segments are processed with Content Protection
+
+**[TRANSLATE-5293](https://jira.translate5.net/browse/TRANSLATE-5293): Main back-end mechanisms (Worker, Logging, etc.) - Task clone leads to an error** <br>
+Fix for error when clone task produces errors in rare cases.
+
+**[TRANSLATE-5244](https://jira.translate5.net/browse/TRANSLATE-5244): Package Ex and Re-Import - Reimport of Translator Package leads to invalid Markup** <br>
+FIX: translator package reimport may lead to exceptions due to tag-errors in diffing to evaluate track-changes
+
+**[TRANSLATE-5216](https://jira.translate5.net/browse/TRANSLATE-5216): translate5 AI - Check why gpt 5.1 and 5.2 work only very inconsistently in MS Azure AI foundry and not at all at openai** <br>
+[🐞 Fix]  Added support of GPT-5 models
+
+
 ## [7.35.2] - 2026-03-03
 
 ### Important Notes:
