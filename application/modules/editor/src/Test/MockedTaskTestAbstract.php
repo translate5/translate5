@@ -38,11 +38,11 @@ abstract class MockedTaskTestAbstract extends UnitTestAbstract
     protected static ?MockedTask $testTask = null;
 
     /**
-     * Retrieves a test-tak to init field-tags with
+     * Retrieves a test-task to init field-tags with
      */
     protected function getTestTask(): MockedTask
     {
-        if (static::$testTask == null) {
+        if (static::$testTask === null) {
             $task = new MockedTask();
             $task->setId(1234);
             $task->setEntityVersion(280);

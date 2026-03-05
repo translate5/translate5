@@ -58,25 +58,21 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      */
     protected $_userName = null;
 
-    /**
-     * zeichnet ein einzelnes Segment aus
-     *
-     * @param string $target bereits in die Ursprungssyntax zurückgebautes target-Segment
-     * @param string $edited bereits in die Ursprungssyntax zurückgebautes editiertes target-Segment (edited-Spalte)
-     * @param string $changeTimestamp Zeitpunkt der letzten Änderung des Segments
-     * @param string $userName Benutzername des Lektors
-     * @return string $edited mit diff-Syntax fertig ausgezeichnet
-     */
-    public function diffSegment($target, $edited, $changeTimestamp, $userName)
-    {
+    public function diffSegment(
+        string $target,
+        string $edited,
+        ?string $changeTimestamp,
+        ?string $userName,
+        bool $concatDelim = false
+    ): string {
         $escapedGTagsTarget = [];
         $escapedGTagsEdited = [];
 
         $this->_changeTimestamp = $changeTimestamp;
         $this->_userName = $userName;
 
-        $targetArr = $this->tagBreakUp($target);
-        $editedArr = $this->tagBreakUp($edited);
+        $targetArr = editor_Utils::tagBreakUp($target);
+        $editedArr = editor_Utils::tagBreakUp($edited);
 
         $targetArr = $this->escapeSingleGTags($targetArr, $escapedGTagsTarget);
         $editedArr = $this->escapeSingleGTags($editedArr, $escapedGTagsEdited);
@@ -87,13 +83,13 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         $targetArr = $this->replacePairMrkTags($targetArr);
         $editedArr = $this->replacePairMrkTags($editedArr);
 
-        $targetArr = $this->wordBreakUp($targetArr);
-        $editedArr = $this->wordBreakUp($editedArr);
+        $targetArr = editor_Utils::wordBreakUp($targetArr);
+        $editedArr = editor_Utils::wordBreakUp($editedArr);
 
         $targetArr = $this->joinTerms($targetArr);
         $editedArr = $this->joinTerms($editedArr);
 
-        $diff = ZfExtended_Factory::get('ZfExtended_Diff');
+        $diff = ZfExtended_Factory::get(ZfExtended_Diff::class);
         $diffRes = $diff->process($targetArr, $editedArr);
 
         $this->_diffResPartCount = count($diffRes);
@@ -107,10 +103,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 $val = implode('', $val);
             }
             //adds sdl:end-attributes to opening G-Tags, which corresponding closing g-Tags changed positions (the others are done in $this->markDeletion)
-            elseif (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1 and
-                    strpos($val, 'sdl:end') === false and
-                    strpos($val, 'sdl:start') === false and //to avoid marking tags whose corresponding tag already is missing since the last edit in Studio itself
-                    $matches[1] === '' and
+            elseif (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1 &&
+                    strpos($val, 'sdl:end') === false &&
+                    strpos($val, 'sdl:start') === false && //to avoid marking tags whose corresponding tag already is missing since the last edit in Studio itself
+                    $matches[1] === '' &&
                     isset($getGTagsToComplement[$matches[2]][$key]['opening']['noChange'])
             ) {
                 $val = str_replace('>', ' sdl:end="false">', $val); //no trailing slash, because according to sdlxliff there is a closing g-tag inserted after the deletion-mrk-Tag to complete the opening tag
@@ -130,9 +126,9 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
     /**
      * restores all tags escaped by escapeSingleGTags
      *
-     * @param array $segment
+     * @param string $segment
      * @param array $escapedIds
-     * @return array $segment
+     * @return string
      */
     protected function restoreSingleGTags($segment, $escapedIds)
     {
@@ -150,7 +146,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      *
      * @param array $segment
      * @param array $escapedIds
-     * @return array $segment
+     * @return array
      */
     protected function escapeSingleGTags($segment, &$escapedIds)
     {
@@ -684,22 +680,6 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         }
 
         return $segment;
-    }
-
-    /**
-     * splits the segment up into HTML tags / entities on one side and plain text on the other side
-     * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
-     * Caution: The ignoring is done by the array index calculation there!
-     * So make no array structure changing things between word and tag break up!
-     *
-     * Sdlxliff has different regex as the csv.
-     *
-     * @param string $segment
-     * @return array $segment
-     */
-    protected function tagBreakUp($segment)
-    {
-        return editor_Utils::tagBreakUp($segment, '/(<[^>]*>|&[^;]+;)/');
     }
 
     /**

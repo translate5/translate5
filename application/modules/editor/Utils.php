@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\ZfExtended\MismatchException;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /*
  */
@@ -478,11 +479,12 @@ class editor_Utils
      * Caution: The ignoring is done by the array index calculation there!
      * So make no array structure changing things between word and tag break up!
      *
-     * @param string $text
-     * @return array $text
+     * @return string[]
      */
-    public static function tagBreakUp($text, $tagRegex = '/(<[^<>]*>|&[^;]+;)/')
+    public static function tagBreakUp(string $text): array
     {
+        $tagRegex = '~(' . trim(Markup::PATTERN, '~()') . '|&[^;]+;)~';
+
         return preg_split($tagRegex, $text, flags: PREG_SPLIT_DELIM_CAPTURE);
     }
 

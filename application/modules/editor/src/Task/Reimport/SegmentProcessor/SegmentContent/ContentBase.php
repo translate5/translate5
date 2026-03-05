@@ -108,9 +108,23 @@ abstract class ContentBase
         return $this->segmentData[$this->sfm->getFirstSourceName()]['original'] ?? null;
     }
 
+    protected function isDataSourceEmpty(): bool
+    {
+        $source = $this->getDataSource();
+
+        return $source === null || $source === '';
+    }
+
     protected function getDataTarget(): mixed
     {
         return $this->segmentData[$this->sfm->getFirstTargetName()]['original'];
+    }
+
+    protected function isDataTargetEmpty(): bool
+    {
+        $target = $this->getDataTarget();
+
+        return $target === null || $target === '';
     }
 
     /**
@@ -124,12 +138,9 @@ abstract class ContentBase
         return $normalized;
     }
 
-    /***
-     * Check if the given two contents are equal. The content to be checked will be normalized
-     * before the check
-     * @param string $old
-     * @param string $new
-     * @return bool
+    /**
+     * Check if the given two contents are equal. The content to be checked will be normalized before the check
+     * TODO FIXME: What is about existing terminology, TrackChanges, MQM ? How must they be dealt with ?
      */
     protected function isContentEqual(string $old, string $new): bool
     {
@@ -142,9 +153,9 @@ abstract class ContentBase
      */
     protected function isTrackChangesActive(): bool
     {
+        /** @var ZfExtended_Plugin_Manager $pluginmanager */
         $pluginmanager = Zend_Registry::get('PluginManager');
 
-        /* @var ZfExtended_Plugin_Manager $pluginmanager */
         return $pluginmanager->isActive('TrackChanges');
     }
 }

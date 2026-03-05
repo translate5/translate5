@@ -103,6 +103,25 @@ abstract class TagSequence implements JsonSerializable
     public const MODE_ORIGINAL = 'original';
 
     /**
+     * Mode for the placeholder rendering: renders the tags like <t5tag{INDEX}> whereas INDEX
+     * is a global counter over multiple sequences. Each tag now is represented by a unique placeholder
+     */
+    public const PLACEHOLDER_UNIQUE = 'unique';
+
+    /**
+     * Mode for the placeholder rendering: renders the tags like <t5tag{HASH}>
+     * whereas hash is a hasghed-value of the tags content (in case of paired tags of the start-tag)
+     * Identical tags will have identical placeholders
+     */
+    public const PLACEHOLDER_HASH = 'hash';
+
+    /**
+     * Mode for the placeholder rendering: renders the tags in typical segment-tag form: <1/>, <ins1>, ...
+     * Be aware this mode creates invalid markup and must only be used for visualization or tests
+     */
+    public const PLACEHOLDER_SHORT = 'short';
+
+    /**
      * Defines the error-domain to log
      */
     protected static string $logger_domain = 'editor.tagsequence';
@@ -194,6 +213,8 @@ abstract class TagSequence implements JsonSerializable
      * Holds the initially set markup for later logging
      */
     private ?string $originalMarkup = null;
+
+    private array $placeholderMap;
 
     /**
      * Sets the internal tags & the text by markup, acts like a constructor
@@ -424,6 +445,39 @@ abstract class TagSequence implements JsonSerializable
         $holder = $this->createRenderingHolder();
 
         return $holder->renderReplaced($mode);
+    }
+
+    /**
+     * Renders all tags as placeholders defined by the mode
+     * @throws \Zend_Exception
+     * @throws editor_Models_Segment_Exception
+     */
+    public function renderAsPlaceholders(string $mode): string
+    {
+        $this->placeholderMap = [];
+        // nothing to do without tags
+        if ($this->numTags() === 0) {
+            return $this->text;
+        }
+        // create holder and render it's children
+        $holder = $this->createRenderingHolder();
+
+        return $holder->renderPlaceholderChildren($this->placeholderMap, $mode);
+    }
+
+    /**
+     * Reverts the placeholders back to the original tags
+     * Can only be used when ::renderAsPlaceholders was called before
+     * @throws \Zend_Exception
+     * @throws editor_Models_Segment_Exception
+     */
+    public function revertPlaceholders(string $markup): string
+    {
+        foreach ($this->placeholderMap as $placeholder => $tag) {
+            $markup = str_replace($placeholder, $tag, $markup);
+        }
+
+        return $markup;
     }
 
     /**

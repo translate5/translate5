@@ -144,6 +144,14 @@ final class editor_TextNode extends editor_Tag
         return $this->text;
     }
 
+    /**
+     * Text-nodes have to return their text-contents as placeholders either
+     */
+    public function renderAsPlaceholder(array &$replacedTags, string $mode): string
+    {
+        return $this->text;
+    }
+
     protected function renderStart(bool $withDataAttribs = true): string
     {
         return '';

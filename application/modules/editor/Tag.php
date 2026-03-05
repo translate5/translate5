@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tag\TagSequence;
 use MittagQI\ZfExtended\Tools\Markup;
 use PHPHtmlParser\Dom;
 use PHPHtmlParser\Dom\Node\AbstractNode;
@@ -51,6 +52,8 @@ class editor_Tag
      * @var boolean
      */
     public const USE_DOM_DOCUMENT = false;
+
+    protected static int $uniqueId = -1;
 
     /**
      * Enodes our attributes (hashtable) to a json-capable structure
@@ -1051,6 +1054,67 @@ class editor_Tag
         }
 
         return $html;
+    }
+
+    /**
+     * Renders the tags as placeholders
+     */
+    public function renderAsPlaceholder(array &$replacedTags, string $mode): string
+    {
+        $placeholder = $this->createPlaceholder($mode);
+        if ($this->isSingular()) {
+            $ph = '<' . $placeholder . '/>';
+            $replacedTags[$ph] = $this->render();
+
+            return $ph;
+        }
+        $phStart = '<' . $placeholder . '>';
+        $phEnd = '</' . $placeholder . '>';
+        $replacedTags[$phStart] = $this->renderStart();
+        $replacedTags[$phEnd] = $this->renderEnd();
+
+        return $phStart . $this->renderPlaceholderChildren($replacedTags, $mode) . $phEnd;
+    }
+
+    public function renderPlaceholderChildren(array &$replacedTags, string $mode): string
+    {
+        $html = '';
+        if ($this->hasChildren()) {
+            foreach ($this->children as $child) {
+                $html .= $child->renderAsPlaceholder($replacedTags, $mode);
+            }
+        }
+
+        return $html;
+    }
+
+    /**
+     * Creates the placeholder string
+     */
+    protected function createPlaceholder(string $mode): string
+    {
+        return match ($mode) {
+            TagSequence::PLACEHOLDER_HASH => 't5tag' . $this->getComparisionHash(),
+            TagSequence::PLACEHOLDER_SHORT => $this->getShortPlaceholder(),
+            default => 't5tag' . ++self::$uniqueId,
+        };
+    }
+
+    /**
+     * retrieves a placeholder for a tag suitable only for tests & display purposes
+     */
+    public function getShortPlaceholder(): string
+    {
+        return $this->getName() . ++self::$uniqueId;
+    }
+
+    /**
+     * Retrieves a hash-value of the tag to compare tags for identity.
+     * For paired tags, this will be the opening tag
+     */
+    public function getComparisionHash(): string
+    {
+        return md5($this->renderStart());
     }
 
     protected function renderStart(bool $withDataAttribs = true): string

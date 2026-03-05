@@ -43,13 +43,13 @@ abstract class editor_Models_Export_DiffTagger
      * Insert tag string
      * @var string
      */
-    public const INSERT_TAG = "ins";
+    public const INSERT_TAG = 'ins';
 
     /***
      * Delete tag string
      * @var string
      */
-    public const DELETE_TAG = "del";
+    public const DELETE_TAG = 'del';
 
     /***
      * Delete tag attributes. Defined as key value, where the key is the attribute name, and the value is the attribute value
@@ -90,39 +90,15 @@ abstract class editor_Models_Export_DiffTagger
      * @param string $edited bereits in die Ursprungssyntax zurückgebautes editiertes target-Segment (edited-Spalte)
      * @param string $changeTimestamp Zeitpunkt der letzten Änderung des Segments
      * @param string $userName Benutzername des Lektors
-     * @return string $edited mit diff-Syntax fertig ausgezeichnet
+     * @return string mit diff-Syntax fertig ausgezeichnet
      */
-    abstract public function diffSegment($target, $edited, $changeTimestamp, $userName);
-
-    /**
-     * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
-     * welches auch die Worttrenner als jeweils eigene Arrayelemente enthält
-     *
-     * - parst nur die geraden Arrayelemente, denn dies sind die Wortbestandteile
-     *   (aber nur weil tagBreakUp davor aufgerufen wurde und sonst das array nicht in der Struktur verändert wurde)
-     *
-     * @param array $segment
-     * @param bool $concatDelim
-     * @return array $segment
-     */
-    protected function wordBreakUp($segment, $concatDelim = false): array
-    {
-        return editor_Utils::wordBreakUp($segment, $concatDelim);
-    }
-
-    /**
-     * splits the segment up into HTML tags / entities on one side and plain text on the other side
-     * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
-     * Caution: The ignoring is done by the array index calculation there!
-     * So make no array structure changing things between word and tag break up!
-     *
-     * @param string $segment
-     * @return array $segment
-     */
-    protected function tagBreakUp($segment)
-    {
-        return editor_Utils::tagBreakUp($segment);
-    }
+    abstract public function diffSegment(
+        string $target,
+        string $edited,
+        ?string $changeTimestamp,
+        ?string $userName,
+        bool $concatDelim = false
+    ): string;
 
     /**
      * generates an UUID and returns it

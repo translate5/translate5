@@ -627,6 +627,18 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
+     * creates the typical short display mode (<1/>, <2> ... </2>) ... which is invalid markup!
+     */
+    public function getShortPlaceholder(): string
+    {
+        if ($this->getTagIndex() > -1) {
+            return (string) $this->getTagIndex();
+        }
+
+        return parent::getShortPlaceholder();
+    }
+
+    /**
      * We do not add children to the tags-container but we build our inner tags from the tags-structure
      */
     public function sequenceChildren(TagSequence $tags, int $parentOrder = -1): void

@@ -77,9 +77,8 @@ class ReimportFile
         $fileFilter->initReImport($this->task, Worker::FILEFILTER_CONTEXT_NEW);
 
         // get the parser dynamically even of only xliff is supported
+        /** @var editor_Models_Import_FileParser $parser */
         $parser = $parserHelper->getFileParserInstance($parserCls, $fileId, new SplFileInfo($filePath));
-        /* @var editor_Models_Import_FileParser $parser */
-
         $parser->setIsReimport();
 
         $segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
