@@ -28,7 +28,6 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -77,10 +76,6 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-
-        if ($this->checkCliUsageAsRoot()) {
-            return Command::FAILURE;
-        }
 
         $suiteNames = $this->getAllSuiteNames();
         $suite = ($this->input->hasArgument('suite')) ? $this->input->getArgument('suite') : null;
