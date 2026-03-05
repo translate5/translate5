@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Integration\Import;
+namespace MittagQI\Translate5\Test\Integration\TMX;
 
 use MittagQI\Translate5\Test\UnitTestAbstract;
 use MittagQI\Translate5\TMX\CutOffTmx;
