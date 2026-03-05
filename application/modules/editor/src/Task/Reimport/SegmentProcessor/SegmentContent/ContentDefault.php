@@ -110,15 +110,17 @@ class ContentDefault extends ContentBase
 
     /**
      * Create the diffed content when track-changes shall be applied
+     * TrackChanges and MQM will usually be removed in this process as otherwise tag-errors are inevitable
+     * @see https://jira.translate5.net/browse/TRANSLATE-5325
      */
     public function diffTargetWithTrackChanges(
         string $segmentTarget,
         string $reimportTarget,
-        bool $removeTerminology = true,
+        bool $removeTerminologyAndMqm = true,
     ): string {
         // the differ may creates invalid markup since it does not respect/check the order nor nesting of (paired) tags
         // thus we can use only internal-tags (which, in case of "meta-pairs" (opener/closer) can reppresent tag-faults
-        if ($removeTerminology) {
+        if ($removeTerminologyAndMqm) {
             $toRemove = [\editor_Plugins_TermTagger_Tag::TYPE, \editor_Segment_Tag::TYPE_MQM];
             $segmentSequence = new SegmentTagSequence($segmentTarget);
             $reimportSequence = new SegmentTagSequence($reimportTarget);
@@ -134,7 +136,7 @@ class ContentDefault extends ContentBase
             $this->user->getUserName()
         );
 
-        if ($removeTerminology) {
+        if ($removeTerminologyAndMqm) {
             $target = $segmentSequence->revertPlaceholders($target);
             // can that happen: tags in the reimported target not being in the existing target ??
             $target = $reimportSequence->revertPlaceholders($target);
