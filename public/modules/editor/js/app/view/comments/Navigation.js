@@ -75,11 +75,13 @@ Ext.define('Editor.view.comments.Navigation', {
                 }
             }
         ],
-        highlightRemark: function(remark){
+        highlightRemark: function (remark) {
             // TODO FIXME: these are mostly private methods ...
-            var node = this.getNodeByRecord(remark),
-                scroller = this.getScrollable();
-            if(node && this.isVisible() && scroller && typeof scroller === 'object'){
+            const node = this.getNodeByRecord(remark);
+            const scroller = this.getScrollable();
+
+            if (node && this.isVisible() && scroller && typeof scroller === 'object') {
+                Ext.fly(node).scrollIntoView(this.getEl(), false, true);
                 scroller.doHighlight(node);
             }
         }

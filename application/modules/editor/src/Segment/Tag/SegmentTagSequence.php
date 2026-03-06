@@ -494,7 +494,7 @@ class SegmentTagSequence extends TagSequence
     }
 
     /**
-     * Replaces the tag at the given index to a placehandler.
+     * Replaces the tag at the given index to a placeholder.
      * Be aware, that this can only be done with singular tags currently and otherwise leads to an exception
      * @throws ZfExtended_Exception
      */
@@ -512,6 +512,22 @@ class SegmentTagSequence extends TagSequence
         }
 
         throw new ZfExtended_Exception('toPlaceholderAt: Index out of boundaries');
+    }
+
+    /**
+     * Removes the tags of the given type and renders the result as placeholders according the defined mode
+     */
+    public function toPlaceholders(
+        array $tagTypesToRemove = [],
+        string $mode = TagSequence::PLACEHOLDER_UNIQUE,
+    ): string {
+        foreach ($tagTypesToRemove as $type) {
+            if ($this->hasType($type, true)) {
+                $this->removeByType($type);
+            }
+        }
+
+        return $this->renderAsPlaceholders($mode);
     }
 
     /**

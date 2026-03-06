@@ -34,6 +34,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Translate5\MaintenanceCli\Command\Log\EcodeSpecificFormatter;
 
 class LogCommand extends Translate5AbstractCommand
 {
@@ -589,7 +590,7 @@ the format is:
             $out[] = '      <info>Trace:</> ' . preg_replace('/((#[0-9]+) |\([0-9]+\))/', "<options=bold>$0</>", $this->formatTrace((string) $row['trace']));
         }
         if (! empty($row['extra'])) {
-            $out[] = '      <info>Extra:</> ' . $this->prepareExtra($row['extra']);
+            $out[] = '      <info>Extra:</> ' . $this->prepareExtra($row['extra'], (string) $row['eventCode']);
         }
         $out[] = '';
 
@@ -599,7 +600,7 @@ the format is:
     /**
      * returns the extra parameter prepared for output
      */
-    protected function prepareExtra(string $extra): string
+    protected function prepareExtra(string $extra, string $eventCode): string
     {
         try {
             $extra = json_decode($extra, associative: true, flags: JSON_THROW_ON_ERROR);
@@ -612,9 +613,8 @@ the format is:
             $extra['task'] = $extra['task']['taskName'] . ' #' . $extra['task']['taskNr'] . ' ID:' . $extra['task']['id'] . ' GUID:' . $extra['task']['taskGuid'];
         }
 
-        $extra = json_encode($extra, JSON_PRETTY_PRINT);
-
-        return OutputFormatter::escape((string) $extra);
+        return EcodeSpecificFormatter::create(! $this->isPorcelain && $this->output->isDecorated())
+            ->formatExtra($extra, $eventCode);
     }
 
     protected function formatTrace(string $trace): string

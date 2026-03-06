@@ -47,10 +47,6 @@ class TqeConflictChecker
 
     public const FLAG_TQE_INSTANT_TRANSLATE = 'tqeInstantTranslateAsDefault';
 
-    public function __construct(
-    ) {
-    }
-
     public static function create()
     {
         return new self();

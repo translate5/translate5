@@ -57,26 +57,20 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
         'ClosingAdd' => '</ins>',
     ];
 
-    /**
-     * zeichnet ein einzelnes Segment aus
-     *
-     * @param string $target bereits in die Ursprungssyntax zurückgebautes target-Segment
-     * @param string $edited bereits in die Ursprungssyntax zurückgebautes editiertes target-Segment (edited-Spalte)
-     * @param string $changeTimestamp Zeitpunkt der letzten Änderung des Segments
-     * @param string $userName Benutzername des Lektors
-     * @param bool $concatDelim Benutzername des Lektors
-     * @return string $edited mit diff-Syntax fertig ausgezeichnet
-     */
-    public function diffSegment($target, $edited, $changeTimestamp, $userName, $concatDelim = false): string
-    {
-        $targetArr = $this->tagBreakUp($target);
-        $editedArr = $this->tagBreakUp($edited);
+    public function diffSegment(
+        string $target,
+        string $edited,
+        ?string $changeTimestamp,
+        ?string $userName,
+        bool $concatDelim = false
+    ): string {
+        $targetArr = editor_Utils::tagBreakUp($target);
+        $editedArr = editor_Utils::tagBreakUp($edited);
 
-        $targetArr = $this->wordBreakUp($targetArr, $concatDelim);
-        $editedArr = $this->wordBreakUp($editedArr, $concatDelim);
+        $targetArr = editor_Utils::wordBreakUp($targetArr, $concatDelim);
+        $editedArr = editor_Utils::wordBreakUp($editedArr, $concatDelim);
 
-        $diff = ZfExtended_Factory::get('ZfExtended_Diff');
-        /* @var $diff ZfExtended_Diff */
+        $diff = ZfExtended_Factory::get(ZfExtended_Diff::class);
         $diffRes = $diff->process($targetArr, $editedArr);
 
         foreach ($diffRes as $key => &$val) {

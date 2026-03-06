@@ -30,6 +30,7 @@ use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestrictio
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTagRenderer;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
@@ -1056,7 +1057,24 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
 
+            //parse attributes for each found segment not only for the whole trans-unit
+            // if the segment is plain text, or a OtherContent_Data we do not pass it
+            $attributes = $this->parseSegmentAttributes(
+                $transUnit,
+                $mid,
+                is_array($currentSource) ? $currentSource : null,
+                is_array($currentTarget) ? $currentTarget : null
+            );
+
             $sourceOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($sourceChunks));
+
+            $exceptProtectors = [];
+
+            if ($attributes->locked) {
+                $exceptProtectors = [
+                    NumberProtector::alias(),
+                ];
+            }
 
             $sourceOriginal = $this->contentProtector->protect(
                 $sourceOriginal,
@@ -1064,6 +1082,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->task->getSourceLang(),
                 $this->task->getTargetLang(),
                 $this->protectTags ? EntityHandlingMode::Off : EntityHandlingMode::Restore,
+                ...$exceptProtectors
             );
 
             $targetOriginal = $this->xmlparser->join($this->surroundingTags->sliceTags($targetChunks));
@@ -1073,6 +1092,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->task->getSourceLang(),
                 $this->task->getTargetLang(),
                 $this->protectTags ? EntityHandlingMode::Off : EntityHandlingMode::Restore,
+                ...$exceptProtectors
             );
 
             [$sourceOriginal, $targetOriginal] = $this->contentProtector->filterTags($sourceOriginal, $targetOriginal);
@@ -1115,15 +1135,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 'original' => $targetOriginal,
             ];
 
-            //parse attributes for each found segment not only for the whole trans-unit
-            // if the segment is plain text, or a OtherContent_Data we do not pass it
-            $attributes = $this->parseSegmentAttributes(
-                $transUnit,
-                $mid,
-                is_array($currentSource) ? $currentSource : null,
-                is_array($currentTarget) ? $currentTarget : null
-            );
-
             if ($currentTarget == self::MISSING_MRK) {
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK;
             } elseif ($currentSource == self::MISSING_MRK) {
@@ -1142,7 +1153,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $sourceHasTagsOnly = ! $this->hasText($this->segmentData[$sourceName]['original']);
 
             if (
-                $sourceHasTagsOnly
+                ! $attributes->locked
+                && $sourceHasTagsOnly
                 && preg_match(NumberTagRenderer::INTERNAL_TAG_REGEX, $this->segmentData[$sourceName]['original'])
             ) {
                 // number tag is not considered as empty segment

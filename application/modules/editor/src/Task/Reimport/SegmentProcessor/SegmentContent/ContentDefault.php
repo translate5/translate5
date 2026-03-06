@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
 use editor_Models_Segment;
 use editor_Models_Segment_AutoStates;
+use MittagQI\Translate5\Segment\Tag\SegmentTagSequence;
 
 class ContentDefault extends ContentBase
 {
@@ -49,7 +50,7 @@ class ContentDefault extends ContentBase
         $this->updateSegment = false;
 
         // ignore the update in case source and target are empty
-        if (empty($this->getDataSource()) && empty($this->getDataTarget())) {
+        if ($this->isDataSourceEmpty() && $this->isDataTargetEmpty()) {
             return;
         }
 
@@ -83,7 +84,7 @@ class ContentDefault extends ContentBase
         $this->segment->setUserName($this->user->getUserName());
 
         $segmentAutoState = editor_Models_Segment_AutoStates::REVIEWED_PM;
-        if (empty($this->getDataTarget())) {
+        if ($this->isDataTargetEmpty()) {
             $segmentAutoState = editor_Models_Segment_AutoStates::NOT_TRANSLATED;
         }
         $this->segment->setAutoStateId($segmentAutoState);
@@ -101,15 +102,47 @@ class ContentDefault extends ContentBase
         $this->segmentTagger->updateSegmentContent($this->segment->getSource(), $target, function ($original, $target) {
             if ($this->isTrackChangesActive()) {
                 $fieldOriginal = $this->segment->getFieldOriginal($this->sfm->getFirstTargetName());
-                $target = $this->diffTagger->diffSegment(
-                    $fieldOriginal,
-                    $target,
-                    date(NOW_ISO),
-                    $this->user->getUserName()
-                );
+                $target = $this->diffTargetWithTrackChanges($fieldOriginal, $target);
             }
             $this->update($target, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
         }, true, true);
+    }
+
+    /**
+     * Create the diffed content when track-changes shall be applied
+     * TrackChanges and MQM will usually be removed in this process as otherwise tag-errors are inevitable
+     * @see https://jira.translate5.net/browse/TRANSLATE-5325
+     */
+    public function diffTargetWithTrackChanges(
+        string $segmentTarget,
+        string $reimportTarget,
+        bool $removeTerminologyAndMqm = true,
+    ): string {
+        // the differ may creates invalid markup since it does not respect/check the order nor nesting of (paired) tags
+        // thus we can use only internal-tags (which, in case of "meta-pairs" (opener/closer) can reppresent tag-faults
+        if ($removeTerminologyAndMqm) {
+            $toRemove = [\editor_Plugins_TermTagger_Tag::TYPE, \editor_Segment_Tag::TYPE_MQM];
+            $segmentSequence = new SegmentTagSequence($segmentTarget);
+            $reimportSequence = new SegmentTagSequence($reimportTarget);
+            // we use hashed placeholders to be able to re-identify the internal tags
+            $segmentTarget = $segmentSequence->toPlaceholders($toRemove, SegmentTagSequence::PLACEHOLDER_HASH);
+            $reimportTarget = $reimportSequence->toPlaceholders($toRemove, SegmentTagSequence::PLACEHOLDER_HASH);
+        }
+
+        $target = $this->diffTagger->diffSegment(
+            $segmentTarget,
+            $reimportTarget,
+            date(NOW_ISO),
+            $this->user->getUserName()
+        );
+
+        if ($removeTerminologyAndMqm) {
+            $target = $segmentSequence->revertPlaceholders($target);
+            // can that happen: tags in the reimported target not being in the existing target ??
+            $target = $reimportSequence->revertPlaceholders($target);
+        }
+
+        return $target;
     }
 
     public function isUpdateSegment(): bool

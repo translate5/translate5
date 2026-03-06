@@ -50,6 +50,9 @@ Ext.define('Editor.controller.CommentNavigation', {
         component: {
             '#commentList': {
                 itemclick: 'handleItemClick'
+            },
+            '#segmentgrid' : {
+                itemclick: 'handleSegmentClick'
             }
         },
         messagebus: {
@@ -92,6 +95,21 @@ Ext.define('Editor.controller.CommentNavigation', {
             case 'visualAnnotation':
                 this.fireEvent('visualRemarkClicked', remarkRecord);
                 break;
+        }
+    },
+
+    handleSegmentClick: function (view, segment, tr, idx, ev) {
+        const store = this.getCommentList().getStore();
+        const segmentNrInTask = segment.get('segmentNrInTask');
+
+        const commentRecords = store.queryBy(function(record) {
+            return record.get('segmentNrInTask') === segmentNrInTask;
+        });
+
+        if (commentRecords.getCount() > 0) {
+            commentRecords.each(function(commentRecord) {
+                this.getCommentList().highlightRemark(commentRecord);
+            }, this);
         }
     },
 

@@ -28,14 +28,18 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
+use Zend_Exception;
+use Zend_Registry;
 
 abstract class Translate5AbstractCommand extends Command
 {
@@ -64,7 +68,7 @@ abstract class Translate5AbstractCommand extends Command
      * This solves the problem, that the database-choice for several commands for test-enabled instances
      * is resolved automatically
      * @param string $commandClass The class of the command to execute. It should inherit from Translate5AbstractCommand
-     * @throws \Exception
+     * @throws Exception
      */
     public static function runSingleCliCommand(
         string $commandClass,
@@ -99,7 +103,7 @@ abstract class Translate5AbstractCommand extends Command
         $cli->setAutoExit(false);
         $cli->add($command);
         $cli->setCatchExceptions(false);
-        $input = new \Symfony\Component\Console\Input\ArrayInput($options);
+        $input = new ArrayInput($options);
 
         return $cli->run($input) === 0;
     }
@@ -122,7 +126,7 @@ abstract class Translate5AbstractCommand extends Command
     /**
      * initializes io class variables
      */
-    protected function initInputOutput(InputInterface $input, OutputInterface $output)
+    protected function initInputOutput(InputInterface $input, OutputInterface $output): void
     {
         $this->input = $input;
         $this->output = $output;
@@ -136,10 +140,12 @@ abstract class Translate5AbstractCommand extends Command
     /**
      * Initializes the translate5 application bridge
      * (setup the translate5 Zend Application so that Models and the DB can be used)
-     * @throws \Zend_Exception
+     * @throws Zend_Exception
      */
-    protected function initTranslate5(string $applicationEnvironment = 'application')
+    protected function initTranslate5(string $applicationEnvironment = 'application'): void
     {
+        $this->checkCliUsageAsRoot();
+
         $this->translate5 = new Application();
         $this->translate5->init($applicationEnvironment);
     }
@@ -149,9 +155,9 @@ abstract class Translate5AbstractCommand extends Command
      * If the installation is setup for API tests, it will ask for the environment to bootstrap,
      * otherwise the application environment will be initialized without notice
      * This API expects  input & output to be inited
-     * @throws \Zend_Exception
+     * @throws Zend_Exception
      */
-    protected function initTranslate5AppOrTest()
+    protected function initTranslate5AppOrTest(): void
     {
         // the app is uninitalized, so we cannot use APPLICATION_PATH
         $installationIniFile = getcwd() . '/application/config/installation.ini';
@@ -173,7 +179,7 @@ abstract class Translate5AbstractCommand extends Command
                 $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
             }
             $this->initTranslate5($environment);
-            $config = \Zend_Registry::get('config');
+            $config = Zend_Registry::get('config');
             if (! $this->isPorcelain) {
                 $this->io->info('Using database "' . $config->resources->db->params->dbname . '"');
             }
@@ -182,13 +188,13 @@ abstract class Translate5AbstractCommand extends Command
         }
     }
 
-    protected function getLogo()
+    protected function getLogo(): string
     {
-        $logo = <<<EOF
+        return <<<EOF
         <fg=bright-yellow;options=reverse>            </>
     <fg=bright-yellow;options=reverse>                    </>
   <fg=bright-yellow;options=reverse>                        </>
- <fg=bright-yellow;options=reverse>   _                      </> _       _       <fg=cyan;options=bold>_____</> 
+ <fg=bright-yellow;options=reverse>   _                      </> _       _       <fg=cyan;options=bold>_____</>
 <fg=bright-yellow;options=reverse>   | |                     |</> |     | |     <fg=cyan;options=bold>| ____|</>
 <fg=bright-yellow;options=reverse>   | |_ _ __ __ _ _ __  ___|</> | __ _| |_ ___<fg=cyan;options=bold>| |__  </>
 <fg=bright-yellow;options=reverse>   | __| "__/ _` | '_ \/ __|</> |/ _` | __/ _ <fg=cyan;options=bold>\___ \ </>
@@ -198,8 +204,6 @@ abstract class Translate5AbstractCommand extends Command
     <fg=bright-yellow;options=reverse>                    </>
         <fg=bright-yellow;options=reverse>            </>
 EOF;
-
-        return $logo;
     }
 
     /**
@@ -223,7 +227,7 @@ EOF;
         ]);
     }
 
-    protected function writeAssoc(array $data)
+    protected function writeAssoc(array $data): void
     {
         $keys = array_keys($data);
         $maxlen = max(array_map('strlen', $keys)) + 1;
@@ -238,7 +242,7 @@ EOF;
     /**
      * Writes a table and reads out the assoc keys of the child items as headline
      */
-    protected function writeTable(array $data)
+    protected function writeTable(array $data): void
     {
         if (empty($data)) {
             return;
@@ -251,7 +255,7 @@ EOF;
      * Translate5 licence text to be reused in each command
      * @return string
      */
-    protected function getTranslate5LicenceText()
+    protected function getTranslate5LicenceText(): string
     {
         return '
 /*
@@ -288,38 +292,79 @@ END LICENSE AND COPYRIGHT
      * Checks, if the command is being called with root-rights or the T5 /data directory is not writable/readable
      * Displays errors, if so, and then returns true
      */
-    protected function checkCliUsageAsRoot(): bool
+    protected function checkCliUsageAsRoot(): void
     {
         // this cannot be checked on windows machines ....
         if (PHP_OS_FAMILY === 'Windows') {
-            return false;
+            return;
         }
         // prevent root usage
         $username = posix_getpwuid(posix_geteuid())['name'];
         if (strtolower($username) === 'root') {
-            $this->io->error('You must not run this command as "' . $username . '"');
+            $dataOwner = $this->getDataDirectoryOwnerUser();
+            $warning = [];
+            if ($dataOwner !== null) {
+                $warning[] = 'You are running as root and not as "' . $dataOwner . '". '
+                    . 'This might lead to broken file permissions.';
+            } else {
+                $warning[] = 'You are running this command as "' . $username . '"';
+            }
+            $warning[] = 'Use just "t5 ..." instead of "./translate5.sh ..." to run with correct permissions.';
+            $this->io->warning($warning);
+            if (! $this->input->isInteractive()) {
+                $this->io->error('Execution as root is not allowed in non-interactive mode. Aborting.');
 
-            return true;
+                exit(self::FAILURE);
+            }
+            if (! $this->io->confirm('Are you sure to continue?', false)) {
+                $this->io->error('Aborted by user.');
+
+                exit(self::FAILURE);
+            }
+            $this->io->note('Continuing as root user by explicit confirmation.');
         }
+
         // We check if the data-dir is readable & writable (if it exists)
         $dataDir = realpath(__DIR__ . '/../../../data');
         if ($dataDir && is_dir($dataDir) && (! is_readable($dataDir) || ! is_writable($dataDir))) {
-            $this->io->error('The data-directory "' . $dataDir . '" is not readable/writable for user "' . $username . '"');
+            $this->io->error(
+                'The data-directory "' . $dataDir
+                . '" is not readable/writable for user "' . $username . '"'
+            );
 
-            return true;
+            exit(self::FAILURE);
         }
         // just an info if running with uncommon user-rights
         if (! in_array(strtolower($username), ['apache', 'apache2', 'dev', 'developer', 'http', 'httpd', 'www-data'])) {
             $this->io->note('You\'re running the command as user "' . $username . '"');
         }
+    }
 
-        return false;
+    /**
+     * Returns the owner user name of the data directory.
+     */
+    private function getDataDirectoryOwnerUser(): ?string
+    {
+        $dataDir = realpath(__DIR__ . '/../../../data');
+        if (! $dataDir || ! is_dir($dataDir)) {
+            return null;
+        }
+        $ownerId = @fileowner($dataDir);
+        if ($ownerId === false) {
+            return null;
+        }
+        $ownerInfo = @posix_getpwuid($ownerId);
+        if (! is_array($ownerInfo)) {
+            return null;
+        }
+
+        return strtolower((string) $ownerInfo['name']);
     }
 
     /**
      * Prints the instance specific client-specific/instance-notes.md file if any
      */
-    protected function printNotes()
+    protected function printNotes(): void
     {
         $notesFile = APPLICATION_ROOT . '/client-specific/instance-notes.md';
         if (file_exists($notesFile)) {

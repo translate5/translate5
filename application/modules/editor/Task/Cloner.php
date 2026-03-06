@@ -84,14 +84,21 @@ class editor_Task_Cloner
     }
 
     /**
-     * if the source task is a single project task (default task), then we have to convert it to a project with projectTasks
+     * If the source task is standalone (id == projectId), move original and clone under one real
+     * project wrapper so they no longer rely on the pseudo-project identity of the original task id.
+     *
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      */
     protected function handleSingleTask(&$data)
     {
-        if ((string) $this->original->getTaskType() !== editor_Task_Type_Default::ID || $this->original->getId() !== $this->original->getProjectId()) {
+        // only convert standalone tasks (id == projectId) that aren't pure project types
+        if ($this->original->getId() !== $this->original->getProjectId()) {
+            return;
+        }
+        $origType = $this->original->getTaskType();
+        if ($origType->isProject() && ! $origType->isTask()) {
             return;
         }
         // 1. we create the project out of the current task

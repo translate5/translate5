@@ -4052,16 +4052,16 @@
         },
         {
             "name": "openai-php/client",
-            "version": "v0.17.1",
+            "version": "v0.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/openai-php/client.git",
-                "reference": "f7d3150159a7b840fe144568bede1c072f768343"
+                "reference": "3362ab004fcfc9d77df3aff7671fbcbe70177cae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openai-php/client/zipball/f7d3150159a7b840fe144568bede1c072f768343",
-                "reference": "f7d3150159a7b840fe144568bede1c072f768343",
+                "url": "https://api.github.com/repos/openai-php/client/zipball/3362ab004fcfc9d77df3aff7671fbcbe70177cae",
+                "reference": "3362ab004fcfc9d77df3aff7671fbcbe70177cae",
                 "shasum": ""
             },
             "require": {
@@ -4123,7 +4123,7 @@
             ],
             "support": {
                 "issues": "https://github.com/openai-php/client/issues",
-                "source": "https://github.com/openai-php/client/tree/v0.17.1"
+                "source": "https://github.com/openai-php/client/tree/v0.18.0"
             },
             "funding": [
                 {
@@ -4139,7 +4139,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-09T10:35:54+00:00"
+            "time": "2025-10-31T18:58:57+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -10157,14 +10157,14 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "shardj/zf1-future": 20,
-        "querypath/querypath": 20,
         "dream-group/horde-text-diff": 20,
-        "translate5/rangy-lib": 20,
-        "translate5/php-html-parser": 20,
-        "wilsonglasser/spout": 20,
+        "mittagqi/restful-zend-framework": 20,
+        "querypath/querypath": 20,
         "select2/select2": 5,
-        "mittagqi/restful-zend-framework": 20
+        "shardj/zf1-future": 20,
+        "translate5/php-html-parser": 20,
+        "translate5/rangy-lib": 20,
+        "wilsonglasser/spout": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -10196,7 +10196,7 @@
         "ext-bcmath": "*",
         "ext-xsl": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.3.23"
     },

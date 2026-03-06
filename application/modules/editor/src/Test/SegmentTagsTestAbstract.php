@@ -39,6 +39,56 @@ use MittagQI\Translate5\Tag\TagSequence;
  */
 abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
 {
+    /**
+     * Normalizes all the user-specific data-fields in trackchanges-markup
+     * Be aware, this adjusts any strings with the given data-xxx format
+     */
+    public static function normalizeTrackChangesMarkup(string $segmentMarkup): string
+    {
+        $segmentMarkup = preg_replace(
+            '~(<(ins|del)[^<]+)data-historylist\s*=\s*"[0-9]*"~',
+            '$1data-historylist="1625486496000"',
+            $segmentMarkup
+        );
+        $segmentMarkup = preg_replace(
+            '~(<(ins|del)[^<]+)data-timestamp\s*=\s*"[^"]*"~',
+            '$1data-timestamp="2024-07-05T14:14:44+02:00"',
+            $segmentMarkup
+        );
+        $segmentMarkup = preg_replace(
+            '~(<(ins|del)[^<]+)data-usercssnr\s*=\s*"[^"]*"~',
+            '$1data-usercssnr="usernr1"',
+            $segmentMarkup
+        );
+        $segmentMarkup = preg_replace(
+            '~(<(ins|del)[^<]+)data-usertrackingid\s*=\s*"[0-9]*"~',
+            '$1data-usertrackingid="1234"',
+            $segmentMarkup
+        );
+        $segmentMarkup = preg_replace(
+            '~(<(ins|del)[^<]+)data-workflowstep\s*=\s*"[^"]*"~',
+            '$1data-workflowstep="review1"',
+            $segmentMarkup
+        );
+
+        $segmentMarkup = preg_replace(
+            '~(<ins[^<]+)data-action_history_[0-9]+\s*=\s*"[^"]*"~',
+            '$1data-action_history_1625486496000="INS"',
+            $segmentMarkup
+        );
+        $segmentMarkup = preg_replace(
+            '~(<del[^<]+)data-action_history_[0-9]+\s*=\s*"[^"]*"~',
+            '$1data-action_history_1625486496000="DEL"',
+            $segmentMarkup
+        );
+        $segmentMarkup = preg_replace(
+            '~(<(ins|del)[^<]+)data-usertrackingid_history_[0-9]+\s*=\s*"[^"]*"~',
+            '$1data-usertrackingid_history_1625486496000="1234"',
+            $segmentMarkup
+        );
+
+        return $segmentMarkup;
+    }
     /* abstract helper-classs to easily create tests for segment tags */
 
     /**
@@ -103,6 +153,9 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
         $this->assertEquals($markup, $tags->render());
+        // test placeholder mode
+        $placeholders = $tags->renderAsPlaceholders(TagSequence::PLACEHOLDER_UNIQUE);
+        $this->assertEquals($markup, $tags->revertPlaceholders($placeholders));
         // compare field-texts vs stripped markup
         $this->assertEquals(editor_Segment_Tag::strip($markup), $tags->getFieldText());
         // re-create from JSON
@@ -128,6 +181,9 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
         $this->assertEquals($markup, $tags->render());
+        // test placeholder mode
+        $placeholders = $tags->renderAsPlaceholders(TagSequence::PLACEHOLDER_UNIQUE);
+        $this->assertEquals($markup, $tags->revertPlaceholders($placeholders));
         // compare field-text original vs "sorted" markup
         $this->assertEquals($originalTags->getFieldText(), $tags->getFieldText());
         // compare field-text vs stripped markup
@@ -150,9 +206,15 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         // compare unparsed markup
         if ($compare == null) {
             $this->assertEquals($markup, $tags->render());
+            // test placeholder mode
+            $placeholders = $tags->renderAsPlaceholders(TagSequence::PLACEHOLDER_UNIQUE);
+            $this->assertEquals($markup, $tags->revertPlaceholders($placeholders));
         } else {
             // if the markup cpontaines invalid mqm we may need a special compare markup
             $this->assertEquals($compare, $tags->render());
+            // test placeholder mode
+            $placeholders = $tags->renderAsPlaceholders(TagSequence::PLACEHOLDER_UNIQUE);
+            $this->assertEquals($compare, $tags->revertPlaceholders($placeholders));
         }
         // compare field-texts vs stripped markup
         $this->assertEquals(editor_Segment_Tag::strip($markup), $tags->getFieldText());

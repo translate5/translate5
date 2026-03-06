@@ -56,7 +56,6 @@ class editor_Models_Import_DataProvider_SingleFile extends editor_Models_Import_
         $this->setTask($task);
         $this->checkAndMakeTempImportFolder();
 
-        $this->importFolder = tempnam(sys_get_temp_dir(), 'import') . '.d';
         $workfiles = $this->importFolder . '/workfiles/';
         mkdir($workfiles, recursive: true);
 

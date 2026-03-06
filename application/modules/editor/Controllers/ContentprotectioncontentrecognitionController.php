@@ -164,7 +164,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
             $this->entity->setKeepAsIs(false);
         }
 
-        if (in_array('regex', $this->data, true)) {
+        if (array_key_exists('regex', $this->data)) {
             $keyGenerator = UniqueKeyGenerator::create();
             $this->entity->setKey($keyGenerator->getUniqueKey());
         }

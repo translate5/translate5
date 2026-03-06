@@ -269,6 +269,18 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return $this->renderStart() . $this->renderChildren($skippedTypes) . $this->renderEnd();
     }
 
+    /**
+     * retrieves a placeholder suitable only for tests & display purposes
+     */
+    public function getShortPlaceholder(): string
+    {
+        if ($this->order > -1) {
+            return static::$type . $this->order;
+        }
+
+        return static::$type . ++static::$uniqueId;
+    }
+
     public function toJson(): false|string
     {
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
