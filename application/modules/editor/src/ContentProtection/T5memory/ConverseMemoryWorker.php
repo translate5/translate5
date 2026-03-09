@@ -41,7 +41,12 @@ use MittagQI\Translate5\LanguageResource\Adapter\LanguagePairDTO;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
+use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\ExportService;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
+use MittagQI\Translate5\T5Memory\ImportService;
 use ZfExtended_Worker_Abstract;
 
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
@@ -66,6 +71,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     private readonly ActionLockService $actionLockService;
 
+    private readonly ImportService $importService;
+
     public function __construct()
     {
         parent::__construct();
@@ -75,6 +82,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->exportService = ExportService::create();
         $this->taskAssocRepository = LanguageResourceTaskAssocRepository::create();
         $this->actionLockService = ActionLockService::create();
+        $this->importService = ImportService::create();
     }
 
     private function restoreLangResourceMemories(): void
@@ -187,60 +195,66 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $this->languageResource->save();
 
-        $mime = $connector->getValidExportTypes()['TMX'];
+        $exportFilename = $this->exportService->export(
+            $this->languageResource,
+            TmFileExtension::TMX,
+        );
 
-        foreach ($this->memoriesBackup as $memory) {
-            // conversion is a long process so we need to refresh the lock
-            $lock->refresh();
-            $exportFilename = $this->exportService->export(
-                $this->languageResource,
-                TmFileExtension::TMX,
-                $memory['filename']
+        // export may be a long process so we need to refresh the lock
+        $lock->refresh();
+
+        if (null === $exportFilename || ! file_exists($exportFilename)) {
+            $this->log->error(
+                'E1587',
+                'Conversion: TM was not exported. TMX file does not exists: {filename}',
+                [
+                    'filename' => $exportFilename,
+                    'languageResource' => $this->languageResource,
+                ]
             );
 
-            if (null === $exportFilename || ! file_exists($exportFilename)) {
-                $this->log->error(
-                    'E1587',
-                    'Conversion: TM was not exported. TMX file does not exists: {filename}',
-                    [
-                        'filename' => $exportFilename,
-                        'languageResource' => $this->languageResource,
-                    ]
-                );
+            $this->resetConversionStarted();
 
-                $this->resetConversionStarted();
+            $lock->release();
 
-                $lock->release();
+            return false;
+        }
 
-                return false;
-            }
+        $customerId = current($this->languageResource->getCustomers());
 
-            $fileinfo = [
-                'tmp_name' => $exportFilename,
-                'type' => $mime,
-                'name' => basename($exportFilename),
-            ];
+        $options = new ImportOptions(
+            stripFramingTags: StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None,
+            tmxFilterOptions: TmxFilterOptions::fromConfig(\Zend_Registry::get('config')),
+            resegmentTmx: (bool) ($params[TranslationUnitResegmentProcessor::RESEGMENT_TU_OPTION] ?? false),
+            customerId: $customerId ? (int) $customerId : null
+        );
 
-            if (! $connector->addTm($fileinfo, [
-                'createNewMemory' => true,
-            ])) {
-                $this->log->error(
-                    'E1588',
-                    'Conversion: Failed to import file: {filename}',
-                    [
-                        'filename' => $exportFilename,
-                        'languageResource' => $this->languageResource,
-                    ]
-                );
+        $this->languageResource->addSpecificData('memories', []);
 
-                $this->rollback($connector);
+        try {
+            $this->importService->importTmx(
+                $this->languageResource,
+                [$exportFilename],
+                $options,
+            );
+        } catch (\Exception $e) {
+            $this->log->exception($e);
+            $this->log->error(
+                'E1588',
+                'Conversion: Failed to import file: {filename}',
+                [
+                    'filename' => $exportFilename,
+                    'languageResource' => $this->languageResource,
+                ]
+            );
 
-                $lock->release();
+            $this->rollback($connector);
 
-                return false;
-            }
-
+            return false;
+        } finally {
             @unlink($exportFilename);
+
+            $lock->release();
         }
 
         $onMemoryDeleted = fn ($filename) =>

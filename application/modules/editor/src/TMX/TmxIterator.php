@@ -107,26 +107,9 @@ class TmxIterator
             }
 
             if ($reader->nodeType === XMLReader::ELEMENT && $reader->name === 'header') {
+                yield '<tmx version="1.4">' . PHP_EOL;
                 yield $reader->readOuterXML() . PHP_EOL;
-            }
-
-            if (! in_array($reader->name, ['tmx', 'body'])) {
-                continue;
-            }
-
-            if ($reader->nodeType === XMLReader::ELEMENT) {
-                // Get the opening part of the 'element' element
-                $openingPart = '<' . $reader->name;
-
-                // Get attributes of the 'element' element
-                while ($reader->moveToNextAttribute()) {
-                    $openingPart .= ' ' . $reader->name . '="' . $reader->value . '"';
-                }
-
-                // If self-closing
-                $openingPart .= $reader->isEmptyElement ? '/>' : '>';
-
-                yield $openingPart . PHP_EOL;
+                yield '<body>' . PHP_EOL;
             }
         }
 
