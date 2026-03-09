@@ -69,7 +69,34 @@ Fix for error when clone task produces errors in rare cases.
 FIX: translator package reimport may lead to exceptions due to tag-errors in diffing to evaluate track-changes
 
 **[TRANSLATE-5216](https://jira.translate5.net/browse/TRANSLATE-5216): translate5 AI - Check why gpt 5.1 and 5.2 work only very inconsistently in MS Azure AI foundry and not at all at openai** <br>
-[🐞 Fix]  Added support of GPT-5 models
+[🐞 Fix]  Added support of GPT-5 model## [7.35.4] - 2026-03-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5341](https://jira.translate5.net/browse/TRANSLATE-5341): Hotfolder Import, VisualReview / VisualTranslation - COTI: Import visual files from sub-folders** <br>
+COTI Hotfolder: Import visual files from sub-folders
+
+
+### Bugfixes
+**[TRANSLATE-5348](https://jira.translate5.net/browse/TRANSLATE-5348): Content Protection - Integer rule "default generic with NNBSP separator" faulty** <br>
+Fix integer rules formatter
+
+**[TRANSLATE-5345](https://jira.translate5.net/browse/TRANSLATE-5345): Content Protection - Converse memory worker is broken** <br>
+Fix ConverseMemoryWorker
+
+**[TRANSLATE-5332](https://jira.translate5.net/browse/TRANSLATE-5332): Editor general - Insert from source produces error** <br>
+When editing a segment and using ctrl a to select all then ctrl . to copy source content did lead to an error.
+
+**[TRANSLATE-5322](https://jira.translate5.net/browse/TRANSLATE-5322): Editor general - Statistics DB is locked** <br>
+PHP error about locked statistics DB is fixed - pre-release to test the fix
+
+**[TRANSLATE-5307](https://jira.translate5.net/browse/TRANSLATE-5307): Hotfolder Import - COTI: ZIP contains Windows-style backslashes stored as literal characters** <br>
+COTI: Improve handling of ZIP that contains Windows-style backslashes stored as literal characters
+
+s
 
 
 ## [7.35.2] - 2026-03-03
