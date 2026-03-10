@@ -452,7 +452,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
                     $start = (int) $match[0][1];
                     $next = mb_strpos($content, "\n## [", $start + 1);
                     $end = $next === false ? mb_strlen($content) : $next;
-                    $content = substr_replace($content, '', $start, $end - $start + 2);
+                    $content = substr_replace($content, '', $start, $end - $start);
                 }
             } else {
                 $this->io->warning('Same version section added again. Please fix CHANGELOG.md file manually');
