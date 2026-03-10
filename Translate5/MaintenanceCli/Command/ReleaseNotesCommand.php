@@ -557,7 +557,7 @@ BUILD=$patch
      */
     private function createMarkDownSection(string $version, string $date, string $importantNotes): string
     {
-        $md = "## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
+        $md = "\n## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
 
         if (! empty($this->issues[self::NEW_FEATURE])) {
             $md .= "\n### Added\n";
