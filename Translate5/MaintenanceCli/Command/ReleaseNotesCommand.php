@@ -452,7 +452,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
                     $start = (int) $match[0][1];
                     $next = mb_strpos($content, "\n## [", $start + 1);
                     $end = $next === false ? mb_strlen($content) : $next;
-                    $content = substr_replace($content, '', $start, $end - $start + 2);
+                    $content = substr_replace($content, '', $start, $end - $start);
                 }
             } else {
                 $this->io->warning('Same version section added again. Please fix CHANGELOG.md file manually');
@@ -557,7 +557,7 @@ BUILD=$patch
      */
     private function createMarkDownSection(string $version, string $date, string $importantNotes): string
     {
-        $md = "## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
+        $md = "\n## [$version] - $date\n\n### Important Notes:\n$importantNotes \n\n";
 
         if (! empty($this->issues[self::NEW_FEATURE])) {
             $md .= "\n### Added\n";

@@ -4744,7 +4744,13 @@ class EditorWrapper {
      * @param {Boolean} skipDataChangeEvent
      * @param {Boolean} moveCarret - if true, move caret to the end of the inserted content
      */
-    replaceContentInRange(rangeStart, rangeEnd, content, skipDataChangeEvent = false, moveCarret = false) {
+    replaceContentInRange(
+        rangeStart,
+        rangeEnd,
+        content,
+        skipDataChangeEvent = false,
+        moveCarret = false
+    ) {
         this._editor.model.change((writer) => {
             const preservedSelection = this._editor.model.document.selection.getFirstRange();
 
@@ -4785,6 +4791,15 @@ class EditorWrapper {
                 if (preservedSelection.start.path[1] > maxOffset) {
                     preservedSelection.start.path[1] = maxOffset;
                 }
+            }
+
+            const newMaxOffset = root.getChild(0).maxOffset;
+            if (preservedSelection.end.path[1] > newMaxOffset) {
+                preservedSelection.end.path[1] = newMaxOffset;
+            }
+
+            if (preservedSelection.start.path[1] > newMaxOffset) {
+                preservedSelection.start.path[1] = newMaxOffset;
             }
 
             writer.setSelection(preservedSelection);

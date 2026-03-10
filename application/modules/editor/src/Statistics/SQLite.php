@@ -245,6 +245,7 @@ class SQLite extends AbstractStatisticsDB
                 }
                 if ((bool) $statConfig->sqliteWriteAheadLog) {
                     $this->query('PRAGMA journal_mode=wal');
+                    $this->client->busyTimeout($statConfig->writeAheadBusyTimeout ?? 1000);
                 }
                 if ((bool) $statConfig->sqliteReadAveragesWithDuckDb) {
                     $this->readAveragesWithDuckDb = true;

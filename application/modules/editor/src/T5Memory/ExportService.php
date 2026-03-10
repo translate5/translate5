@@ -299,13 +299,10 @@ class ExportService
             throw new ExportException();
         }
 
-        if (0 !== $writtenElements) {
+        if ($atLeastOneFileRead) {
             // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
             // so add body and tmx closing tags manually
             yield '</body>' . PHP_EOL;
-        }
-
-        if ($atLeastOneFileRead) {
             yield '</tmx>';
         }
     }

@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
        http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
@@ -182,6 +183,44 @@ class IntegerProtectorTest extends TestCase
             'number' => '±123456',
             'expected' => '<number type="integer" name="test-default" source="±123456" iso="±123456" target="±123456" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
             'protectionDto' => $protectionDtoDash,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $protectionDtoNbsp = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '# ###',
+            1,
+            'aaa',
+        );
+
+        yield 'NNBSP as separator' => [
+            'number' => '123,456',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123 456" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoNbsp,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $protectionDtoNbspEscaped = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            "#\u{202F}###",
+            1,
+            'aaa',
+        );
+
+        yield '\u{202F} as separator' => [
+            'number' => '123,456',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123 456" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoNbspEscaped,
             'targetLang' => $targetLangDe,
         ];
     }

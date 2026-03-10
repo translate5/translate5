@@ -120,7 +120,21 @@ class IntegerProtector extends FloatProtector
     private function getTargetInteger(int $integer, string $targetFormat): string
     {
         $fmt = NumberFormatter::create('en', NumberFormatter::PATTERN_DECIMAL);
-        $this->setFormat($targetFormat, $fmt);
+
+        // detect custom grouping char from incoming format
+        if (preg_match('/#(.+)###/uU', $targetFormat, $m)) {
+            $groupingChar = $m[1];
+
+            // convert visual format to ICU pattern format
+            $icuPattern = str_replace($m[1], ',', $targetFormat);
+            $fmt->setPattern($icuPattern);
+
+            if ($groupingChar !== null) {
+                $fmt->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $groupingChar);
+            }
+        } else {
+            $this->setFormat($targetFormat, $fmt);
+        }
 
         return $fmt->format($integer);
     }
