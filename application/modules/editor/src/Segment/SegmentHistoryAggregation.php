@@ -75,6 +75,7 @@ class SegmentHistoryAggregation
         string $matchRateType,
         int $langResId,
         int $isEditable,
+        ?int $qualityScore = null,
     ): void {
         // trim brackets
         $taskGuid = trim($taskGuid, '{}');
@@ -93,6 +94,7 @@ class SegmentHistoryAggregation
             editor_Models_Segment_MatchRateType::getLangResourceType($matchRateType),
             $langResId,
             $isEditable,
+            $qualityScore,
         ];
     }
 
@@ -128,6 +130,7 @@ class SegmentHistoryAggregation
                     'langResType',
                     'langResId',
                     'editable',
+                    'qualityScore',
                 ]
             );
 
@@ -183,6 +186,7 @@ class SegmentHistoryAggregation
                     'langResType',
                     'langResId',
                     'editable',
+                    'qualityScore',
                     'lastEdit',
                 ]
             );
@@ -211,6 +215,7 @@ class SegmentHistoryAggregation
         string $matchRateType,
         int $langResId,
         int $isEditable,
+        ?int $qualityScore = null,
     ): bool {
         $this->upsertBuffered(
             $taskGuid,
@@ -224,10 +229,37 @@ class SegmentHistoryAggregation
             $matchRate,
             $matchRateType,
             $langResId,
-            $isEditable
+            $isEditable,
+            $qualityScore
         );
 
         return $this->flushUpserts();
+    }
+
+    /**
+     * Update single segment tqe value. This can happen when single segment TQE evaluation is triggered.
+     */
+    public function updateQualityScore(string $taskGuid, int $segmentId, ?int $qualityScore): void
+    {
+        $bind = [
+            'taskGuid' => trim($taskGuid, '{}'),
+        ];
+        $value = $qualityScore === null ? 'NULL' : (int) $qualityScore;
+
+        try {
+            $this->client->query(
+                'UPDATE ' . self::TABLE_NAME . ' SET qualityScore=' . $value .
+                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
+                $bind
+            );
+            $this->client->query(
+                'UPDATE ' . self::TABLE_NAME_LEV . ' SET qualityScore=' . $value .
+                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
+                $bind
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
     }
 
     public function updateEditable(string $taskGuid, int $segmentId, int $editable): void

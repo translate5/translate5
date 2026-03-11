@@ -95,7 +95,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
         langResource: '#UT#Sprachressourcen',
         langResourceType: '#UT#Typ der Ressource',
         matchRateMin: '#UT#Matchrate',
-        matchRateMax: '#UT#Matchrate'
+        matchRateMax: '#UT#Matchrate',
+        qualityScoreMin: '#UT#Quality estimation',
+        qualityScoreMax: '#UT#Quality estimation',
     },
     strings: {
         deadlineDateHeader: '#UT#Deadline Datum',

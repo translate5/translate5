@@ -323,7 +323,7 @@ class SegmentHistoryAggregationRepository
 
     /**
      * Special filters from Advanced Filters window
-     * Currently supported: langResource, langResourceType, matchRateMin, matchRateMax
+     * Currently supported: langResource, langResourceType, matchRateMin, matchRateMax, qualityScoreMin, qualityScoreMax
      * @param AggregationFilter[] $filters
      */
     private static function getExtraFiltersSQLWhere(
@@ -337,6 +337,10 @@ class SegmentHistoryAggregationRepository
                     $sqlWhere .= ' AND matchRate>=' . (int) $filter->value;
                 } elseif ($filter->property == 'matchRateMax') {
                     $sqlWhere .= ' AND matchRate<=' . (int) $filter->value;
+                } elseif ($filter->property == 'qualityScoreMin') {
+                    $sqlWhere .= ' AND qualityScore>=' . (int) $filter->value;
+                } elseif ($filter->property == 'qualityScoreMax') {
+                    $sqlWhere .= ' AND qualityScore<=' . (int) $filter->value;
                 } elseif ($filter->property == 'langResource') {
                     if (! empty($filter->value) && is_array($filter->value)) {
                         $value = array_map(fn ($v) => (int) $v, $filter->value);

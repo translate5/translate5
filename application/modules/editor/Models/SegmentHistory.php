@@ -56,6 +56,8 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
         'workflowStepNr',
         'matchRate',
         'matchRateType',
+        'qualityScore',
+        'qualityScoreReasoning',
     ];
 
     /**

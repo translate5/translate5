@@ -74,7 +74,7 @@ class editor_TaskController extends ZfExtended_RestController
 {
     use TaskContextTrait;
 
-    private const EXTRA_FILTERS = ['matchRateMin', 'matchRateMax', 'langResource', 'langResourceType'];
+    private const EXTRA_FILTERS = ['matchRateMin', 'matchRateMax', 'langResource', 'langResourceType', 'qualityScoreMin', 'qualityScoreMax'];
 
     protected $entityClass = 'editor_Models_Task';
 

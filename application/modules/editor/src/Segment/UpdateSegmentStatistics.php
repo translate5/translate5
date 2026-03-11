@@ -124,6 +124,7 @@ class UpdateSegmentStatistics
             $duration = 0;
         }
 
+        $qualityScore = $segment->getQualityScore();
         $this->aggregator->upsert(
             $segment->getTaskGuid(),
             $segment->getUserGuid(),
@@ -136,7 +137,8 @@ class UpdateSegmentStatistics
             (int) $segment->getMatchRate(),
             $segment->getMatchRateType(),
             self::getLangResId($segment->meta()->getPreTransLangResUuid()),
-            (int) $segment->getEditable()
+            (int) $segment->getEditable(),
+            ($qualityScore !== null && $qualityScore !== '') ? (int) $qualityScore : null,
         );
     }
 

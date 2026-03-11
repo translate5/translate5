@@ -69,7 +69,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     layout: 'hbox',
     border:false,
     width:800,
-    height: Editor.data.statistics.enabled ? 600 : 500,
+    height: Editor.data.statistics.enabled ? 710 : 500,
     bodyStyle: {
         borderWidth: 0
     },

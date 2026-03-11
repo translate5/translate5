@@ -109,6 +109,10 @@
             <file>editorAPI/SessionApiTest.php</file>
             <file>editorAPI/ClientPmTest.php</file>
         </testsuite>
+        <testsuite name="statistics">
+            <file>Unit/Statistics/SegmentHistoryAggregationTest.php</file>
+            <file>Unit/Statistics/SegmentHistoryAggregationRepositoryTest.php</file>
+        </testsuite>
         <testsuite name="unit">
             <directory>Unit</directory>
         </testsuite>

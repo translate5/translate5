@@ -81,6 +81,11 @@ class AggregateTaskHistory
             '),"",userGuid) FROM LEK_segments WHERE taskGuid="' . $taskGuid . '"'
         );
 
+        // pre-fetch qualityScore for all segments in the task
+        $qualityScores = $this->db->fetchPairs(
+            'SELECT id,qualityScore FROM LEK_segments WHERE taskGuid="' . $taskGuid . '"'
+        );
+
         $this->jobsLogged->initDataFor($taskGuid);
 
         $resultsDeduplicated = [];
@@ -233,6 +238,7 @@ class AggregateTaskHistory
             if (! isset($aggregation[$v['workflowStep']])) {
                 $aggregation[$v['workflowStep']] = [];
             }
+            $qualityScore = $qualityScores[$v['segmentId']] ?? null;
             $aggregation[$v['workflowStep']][] = [
                 $taskGuid,
                 $v['userGuid'],
@@ -246,6 +252,7 @@ class AggregateTaskHistory
                 $v['matchRateType'],
                 $this->getLangResId($v['segmentId']),
                 $isEditable,
+                ($qualityScore !== null && $qualityScore !== '') ? (int) $qualityScore : null,
             ];
         }
 
@@ -303,6 +310,7 @@ class AggregateTaskHistory
             if (! isset($aggregation[$v['workflowStep']])) {
                 $aggregation[$v['workflowStep']] = [];
             }
+            $qualityScore = $qualityScores[$segmentId] ?? null;
             $aggregation[$v['workflowStep']][] = [
                 $taskGuid,
                 $v['userGuid'],
@@ -316,6 +324,7 @@ class AggregateTaskHistory
                 $v['matchRateType'],
                 $this->getLangResId($segmentId),
                 (int) $v['editable'],
+                ($qualityScore !== null && $qualityScore !== '') ? (int) $qualityScore : null,
             ];
         }
 
@@ -429,6 +438,7 @@ class AggregateTaskHistory
                         if (! isset($unmodifiedAggregation[$workflowStep])) {
                             $unmodifiedAggregation[$workflowStep] = [];
                         }
+                        $qualityScore = $qualityScores[$segmentId] ?? null;
                         $unmodifiedAggregation[$workflowStep][] = [
                             $v['taskGuid'],
                             $userGuid,
@@ -442,6 +452,7 @@ class AggregateTaskHistory
                             $v['matchRateType'],
                             $this->getLangResId($segmentId),
                             (int) $v['editable'],
+                            ($qualityScore !== null && $qualityScore !== '') ? (int) $qualityScore : null,
                         ];
                     }
                 }
