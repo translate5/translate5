@@ -30,10 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\TMX;
 
+use MittagQI\Translate5\T5Memory\DirectoryPath;
+
 class TmxSymbolsFixer
 {
     public function __construct(
         private readonly CharacterReplacer $characterReplacer,
+        private readonly DirectoryPath $directoryPath,
     ) {
     }
 
@@ -41,15 +44,13 @@ class TmxSymbolsFixer
     {
         return new self(
             CharacterReplacer::create(),
+            DirectoryPath::create(),
         );
     }
 
     public function fixInvalidXmlSymbols(string $filePath): void
     {
-        $dirPath = APPLICATION_PATH . '/../data/TmxImportPreprocessing/';
-        if (! is_dir($dirPath) && ! mkdir($dirPath) && ! is_dir($dirPath)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirPath));
-        }
+        $dirPath = $this->directoryPath->tmxImportProcessingDir();
         $outputFilename = tempnam($dirPath, 'tmxfix_');
 
         // Process file in chunks to optimize memory usage

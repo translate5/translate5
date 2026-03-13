@@ -69,6 +69,7 @@ class ImportService
         private readonly ConcatTmx $concatTmx,
         private readonly EmptyMemoryCheck $emptyMemoryCheck,
         private readonly ExportService $exportService,
+        private readonly DirectoryPath $directoryPath,
     ) {
     }
 
@@ -88,6 +89,7 @@ class ImportService
             ConcatTmx::create(),
             EmptyMemoryCheck::create(),
             ExportService::create(),
+            DirectoryPath::create(),
         );
     }
 
@@ -122,7 +124,8 @@ class ImportService
         }
 
         if (count($files) > 1) {
-            $file = APPLICATION_DATA . '/TmxImportPreprocessing/concat_' . uniqid() . '.tmx';
+            $processingDir = $this->directoryPath->tmxImportProcessingDir();
+            $file = $processingDir . '/concat_' . uniqid() . '.tmx';
 
             $this->concatTmx->concat(
                 $files,

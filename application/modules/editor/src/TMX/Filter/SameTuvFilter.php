@@ -30,14 +30,22 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\TMX\Filter;
 
+use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\Exception\TmxFilterException;
 use XMLReader;
 
 class SameTuvFilter
 {
+    public function __construct(
+        private readonly DirectoryPath $directoryPath,
+    ) {
+    }
+
     public static function create(): self
     {
-        return new self();
+        return new self(
+            DirectoryPath::create(),
+        );
     }
 
     public function filter(string $tmxFile): void
@@ -48,7 +56,7 @@ class SameTuvFilter
         }
 
         $resultingFile = basename($tmxFile, '.tmx') . '.filtered.tmx';
-        $filterFolder = APPLICATION_DATA . '/tmx-filter/' . bin2hex(random_bytes(8));
+        $filterFolder = $this->directoryPath->tmxFilterDir() . '/' . bin2hex(random_bytes(8));
 
         if (! @mkdir($filterFolder, 0777, true) && ! is_dir($filterFolder)) {
             throw new TmxFilterException('Could not create temporary folder ' . $filterFolder);

@@ -60,6 +60,7 @@ class ExportService
         private readonly Zend_Config $config,
         private readonly ConcatTmx $concatTmx,
         private readonly TmxIterator $tmxIterator,
+        private readonly DirectoryPath $directoryPath,
     ) {
     }
 
@@ -75,6 +76,7 @@ class ExportService
             Zend_Registry::get('config'),
             ConcatTmx::create(),
             TmxIterator::create(),
+            DirectoryPath::create(),
         );
     }
 
@@ -363,8 +365,8 @@ class ExportService
             return null;
         }
 
-        $exportDir = APPLICATION_DATA . '/TMExport/';
-        $tmpDir = $exportDir . $languageResource->getId() . '_' . uniqid() . '/';
+        $exportDir = $this->directoryPath->tmExportDir();
+        $tmpDir = $exportDir . '/' . $languageResource->getId() . '_' . uniqid() . '/';
 
         if (! mkdir($tmpDir, recursive: true) && ! is_dir($tmpDir)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $tmpDir));
@@ -478,11 +480,7 @@ class ExportService
         LanguageResource $languageResource,
         bool $multipleParts,
     ): string {
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
-
-        if (! is_dir($exportDir) && ! mkdir($exportDir, recursive: true)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $exportDir));
-        }
+        $exportDir = $this->directoryPath->tmExportDir() . '/';
 
         if (! $multipleParts) {
             return $exportDir;

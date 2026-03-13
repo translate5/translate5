@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Reorganize;
 
 use MittagQI\Translate5\Maintenance\CleanUpFolders;
+use MittagQI\Translate5\T5Memory\DirectoryPath;
 
 class CleanUpCronJob
 {
@@ -38,6 +39,7 @@ class CleanUpCronJob
 
     public function __construct(
         private readonly CleanUpFolders $cleanUpFolders,
+        private readonly DirectoryPath $directoryPath,
     ) {
     }
 
@@ -45,6 +47,7 @@ class CleanUpCronJob
     {
         return new self(
             new CleanUpFolders(),
+            DirectoryPath::create(),
         );
     }
 
@@ -52,6 +55,21 @@ class CleanUpCronJob
     {
         $this->cleanUpFolders->deleteOldDateFolders(
             ManualReorganizeService::REORGANIZE_DIR,
+            new \DateTime(self::THRESHOLD_DAYS)
+        );
+
+        $this->cleanUpFolders->deleteOldDateFolders(
+            $this->directoryPath->tmxImportProcessingDir(root: true),
+            new \DateTime(self::THRESHOLD_DAYS)
+        );
+
+        $this->cleanUpFolders->deleteOldDateFolders(
+            $this->directoryPath->tmExportDir(root: true),
+            new \DateTime(self::THRESHOLD_DAYS)
+        );
+
+        $this->cleanUpFolders->deleteOldDateFolders(
+            $this->directoryPath->tmxFilterDir(root: true),
             new \DateTime(self::THRESHOLD_DAYS)
         );
     }

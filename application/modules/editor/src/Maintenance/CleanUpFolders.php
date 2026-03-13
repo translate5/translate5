@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\Maintenance;
 use DateTime;
 use DirectoryIterator;
 use Exception;
-use FilesystemIterator;
 
 class CleanUpFolders
 {
@@ -57,7 +56,8 @@ class CleanUpFolders
 
                     if ($folderDate < $threshold) {
                         $folderPath = $fileInfo->getPathname();
-                        $this->deleteDirectoryRecursively($folderPath);
+
+                        \ZfExtended_Utils::recursiveDelete($folderPath);
                     }
                 } catch (Exception) {
                     // Skip if folder name is not a valid date
@@ -65,18 +65,5 @@ class CleanUpFolders
                 }
             }
         }
-    }
-
-    private function deleteDirectoryRecursively(string $dir): void
-    {
-        $items = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
-        foreach ($items as $item) {
-            if ($item->isDir()) {
-                $this->deleteDirectoryRecursively($item->getPathname());
-            } else {
-                unlink($item->getPathname());
-            }
-        }
-        rmdir($dir);
     }
 }

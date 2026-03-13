@@ -34,6 +34,7 @@ use editor_Models_Languages as Language;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
 use MittagQI\Translate5\T5Memory\Contract\TmxImportProcessor;
+use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateFileForTmxPreprocessingException;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\AddFakeContextProcessor;
@@ -60,6 +61,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         private readonly ZfExtended_Logger $logger,
         private readonly TmxFilter $tmxFilter,
         private readonly TmxSymbolsFixer $symbolsFixer,
+        private readonly DirectoryPath $directoryPath,
     ) {
     }
 
@@ -81,6 +83,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
             Zend_Registry::get('logger')->cloneMe('editor.t5memory.tmx-import-preprocessing'),
             TmxFilter::create(),
             TmxSymbolsFixer::create(),
+            DirectoryPath::create(),
         );
     }
 
@@ -109,15 +112,11 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
             return $filepath;
         }
 
-        $processingDir = APPLICATION_PATH . '/../data/TmxImportPreprocessing/';
+        $processingDir = $this->directoryPath->tmxImportProcessingDir();
         $problematicDir = $processingDir . 'problematic/';
 
-        if (! is_dir($processingDir)) {
-            @mkdir($processingDir, recursive: true);
-        }
-
         if (! is_dir($problematicDir)) {
-            @mkdir($problematicDir, recursive: true);
+            @mkdir($problematicDir, 0777, true);
         }
 
         $this->symbolsFixer->fixInvalidXmlSymbols($filepath);
