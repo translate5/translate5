@@ -41,7 +41,6 @@ END LICENSE AND COPYRIGHT
  * @method string getSourceIsAutoDetected()
  * @method void setSourceIsAutoDetected(bool $sourceIsAutoDetected)
  */
-
 class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = 'editor_Models_Db_UserMeta';
@@ -72,7 +71,7 @@ class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract
     }
 
     /***
-     * Save the default languages for the given user.
+     * Save the default languages for the given user (text translation).
      * When the record for the user exist, it will be updated with the new values.
      *
      * @return mixed|array
