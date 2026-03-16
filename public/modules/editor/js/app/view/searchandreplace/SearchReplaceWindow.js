@@ -127,5 +127,16 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    }
+    },
+
+    toFront: function(preventFocus) {
+
+        // If changealike-window is currently opened - prevent searchreplace-window from overlapping changealike-window
+        if (Ext.ComponentQuery.query('changealikeWindow').length) {
+            return this;
+        }
+
+        // Do as usual
+        return this.callParent(arguments);
+    },
 });
