@@ -288,6 +288,7 @@ class RepetitionService
             $repetition->setUserGuid($master->getUserGuid());
             $repetition->setWorkflowStep($master->getWorkflowStep());
             $repetition->setWorkflowStepNr((int) $master->getWorkflowStepNr());
+            $repetition->setEditedInStep($master->getEditedInStep());
 
             $newMatchRate = $task->isTranslation()
                 ? FileBasedInterface::REPETITION_MATCH_VALUE

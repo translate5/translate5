@@ -102,9 +102,11 @@ class editor_Workflow_Default_SegmentHandler
         $segmentToSave->setWorkflowStepNr((int) $task->getWorkflowStep());
         if ($tua->getIsPmOverride() == 1) {
             $segmentToSave->setWorkflowStep($this->workflow::STEP_PM_CHECK);
+            $segmentToSave->setEditedInStep($task->getWorkflowStepName());
         } else {
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
             $segmentToSave->setWorkflowStep($tua->getWorkflowStepName());
+            $segmentToSave->setEditedInStep($tua->getWorkflowStepName());
         }
 
         $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
