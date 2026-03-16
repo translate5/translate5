@@ -59,25 +59,3 @@ CREATE TABLE IF NOT EXISTS `LEK_user_preselection` (
         ON DELETE SET NULL
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Migrate existing data from LEK_user_meta if columns exist
-INSERT IGNORE INTO `LEK_user_preselection` (`userId`, `sourceLangFileDefault`, `targetLangFileDefault`, `targetLangFileDefaultMulti`, `fileCustomerDefault`)
-SELECT `userId`, `sourceLangFileDefault`, `targetLangFileDefault`, `targetLangFileDefaultMulti`, `fileCustomerDefault`
-FROM `LEK_user_meta`
-WHERE `sourceLangFileDefault` IS NOT NULL
-   OR `targetLangFileDefault` IS NOT NULL
-   OR `targetLangFileDefaultMulti` IS NOT NULL
-   OR `fileCustomerDefault` IS NOT NULL;
-
--- Drop the migrated columns from LEK_user_meta
-ALTER TABLE `LEK_user_meta`
-DROP FOREIGN KEY `fk_LEK_user_meta_source_file`,
-DROP FOREIGN KEY `fk_LEK_user_meta_target_file`,
-DROP FOREIGN KEY `fk_LEK_user_meta_customer`,
-DROP INDEX `fk_LEK_user_meta_source_file_idx`,
-DROP INDEX `fk_LEK_user_meta_target_file_idx`,
-DROP INDEX `fk_LEK_user_meta_customer_idx`,
-DROP COLUMN `sourceLangFileDefault`,
-DROP COLUMN `targetLangFileDefault`,
-DROP COLUMN `targetLangFileDefaultMulti`,
-DROP COLUMN `fileCustomerDefault`;
