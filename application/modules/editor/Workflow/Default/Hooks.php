@@ -53,6 +53,8 @@ class editor_Workflow_Default_Hooks
 
     public const DIRECT_TRIGGER = 'handleDirect::';
 
+    public const TRIGGER_NOTIFY_ALL_USERS_TASK_ASSOC = 'notifyAllUsersAboutTaskAssociation';
+
     // Limited by available workflow step labels in de.xliff, up to 4 now
     public const PDF_REVIEW_ITERATIONS_MAX = 4;
 
@@ -107,7 +109,7 @@ class editor_Workflow_Default_Hooks
     protected $isCron = false;
 
     protected $validDirectTrigger = [
-        'notifyAllUsersAboutTaskAssociation',
+        self::TRIGGER_NOTIFY_ALL_USERS_TASK_ASSOC,
         'notifyPmFinishOfVisualApproval',
         'finishPrintApprovalJobs1',
         'finishWaitingPdfJob1',
