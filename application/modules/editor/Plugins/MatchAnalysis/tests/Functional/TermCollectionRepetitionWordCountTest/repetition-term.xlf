@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="term-repetition.txt" source-language="en" target-language="de" datatype="x-undefined">
+<body>
+<trans-unit id="1">
+    <source xml:lang="en">Terminology segment</source>
+    <seg-source><mrk mid="0" mtype="seg">Terminology segment</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="0"/></target>
+</trans-unit>
+<trans-unit id="2">
+    <source xml:lang="en">Terminology segment</source>
+    <seg-source><mrk mid="1" mtype="seg">Terminology segment</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="1"/></target>
+</trans-unit>
+<trans-unit id="3">
+    <source xml:lang="en">Terminology segment</source>
+    <seg-source><mrk mid="2" mtype="seg">Terminology segment</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="2"/></target>
+</trans-unit>
+<trans-unit id="4">
+    <source xml:lang="en">Terminology segment</source>
+    <seg-source><mrk mid="3" mtype="seg">Terminology segment</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="3"/></target>
+</trans-unit>
+<trans-unit id="5">
+    <source xml:lang="en">Terminology segment</source>
+    <seg-source><mrk mid="4" mtype="seg">Terminology segment</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="4"/></target>
+</trans-unit>
+<trans-unit id="6">
+    <source xml:lang="en">Terminology segment</source>
+    <seg-source><mrk mid="5" mtype="seg">Terminology segment</mrk></seg-source>
+    <target xml:lang="de"><mrk mtype="seg" mid="5"/></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

@@ -291,10 +291,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // repetition
         if ($masterHasResult && $masterResult->matchrate === FileBasedInterface::TERMCOLLECTION_MATCH_VALUE) {
             $this->saveAnalysis($segment, FileBasedInterface::REPETITION_MATCH_VALUE, 0);
-            $masterResult->matchrate = FileBasedInterface::REPETITION_MATCH_VALUE;
-            $masterResult->isRepetition = true;
 
-            return $masterResult;
+            // clone the result so the master result it is not overwritten
+            $returnMaster = clone $masterResult;
+
+            $returnMaster->matchrate = FileBasedInterface::REPETITION_MATCH_VALUE;
+            $returnMaster->isRepetition = true;
+
+            return $returnMaster;
         }
 
         // DESCRIPTION BEHAVIOUR FOR REPETITIONS
@@ -682,7 +686,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected function saveAnalysis($segment, $matchRateResult, $languageResourceid)
     {
-        /* @var $matchAnalysis MatchAnalysis */
         $matchAnalysis = Factory::get(MatchAnalysis::class);
         $matchAnalysis->setSegmentId($segment->getId());
         $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
