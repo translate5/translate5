@@ -65,11 +65,11 @@ class UpdateRequest extends Request
                 'targetLang' => $targetLang,
                 'timeStamp' => gmdate(self::DATE_FORMAT, $dto->timestamp),
                 'documentName' => $dto->fileName,
-                'author' => $dto->userName,
+                'author' => preg_replace('/&[a-zA-Z0-9#]+;/', '', htmlentities($dto->userName, ENT_XML1)),
                 'context' => $dto->context,
                 'save2disk' => $save2disk ? '1' : '0',
                 'saveDifferentTargetsForSameSource' => $saveDifferentTargetsForSameSource ? '1' : '0',
-            ], JSON_PRETTY_PRINT)
+            ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)
         );
     }
 }

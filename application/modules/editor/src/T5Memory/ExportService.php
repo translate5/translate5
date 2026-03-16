@@ -37,6 +37,7 @@ use LogicException;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
+use MittagQI\Translate5\T5Memory\Export\TmxChunkFixer;
 use MittagQI\Translate5\TMX\ConcatTmx;
 use MittagQI\Translate5\TMX\TmxIterator;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -60,6 +61,7 @@ class ExportService
         private readonly Zend_Config $config,
         private readonly ConcatTmx $concatTmx,
         private readonly TmxIterator $tmxIterator,
+        private readonly TmxChunkFixer $tmxChunkFixer,
     ) {
     }
 
@@ -75,6 +77,7 @@ class ExportService
             Zend_Registry::get('config'),
             ConcatTmx::create(),
             TmxIterator::create(),
+            TmxChunkFixer::create(),
         );
     }
 
@@ -348,11 +351,15 @@ class ExportService
      */
     private function exportTmxChunk(LanguageResource $languageResource, string $tmName): iterable
     {
-        return yield from $this->t5MemoryApi->downloadTmx(
+        $chunks = $this->t5MemoryApi->downloadTmx(
             $languageResource->getResource()->getUrl(),
             $this->persistenceService->addTmPrefix($tmName),
             self::CHUNKSIZE
         );
+
+        foreach ($chunks as $chunk) {
+            yield $this->tmxChunkFixer->fixChunk($chunk);
+        }
     }
 
     private function exportAllAsArchive(LanguageResource $languageResource, ?string $exactTmName): ?string

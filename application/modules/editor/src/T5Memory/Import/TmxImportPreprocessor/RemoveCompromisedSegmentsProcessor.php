@@ -71,6 +71,10 @@ class RemoveCompromisedSegmentsProcessor extends Processor
         ImportOptions $importOptions,
         BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
     ): iterable {
+        if ('' === trim($tu)) {
+            return yield from [];
+        }
+
         try {
             $structure = $this->transUnitParser->extractStructure(
                 $tu,

@@ -81,12 +81,33 @@ class TmxSymbolsFixer
                 return htmlentities(html_entity_decode($matches[0]), ENT_XML1, 'UTF-8');
             };
 
-            $htmlEntitiesPattern = '/&[a-zA-Z0-9#]+;/';
+            // Match HTML entities that are NOT inside tags
+            // Split the line into parts: inside tags and outside tags
+            // Then only process entities that are outside tags
+            $parts = preg_split('/(<[^>]*>)/', $processed, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $result = '';
 
-            $processed = preg_replace_callback($htmlEntitiesPattern, $fixHtmlEntitiesCallback, $processed);
+            foreach ($parts as $i => $part) {
+                // Odd indices are tag delimiters (captured groups), even indices are content outside tags
+                if ($i % 2 === 0) {
+                    // Outside tags - replace HTML entities
+                    $result .= preg_replace_callback('/&[a-zA-Z0-9#]+;/', $fixHtmlEntitiesCallback, $part);
+
+                    continue;
+                }
+
+                if (strpos($part, '<tu ') !== false) {
+                    $result .= preg_replace('/&[a-zA-Z0-9#]+;/', '', $part);
+
+                    continue;
+                }
+
+                // Inside tags - keep as-is
+                $result .= $part;
+            }
 
             // Write processed content to output
-            fwrite($outputHandle, $processed);
+            fwrite($outputHandle, $result);
         }
 
         if (! feof($inputHandle)) {

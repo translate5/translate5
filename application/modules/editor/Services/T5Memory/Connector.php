@@ -44,6 +44,7 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
+use MittagQI\Translate5\T5Memory\Export\TmxChunkFixer;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\FuzzySearchService;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
@@ -134,6 +135,7 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
             $this->config,
             ConcatTmx::create(),
             TmxIterator::create(),
+            TmxChunkFixer::create(),
         );
 
         $this->reorganizeService = ReorganizeService::create();

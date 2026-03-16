@@ -9,6 +9,7 @@ use editor_Models_LanguageResources_Resource;
 use GuzzleHttp\Psr7\Stream;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
+use MittagQI\Translate5\T5Memory\Export\TmxChunkFixer;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\TMX\ConcatTmx;
@@ -52,6 +53,7 @@ class ExportServiceTest extends TestCase
             $config,
             ConcatTmx::create(),
             TmxIterator::create(),
+            TmxChunkFixer::create(),
         );
     }
 
