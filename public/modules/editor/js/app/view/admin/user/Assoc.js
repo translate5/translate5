@@ -88,8 +88,11 @@ Ext.define('Editor.view.admin.user.Assoc', {
                     {
                         xtype: 'container',
                         region: 'east',
-                        autoScroll: true,
                         height: 'auto',
+                        layout: {
+                            type: 'vbox',
+                            align: 'stretch'
+                        },
                         width: 300,
                         items: [{
                             xtype: 'form',
@@ -98,6 +101,8 @@ Ext.define('Editor.view.admin.user.Assoc', {
                             region: 'east',
                             reference: 'assocForm',
                             itemId: 'userAssocForm',
+                            flex: 1,
+                            scrollable: 'y',
                             defaults: {
                                 labelAlign: 'top',
                                 duplicateRecord: false,
