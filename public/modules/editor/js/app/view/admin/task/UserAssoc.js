@@ -72,8 +72,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                 {
                     xtype: 'container',
                     region: 'east',
-                    autoScroll: true,
                     height: 'auto',
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch'
+                    },
                     bind: {
                         disabled: '{!enablePanel}'
                     },
@@ -96,6 +99,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                             region: 'east',
                             reference: 'assocForm',
                             itemId: 'userAssocForm',
+                            flex: 1,
+                            scrollable: 'y',
                             defaults: {
                                 labelAlign: 'top'
                             },

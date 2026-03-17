@@ -52,6 +52,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($data['taskGuid'] ?? $this->entity->getTaskGuid());
         /* @var $workflow editor_Workflow_Default */
         $this->addValidator('workflowStep', 'inArray', [$workflow->getSteps()]);
+        $this->addValidator('editedInStep', 'inArray', [$workflow->getSteps()]);
 
         if (parent::isValid($data)) {
             return true;
@@ -103,7 +104,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('userName', 'stringLength', [
             'min' => 0,
             'max' => 255,
-        ]); //es wird kein assoc Array benötigt, aber so ist besser lesbar
+        ]);
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('matchRate', 'between', [
             'min' => 0,

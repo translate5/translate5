@@ -37,7 +37,6 @@ use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Response\Response as ApiResponse;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
-use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\ReorganizeOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
@@ -45,6 +44,7 @@ use MittagQI\Translate5\T5Memory\DTO\UpdateOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateMemoryException;
+use MittagQI\Translate5\T5Memory\Export\TmxChunkFixer;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\FuzzySearchService;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
@@ -135,7 +135,7 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
             $this->config,
             ConcatTmx::create(),
             TmxIterator::create(),
-            DirectoryPath::create(),
+            TmxChunkFixer::create(),
         );
 
         $this->reorganizeService = ReorganizeService::create();

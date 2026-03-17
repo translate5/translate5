@@ -152,6 +152,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_translate5ai_qualityestimate_analysis' => false,
         'LEK_translate5ai_qualityestimate_analysis_results' => false,
         'LEK_translate5ai_qualityestimate_taskassoc' => false,
+        'LEK_user_preselection' => false,
     ];
 
     /**

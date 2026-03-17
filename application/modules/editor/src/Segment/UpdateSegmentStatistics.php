@@ -87,12 +87,7 @@ class UpdateSegmentStatistics
         }
 
         $segmentOriginalValue = $segment->getTarget();
-        $workflowStepName = $segment->getWorkflowStep();
-        if ($workflowStepName === editor_Workflow_Default::STEP_PM_CHECK) {
-            $workflowStepName = $segment->getTask()->getWorkflowStepName();
-        }
-
-        $segment->setEditedInStep($workflowStepName);
+        $workflowStepName = $segment->getEditedInStep();
 
         if ($segmentOriginalValue === '' && $isInteractive) {
             $segmentOriginalValue = $this->lookupPretranslatedValue(

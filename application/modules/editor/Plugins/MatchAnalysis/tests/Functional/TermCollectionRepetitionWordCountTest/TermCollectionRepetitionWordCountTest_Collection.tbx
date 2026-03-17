@@ -1,0 +1,35 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection TermCollectionRepetitionWordCountTest_Collection</title>
+                <note>Contains the languages: en, de</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance by functional tests</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="id-terminology-segment">
+                <langSet xml:lang="en">
+                    <tig>
+                        <term id="id-en-terminology-segment">Terminology segment</term>
+                        <termNote type="processStatus">finalized</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="id-de-terminology-segment">Terminologiesegment</term>
+                        <termNote type="processStatus">finalized</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+    </text>
+</martif>

@@ -2198,6 +2198,19 @@ class editor_TaskController extends ZfExtended_RestController
         $this->entityLoad();
         $this->log->request();
         $this->initWorkflow($this->entity->getWorkflow());
+
+        $this->taskActionPermissionAssert->assertGranted(
+            TaskAction::Read,
+            $this->entity,
+            new PermissionAssertContext($this->authenticatedUser)
+        );
+
+        $trigger = $this->getParam('trigger');
+
+        if ($this->authenticatedUser->isCoordinator() && \editor_Workflow_Default_Hooks::TRIGGER_NOTIFY_ALL_USERS_TASK_ASSOC !== $trigger) {
+            throw new ZfExtended_NoAccessException("User is not allowed to trigger workflow '$trigger' action");
+        }
+
         $this->view->trigger = $this->getParam('trigger');
         $this->view->success = $this->workflow->hookin()->doDirectTrigger($this->entity, $this->getParam('trigger'));
         if ($this->view->success) {

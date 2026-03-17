@@ -336,6 +336,40 @@ class TmxSymbolsFixerTest extends TestCase
         self::assertSame($content, $result);
     }
 
+    public function testHtmlEntitiesInsideOpeningTagRemainAsIs(): void
+    {
+        $content = '<tag blabla="&lt;hello&quot;&gt;">hello again hello&quot;</tag>';
+        $inputFile = $this->createTestFile($content, true);
+
+        $this->fixer->fixInvalidXmlSymbols($inputFile);
+
+        $result = file_get_contents($inputFile);
+
+        // Entities inside the tag attribute should remain as-is
+        self::assertStringContainsString('blabla="&lt;hello&quot;&gt;"', $result);
+
+        // Entity outside the tag should be converted to actual character
+        self::assertStringContainsString('hello again hello"', $result);
+        self::assertStringNotContainsString('hello again hello&quot;', $result);
+    }
+
+    public function testHtmlEntitiesInsideOpeningTagAreCleaned(): void
+    {
+        $content = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tmx version=\"1.4\">\n  <body>\n    <tu creationid="&lt;hello&quot;&gt;">hello again hello&quot;</tu>\n  </body>\n</tmx>';
+        $inputFile = $this->createTestFile($content);
+
+        $this->fixer->fixInvalidXmlSymbols($inputFile);
+
+        $result = file_get_contents($inputFile);
+
+        // Entities inside the tag attribute should remain as-is
+        self::assertStringContainsString('creationid="hello"', $result);
+
+        // Entity outside the tag should be converted to actual character
+        self::assertStringContainsString('hello again hello"', $result);
+        self::assertStringNotContainsString('hello again hello&quot;', $result);
+    }
+
     /**
      * Helper method to create a test file
      */

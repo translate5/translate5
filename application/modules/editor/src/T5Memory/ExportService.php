@@ -37,6 +37,7 @@ use LogicException;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
+use MittagQI\Translate5\T5Memory\Export\TmxChunkFixer;
 use MittagQI\Translate5\TMX\ConcatTmx;
 use MittagQI\Translate5\TMX\TmxIterator;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -60,7 +61,7 @@ class ExportService
         private readonly Zend_Config $config,
         private readonly ConcatTmx $concatTmx,
         private readonly TmxIterator $tmxIterator,
-        private readonly DirectoryPath $directoryPath,
+        private readonly TmxChunkFixer $tmxChunkFixer,
     ) {
     }
 
@@ -76,7 +77,7 @@ class ExportService
             Zend_Registry::get('config'),
             ConcatTmx::create(),
             TmxIterator::create(),
-            DirectoryPath::create(),
+            TmxChunkFixer::create(),
         );
     }
 
@@ -350,11 +351,15 @@ class ExportService
      */
     private function exportTmxChunk(LanguageResource $languageResource, string $tmName): iterable
     {
-        return yield from $this->t5MemoryApi->downloadTmx(
+        $chunks = $this->t5MemoryApi->downloadTmx(
             $languageResource->getResource()->getUrl(),
             $this->persistenceService->addTmPrefix($tmName),
             self::CHUNKSIZE
         );
+
+        foreach ($chunks as $chunk) {
+            yield $this->tmxChunkFixer->fixChunk($chunk);
+        }
     }
 
     private function exportAllAsArchive(LanguageResource $languageResource, ?string $exactTmName): ?string
@@ -365,8 +370,8 @@ class ExportService
             return null;
         }
 
-        $exportDir = $this->directoryPath->tmExportDir();
-        $tmpDir = $exportDir . '/' . $languageResource->getId() . '_' . uniqid() . '/';
+        $exportDir = APPLICATION_DATA . '/TMExport/';
+        $tmpDir = $exportDir . $languageResource->getId() . '_' . uniqid() . '/';
 
         if (! mkdir($tmpDir, recursive: true) && ! is_dir($tmpDir)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $tmpDir));
@@ -480,7 +485,11 @@ class ExportService
         LanguageResource $languageResource,
         bool $multipleParts,
     ): string {
-        $exportDir = $this->directoryPath->tmExportDir() . '/';
+        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+
+        if (! is_dir($exportDir) && ! mkdir($exportDir, recursive: true)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $exportDir));
+        }
 
         if (! $multipleParts) {
             return $exportDir;
