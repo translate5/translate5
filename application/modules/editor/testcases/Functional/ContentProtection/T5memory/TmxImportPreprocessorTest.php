@@ -36,6 +36,7 @@ use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
@@ -162,6 +163,7 @@ class TmxImportPreprocessorTest extends TestCase
                 ])
             ),
             TmxSymbolsFixer::create(),
+            DirectoryPath::create(),
         );
 
         $file = $service->process(

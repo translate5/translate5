@@ -38,6 +38,7 @@ use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ContentProtection\QueryStringGuesser;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
+use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\EmptyMemoryCheck;
@@ -324,6 +325,7 @@ class FuzzySearchServiceTest extends TestCase
             ConcatTmx::create(),
             EmptyMemoryCheck::create(),
             ExportService::create(),
+            DirectoryPath::create(),
         );
     }
 }
