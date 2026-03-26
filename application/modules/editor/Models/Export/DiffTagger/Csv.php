@@ -96,7 +96,7 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
         if (count($i) > 0) {
             $addition = implode('', $i);
             if ($addition === '') {
-                return;
+                return '';
             }
 
             return $this->surroundWithIns($addition);
@@ -116,7 +116,7 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
         if (count($d) > 0) {
             $deletion = implode('', $d);
             if ($deletion === '') {
-                return;
+                return '';
             }
 
             return $this->surroundWithDel($deletion);
