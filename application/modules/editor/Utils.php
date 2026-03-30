@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\ZfExtended\MismatchException;
-use MittagQI\ZfExtended\Tools\Markup;
 
 /*
  */
@@ -478,14 +477,14 @@ class editor_Utils
      * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
      * Caution: The ignoring is done by the array index calculation there!
      * So make no array structure changing things between word and tag break up!
-     *
+     * NOTE: this function also supports the INVALID "number tags" we use in the frontend (<1/>, <2>, <2/>, ...)
+     * This is needed by the task's CSV import/export
      * @return string[]
      */
     public static function tagBreakUp(string $text): array
     {
-        $tagRegex = '~(' . trim(Markup::PATTERN, '~()') . '|&[^;]+;)~';
-
-        return preg_split($tagRegex, $text, flags: PREG_SPLIT_DELIM_CAPTURE);
+        // supports valid tags as well as the invalid special t5 placeholders
+        return preg_split('~(<[^>]*>|&[^;]+;)~', $text, flags: PREG_SPLIT_DELIM_CAPTURE);
     }
 
     /**
