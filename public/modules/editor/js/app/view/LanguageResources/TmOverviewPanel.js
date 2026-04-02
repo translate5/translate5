@@ -43,6 +43,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         'Editor.view.LanguageResources.TmOverviewViewController',
         'Editor.view.LanguageResources.TermCollectionExportActionMenu',
         'Editor.view.admin.TaskGrid',
+        'Editor.view.ui.LangTagFieldFilter',
     ],
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
@@ -303,7 +304,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         renderer: me.langRenderer,
                         cls: 'source-lang',
                         filter: {
-                            type: 'string',
+                            type: 'langtagfield',
                         },
                         text: me.strings.sourceLang,
                     },
@@ -314,7 +315,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         renderer: me.langRenderer,
                         cls: 'target-lang',
                         filter: {
-                            type: 'string',
+                            type: 'langtagfield',
                         },
                         text: me.strings.targetLang,
                     },

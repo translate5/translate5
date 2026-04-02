@@ -85,9 +85,6 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
         
         //the filter dataIndex to source type mapping
         //the source type mapping is used in getFieldSourceValue function for custom field value render
-        me.filterFieldSourceMap['sourceLang']='language';
-        me.filterFieldSourceMap['targetLang']='language';
-        me.filterFieldSourceMap['relaisLangLang']='language';
         me.filterFieldSourceMap['userName']='user';
         me.filterFieldSourceMap['workflowState']='workflowState';
         me.filterFieldSourceMap['workflowUserRole']='workflowUserRole';

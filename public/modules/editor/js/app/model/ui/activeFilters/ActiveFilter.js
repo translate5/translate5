@@ -115,6 +115,19 @@ Ext.define('Editor.model.ui.activeFilters.ActiveFilter', {
                     .down('^ grid gridcolumn[dataIndex=' + rec.get('property') +']')
                     ?.filter;
 
+                // Return array of language labels instead of IDs for langtagfield filters
+                if (filter?.type === 'langtagfield') {
+                    var store = Ext.StoreMgr.get('admin.Languages');
+                    var retVal = [];
+                    for (var id of val) {
+                        var record = store.findRecord('id', id, 0, false, true, true);
+                        if (record) {
+                            retVal.push(record.get('label'));
+                        }
+                    }
+                    return retVal.join(', ');
+                }
+
                 // If no filter, or filter type is not 'list' - return raw value
                 if (filter?.type !== 'list') {
                     return val;

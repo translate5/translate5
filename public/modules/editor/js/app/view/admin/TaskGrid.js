@@ -35,7 +35,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
         'Editor.view.admin.task.filter.AdvancedFilter',
         'Editor.view.admin.task.filter.PercentFilter',
         'Editor.view.admin.TaskGridViewController',
-        'Editor.view.task.LogInfoColumn'
+        'Editor.view.task.LogInfoColumn',
+        'Editor.view.ui.LangTagFieldFilter',
     ],
     controller: 'taskGrid',
     alias: 'widget.adminTaskGrid',
@@ -614,9 +615,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         dataIndex: 'sourceLang',
                         stateId: 'sourceLang',
                         filter: {
-                            type: 'list',
-                            options: Editor.data.languages,
-                            phpMode: false
+                            type: 'langtagfield',
                         },
                         tooltip: me.text_cols.sourceLang,
                         text: me.text_cols.sourceLang,
@@ -629,8 +628,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         dataIndex: 'relaisLang',
                         stateId: 'relaisLang',
                         filter: {
-                            type: 'list',
-                            options: relaisLanguages,
+                            type: 'langtagfield',
                             phpMode: false
                         },
                         tooltip: me.text_cols.relaisLang,
@@ -644,9 +642,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         dataIndex: 'targetLang',
                         stateId: 'targetLang',
                         filter: {
-                            type: 'list',
-                            options: Editor.data.languages,
-                            phpMode: false
+                            type: 'langtagfield',
                         },
                         tooltip: me.text_cols.targetLang,
                         text: me.text_cols.targetLang,

@@ -36,6 +36,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
         'Editor.view.admin.TaskGrid',
         'Editor.view.admin.task.menu.TaskBatchActionMenu',
         'Editor.view.ui.activeFilters.Toolbar',
+        'Editor.view.ui.LangTagFieldFilter',
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -179,9 +180,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     dataIndex: 'sourceLang',
                     stateId: 'sourceLang',
                     filter: {
-                        type: 'list',
-                        options: Editor.data.languages,
-                        phpMode: false
+                        type: 'langtagfield',
                     },
                     text: Editor.data.l10n.projectGrid.text_cols.sourceLang,
                     bind: {
