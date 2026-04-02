@@ -3,6 +3,7 @@ import TagsConversion from "../TagsTransform/tags-conversion";
 import TagCheck from "../TagsTransform/tag-check";
 import PixelMapping from "../TagsTransform/pixel-mapping";
 import { htmlEncode } from 'js-htmlencode';
+import stringToDom from '../Tools/string-to-dom.js';
 
 export default class DataTransformer {
     #userCanModifyWhitespaceTags;
@@ -40,6 +41,7 @@ export default class DataTransformer {
             [TagsConversion.TYPE.WHITESPACE]: {},
         };
         this._transformedNodes = [];
+        this._transformedReferenceNodes = [];
         this.#userCanModifyWhitespaceTags = userCanModifyWhitespaceTags;
         this.#userCanInsertWhitespaceTags = userCanInsertWhitespaceTags;
 
@@ -51,7 +53,8 @@ export default class DataTransformer {
      * @param {NodeListOf<HTMLElement>} referenceItems
      */
     #transform(items, referenceItems = []) {
-        this.#retrieveTags(this.#transformItems(referenceItems), this._referenceTags);
+        this._transformedReferenceNodes = this.#transformItems(referenceItems);
+        this.#retrieveTags(this._transformedReferenceNodes, this._referenceTags);
         this._tagCheck = new TagCheck(
             this._referenceTags,
             this._tagsConversion,
@@ -96,17 +99,26 @@ export default class DataTransformer {
      * @returns {{data: string, checkResult: CheckResult}}
      */
     reverseTransform(data) {
-        let checkResult = this._tagCheck.checkTags(data);
+        const checkResult = this._tagCheck.checkTags(data);
+        const referenceCheckResult = this._tagCheck.checkTags(
+            stringToDom(this.toString(true))
+        );
 
         // Replace encoded spaces is done here because of the processing of the data on the server side
         // The editor is mixing normal spaces with encoded spaces, so we need to replace them back
-        return {"data": this.#replaceEncodedSpaces(this.#reverseTransformItems(data)), "checkResult": checkResult};
+        return {
+            data: this.#replaceEncodedSpaces(this.#reverseTransformItems(data)),
+            checkResult: checkResult,
+            referenceCheckResult: referenceCheckResult,
+        };
     }
 
-    toString() {
+    toString(reference = false) {
         let result = "";
 
-        for (const node of this._transformedNodes) {
+        const nodes = reference ? this._transformedReferenceNodes : this._transformedNodes;
+
+        for (const node of nodes) {
             result += node._transformed.outerHTML !== undefined ? node._transformed.outerHTML : htmlEncode(node._transformed.textContent);
         }
 

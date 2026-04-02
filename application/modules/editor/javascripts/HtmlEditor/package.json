@@ -6,7 +6,7 @@
   "type": "module",
   "dependencies": {
     "@ckeditor/ckeditor5-dev-utils": "^45",
-    "@ckeditor/ckeditor5-theme-lark": "^43",
+    "@ckeditor/ckeditor5-theme-lark": "^47.5.0",
     "css-loader": "^6.8.1",
     "js-htmlencode": "^0.3.0",
     "lodash": "^4.17.21",

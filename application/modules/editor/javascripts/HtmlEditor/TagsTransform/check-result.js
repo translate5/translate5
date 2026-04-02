@@ -12,4 +12,11 @@ export default class CheckResult {
             && this.excessTags.length === 0
             && this.tagsOrderCorrect === true;
     }
+
+    hasTagsOrderErrorsOnly() {
+        return this.missingTags.length === 0
+            && this.duplicatedTags.length === 0
+            && this.excessTags.length === 0
+            && this.tagsOrderCorrect === false;
+    }
 }

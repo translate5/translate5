@@ -778,7 +778,7 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
             return false;
         }
 
-        if (me.hasAndDisplayErrors(me.context.record, data.checkResult)) {
+        if (me.hasAndDisplayErrors(me.context.record, data.checkResult, data.referenceCheckResult)) {
             return false;
         }
 
@@ -795,7 +795,7 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
     },
 
     // TODO refactor this method
-    hasAndDisplayErrors: function (currentSegment, tagsCheckResult) {
+    hasAndDisplayErrors: function (currentSegment, tagsCheckResult, referenceCheckResult) {
         let me = this,
             msg = '';
         const editorWrapper = this.editingPlugin.editor.mainEditor.editor;
@@ -828,6 +828,13 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
         }
 
         if (tagsCheckResult.isSuccessful()) {
+            me.fireEvent('contentErrors', me, null, true);
+
+            return false;
+        }
+
+        if (tagsCheckResult.hasTagsOrderErrorsOnly() && referenceCheckResult.hasTagsOrderErrorsOnly()) {
+            // In case we only have tag order error and tag order errors then we can ignore it
             me.fireEvent('contentErrors', me, null, true);
 
             return false;
