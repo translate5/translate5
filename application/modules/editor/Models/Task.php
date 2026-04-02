@@ -422,10 +422,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             //if anonymizeUsers is not defined on task level, the task customer anonymizeUsers value is used
             //if anonymizeUsers is also not defined on customer level, then the instance anonymizeUsers value is used
             $anonSql = 'AND filter.taskGuid NOT IN(SELECT IF((SELECT IF(t.value IS NOT NULL,t.value, if(c.value IS NOT NULL,c.value,z.value = 1)) FROM Zf_configuration z
-                        LEFT JOIN LEK_customer_config c on z.name = c.name
-                        LEFT JOIN LEK_task_config t on t.name = z.name
-                        WHERE ((t.taskGuid = LEK_task.taskGuid) OR (c.customerId = LEK_task.customerId AND t.taskGuid IS NULL)) 
-                        AND z.name =  "runtimeOptions.customers.anonymizeUsers") = 1,LEK_task.taskGuid,NULL) AS s
+                        LEFT JOIN LEK_customer_config c on z.name = c.name AND c.customerId = LEK_task.customerId
+                        LEFT JOIN LEK_task_config t on t.name = z.name AND t.taskGuid = LEK_task.taskGuid
+                        WHERE z.name =  "runtimeOptions.customers.anonymizeUsers") = 1,LEK_task.taskGuid,NULL) AS s
                         FROM LEK_task
                         GROUP BY LEK_task.taskGuid
                         HAVING s IS NOT NULL) ';
