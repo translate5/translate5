@@ -27,7 +27,7 @@
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `level`, `description`, `guiName`, `guiGroup`)
 VALUES
-    ('runtimeOptions.LanguageResources.t5memory.skipAuthor', 1, 'app', 'system', '0', '0', '', 'boolean', 2, 'If set to "true" on TMX import and TM update operations author will not be evaluated for segment uniqueness', 'Skip author evaluation on TM repetition check', 't5memory maintenance'),
+    ('runtimeOptions.LanguageResources.t5memory.skipAuthor', 1, 'app', 'system', '1', '1', '', 'boolean', 2, 'If set to "true" on TMX import and TM update operations author will not be evaluated for segment uniqueness', 'Skip author evaluation on TM repetition check', 't5memory maintenance'),
     ('runtimeOptions.LanguageResources.t5memory.skipDocument', 1, 'app', 'system', '0', '0', '', 'boolean', 2, 'If set to "true" on TMX import and TM update operations document name will not be evaluated for segment uniqueness', 'Skip document name evaluation on TM repetition check', 't5memory maintenance'),
     ('runtimeOptions.LanguageResources.t5memory.skipContext', 1, 'app', 'system', '0', '0', '', 'boolean', 2, 'If set to "true" on TMX import and TM update operations context will not be evaluated for segment uniqueness', 'Skip context evaluation on TM repetition check', 't5memory maintenance'),
 
