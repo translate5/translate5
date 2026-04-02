@@ -14,14 +14,16 @@ export default class DataTransformer {
      * @param {Font} font
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
-     * @param {Boolean} userCanModifyWhitespaceTags
-     * @param {Boolean} userCanInsertWhitespaceTags
+     * @param {boolean} isSource
+     * @param {boolean} userCanModifyWhitespaceTags
+     * @param {boolean} userCanInsertWhitespaceTags
      */
     constructor(
         tagsConversion,
         font,
         items,
         referenceItems,
+        isSource,
         userCanModifyWhitespaceTags,
         userCanInsertWhitespaceTags
     ) {
@@ -43,31 +45,33 @@ export default class DataTransformer {
         this.#userCanModifyWhitespaceTags = userCanModifyWhitespaceTags;
         this.#userCanInsertWhitespaceTags = userCanInsertWhitespaceTags;
 
-        this.#transform(items, referenceItems);
+        this.#transform(items, referenceItems, isSource);
     }
 
     /**
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>} referenceItems
+     * @param {boolean} isSource
      */
-    #transform(items, referenceItems = []) {
-        this.#retrieveTags(this.#transformItems(referenceItems), this._referenceTags);
+    #transform(items, referenceItems = [], isSource) {
+        this.#retrieveTags(this.#transformItems(referenceItems, isSource), this._referenceTags);
         this._tagCheck = new TagCheck(
             this._referenceTags,
             this._tagsConversion,
             this.#userCanModifyWhitespaceTags,
             this.#userCanInsertWhitespaceTags
         );
-        this._transformedNodes = this.#transformItems(items);
+        this._transformedNodes = this.#transformItems(items, isSource);
         this.#retrieveTags(this._transformedNodes, this._transformedTags);
     }
 
     /**
      * @param {NodeListOf<HTMLElement>} items
+     * @param {boolean} isSource
      * @returns {string}
      */
-    transformPartial(items) {
-        const nodes = this.#transformItems(items);
+    transformPartial(items, isSource = false) {
+        const nodes = this.#transformItems(items, isSource);
         this.#retrieveTags(nodes, this._transformedTags);
 
         let result = '';
@@ -79,11 +83,11 @@ export default class DataTransformer {
     }
 
     /**
-     * @param {HTMLElement} whitespce
+     * @param {HTMLElement} whitespace
      * @returns {*}
      */
-    transformWhitespace(whitespce) {
-        const items = this.#transformItems([whitespce], true);
+    transformWhitespace(whitespace) {
+        const items = this.#transformItems([whitespace]);
         this.#retrieveTags(items, this._transformedTags);
 
         return items.pop();
@@ -143,15 +147,15 @@ export default class DataTransformer {
 
     /**
      * @param {NodeListOf<HTMLElement>} items
-     * @param {Boolean} reference
+     * @param {boolean} isSource
      * @returns {Array<Node>}
      */
-    #transformItems(items, reference = false) {
+    #transformItems(items, isSource = false) {
         let result = [];
         const pixelMapping = new PixelMapping(this.#font);
 
         for (const item of items) {
-            const transformed = this._tagsConversion.transform(item, pixelMapping);
+            const transformed = this._tagsConversion.transform(item, pixelMapping, isSource);
 
             if (! transformed) {
                 continue;
@@ -162,7 +166,7 @@ export default class DataTransformer {
             result.push(node);
 
             if (item.childNodes.length) {
-                node._children = this.#transformItems(item.childNodes);
+                node._children = this.#transformItems(item.childNodes, isSource);
             }
         }
 

@@ -20,7 +20,13 @@ export default class TagsConversion {
         this._templating = new Templating(this._idPrefix);
     };
 
-    transform(item, pixelMapping = null) {
+    /**
+     * @param {HTMLElement} item
+     * @param {PixelMapping} pixelMapping
+     * @param {boolean} isSource
+     * @returns {ChildNode|Node|ActiveX.IXMLDOMNode|null}
+     */
+    transform(item, pixelMapping = null, isSource = false) {
         //some tags are marked as to be ignored in the editor, so we ignore them
         if (this._isIgnoredNode(item)) {
             return null;
@@ -111,7 +117,14 @@ export default class TagsConversion {
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
         if (this.isInternalTagNode(item) && this.#isCorrectInternalTagNode(item)) {
-            return stringToDom(this._replaceInternalTagToImage(item, this._editorElement, pixelMapping)).childNodes[0];
+            return stringToDom(
+                this._replaceInternalTagToImage(
+                    item,
+                    this._editorElement,
+                    pixelMapping,
+                    isSource
+                )
+            ).childNodes[0];
         }
 
         return null;
@@ -321,8 +334,16 @@ export default class TagsConversion {
         return item.tagName === 'BR';
     }
 
-    _replaceInternalTagToImage(item, editorElement, pixelMapping) {
-        let data = this._extractInternalTagsData(item, pixelMapping);
+    /**
+     * @param {HTMLElement} item
+     * @param {HTMLElement} editorElement
+     * @param {PixelMapping} pixelMapping
+     * @param {boolean} isSource
+     * @returns {string}
+     * @private
+     */
+    _replaceInternalTagToImage(item, editorElement, pixelMapping, isSource = false) {
+        let data = this._extractInternalTagsData(item, pixelMapping, isSource);
 
         if (this._tagModeProvider.isFullTagMode() || data.whitespaceTag || data.numberTag || data.placeableTag) {
             data.path = this._getSvg(data.text, data.fullWidth, editorElement);
@@ -379,9 +400,10 @@ export default class TagsConversion {
      * Get data from the tags
      *
      * @param {HTMLDivElement} item
-     * @param pixelMapping
+     * @param {PixelMapping} pixelMapping
+     * @param {boolean} isSource
      */
-    _extractInternalTagsData(item, pixelMapping) {
+    _extractInternalTagsData(item, pixelMapping, isSource = false) {
         let data = this._getInitialData();
 
         const spanFull = item.querySelector('span.full');
@@ -416,7 +438,7 @@ export default class TagsConversion {
         }
 
         if (data.numberTag) {
-            data.text = data.target ? data.target : data.source;
+            data.text = data.target && ! isSource ? data.target : data.source;
         }
 
         // get the dimensions of the inner spans
@@ -504,6 +526,13 @@ export default class TagsConversion {
         };
     }
 
+    /**
+     * @param {string} text
+     * @param {integer} width
+     * @param {HTMLElement} editorElement
+     * @returns {string}
+     * @private
+     */
     _getSvg(text, width, editorElement) {
         let prefix = 'data:image/svg+xml;charset=utf-8,',
             svg = '',

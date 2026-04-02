@@ -553,7 +553,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      */
     updateSegment: function (record, fieldname) {
         const fields = Editor.data.task.segmentFields(),
-            field = fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))),
+            field = fieldname ? fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))) : null,
             minMaxEnabled = field && field.isTarget() && this.shouldUseMinMaxWidth(record.get('metaCache')),
             counterCheckBox = minMaxEnabled ? [] : Ext.ComponentQuery.query('#segmentgrid segmentsToolbar #showHideCharCounter');
 
