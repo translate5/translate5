@@ -483,7 +483,11 @@ class ConcordanceSearchService
         if (null === $response->getSegmentIndex()) {
             // This means memory is not loaded into RAM
             // So call for a fake segment to force t5memory to load memory into RAM and call for status again
-            $this->t5MemoryApi->getEntry($languageResource->getResource()->getUrl(), $tmName, '7:1');
+            $this->t5MemoryApi->getEntry(
+                $languageResource->getResource()->getUrl(),
+                $this->persistenceService->addTmPrefix($tmName),
+                '7:1',
+            );
 
             $response = $this->t5MemoryApi->getSegmentIndex(
                 $languageResource->getResource()->getUrl(),
