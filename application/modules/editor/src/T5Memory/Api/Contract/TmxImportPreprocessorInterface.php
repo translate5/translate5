@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Api\Contract;
 
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
 
 interface TmxImportPreprocessorInterface
 {
@@ -39,5 +40,6 @@ interface TmxImportPreprocessorInterface
         int $sourceLangId,
         int $targetLangId,
         ImportOptions $importOptions,
+        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitLogger,
     ): string;
 }

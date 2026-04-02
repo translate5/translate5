@@ -33,7 +33,9 @@ namespace MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\BrokenTranslationUnitException;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector\CompromisedTuCollector;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector\UnexpectedStructureCollector;
 use MittagQI\Translate5\TMX\TransUnitParser;
 use Zend_Config;
 use Zend_Registry;
@@ -69,7 +71,7 @@ class RemoveCompromisedSegmentsProcessor extends Processor
         Language $sourceLang,
         Language $targetLang,
         ImportOptions $importOptions,
-        BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
     ): iterable {
         if ('' === trim($tu)) {
             return yield from [];
@@ -86,9 +88,7 @@ class RemoveCompromisedSegmentsProcessor extends Processor
                 error_log("Trans unit has unexpected structure and was excluded from TMX import:\n" . $tu);
             }
 
-            $brokenTranslationUnitIndicator->logProblemOnce();
-
-            $brokenTranslationUnitIndicator->collectProblematicTU($tu);
+            $brokenTranslationUnitIndicator->collectProblematicTU(UnexpectedStructureCollector::logCode(), $tu);
 
             return yield from [];
         }
@@ -101,7 +101,7 @@ class RemoveCompromisedSegmentsProcessor extends Processor
             return yield $tu;
         }
 
-        $brokenTranslationUnitIndicator->collectProblematicTU($tu);
+        $brokenTranslationUnitIndicator->collectProblematicTU(CompromisedTuCollector::logCode(), $tu);
 
         return yield from [];
     }

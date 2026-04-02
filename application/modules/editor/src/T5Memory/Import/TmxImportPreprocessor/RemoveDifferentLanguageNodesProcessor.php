@@ -31,67 +31,53 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
 
 use editor_Models_Languages as Language;
-use MittagQI\Translate5\T5Memory\Contract\TmxImportProcessor;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector\LanguagePairMismatchCollector;
 
-abstract class Processor implements TmxImportProcessor
+class RemoveDifferentLanguageNodesProcessor extends Processor
 {
-    private ?TmxImportProcessor $nextProcessor = null;
-
-    public function next(): ?TmxImportProcessor
-    {
-        return $this->nextProcessor;
+    public function __construct(
+    ) {
     }
 
-    public function setNext(TmxImportProcessor $processor): void
+    public static function create(): self
     {
-        $this->nextProcessor = $processor;
-    }
-
-    final public function process(
-        string $tu,
-        Language $sourceLang,
-        Language $targetLang,
-        ImportOptions $importOptions,
-        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitLogger,
-    ): iterable {
-        $processed = $this->processTu(
-            $tu,
-            $sourceLang,
-            $targetLang,
-            $importOptions,
-            $brokenTranslationUnitLogger
+        return new self(
         );
-
-        if (null === $this->next()) {
-            foreach ($processed as $transUnit) {
-                yield $transUnit;
-            }
-
-            return;
-        }
-
-        foreach ($processed as $transUnit) {
-            $nextProcessed = $this->next()->process(
-                $transUnit,
-                $sourceLang,
-                $targetLang,
-                $importOptions,
-                $brokenTranslationUnitLogger
-            );
-
-            foreach ($nextProcessed as $item) {
-                yield $item;
-            }
-        }
     }
 
-    abstract protected function processTu(
+    public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool
+    {
+        return true;
+    }
+
+    public function order(): int
+    {
+        return 80;
+    }
+
+    protected function processTu(
         string $tu,
         Language $sourceLang,
         Language $targetLang,
         ImportOptions $importOptions,
         BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
-    ): iterable;
+    ): iterable {
+        $lowerTu = strtolower($tu);
+        $sourceLangCode = strtolower($sourceLang->getRfc5646());
+        $targetLangCode = strtolower($targetLang->getRfc5646());
+
+        $hasSourceLangNode = str_contains($lowerTu, 'xml:lang="' . $sourceLangCode . '"');
+        $hasTargetLangNode = str_contains($lowerTu, 'xml:lang="' . $targetLangCode . '"');
+
+        if (! $hasSourceLangNode || ! $hasTargetLangNode) {
+            $brokenTranslationUnitIndicator->collectProblematicTU(LanguagePairMismatchCollector::logCode(), $tu);
+
+            // Skip this TU entirely
+            return yield from [];
+        }
+
+        return yield $tu;
+    }
 }

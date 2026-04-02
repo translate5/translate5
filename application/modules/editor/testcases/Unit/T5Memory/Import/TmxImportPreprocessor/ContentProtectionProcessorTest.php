@@ -37,7 +37,7 @@ use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionProcessor;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\NullBrokenTranslationUnitLogger;
 use MittagQI\Translate5\TMX\TransUnitParser;
 use MittagQI\Translate5\TMX\TransUnitStructure;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -136,10 +136,7 @@ class ContentProtectionProcessorTest extends TestCase
                 new editor_Models_Languages(),
                 new editor_Models_Languages(),
                 $options,
-                BrokenTranslationUnitLogger::create(
-                    $this->createMock(\ZfExtended_Logger::class),
-                    'problematic_file_path.txt',
-                )
+                NullBrokenTranslationUnitLogger::create(),
             )->current() // @phpstan-ignore-line
         );
     }

@@ -28,36 +28,39 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Contract;
+namespace MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector;
 
-use editor_Models_Languages as Language;
-use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
+use ZfExtended_Logger;
 
-interface TmxImportProcessor
+class UnexpectedStructureCollector extends AbstractTranslationUnitFileCollector
 {
-    public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool;
+    public static function create(string $artefactsDir): self
+    {
+        return new self($artefactsDir);
+    }
 
-    public function next(): ?TmxImportProcessor;
+    public function writeLog(ZfExtended_Logger $logger, array $extra = []): void
+    {
+        if (empty($this->tuWasCollected)) {
+            return;
+        }
 
-    public function setNext(TmxImportProcessor $processor): void;
+        $extra = array_merge(
+            $extra,
+            [
+                'file' => $this->getFilename(),
+            ],
+        );
 
-    /**
-     * Higher value will be processed first.
-     */
-    public function order(): int;
+        $logger->error(
+            self::logCode(),
+            'Some translation units had unexpected structure and were excluded from TMX import',
+            $extra,
+        );
+    }
 
-    /**
-     * Processes a translation unit (tu) for import into a TMX file.
-     *
-     * @param string $tu An iterable collection of translation units to process.
-     * @return iterable<string> An iterable collection of processed translation units.
-     */
-    public function process(
-        string $tu,
-        Language $sourceLang,
-        Language $targetLang,
-        ImportOptions $importOptions,
-        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitLogger,
-    ): iterable;
+    public static function logCode(): string
+    {
+        return 'E1593';
+    }
 }

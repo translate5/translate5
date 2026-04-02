@@ -1,0 +1,95 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector;
+
+use ZfExtended_Logger;
+
+class LanguagePairMismatchCollector extends AbstractTranslationUnitFileCollector
+{
+    private array $skippedPerLanguagePair = [];
+
+    public static function create(string $artefactsDir): self
+    {
+        return new self($artefactsDir);
+    }
+
+    public function collectTU(string $tu): void
+    {
+        $this->tuWasCollected = true;
+
+        preg_match_all('/<tuv[^>]+?xml:lang="([^"]+)"/U', $tu, $matches);
+
+        [$lang1, $lang2] = $matches[1];
+        $lang1 = strtolower($lang1);
+        $lang2 = strtolower($lang2);
+
+        $pair = "$lang1 - $lang2";
+        $pairReverse = "$lang2 - $lang1";
+
+        match (true) {
+            isset($this->skippedPerLanguagePair[$pair]) => $this->skippedPerLanguagePair[$pair]++,
+            isset($this->skippedPerLanguagePair[$pairReverse]) => $this->skippedPerLanguagePair[$pairReverse]++,
+            default => $this->skippedPerLanguagePair[$pair] = 1,
+        };
+
+        file_put_contents(
+            $this->getFilename(),
+            $tu . PHP_EOL,
+            FILE_APPEND | LOCK_EX,
+        );
+    }
+
+    public function writeLog(ZfExtended_Logger $logger, array $extra = []): void
+    {
+        if (empty($this->tuWasCollected)) {
+            return;
+        }
+
+        $extra = array_merge(
+            $extra,
+            [
+                'file' => $this->getFilename(),
+                'skipped_per_language_pair' => $this->skippedPerLanguagePair,
+            ],
+        );
+
+        $logger->warn(
+            self::logCode(),
+            "Translation units were skipped as doesn't match language pair of Language resource",
+            $extra,
+        );
+    }
+
+    public static function logCode(): string
+    {
+        return 'E1771';
+    }
+}

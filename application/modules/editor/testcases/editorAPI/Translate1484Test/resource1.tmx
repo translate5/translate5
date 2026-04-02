@@ -1,43 +1,43 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <tmx version="1.4">
-  <header creationtoolversion="1.5.1.1" segtype="sentence" adminlang="en-us" srclang="en-US" o-tmf="OpenTM2" creationtool="OpenTM2" datatype="plaintext" />
+  <header creationtoolversion="1.5.1.1" segtype="sentence" adminlang="en-us" srclang="en" o-tmf="OpenTM2" creationtool="OpenTM2" datatype="plaintext" />
   <body>
-    <tu tuid="1" creationdate="20220203T110436Z">
+    <tu tuid="1" creationid="MANAGER" creationdate ="20220203T110436Z">
       <prop type="tmgr:segNum">0</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
       <prop type="tmgr:docname">simple-en-de.xlf</prop>
-      <tuv xml:lang="en-US">
+      <tuv xml:lang="en">
         <prop type="tmgr:language">English(U.S.)</prop>
         <seg>Installation and Configuration</seg>
       </tuv>
-      <tuv xml:lang="de-DE">
+      <tuv xml:lang="de">
         <prop type="tmgr:language">GERMAN(REFORM)</prop>
         <seg>Installation und Konfiguration</seg>
       </tuv>
     </tu>
-    <tu tuid="2" creationdate="20220203T110441Z">
+    <tu tuid="2" creationid="MANAGER" creationdate ="20220203T110441Z">
       <prop type="tmgr:segNum">0</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
       <prop type="tmgr:docname">simple-en-de.xlf</prop>
-      <tuv xml:lang="en-US">
+      <tuv xml:lang="en">
         <prop type="tmgr:language">English(U.S.)</prop>
         <seg><bpt i="1" type="82" x="1" />Note<ept i="1" />:</seg>
       </tuv>
-      <tuv xml:lang="de-DE">
+      <tuv xml:lang="de">
         <prop type="tmgr:language">GERMAN(REFORM)</prop>
         <seg><bpt i="1" type="82" x="1" />Hinweis<ept i="1" />:</seg>
       </tuv>
     </tu>
-    <tu tuid="3" creationdate="20220203T110704Z">
+    <tu tuid="3" creationid="MANAGER" creationdate ="20220203T110704Z">
       <prop type="tmgr:segNum">0</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
       <prop type="tmgr:docname">simple-en-de.xlf</prop>
-      <tuv xml:lang="en-US">
+      <tuv xml:lang="en">
         <prop type="tmgr:language">English(U.S.)</prop>
         <seg>Apache 2.x on Unix systems - Manual</seg>
       </tuv>
-      <tuv xml:lang="de-DE">
+      <tuv xml:lang="de">
         <prop type="tmgr:language">GERMAN(REFORM)</prop>
         <seg>Apache 2.0 auf Unixsystemen - Manual</seg>
       </tuv>

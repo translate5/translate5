@@ -34,7 +34,8 @@ use editor_Models_Languages as Language;
 use MittagQI\Translate5\Segment\SegmentationService;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\BrokenTranslationUnitException;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector\UnexpectedStructureCollector;
 use MittagQI\Translate5\TMX\TransUnitParser;
 use MittagQI\Translate5\TMX\TransUnitStructure;
 use Zend_Config;
@@ -75,7 +76,7 @@ class TranslationUnitResegmentProcessor extends Processor
         Language $sourceLang,
         Language $targetLang,
         ImportOptions $importOptions,
-        BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
     ): iterable {
         try {
             $structure = $this->transUnitParser->extractStructure(
@@ -88,7 +89,7 @@ class TranslationUnitResegmentProcessor extends Processor
                 error_log("Trans unit has unexpected structure and was excluded from TMX import:\n" . $tu);
             }
 
-            $brokenTranslationUnitIndicator->logProblemOnce();
+            $brokenTranslationUnitIndicator->collectProblematicTU(UnexpectedStructureCollector::logCode(), $tu);
 
             return yield from [];
         }

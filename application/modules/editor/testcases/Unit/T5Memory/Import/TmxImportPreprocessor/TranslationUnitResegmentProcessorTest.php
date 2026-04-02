@@ -36,7 +36,7 @@ use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\NullBrokenTranslationUnitLogger;
 use MittagQI\Translate5\TMX\TransUnitParser;
 use MittagQI\Translate5\TMX\TransUnitStructure;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -128,10 +128,7 @@ class TranslationUnitResegmentProcessorTest extends TestCase
             $lang,
             $lang,
             $options,
-            BrokenTranslationUnitLogger::create(
-                $this->createMock(\ZfExtended_Logger::class),
-                'problematic_file_path.txt',
-            )
+            NullBrokenTranslationUnitLogger::create(),
         );
 
         $i = 1;

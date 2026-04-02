@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
 
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
 
 class FixCreationTimeProcessor extends Processor
 {
@@ -61,7 +61,7 @@ class FixCreationTimeProcessor extends Processor
         Language $sourceLang,
         Language $targetLang,
         ImportOptions $importOptions,
-        BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
     ): iterable {
         // Remove changedate, lastusagedate attributes and fix creationdate - all applied only to <tu> opening tag
         return yield preg_replace_callback(

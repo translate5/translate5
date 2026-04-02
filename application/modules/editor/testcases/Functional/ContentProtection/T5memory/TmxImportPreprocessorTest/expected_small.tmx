@@ -3,10 +3,10 @@
 <header creationtoolversion="0.6.66" gitCommit="96744f79 * updated to v0.6.66 * fixed memmove crash in compareputdata" segtype="sentence" adminlang="en-us" srclang="de-DE" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
 <body>
 <tu tuid="551" creationdate="20240529T144559Z" creationid="[AMPLEXOR]">
+<prop type="tmgr:context">-</prop>
             <prop type="tmgr:segId">1551</prop>
             <prop type="t5:InternalKey">1466:1</prop>
             <prop type="tmgr:markup">OTMXUXLF</prop>
-            <prop type="tmgr:context">-</prop>
             <prop type="tmgr:docname">none</prop>
             <tuv xml:lang="de-DE">
                 <seg><t5:n id="1" r="aaa" n="1"/> ... <t5:n id="2" r="aaa" n="10"/> Temperaturklasse <t5:n id="3" r="aaa" n="1"/> ... <t5:n id="4" r="bbb" n="10"/>V</seg>
@@ -16,10 +16,10 @@
             </tuv>
         </tu>
 <tu tuid="541" creationdate="20240529T144601Z" creationid="[AMPLEXOR]">
+<prop type="tmgr:context">-</prop>
             <prop type="tmgr:segId">1541</prop>
             <prop type="t5:InternalKey">1460:1</prop>
             <prop type="tmgr:markup">OTMXUXLF</prop>
-            <prop type="tmgr:context">-</prop>
             <prop type="tmgr:docname">none</prop>
             <tuv xml:lang="de-DE">
                 <seg><t5:n id="1" r="aaa" n="1"/> ... <t5:n id="2" r="aaa" n="10"/> Temperaturklasse <t5:n id="3" r="aaa" n="4"/> ... <t5:n id="4" r="bbb" n="20"/>mA</seg>
@@ -29,10 +29,10 @@
             </tuv>
         </tu>
 <tu tuid="1" creationdate="20240628T093631Z" creationid="SABRINA LUWICH">
+<prop type="tmgr:context">-</prop>
             <prop type="tmgr:segId">3</prop>
             <prop type="t5:InternalKey">7:1</prop>
             <prop type="tmgr:markup">OTMXUXLF</prop>
-            <prop type="tmgr:context">-</prop>
             <prop type="tmgr:docname">none</prop>
             <tuv xml:lang="de-DE">
                 <seg>Temperaturklasse, maximale Oberflächentemperatur &lt; <t5:n id="1" r="aaa" n="135"/> °C; <t5:n id="2" r="aaa" n="275"/> °F</seg>
@@ -42,10 +42,10 @@
             </tuv>
         </tu>
 <tu tuid="2" creationdate="20240628T093632Z" creationid="SABRINA LUWICH">
+<prop type="tmgr:context">-</prop>
             <prop type="tmgr:segId">3</prop>
             <prop type="t5:InternalKey">7:1</prop>
             <prop type="tmgr:markup">OTMXUXLF</prop>
-            <prop type="tmgr:context">-</prop>
             <prop type="tmgr:docname">none</prop>
             <tuv xml:lang="de-DE">
                 <seg>**hallo** SOME_TEXT</seg>

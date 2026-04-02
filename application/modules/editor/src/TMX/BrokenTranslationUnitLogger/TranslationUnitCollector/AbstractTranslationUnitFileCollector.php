@@ -28,69 +28,34 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\TMX;
+namespace MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCollector;
 
-use ZfExtended_Logger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\TranslationUnitCollectorInterface;
 
-class BrokenTranslationUnitLogger
+abstract class AbstractTranslationUnitFileCollector implements TranslationUnitCollectorInterface
 {
-    private bool $problemLogged = false;
+    protected bool $tuWasCollected = false;
 
-    private bool $tuWasCollected = false;
-
-    private function __construct(
-        private readonly ZfExtended_Logger $logger,
-        private readonly string $problematicFilepath,
+    protected function __construct(
+        protected readonly string $artefactsDir,
     ) {
     }
 
-    public static function create(
-        ZfExtended_Logger $logger,
-        string $problematicFilepath,
-    ): self {
-        return new self(
-            $logger,
-            $problematicFilepath,
-        );
-    }
+    abstract public static function logCode(): string;
 
-    public function logProblemOnce(): void
-    {
-        if ($this->problemLogged) {
-            return;
-        }
-
-        $this->problemLogged = true;
-
-        $this->logger->error(
-            'E1593',
-            'Some translation units had unexpected structure and were excluded from TMX import',
-        );
-    }
-
-    public function collectProblematicTU(string $tu): void
+    public function collectTU(string $tu): void
     {
         $this->tuWasCollected = true;
 
         file_put_contents(
-            $this->problematicFilepath,
+            $this->getFilename(),
             $tu . PHP_EOL,
             FILE_APPEND | LOCK_EX,
         );
     }
 
-    public function writeCollectedTUsLog(): void
+    protected function getFilename(): string
     {
-        if (! $this->tuWasCollected) {
-            return;
-        }
-
-        $this->logger->info(
-            'E1593',
-            'Some translation were excluded from TMX import and were written to {file} for analysis.',
-            [
-                'file' => $this->problematicFilepath,
-            ],
-        );
+        return $this->artefactsDir . '/' . static::logCode() . '.tmx';
     }
 }

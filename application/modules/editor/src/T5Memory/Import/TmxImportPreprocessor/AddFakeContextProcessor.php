@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
 
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
 
 class AddFakeContextProcessor extends Processor
 {
@@ -61,12 +60,12 @@ class AddFakeContextProcessor extends Processor
         Language $sourceLang,
         Language $targetLang,
         ImportOptions $importOptions,
-        BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+        $brokenTranslationUnitIndicator,
     ): iterable {
         if (! str_contains($tu, 'tmgr:context')) {
             return yield preg_replace(
-                '#(( +)<prop type="tmgr:(docname|markup)">.+</prop>)#U',
-                '$1' . PHP_EOL . '$2<prop type="tmgr:context">-</prop>',
+                '#(<tu\s.+>)#U',
+                '$1' . PHP_EOL . '$3<prop type="tmgr:context">-</prop>',
                 $tu,
                 1,
             );

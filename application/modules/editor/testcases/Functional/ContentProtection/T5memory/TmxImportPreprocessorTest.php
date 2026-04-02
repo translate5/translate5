@@ -46,6 +46,7 @@ use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionP
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\NullBrokenTranslationUnitLogger;
 use MittagQI\Translate5\TMX\Filter\TmxFilter;
 use MittagQI\Translate5\TMX\TmxUtilsWrapper;
 use PHPUnit\Framework\TestCase;
@@ -149,7 +150,6 @@ class TmxImportPreprocessorTest extends TestCase
                 TranslationUnitResegmentProcessor::create(),
                 AddFakeContextProcessor::create(),
             ],
-            \Zend_Registry::get('logger')->cloneMe('test.t5memory.tmx-import-preprocessing'),
             new TmxFilter(
                 TmxUtilsWrapper::create(),
                 new \Zend_Config([
@@ -173,7 +173,8 @@ class TmxImportPreprocessorTest extends TestCase
             new ImportOptions(
                 StripFramingTags::None,
                 new TmxFilterOptions(),
-            )
+            ),
+            NullBrokenTranslationUnitLogger::create(),
         );
 
         self::assertFileEquals(__DIR__ . '/TmxImportPreprocessorTest/expected_small.tmx', $file);

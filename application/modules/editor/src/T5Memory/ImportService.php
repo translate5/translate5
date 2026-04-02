@@ -43,6 +43,7 @@ use MittagQI\Translate5\T5Memory\Enum\WaitCallState;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInErrorException;
 use MittagQI\Translate5\T5Memory\Exception\ImportResultedInReorganizeException;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\BrokenTranslationUnitLogger;
 use MittagQI\Translate5\TMX\ConcatTmx;
 use MittagQI\Translate5\TMX\CutOffTmx;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -123,8 +124,9 @@ class ImportService
             $files[] = $exportedFile;
         }
 
+        $processingDir = $this->directoryPath->tmxImportProcessingDir();
+
         if (count($files) > 1) {
-            $processingDir = $this->directoryPath->tmxImportProcessingDir();
             $file = $processingDir . '/concat_' . uniqid() . '.tmx';
 
             $this->concatTmx->concat(
@@ -134,12 +136,23 @@ class ImportService
             );
         }
 
+        $problematicDir = $processingDir . '/problematic/' . bin2hex(random_bytes(16)) . '/';
+
+        if (! is_dir($problematicDir)) {
+            @mkdir($problematicDir, recursive: true);
+        }
+
         try {
             $importFilename = $this->tmxImportPreprocessor->process(
                 $file,
                 (int) $languageResource->getSourceLang(),
                 (int) $languageResource->getTargetLang(),
-                $importOptions
+                $importOptions,
+                BrokenTranslationUnitLogger::create(
+                    $this->logger,
+                    $problematicDir,
+                    $languageResource,
+                )
             );
 
             if ($file !== $importFilename) {

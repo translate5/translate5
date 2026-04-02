@@ -28,36 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Contract;
+namespace MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract;
 
-use editor_Models_Languages as Language;
-use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
-
-interface TmxImportProcessor
+interface BrokenTranslationUnitLoggerInterface
 {
-    public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool;
+    public function collectProblematicTU(string $code, string $tu): void;
 
-    public function next(): ?TmxImportProcessor;
-
-    public function setNext(TmxImportProcessor $processor): void;
-
-    /**
-     * Higher value will be processed first.
-     */
-    public function order(): int;
-
-    /**
-     * Processes a translation unit (tu) for import into a TMX file.
-     *
-     * @param string $tu An iterable collection of translation units to process.
-     * @return iterable<string> An iterable collection of processed translation units.
-     */
-    public function process(
-        string $tu,
-        Language $sourceLang,
-        Language $targetLang,
-        ImportOptions $importOptions,
-        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitLogger,
-    ): iterable;
+    public function writeCollectedTUsLog(): void;
 }

@@ -35,7 +35,7 @@ use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\FixCreationTimeProcessor;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\BrokenTranslationUnitLogger;
 use PHPUnit\Framework\TestCase;
 
 class FixCreationTimeProcessorTest extends TestCase

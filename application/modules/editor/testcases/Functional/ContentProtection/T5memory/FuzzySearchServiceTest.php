@@ -53,6 +53,7 @@ use MittagQI\Translate5\T5Memory\RetryService;
 use MittagQI\Translate5\T5Memory\StatusService;
 use MittagQI\Translate5\T5Memory\TagHandler\TagHandlerProvider;
 use MittagQI\Translate5\T5Memory\WipeMemoryService;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
 use MittagQI\Translate5\TMX\ConcatTmx;
 use MittagQI\Translate5\TMX\CutOffTmx;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -306,6 +307,7 @@ class FuzzySearchServiceTest extends TestCase
                 int $sourceLangId,
                 int $targetLangId,
                 ImportOptions $importOptions,
+                BrokenTranslationUnitLoggerInterface $brokenTranslationUnitLogger,
             ): string {
                 return $filepath;
             }

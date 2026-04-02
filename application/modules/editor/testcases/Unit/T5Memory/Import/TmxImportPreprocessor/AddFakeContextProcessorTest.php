@@ -35,7 +35,7 @@ use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\AddFakeContextProcessor;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\BrokenTranslationUnitLogger;
 use PHPUnit\Framework\TestCase;
 
 class AddFakeContextProcessorTest extends TestCase
@@ -137,10 +137,10 @@ TMX,
 TMX,
             'expected' => <<<TMX
 <tu tuid="921" creationdate="20170714T121013Z" creationid="BENJAMIN FRIEDRICHS">
+<prop type="tmgr:context">-</prop>
       <prop type="tmgr:segId">11921</prop>
       <prop type="t5:InternalKey">9586:1</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
-      <prop type="tmgr:context">-</prop>
       <prop type="tmgr:docname">none</prop>
       <tuv xml:lang="de-DE">
         <seg>NEU</seg>
@@ -168,10 +168,10 @@ TMX,
 TMX,
             'expected' => <<<TMX
 <tu tuid="921" creationdate="20170714T121013Z" creationid="BENJAMIN FRIEDRICHS">
+<prop type="tmgr:context">-</prop>
       <prop type="tmgr:segId">11921</prop>
       <prop type="t5:InternalKey">9586:1</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
-      <prop type="tmgr:context">-</prop>
       <tuv xml:lang="de-DE">
         <seg>NEU</seg>
       </tuv>

@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
 
 use editor_Models_Languages as Language;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
 
 class CapitaliseAuthorProcessor extends Processor
 {
@@ -61,7 +61,7 @@ class CapitaliseAuthorProcessor extends Processor
         Language $sourceLang,
         Language $targetLang,
         ImportOptions $importOptions,
-        BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
     ): iterable {
         // <tu tuid="1" creationdate="20000101T120000Z" creationid="manager">
         return yield preg_replace_callback(

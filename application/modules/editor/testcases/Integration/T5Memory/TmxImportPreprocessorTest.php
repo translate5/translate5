@@ -38,7 +38,8 @@ use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor;
 use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\NullBrokenTranslationUnitLogger;
 use MittagQI\Translate5\TMX\Filter\TmxFilter;
 use PHPUnit\Framework\TestCase;
 
@@ -47,17 +48,16 @@ class TmxImportPreprocessorTest extends TestCase
     public function testProcessWithEmptyProcessorList(): void
     {
         $languageRepository = $this->createMock(LanguageRepository::class);
-        $logger = $this->createMock(\ZfExtended_Logger::class);
         $tmxFilter = $this->createMock(TmxFilter::class);
         $symbolsFixer = $this->createMock(TmxSymbolsFixer::class);
+        $directoryPath = $this->createMock(DirectoryPath::class);
 
         $processor = new TmxImportPreprocessor(
             $languageRepository,
             [],
-            $logger,
             $tmxFilter,
             $symbolsFixer,
-            DirectoryPath::create(),
+            $directoryPath,
         );
 
         $filename = 'small.tmx';
@@ -67,14 +67,17 @@ class TmxImportPreprocessorTest extends TestCase
             new TmxFilterOptions(),
         );
 
-        self::assertSame($filename, $processor->process($filename, 1, 2, $options));
+        self::assertSame(
+            $filename,
+            $processor->process($filename, 1, 2, $options, NullBrokenTranslationUnitLogger::create())
+        );
     }
 
     public function testConvertTMXForImport(): void
     {
         $languageRepository = $this->createMock(LanguageRepository::class);
-        $logger = $this->createMock(\ZfExtended_Logger::class);
         $symbolsFixer = $this->createMock(TmxSymbolsFixer::class);
+        $directoryPath = DirectoryPath::create();
 
         $languageRepository
             ->method('find')
@@ -106,7 +109,7 @@ TU;
                 Language $sourceLang,
                 Language $targetLang,
                 ImportOptions $importOptions,
-                BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+                BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
             ): iterable {
                 return [$this->tu1];
             }
@@ -133,7 +136,7 @@ TU;
                 Language $sourceLang,
                 Language $targetLang,
                 ImportOptions $importOptions,
-                BrokenTranslationUnitLogger $brokenTranslationUnitIndicator,
+                BrokenTranslationUnitLoggerInterface $brokenTranslationUnitIndicator,
             ): iterable {
                 TestCase::assertSame($this->tu1, $tu);
 
@@ -169,7 +172,6 @@ TU;
     </tuv>
 </tu>
 TU;
-                ;
             }
 
             public function supports(Language $sourceLang, Language $targetLang, ImportOptions $importOptions): bool
@@ -189,10 +191,9 @@ TU;
                 $processor1,
                 $processor2,
             ],
-            $logger,
             TmxFilter::create(),
             $symbolsFixer,
-            DirectoryPath::create(),
+            $directoryPath,
         );
 
         $options = new ImportOptions(
@@ -200,7 +201,13 @@ TU;
             new TmxFilterOptions(),
         );
 
-        $file = $service->process(__DIR__ . '/TmConversionServiceTest/small.tmx', 1, 2, $options);
+        $file = $service->process(
+            __DIR__ . '/TmConversionServiceTest/small.tmx',
+            1,
+            2,
+            $options,
+            NullBrokenTranslationUnitLogger::create(),
+        );
 
         self::assertFileEquals(__DIR__ . '/TmConversionServiceTest/expected_small.tmx', $file);
 

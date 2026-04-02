@@ -42,13 +42,12 @@ use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\CapitaliseAuthorPr
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\FixCreationTimeProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveDifferentLanguageNodesProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
 use MittagQI\Translate5\TMX\Filter\TmxFilter;
 use XMLWriter;
-use Zend_Registry;
-use ZfExtended_Logger;
 
 class TmxImportPreprocessor implements TmxImportPreprocessorInterface
 {
@@ -58,7 +57,6 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
     public function __construct(
         private readonly LanguageRepository $languageRepository,
         private readonly iterable $tmxImportProcessors,
-        private readonly ZfExtended_Logger $logger,
         private readonly TmxFilter $tmxFilter,
         private readonly TmxSymbolsFixer $symbolsFixer,
         private readonly DirectoryPath $directoryPath,
@@ -73,6 +71,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         return new self(
             LanguageRepository::create(),
             [
+                RemoveDifferentLanguageNodesProcessor::create(),
                 RemoveCompromisedSegmentsProcessor::create(),
                 ContentProtectionProcessor::create(),
                 TranslationUnitResegmentProcessor::create(),
@@ -80,7 +79,6 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
                 CapitaliseAuthorProcessor::create(),
                 FixCreationTimeProcessor::create(),
             ],
-            Zend_Registry::get('logger')->cloneMe('editor.t5memory.tmx-import-preprocessing'),
             TmxFilter::create(),
             TmxSymbolsFixer::create(),
             DirectoryPath::create(),
@@ -92,6 +90,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         int $sourceLangId,
         int $targetLangId,
         ImportOptions $importOptions,
+        BrokenTranslationUnitLoggerInterface $brokenTranslationUnitLogger,
     ): string {
         if (empty($this->tmxImportProcessors)) {
             return $filepath;
@@ -113,19 +112,12 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         }
 
         $processingDir = $this->directoryPath->tmxImportProcessingDir();
-        $problematicDir = $processingDir . 'problematic/';
-
-        if (! is_dir($problematicDir)) {
-            @mkdir($problematicDir, 0777, true);
-        }
 
         $this->symbolsFixer->fixInvalidXmlSymbols($filepath);
 
         $processedFilename = str_replace('.tmx', '', basename($filepath)) . '_processed.tmx';
-        $problematicFilename = str_replace('.tmx', '', basename($filepath)) . '_problematic.tmx';
 
         $resultFilepath = $processingDir . $processedFilename;
-        $problematicFilepath = $problematicDir . $problematicFilename;
 
         $writer = new XMLWriter();
 
@@ -140,8 +132,6 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
         $errorLevel = error_reporting();
         error_reporting($errorLevel & ~E_WARNING);
 
-        $brokenTranslationUnitIndicator = BrokenTranslationUnitLogger::create($this->logger, $problematicFilepath);
-
         foreach ($this->tmxFilter->filter($filepath, $importOptions->tmxFilterOptions) as [$node, $isTu]) {
             if (! $isTu) {
                 $writer->writeRaw($node);
@@ -154,7 +144,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
                 $sourceLang,
                 $targetLang,
                 $importOptions,
-                $brokenTranslationUnitIndicator,
+                $brokenTranslationUnitLogger,
             );
 
             foreach ($tus as $transUnit) {
@@ -170,7 +160,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
 
         $writer->flush();
 
-        $brokenTranslationUnitIndicator->writeCollectedTUsLog();
+        $brokenTranslationUnitLogger->writeCollectedTUsLog();
 
         // after protection there may be new duplicates
         $this->tmxFilter->filterFile($resultFilepath, $importOptions->tmxFilterOptions);

@@ -44,7 +44,7 @@ use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionProcessor;
 use MittagQI\Translate5\T5Memory\TMX\CharacterReplacer;
-use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger;
+use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\NullBrokenTranslationUnitLogger;
 use MittagQI\Translate5\TMX\TransUnitParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -151,10 +151,7 @@ TU,
             $de,
             $ko,
             $options,
-            BrokenTranslationUnitLogger::create(
-                $this->createMock(\ZfExtended_Logger::class),
-                'problematic_file_path.txt',
-            )
+            NullBrokenTranslationUnitLogger::create(),
         )->current(); // @phpstan-ignore-line
 
         self::assertSame(
