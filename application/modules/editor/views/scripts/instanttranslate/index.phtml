@@ -277,12 +277,22 @@ $languageSelector[] = '</form>';
                 // the following input type="file" must be outside of the <div class="dropSourceFile..
                 // else we have a JS problem and Drag'nDrop will not work
             ?>
+            <?php
+                // add the accept argument only if we actually have supported file extensions otherwize the app will crash
+                $supportedFileExtensions = $this->Php2JsVars()->get('supportedFileExtensions');
+                $firstCustomerExtensions = !empty($supportedFileExtensions) && is_array($supportedFileExtensions)
+                    ? array_values($supportedFileExtensions)[0]
+                    : [];
+                $acceptAttr = !empty($firstCustomerExtensions) && is_array($firstCustomerExtensions)
+                    ? 'accept=".' . implode(',.', $firstCustomerExtensions) . '"'
+                    : '';
+            ?>
             <input
                 id="sourceFile"
                 name="sourceFile"
                 type="file"
                 class="hide"
-                accept=".<?= implode(',.', array_values($this->Php2JsVars()->get('supportedFileExtensions'))[0]); ?>"
+                <?= $acceptAttr ?>
             />
 
             <input
