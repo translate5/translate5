@@ -30,10 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TMMaintenance\TagHandler;
 
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
-use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
-use MittagQI\Translate5\T5Memory\ContentProtection\DiffProtector;
-
 class T5MemoryXliff extends \editor_Services_Connector_TagHandler_T5MemoryXliff
 {
     public function restoreInResult(string $resultString, bool $isSource = true): ?string
