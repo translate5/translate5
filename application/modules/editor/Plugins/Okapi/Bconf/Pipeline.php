@@ -49,7 +49,14 @@ final class Pipeline extends ResourceFile
 {
     /*
      * A typical pipeline file looks like this:
-    </rainbowPipeline>
+        <rainbowPipeline version="1" t5bconfVersion="11">
+            <step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"/>
+            <step class="net.sf.okapi.steps.segmentation.SegmentationStep">#v1
+                doNotSegmentIfHasTarget.b=false
+                ...
+                writerOptions.escapeGT.b=true
+            </step>
+        </rainbowPipeline>
      */
 
     public const FILE = 'pipeline.pln';

@@ -35,19 +35,24 @@ use SplFileInfo;
 
 final class OkapiWorkerHelper
 {
-    public const OKAPI_REL_DATA_DIR = 'okapi-data';
+    public const string OKAPI_REL_DATA_DIR = 'okapi-data';
 
     /**
      * filename template for storing the manifest files
      * @var string
      */
-    public const MANIFEST_FILE = 'manifest-%s.rkm';
+    public const string MANIFEST_FILE = 'manifest-%s.rkm';
 
     /**
      * filename template for storing the original files
      * @var string
      */
-    public const ORIGINAL_FILE = 'original-%s.%s';
+    public const string ORIGINAL_FILE = 'original-%s.%s';
+
+    /**
+     * The file-name of the copy of the Export-Bconf in the tasks okapi-data folder
+     */
+    public const string EXPORT_BCONF_FILE = 'export.bconf';
 
     /**
      * returns the original filename for a stored file

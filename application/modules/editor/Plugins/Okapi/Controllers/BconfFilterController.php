@@ -34,6 +34,7 @@ use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmValidation;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\PropertiesValidation;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\Helpers\ResourceFileImport;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfHelper;
 
 /**
  * REST Endpoint Controller to serve a Bconfs Filter List for the Bconf-Management in the Preferences
@@ -64,6 +65,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     public function indexAction(): void
     {
         $bconf = new BconfEntity();
+        $taskBconf = new TaskBconfHelper();
         $bconf->load($this->getParam('bconfId'));
 
         // add the grid data
@@ -75,7 +77,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             $this->view->metaData = new stdClass();
         }
         $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->getIdentifierMap();
-        $this->view->metaData->allExtensions = editor_Plugins_Okapi_Init::getSystemDefaultBconf()->getSupportedExtensions();
+        $this->view->metaData->allExtensions = $taskBconf->getSystemDefaultBconf()->getSupportedExtensions();
     }
 
     /**

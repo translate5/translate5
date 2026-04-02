@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Customer Entity Objekt
  *
- * @method int getId()
+ * @method string getId()
  * @method void setId(int $id)
  *
  * @method string getName()
@@ -68,11 +68,11 @@ END LICENSE AND COPYRIGHT
  * @method string getOpenIdRedirectLabel()
  * @method void setOpenIdRedirectLabel(string $openIdRedirectLabel)
  *
- * @method int getOpenIdRedirectCheckbox()
- * @method void setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
+ * @method string getOpenIdRedirectCheckbox()
+ * @method void setOpenIdRedirectCheckbox(int $openIdRedirectCheckbox)
  *
- * @method int getOpenIdSyncUserData()
- * @method void setOpenIdSyncUserData(integer $openIdSyncUserData)
+ * @method string getOpenIdSyncUserData()
+ * @method void setOpenIdSyncUserData(int $openIdSyncUserData)
  */
 class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
 {
@@ -96,11 +96,10 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
 
     public function delete()
     {
-        $customerId = $this->getId();
         parent::delete();
         $logger = ZfExtended_Factory::get(editor_Models_LanguageResources_UsageLogger::class);
         //remove the log data for the deleted customer
-        $logger->deleteByCustomer($customerId);
+        $logger->deleteByCustomer((int) $this->getId());
     }
 
     /**
@@ -112,7 +111,7 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
     {
         $customerConfig = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
 
-        return $customerConfig->getCustomerConfig($this->getId());
+        return $customerConfig->getCustomerConfig((int) $this->getId());
     }
 
     /**
@@ -261,8 +260,8 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
     public function meta(bool $reinit = false)
     {
         $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get(editor_Models_Customer_Meta::class);
-        $customerId = $this->getId();
-        if ($meta->getCustomerId() != $customerId || $reinit) {
+        $customerId = (int) $this->getId();
+        if ((int) $meta->getCustomerId() !== $customerId || $reinit) {
             try {
                 $meta->loadByCustomerId($customerId);
             } catch (ZfExtended_Models_Entity_NotFoundException) {

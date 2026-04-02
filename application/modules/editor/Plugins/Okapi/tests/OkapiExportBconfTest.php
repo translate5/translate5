@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfHelper;
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -36,6 +37,8 @@ class OkapiExportBconfTest extends JsonTestAbstract
 
     private static Bconf $bconf2;
 
+    private static TaskBconfHelper $taskBconf;
+
     /**
      * Just imports a bconf to test with
      */
@@ -43,6 +46,7 @@ class OkapiExportBconfTest extends JsonTestAbstract
     {
         self::$bconf1 = $config->addBconf('TestBconf', 'typo3.bconf');
         self::$bconf2 = $config->addBconf('JsonBconf', 'json.bconf');
+        self::$taskBconf = new TaskBconfHelper();
     }
 
     public function test10_BconfsImport()
@@ -66,17 +70,17 @@ class OkapiExportBconfTest extends JsonTestAbstract
     public function test20_OkapiJsonImport()
     {
         $config = static::getConfig();
-        $config->import(
-            $config
-                ->addTask('en', 'de')
-                ->setMaxWaitTime(100)
-                ->setImportBconfId(self::$bconf2->getId())
-                ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
-                ->setToEditAfterImport()
-        );
+        $task = $config
+            ->addTask('en', 'de')
+            ->setMaxWaitTime(100)
+            ->setImportBconfId(self::$bconf2->getId())
+            ->addUploadFile('workfiles/unity_en_newly_added_keys1.json')
+            ->setToEditAfterImport();
+        $config->import($task);
         $segments = static::api()->getSegments();
         $this->assertEquals(17, count($segments));
         $this->assertEquals('Green:', $segments[0]->source);
+        $this->assertTaskDataExportBconfExists($task->getId());
     }
 
     /**
@@ -86,18 +90,18 @@ class OkapiExportBconfTest extends JsonTestAbstract
     public function test30_OkapiTypo3Import()
     {
         $config = static::getConfig();
-        $config->import(
-            $config
-                ->addTask('en', 'de')
-                ->setMaxWaitTime(100)
-                ->setImportBconfId(self::$bconf1->getId())
-                ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
-                ->setToEditAfterImport()
-        );
+        $task = $config
+            ->addTask('en', 'de')
+            ->setMaxWaitTime(100)
+            ->setImportBconfId(self::$bconf1->getId())
+            ->addUploadFile('workfiles/export-contentelements-14104-EN.xliff.typo3')
+            ->setToEditAfterImport();
+        $config->import($task);
 
         $segments = static::api()->getSegments();
         $this->assertEquals(42, count($segments));
         $this->assertEquals('Reference', $segments[0]->source);
+        $this->assertTaskDataExportBconfExists($task->getId());
     }
 
     /**
@@ -120,5 +124,12 @@ class OkapiExportBconfTest extends JsonTestAbstract
         $expectedData = static::api()->getFileContent('workfiles/export-contentelements-14104-EN.xliff.typo3');
 
         $this->assertEquals($adjustData($expectedData), $adjustData($exportedData), 'Exported result does not equal to expected XLIFF content');
+    }
+
+    private function assertTaskDataExportBconfExists(int $taskId): void
+    {
+        $task = new editor_Models_Task();
+        $task->load($taskId);
+        self::assertFileExists(self::$taskBconf->createExportBconfCopyPath($task));
     }
 }

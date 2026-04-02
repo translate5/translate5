@@ -31,6 +31,9 @@ namespace MittagQI\Translate5\Plugins\Okapi\Worker;
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use SplFileInfo;
 
+/**
+ * TODO FIXME: documentation !!!
+ */
 final class XmlEntitiesPatcher
 {
     private const XML_IDENTIFIER_START = 'okf_xml';
@@ -42,9 +45,9 @@ final class XmlEntitiesPatcher
 
     private const T5_CLOSE = 'T5';
 
-    public static function patchBeforeImport(?int $bconfId, SplFileInfo $file): void
+    public static function patchBeforeImport(BconfEntity $bconf, SplFileInfo $file): void
     {
-        $patchedEntities = self::getPatchedEntities($bconfId, $file->getExtension());
+        $patchedEntities = self::getPatchedEntities($bconf, $file->getExtension());
         $entitiesMap = [];
         foreach ($patchedEntities as $entity) {
             $char = html_entity_decode('&' . $entity . ';', ENT_HTML5, 'UTF-8');
@@ -112,13 +115,8 @@ final class XmlEntitiesPatcher
         }
     }
 
-    private static function getPatchedEntities(?int $bconfId, string $fileExtension): array
+    private static function getPatchedEntities(BconfEntity $bconf, string $fileExtension): array
     {
-        if (empty($bconfId)) {
-            return [];
-        }
-        $bconf = new BconfEntity();
-        $bconf->load($bconfId);
         $patchedEntities = trim($bconf->getPatchedEntities());
         $identifiers = $bconf->getExtensionMapping()->findCustomIdentifiers();
         if (empty($identifiers) || empty($patchedEntities)) {

@@ -183,7 +183,8 @@ final class BconfEntity extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Loads the system default bconf
+     * Loads the system default bconf which is the BCONF, that has the name "Translate5-Standard".
+     * Note, that this is not the same as the "defaultcustomer" BCONF
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint

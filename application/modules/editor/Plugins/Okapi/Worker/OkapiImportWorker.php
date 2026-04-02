@@ -34,9 +34,11 @@ use editor_Models_Task_AbstractWorker;
 use editor_Plugins_Okapi_FileFilter;
 use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\File\Filter\Type;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfAssocRepository;
+use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfHelper;
 use SplFileInfo;
 use Throwable;
 use Zend_Registry;
@@ -92,8 +94,18 @@ class OkapiImportWorker extends editor_Models_Task_AbstractWorker
         $api = new OkapiAdapter($taskConfig);
 
         $tbAssoc = TaskBconfAssocRepository::create()->findForTask($this->task->getTaskGuid());
-
-        XmlEntitiesPatcher::patchBeforeImport($tbAssoc->getBconfId(), $file);
+        // in case we are using a database-based BCONF (not from ZIP)
+        if ($tbAssoc->hasReferencedBconf()) {
+            $bconf = new BconfEntity();
+            $bconf->load($tbAssoc->getBconfId());
+            // ... we may have to patch entities in an uploaded XLIFF/XML file
+            XmlEntitiesPatcher::patchBeforeImport($bconf, $file);
+            // and copy the export-bconf to the data-folder
+            $taskBconf = new TaskBconfHelper();
+            $targetPath = $taskBconf->createExportBconfCopyPath($this->task);
+            copy($bconf->getPath(true), $targetPath);
+            chmod($targetPath, 0777);
+        }
 
         try {
             $message = 'Okapi Plug-In: File "{fileName}" (id: {fileId}) will be imported with Okapi "{okapi}"';

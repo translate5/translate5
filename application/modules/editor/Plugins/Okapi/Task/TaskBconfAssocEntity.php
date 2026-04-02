@@ -60,4 +60,9 @@ final class TaskBconfAssocEntity extends ZfExtended_Models_Entity_Abstract
 
         return (int) $this->get('bconfId');
     }
+
+    public function hasReferencedBconf(): bool
+    {
+        return ! empty($this->get('bconfId'));
+    }
 }

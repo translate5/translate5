@@ -31,9 +31,9 @@ namespace MittagQI\Translate5\Plugins\Okapi\Worker;
 use editor_Models_Export_FileParser_Xlf as XlfFileparser;
 use editor_Models_Languages;
 use editor_Models_Task_AbstractWorker;
-use editor_Plugins_Okapi_Init;
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\Task\TaskBconfHelper;
 use SplFileInfo;
 use Throwable;
 use Zend_Registry;
@@ -102,7 +102,8 @@ class OkapiExportWorker extends editor_Models_Task_AbstractWorker
         $result = false;
 
         try {
-            $exportBconf = editor_Plugins_Okapi_Init::getExportBconfPath($this->task);
+            $taskBconf = new TaskBconfHelper();
+            $exportBconf = $taskBconf->getExportBconfPath($this->task);
             if ($this->doDebug) {
                 $message = 'Okapi Plug-In: File "{fileName}" (id: {fileId}) will be exported with Okapi "{okapi}"';
                 $extra = [
