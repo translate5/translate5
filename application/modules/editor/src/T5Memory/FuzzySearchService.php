@@ -195,6 +195,16 @@ class FuzzySearchService
 
             $foundInternalKeys[$key] = true;
 
+            // Recreate the tag handler for each match to reset the internal state, as prepareQuery and restoreInFuzzyResult calls can change it
+            // which may lead to wrong result restoring for the next matches depending on matches order in the response from t5memory
+            // TRANSLATE-5367
+            $tagHandler = $this->tagHandlerProvider->getTagHandler(
+                (int) $languageResource->getSourceLang(),
+                (int) $languageResource->getSourceLang(),
+                $config,
+            );
+            $tagHandler->prepareQuery($queryString);
+
             $target = $tagHandler->restoreInFuzzyResult($found->target, $found->skippedTags, false);
             $hasTargetErrors = $tagHandler->hasRestoreErrors();
 

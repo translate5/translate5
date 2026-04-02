@@ -104,11 +104,11 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     public function __construct(array $options = [])
     {
         $this->keepWhitespaceTags = (bool) ($options[self::OPTION_KEEP_WHITESPACE_TAGS] ?? false);
-        $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         $this->trackChange = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->logger = ZfExtended_Factory::get(ZfExtended_Logger_Queued::class);
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
+        $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
         $this->xmlparser->registerOther(function ($textNode, $key) {
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags

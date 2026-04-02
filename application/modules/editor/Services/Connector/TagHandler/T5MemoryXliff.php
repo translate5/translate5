@@ -88,7 +88,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         $this->diffProtector = DiffProtector::create();
         $this->languageRepository = LanguageRepository::create();
         $this->characterReplacer = CharacterReplacer::create();
-        $this->config = \Zend_Registry::get('config');
+        $this->config = $options['config'] ?? \Zend_Registry::get('config');
         $this->guessTagRepairer = XliffTagRepairer::createWithRepairers([new GuessExtraTags()]);
     }
 
