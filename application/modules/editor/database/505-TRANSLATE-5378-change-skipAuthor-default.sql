@@ -26,5 +26,5 @@
 -- */
 
 UPDATE Zf_configuration
-SET default = 1
+SET `default` = 1
 WHERE name = 'runtimeOptions.LanguageResources.t5memory.skipAuthor';
