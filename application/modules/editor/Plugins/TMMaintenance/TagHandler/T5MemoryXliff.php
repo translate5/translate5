@@ -49,31 +49,4 @@ class T5MemoryXliff extends \editor_Services_Connector_TagHandler_T5MemoryXliff
 
         return preg_replace('/\s+/', ' ', $updatedHtml);
     }
-
-    protected function getProtectionDto(array &$protectionDtos, string $rule, T5NTag $tag): ContentProtectionDto
-    {
-        if (! isset($protectionDtos[$rule])) {
-            $recognition = $this->contentProtectionRepository->findRecognitionByKey($tag->rule);
-
-            if (null === $recognition) {
-                $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
-            }
-
-            $protectionDtos[$rule] = null === $recognition
-                ? ContentProtectionDto::dummy(
-                    DiffProtector::getType(),
-                    'Missing rule - in TM only',
-                    $tag->getRegex(),
-                    $tag->rule,
-                )
-                : ContentProtectionDto::dummy(
-                    $recognition->getType(),
-                    $recognition->getName() . ' - in TM only',
-                    $tag->getRegex(),
-                    $tag->rule,
-                );
-        }
-
-        return $protectionDtos[$rule];
-    }
 }

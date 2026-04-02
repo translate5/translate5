@@ -295,6 +295,8 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                     $recognition->getName() . ' - in TM only',
                     $recognition->getRegex(),
                     $recognition->getKey(),
+                    $recognition->getFormat() ?: null,
+                    $recognition->getFormat() ?: null,
                 );
         }
 
