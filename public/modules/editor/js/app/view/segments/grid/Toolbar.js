@@ -116,20 +116,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             ]
         };
 
-        //add the available translate5 translations
-        Ext.Object.each(Editor.data.l10n.segmentGrid.toolbar.interfaceTranslation, function (i, n) {
-            menu.items.push({
-                xtype: 'menucheckitem',
-                itemId: 'localeMenuItem' + i,
-                checked: Editor.data.locale == i,
-                bind: {
-                    text: '{l10n.segmentGrid.toolbar.interfaceTranslation.' + i + '}',
-                },
-                value: i,
-                tagMode: 'full',
-                group: 'localeMenuGroup'
-            });
-        });
+        // add the GUI language switch
+        menu.items.push(me.getLanguageMenuConfig());
 
         // add change user theme only if allowed
         if (Editor.data.frontend.changeUserThemeVisible) {
@@ -809,14 +797,38 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
         return me.callParent([config]);
     },
 
-    /***
+    /**
+     * Create the GUI language changer config
+     * @returns {{text: string, menu: {items: *[]}}}
+     */
+    getLanguageMenuConfig: function () {
+        let menuItems = [];
+
+        Ext.Object.each(Editor.data.l10n.translations, function(locale, name) {
+            menuItems.push({
+                text: name,
+                value: locale,
+                checked: Editor.data.locale === locale,
+                group: 'uiLanguage'
+            });
+        });
+
+        return {
+            bind: {
+                text: '{l10n.preferences.user.changeUiLangaugeLabelText}'
+            },
+            menu: {
+                items: menuItems
+            }
+        };
+    },
+
+    /**
      * Create the theme menu picker config
      * @returns {{text: string, menu: {items: *[]}}}
      */
     getThemeMenuConfig: function () {
-        var me = this,
-            config,
-            uiThemesRecord = Editor.app.getUserConfig('extJs.theme', true),
+        let uiThemesRecord = Editor.app.getUserConfig('extJs.theme', true),
             menuItems = [];
 
         Ext.Array.each(uiThemesRecord.get('defaults'), function (i) {
@@ -831,7 +843,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             });
         });
 
-        config = {
+        return {
             bind: {
                 text: '{l10n.segmentGrid.toolbar.themeMenuConfigText}'
             },
@@ -839,8 +851,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 items: menuItems
             }
         };
-
-        return config;
     },
 
     getKeyboardShortcutUrl: function () {

@@ -604,29 +604,30 @@ Ext.application({
     logout: function () {
         window.location = Editor.data.loginUrl;
     },
+
     /**
-     * sets the locale / language to be used by the application. Restarts the application.
-     * @param {String} lang
+     * sets the locale / language to be used by the application.
+     * This will also set the locale for the current user
+     * @param {String} newLocale
      */
-    setTranslation: function (lang) {
-        var formSpec = {
-                tag: 'form',
-                action: window.location.href,
-                method: 'POST',
-                target: '_self',
-                style: 'display:none',
-                cn: [{
-                    tag: 'input',
-                    type: 'hidden',
-                    name: 'locale',
-                    value: Ext.String.htmlEncode(lang)
-                }]
+    setAppLocale: function (newLocale) {
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'user/changelocale',
+            method: 'PUT',
+            params: {
+                id: Editor.app.authenticatedUser.getId(),
+                locale: newLocale,
             },
-            // Create the form
-            form = Ext.DomHelper.append(Ext.getBody(), formSpec);
-        // disable logoutOnWindowClose when the language is changed
-        Editor.data.logoutOnWindowClose = false;
-        form.submit();
+            success: function() {
+                // disable logoutOnWindowClose when the window is reloaded
+                Editor.data.logoutOnWindowClose = false;
+                // reload the app to reload all localized strings
+                window.location.reload();
+            },
+            failure: function(response) {
+                console.log('Failed to change app locale ' + response.status);
+            }
+        });
     },
 
     /***

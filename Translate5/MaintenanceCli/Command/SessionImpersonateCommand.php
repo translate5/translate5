@@ -73,6 +73,13 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             mode: InputOption::VALUE_REQUIRED,
             description: 'Give a segment-nr complementing the given task.'
         );
+
+        $this->addOption(
+            'locale',
+            'l',
+            InputOption::VALUE_REQUIRED,
+            'A locale to be used in the frontend (does not change the users locale).'
+        );
     }
 
     /**
@@ -86,17 +93,24 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         Application::$startSession = true;
         $this->initTranslate5();
         $login = $this->input->getArgument('login');
+        $locale = $this->input->getOption('locale');
         $this->writeTitle('Impersonate as user "' . $login . '"');
 
         $auth = \ZfExtended_Authentication::getInstance();
         if (! $auth->authenticateByLogin($login)) {
             $this->io->error('User ' . $login . ' not found.');
 
-            return 1;
+            return self::FAILURE;
         }
+        if (! empty($locale) && ! in_array($locale, Localization::getAvailableLocales())) {
+            $this->io->error('Locale "' . $locale . '" not valid.');
 
+            return self::FAILURE;
+        } elseif (empty($locale)) {
+            $locale = $auth->getUser()->getLocale();
+        }
+        // set app locale
         $session = new \Zend_Session_Namespace();
-        $locale = $auth->getUser()->getLocale();
         $session->locale = Localization::getLocale($locale);
 
         $sessionDb = new ZfExtended_Models_Db_Session();

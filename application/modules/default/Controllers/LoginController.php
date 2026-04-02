@@ -374,7 +374,7 @@ class LoginController extends ZfExtended_Controllers_Login
 
         try {
             $user = $userRepository->get(
-                Auth::getInstance()->getUser()->getId()
+                (int) Auth::getInstance()->getUser()->getId()
             );
         } catch (InexistentUserException) {
             return;

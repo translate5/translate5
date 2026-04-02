@@ -81,7 +81,7 @@ Ext.define('Editor.view.admin.preferences.UserViewController', {
      * @param locale
      */
     changeLocale: function (combo, locale) {
-        Editor.app.setTranslation(locale);
+        Editor.app.setAppLocale(locale);
     },
 
     /***

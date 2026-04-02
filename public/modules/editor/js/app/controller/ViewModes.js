@@ -78,7 +78,7 @@ Ext.define('Editor.controller.ViewModes', {
             'gridpanel segmentsToolbar menucheckitem[group="tagMode"]' : {
                 click : 'handleTagButtonClick'
             },
-            'gridpanel segmentsToolbar menucheckitem[group="localeMenuGroup"]' : {
+            'gridpanel segmentsToolbar menucheckitem[group="uiLanguage"]' : {
                 click : 'handleLocaleMenuClick'
             },
             'button[type="segment-zoom"]' : {
@@ -434,7 +434,7 @@ Ext.define('Editor.controller.ViewModes', {
      * On locale switch click. This will change the translate5 interface language
      */
     handleLocaleMenuClick: function(btn){
-    	Editor.app.setTranslation(btn.getValue());
+    	Editor.app.setAppLocale(btn.getValue());
     },
 
     getActiveEditor: function() {
