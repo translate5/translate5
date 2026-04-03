@@ -150,16 +150,18 @@ export default class EditorWrapper {
      * @param {string} data
      * @param {string} referenceData
      * @param {Font} font
+     * @param {boolean} isSource
      */
-    setDataT5Format(data, referenceData, font) {
+    setDataT5Format(data, referenceData, font, isSource = false) {
         this.#font = font;
         this.dataTransformer = new DataTransformer(
             this._tagsConversion,
             this.#font,
             stringToDom(data).childNodes,
             stringToDom(referenceData).childNodes,
+            isSource,
             this.#userCanModifyWhitespaceTags,
-            this.#userCanInsertWhitespaceTags
+            this.#userCanInsertWhitespaceTags,
         );
         this.#setRawData(this.dataTransformer.toString());
         this._editor.editing.view.focus();
@@ -167,9 +169,9 @@ export default class EditorWrapper {
         this.#triggerDataChanged();
     }
 
-    addDataT5Format(data) {
+    addDataT5Format(data, isSource = false) {
         const items = RichTextEditor.stringToDom(data).childNodes;
-        const transformed = this.dataTransformer.transformPartial(items);
+        const transformed = this.dataTransformer.transformPartial(items, isSource);
 
         const selection = this.getSelection();
         const start = selection.start;
@@ -178,7 +180,7 @@ export default class EditorWrapper {
         this.replaceContentInRange(start, end, transformed, false, true);
     }
 
-    replaceDataT5Format(data) {
+    replaceDataT5Format(data, isSource = false) {
         const rangeStart = 0;
         const rangeEnd = this._editor.model.document.getRoot().getChild(0).maxOffset;
 

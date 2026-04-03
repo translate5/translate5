@@ -92,15 +92,16 @@ Ext.define('Editor.view.segments.new.EditorNew', {
             this.currentlyEditingRecord.get('pretrans'),
             this.currentlyEditingRecord.get('matchRateType')
         );
+        const isSource = this.currentlyEditingColumnToEdit && this.currentlyEditingColumnToEdit.includes('source');
 
         if (isReplacing) {
-            this.editor.replaceDataT5Format(data);
+            this.editor.replaceDataT5Format(data, isSource);
 
             return;
         }
 
         if (isAdding) {
-            this.editor.addDataT5Format(data);
+            this.editor.addDataT5Format(data, isSource);
 
             return;
         }
@@ -113,7 +114,8 @@ Ext.define('Editor.view.segments.new.EditorNew', {
                 metaCache.font.toLowerCase(),
                 metaCache.fontSize,
                 this.currentlyEditingRecord.get('fileId')
-            )
+            ),
+            isSource
         );
     },
 

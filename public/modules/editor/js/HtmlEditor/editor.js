@@ -169,14 +169,16 @@ class DataTransformer {
      * @param {Font} font
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>|Array<HTMLElement>} referenceItems
-     * @param {Boolean} userCanModifyWhitespaceTags
-     * @param {Boolean} userCanInsertWhitespaceTags
+     * @param {boolean} isSource
+     * @param {boolean} userCanModifyWhitespaceTags
+     * @param {boolean} userCanInsertWhitespaceTags
      */
     constructor(
         tagsConversion,
         font,
         items,
         referenceItems,
+        isSource,
         userCanModifyWhitespaceTags,
         userCanInsertWhitespaceTags
     ) {
@@ -199,15 +201,16 @@ class DataTransformer {
         this.#userCanModifyWhitespaceTags = userCanModifyWhitespaceTags;
         this.#userCanInsertWhitespaceTags = userCanInsertWhitespaceTags;
 
-        this.#transform(items, referenceItems);
+        this.#transform(items, referenceItems, isSource);
     }
 
     /**
      * @param {NodeListOf<HTMLElement>} items
      * @param {NodeListOf<HTMLElement>} referenceItems
+     * @param {boolean} isSource
      */
-    #transform(items, referenceItems = []) {
-        this._transformedReferenceNodes = this.#transformItems(referenceItems);
+    #transform(items, referenceItems = [], isSource) {
+        this._transformedReferenceNodes = this.#transformItems(referenceItems, isSource);
         this.#retrieveTags(this._transformedReferenceNodes, this._referenceTags);
         this._tagCheck = new _TagsTransform_tag_check__WEBPACK_IMPORTED_MODULE_2__["default"](
             this._referenceTags,
@@ -215,16 +218,17 @@ class DataTransformer {
             this.#userCanModifyWhitespaceTags,
             this.#userCanInsertWhitespaceTags
         );
-        this._transformedNodes = this.#transformItems(items);
+        this._transformedNodes = this.#transformItems(items, isSource);
         this.#retrieveTags(this._transformedNodes, this._transformedTags);
     }
 
     /**
      * @param {NodeListOf<HTMLElement>} items
+     * @param {boolean} isSource
      * @returns {string}
      */
-    transformPartial(items) {
-        const nodes = this.#transformItems(items);
+    transformPartial(items, isSource = false) {
+        const nodes = this.#transformItems(items, isSource);
         this.#retrieveTags(nodes, this._transformedTags);
 
         let result = '';
@@ -236,11 +240,11 @@ class DataTransformer {
     }
 
     /**
-     * @param {HTMLElement} whitespce
+     * @param {HTMLElement} whitespace
      * @returns {*}
      */
-    transformWhitespace(whitespce) {
-        const items = this.#transformItems([whitespce], true);
+    transformWhitespace(whitespace) {
+        const items = this.#transformItems([whitespace]);
         this.#retrieveTags(items, this._transformedTags);
 
         return items.pop();
@@ -309,15 +313,15 @@ class DataTransformer {
 
     /**
      * @param {NodeListOf<HTMLElement>} items
-     * @param {Boolean} reference
+     * @param {boolean} isSource
      * @returns {Array<Node>}
      */
-    #transformItems(items, reference = false) {
+    #transformItems(items, isSource = false) {
         let result = [];
         const pixelMapping = new _TagsTransform_pixel_mapping__WEBPACK_IMPORTED_MODULE_3__["default"](this.#font);
 
         for (const item of items) {
-            const transformed = this._tagsConversion.transform(item, pixelMapping);
+            const transformed = this._tagsConversion.transform(item, pixelMapping, isSource);
 
             if (! transformed) {
                 continue;
@@ -328,7 +332,7 @@ class DataTransformer {
             result.push(node);
 
             if (item.childNodes.length) {
-                node._children = this.#transformItems(item.childNodes);
+                node._children = this.#transformItems(item.childNodes, isSource);
             }
         }
 
@@ -902,16 +906,18 @@ class EditorWrapper {
      * @param {string} data
      * @param {string} referenceData
      * @param {Font} font
+     * @param {boolean} isSource
      */
-    setDataT5Format(data, referenceData, font) {
+    setDataT5Format(data, referenceData, font, isSource = false) {
         this.#font = font;
         this.dataTransformer = new _DataTransform_data_transformer__WEBPACK_IMPORTED_MODULE_3__["default"](
             this._tagsConversion,
             this.#font,
             (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(data).childNodes,
             (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(referenceData).childNodes,
+            isSource,
             this.#userCanModifyWhitespaceTags,
-            this.#userCanInsertWhitespaceTags
+            this.#userCanInsertWhitespaceTags,
         );
         this.#setRawData(this.dataTransformer.toString());
         this._editor.editing.view.focus();
@@ -919,9 +925,9 @@ class EditorWrapper {
         this.#triggerDataChanged();
     }
 
-    addDataT5Format(data) {
+    addDataT5Format(data, isSource = false) {
         const items = RichTextEditor.stringToDom(data).childNodes;
-        const transformed = this.dataTransformer.transformPartial(items);
+        const transformed = this.dataTransformer.transformPartial(items, isSource);
 
         const selection = this.getSelection();
         const start = selection.start;
@@ -930,7 +936,7 @@ class EditorWrapper {
         this.replaceContentInRange(start, end, transformed, false, true);
     }
 
-    replaceDataT5Format(data) {
+    replaceDataT5Format(data, isSource = false) {
         const rangeStart = 0;
         const rangeEnd = this._editor.model.document.getRoot().getChild(0).maxOffset;
 
@@ -3246,7 +3252,13 @@ class TagsConversion {
         this._templating = new _templating__WEBPACK_IMPORTED_MODULE_1__["default"](this._idPrefix);
     };
 
-    transform(item, pixelMapping = null) {
+    /**
+     * @param {HTMLElement} item
+     * @param {PixelMapping} pixelMapping
+     * @param {boolean} isSource
+     * @returns {ChildNode|Node|ActiveX.IXMLDOMNode|null}
+     */
+    transform(item, pixelMapping = null, isSource = false) {
         //some tags are marked as to be ignored in the editor, so we ignore them
         if (this._isIgnoredNode(item)) {
             return null;
@@ -3337,7 +3349,14 @@ class TagsConversion {
 
         //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
         if (this.isInternalTagNode(item) && this.#isCorrectInternalTagNode(item)) {
-            return (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(this._replaceInternalTagToImage(item, this._editorElement, pixelMapping)).childNodes[0];
+            return (0,_Tools_string_to_dom__WEBPACK_IMPORTED_MODULE_2__["default"])(
+                this._replaceInternalTagToImage(
+                    item,
+                    this._editorElement,
+                    pixelMapping,
+                    isSource
+                )
+            ).childNodes[0];
         }
 
         return null;
@@ -3547,8 +3566,16 @@ class TagsConversion {
         return item.tagName === 'BR';
     }
 
-    _replaceInternalTagToImage(item, editorElement, pixelMapping) {
-        let data = this._extractInternalTagsData(item, pixelMapping);
+    /**
+     * @param {HTMLElement} item
+     * @param {HTMLElement} editorElement
+     * @param {PixelMapping} pixelMapping
+     * @param {boolean} isSource
+     * @returns {string}
+     * @private
+     */
+    _replaceInternalTagToImage(item, editorElement, pixelMapping, isSource = false) {
+        let data = this._extractInternalTagsData(item, pixelMapping, isSource);
 
         if (this._tagModeProvider.isFullTagMode() || data.whitespaceTag || data.numberTag || data.placeableTag) {
             data.path = this._getSvg(data.text, data.fullWidth, editorElement);
@@ -3605,9 +3632,10 @@ class TagsConversion {
      * Get data from the tags
      *
      * @param {HTMLDivElement} item
-     * @param pixelMapping
+     * @param {PixelMapping} pixelMapping
+     * @param {boolean} isSource
      */
-    _extractInternalTagsData(item, pixelMapping) {
+    _extractInternalTagsData(item, pixelMapping, isSource = false) {
         let data = this._getInitialData();
 
         const spanFull = item.querySelector('span.full');
@@ -3642,7 +3670,7 @@ class TagsConversion {
         }
 
         if (data.numberTag) {
-            data.text = data.target ? data.target : data.source;
+            data.text = data.target && ! isSource ? data.target : data.source;
         }
 
         // get the dimensions of the inner spans
@@ -3730,6 +3758,13 @@ class TagsConversion {
         };
     }
 
+    /**
+     * @param {string} text
+     * @param {integer} width
+     * @param {HTMLElement} editorElement
+     * @returns {string}
+     * @private
+     */
     _getSvg(text, width, editorElement) {
         let prefix = 'data:image/svg+xml;charset=utf-8,',
             svg = '',

@@ -30,10 +30,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TMMaintenance\TagHandler;
 
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
-use MittagQI\Translate5\ContentProtection\T5memory\T5NTag;
-use MittagQI\Translate5\T5Memory\ContentProtection\DiffProtector;
-
 class T5MemoryXliff extends \editor_Services_Connector_TagHandler_T5MemoryXliff
 {
     public function restoreInResult(string $resultString, bool $isSource = true): ?string
@@ -48,32 +44,5 @@ class T5MemoryXliff extends \editor_Services_Connector_TagHandler_T5MemoryXliff
         $updatedHtml = preg_replace($pattern, $replacement, $restoredResult);
 
         return preg_replace('/\s+/', ' ', $updatedHtml);
-    }
-
-    protected function getProtectionDto(array &$protectionDtos, string $rule, T5NTag $tag): ContentProtectionDto
-    {
-        if (! isset($protectionDtos[$rule])) {
-            $recognition = $this->contentProtectionRepository->findRecognitionByKey($tag->rule);
-
-            if (null === $recognition) {
-                $recognition = $this->contentProtectionRepository->findRecognitionByRegex($tag->getRegex());
-            }
-
-            $protectionDtos[$rule] = null === $recognition
-                ? ContentProtectionDto::dummy(
-                    DiffProtector::getType(),
-                    'Missing rule - in TM only',
-                    $tag->getRegex(),
-                    $tag->rule,
-                )
-                : ContentProtectionDto::dummy(
-                    $recognition->getType(),
-                    $recognition->getName() . ' - in TM only',
-                    $tag->getRegex(),
-                    $tag->rule,
-                );
-        }
-
-        return $protectionDtos[$rule];
     }
 }

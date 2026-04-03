@@ -288,6 +288,10 @@ class ReorganizeService
     private function increaseReorganizeAttempts(LanguageResource $languageResource, string $tmName): void
     {
         $attempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS, true);
+        if (! is_array($attempts)) {
+            $attempts = [];
+        }
+
         $attempts[$tmName] = ($attempts[$tmName] ?? 0) + 1;
 
         $languageResource->addSpecificData(self::REORGANIZE_ATTEMPTS, $attempts);

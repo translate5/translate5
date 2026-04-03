@@ -112,16 +112,22 @@ class ContentProtectionDto
         );
     }
 
-    public static function dummy(string $type, string $name, string $regex, string $key): self
-    {
+    public static function dummy(
+        string $type,
+        string $name,
+        string $regex,
+        string $key,
+        ?string $format = null,
+        ?string $outputFormat = null,
+    ): self {
         return new self(
             $type,
             $name,
             $regex,
             0,
-            null,
+            $format,
             true,
-            null,
+            $outputFormat,
             1,
             $key,
         );

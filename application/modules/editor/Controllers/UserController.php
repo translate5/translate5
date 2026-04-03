@@ -128,7 +128,7 @@ class Editor_UserController extends ZfExtended_RestController
     public function getAction(): void
     {
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserId());
-        $user = $this->userRepository->get($this->getParam('id'));
+        $user = $this->userRepository->get((int) $this->getParam('id'));
 
         if ($user->getLogin() == ZfExtended_Models_User::SYSTEM_LOGIN) {
             $e = new ZfExtended_Models_Entity_NotFoundException();
@@ -334,6 +334,38 @@ class Editor_UserController extends ZfExtended_RestController
         $pmRoles = array_unique(array_filter($pmRoles));
         $this->view->rows = $this->entity->loadAllByRole($pmRoles);
         $this->view->total = $this->entity->getTotalByRole($pmRoles);
+    }
+
+    /**
+     * Changes the locale for the current user
+     * Note: The Frontend needs to be reloaded to show the new locale
+     */
+    public function changelocaleAction(): void
+    {
+        $this->entityLoad();
+        $locale = (string) $this->getParam('locale');
+        if ((int) $this->entity->getId() !== ZfExtended_Authentication::getInstance()->getUserid()) {
+            throw new ZfExtended_Models_Entity_NoAccessException(
+                'Changinge the locale is only allowed for the authenticated user'
+            );
+        }
+        if (! in_array($locale, Localization::getAvailableLocales())) {
+            throw new ZfExtended_BadRequest(
+                'Unsupported locale “' . $locale . '”'
+            );
+        }
+
+        // update user
+        $this->entity->setLocale($locale);
+        $this->entity->save();
+        // update auth user
+        ZfExtended_Authentication::getInstance()->getUser()->setLocale($locale);
+        // update session
+        $session = new Zend_Session_Namespace();
+        $session->locale = $locale; // @phpstan-ignore-line
+        // register locale
+        $zendLocale = new Zend_Locale($locale);
+        Zend_Registry::set('Zend_Locale', $zendLocale);
     }
 
     /**

@@ -50,6 +50,7 @@ class TagHandlerProvider implements TagHandlerProviderInterface
         $tagHandler = new TagHandler([
             'gTagPairing' => false,
             TagHandler::OPTION_KEEP_WHITESPACE_TAGS => $sendWhitespaceAsTag,
+            'config' => $config,
         ]);
         $tagHandler->setLanguages($sourceLang, $targetLang);
 
