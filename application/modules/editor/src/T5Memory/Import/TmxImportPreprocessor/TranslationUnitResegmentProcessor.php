@@ -119,6 +119,23 @@ class TranslationUnitResegmentProcessor extends Processor
         }
 
         foreach ($sourceSegments as $index => $sourceSegment) {
+            if (
+                ('' === trim($sourceSegment) && '' !== trim($targetSegments[$index]))
+                || ('' !== trim($sourceSegment) && '' === trim($targetSegments[$index]))
+            ) {
+                if ($this->config->runtimeOptions->tmxImportProcessor?->debug) {
+                    error_log("One of the segments is empty after trimming, skipping TU:\n" . $tu);
+                }
+
+                return yield $tu;
+            }
+        }
+
+        foreach ($sourceSegments as $index => $sourceSegment) {
+            if ('' === trim($sourceSegment) && '' === trim($targetSegments[$index])) {
+                continue;
+            }
+
             yield str_replace(
                 [
                     TransUnitStructure::SOURCE_PLACEHOLDER,
