@@ -26,3 +26,20 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
+set_time_limit(0);
+
+/** @var ZfExtended_Models_Installer_DbUpdater $this */
+
+use MittagQI\Translate5\Plugins\Okapi\OkapiVersionConfigUpdater;
+
+// we will be regarded as having run only after a successful update!
+$this->doNotSavePhpForDebugging = false; // @phpstan-ignore-line
+
+$updater = new OkapiVersionConfigUpdater('1.48.0-SNAPSHOT');
+if ($updater->update()) {
+    echo $updater->getSuccessMsg();
+    $this->doNotSavePhpForDebugging = true; // @phpstan-ignore-line
+} else {
+    $this->errors = $updater->getErrors(); // @phpstan-ignore-line
+}

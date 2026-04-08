@@ -105,6 +105,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         'okapi-longhorn-148-snapshot-1',
         'okapi-longhorn-148-snapshot-2',
         'okapi-longhorn-148-snapshot-3',
+        'okapi-longhorn-148-snapshot-6',
     ];
 
     protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
