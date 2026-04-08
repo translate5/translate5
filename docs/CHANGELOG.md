@@ -13,6 +13,94 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.35.5] - 2026-04-08
+
+### Important Notes:
+#### [TRANSLATE-5317](https://jira.translate5.net/browse/TRANSLATE-5317)
+The POST parameter "locale" that could be added to any request to switch the current users locale is removed.
+ 
+
+
+### Changed
+**[TRANSLATE-5378](https://jira.translate5.net/browse/TRANSLATE-5378): t5memory - New installations set t5memory skipAuthor to true by default** <br>
+For new installations t5memory skipAuthor is enabled by default. For existing instances the configuration is not automatically changed.
+
+**[TRANSLATE-5268](https://jira.translate5.net/browse/TRANSLATE-5268): InstantTranslate - Instant-translate: Move plugin specific user defaults to separate entity** <br>
+Reorganise internal storage for InstantTranslate specific features. 
+
+**[TRANSLATE-4176](https://jira.translate5.net/browse/TRANSLATE-4176): Auto-QA - highlighted segment should stay after unfiltering of QA** <br>
+FIXED: segments grid is now scrolled to the last selected segment if quality filters were unset
+
+
+### Bugfixes
+**[TRANSLATE-5392](https://jira.translate5.net/browse/TRANSLATE-5392): t5memory - Type error in reorganise** <br>
+Prevent type error before increasing reorganise attempts
+
+**[TRANSLATE-5391](https://jira.translate5.net/browse/TRANSLATE-5391): t5memory - Incorrect handling for replace rules in case if entity protected only on TM side** <br>
+Provide output format for rule to render TM only entity
+
+**[TRANSLATE-5390](https://jira.translate5.net/browse/TRANSLATE-5390): t5connect - Concordance triggers reorganise for first search** <br>
+Prevents probable problems with concordance search and reorganisation of TMs.
+
+**[TRANSLATE-5382](https://jira.translate5.net/browse/TRANSLATE-5382): translate5 AI - Terms are ignored on translation re-try for LLM resources** <br>
+Solves problem where terminology is ignored when failed segment translation is re-send.
+
+**[TRANSLATE-5375](https://jira.translate5.net/browse/TRANSLATE-5375): Task Management, Workflows - no deadline reminder for tasks in state unconfirmed** <br>
+Send deadline reminder e-mail for tasks in state unconfirmed
+
+**[TRANSLATE-5369](https://jira.translate5.net/browse/TRANSLATE-5369): Import/Export - Excel Re-Import: Import Tag-Parsing seems to produce broken markup** <br>
+FIX: The Excel-Reimport parser did produce broken markup in rare situations
+
+**[TRANSLATE-5367](https://jira.translate5.net/browse/TRANSLATE-5367): t5memory - Tags remapping depends on the order of matches for t5memoryxliff tag handler** <br>
+Fixed bug which may cause tags to be improperly remapped in segment target.
+
+**[TRANSLATE-5364](https://jira.translate5.net/browse/TRANSLATE-5364): InstantTranslate - send to human revision not respecting client selection** <br>
+Fix problem where customer was changed for human revision tasks in case the user has more than one customer assigned.
+
+**[TRANSLATE-5361](https://jira.translate5.net/browse/TRANSLATE-5361): t5memory - t5memory produces invalid xml and can't process html entities in tu tag attributes** <br>
+Fix TU nodes on TMX export from t5memory
+Cleanup TU attributes on import to t5memory
+
+**[TRANSLATE-5359](https://jira.translate5.net/browse/TRANSLATE-5359): Task Management - User association window save button now always visible** <br>
+User Association: When adding or editing a user, the Save/Cancel buttons are now always visible; scrolling only applies to the form content.
+
+**[TRANSLATE-5356](https://jira.translate5.net/browse/TRANSLATE-5356): Hotfolder Import - COTI: Check for archives in standard correct folder structure** <br>
+Check for archives in standard correct folder structure
+
+**[TRANSLATE-5349](https://jira.translate5.net/browse/TRANSLATE-5349): MatchAnalysis & Pretranslation - Term collection repetitions not counted in the analysis** <br>
+Fix for a problem where term collection repetitions where skipped in the analysis.
+
+**[TRANSLATE-5346](https://jira.translate5.net/browse/TRANSLATE-5346): translate5 AI - Improve TQE for empty target segments** <br>
+Improve TQE empty target reasoning message.
+
+**[TRANSLATE-5337](https://jira.translate5.net/browse/TRANSLATE-5337): Content Protection, Editor general - edit source field in editor displays target format of content protection rule** <br>
+Fix displaying content protected tag while editing segment source.
+
+**[TRANSLATE-5319](https://jira.translate5.net/browse/TRANSLATE-5319): Editor general - PHP Error [E9999 core] Zend_Db_Statement_Exception: SQLSTATE[21000]: Cardinality violation** <br>
+PHP error fixed
+
+**[TRANSLATE-5318](https://jira.translate5.net/browse/TRANSLATE-5318): job coordinator, User Management - job coordinator cannot notify users: forbidden** <br>
+Allow Job Coordinator to send job notifications
+
+**[TRANSLATE-5317](https://jira.translate5.net/browse/TRANSLATE-5317): Editor general, localization - UI language switch in grid broken** <br>
+FIX: The GUI-locale switch in the segment-grid did not show all available locales and was not working properly
+
+**[TRANSLATE-5304](https://jira.translate5.net/browse/TRANSLATE-5304): InstantTranslate - InstantTranslate fails to load on specific customer / file filter combinations** <br>
+Fixed that InstantTranslate did not load in some situations.
+
+**[TRANSLATE-5244](https://jira.translate5.net/browse/TRANSLATE-5244): Package Ex and Re-Import - Reimport of Translator Package leads to invalid Markup** <br>
+FIX: translator package reimport may lead to errors due to tag-errors in diffing to evaluate track-changes
+
+**[TRANSLATE-5205](https://jira.translate5.net/browse/TRANSLATE-5205): InstantTranslate - Backend for missing default PM error not shown on human revision usage** <br>
+Do not clear and remove important error messages.
+
+**[TRANSLATE-5194](https://jira.translate5.net/browse/TRANSLATE-5194): Repetition editor, Search & Replace (editor) - search and replace dialogue and repetitions** <br>
+FIXED: Search & Replace window is now prevent from overlapping Repetitions window
+
+**[TRANSLATE-5151](https://jira.translate5.net/browse/TRANSLATE-5151): InstantTranslate - pre-selected languages in InstantTranslate not remembered** <br>
+Fix the problem where default instant translate pre-selected languages config was not evaluated correctly.
+
+
 ## [7.35.4] - 2026-03-09
 
 ### Important Notes:
