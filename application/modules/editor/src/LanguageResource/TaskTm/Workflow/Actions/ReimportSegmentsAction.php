@@ -48,7 +48,7 @@ class ReimportSegmentsAction extends AbstractAction
             $this->log,
             new ReimportSegmentsQueue(),
             new LanguageResourceRepository(),
-            new TaskTmRepository(),
+            TaskTmRepository::create(),
         ))->reimportSegments($task);
     }
 }

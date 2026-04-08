@@ -38,6 +38,33 @@ use ZfExtended_Factory;
 
 class TaskTmRepository
 {
+    public function __construct(
+        private readonly \Zend_Db_Adapter_Abstract $db,
+    ) {
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public static function create(): self
+    {
+        return new self(
+            \Zend_Db_Table::getDefaultAdapter(),
+        );
+    }
+
+    public function getLanguageResourceIdsList(): array
+    {
+        $s = $this->db->select()->from(
+            \MittagQI\Translate5\LanguageResource\TaskTm\Db\TaskTmTaskAssociation::TABLE,
+            [
+                'distinct(languageResourceId)',
+            ]
+        );
+
+        return $this->db->fetchCol($s);
+    }
+
     public function hasWritableOfType(string $taskGuid, string $serviceType): bool
     {
         $db = ZfExtended_Factory::get(TaskAssociation::class)->db;

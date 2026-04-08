@@ -56,7 +56,7 @@ class EventListener
         return new self(
             $eventManager,
             new editor_Services_Manager(),
-            new TaskTmRepository(),
+            TaskTmRepository::create(),
             AssociateTaskOperation::create(),
             TaskRepository::create(),
         );

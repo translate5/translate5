@@ -71,7 +71,7 @@ class UpdateSegmentOperation
         return new self(
             TaskRepository::create(),
             new LanguageResourceRepository(),
-            new TaskTmRepository(),
+            TaskTmRepository::create(),
             Zend_Registry::get('logger')->cloneMe('editor.languageresource.service'),
             Zend_Registry::get('config'),
             Zend_Registry::get('integration.segment.update'),

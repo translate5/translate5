@@ -49,7 +49,7 @@ $reimportSegmentsActionExecutor = new ReimportSegmentsActionExecutor(
     $logger,
     $queue,
     $languageResourceRepository,
-    new TaskTmRepository(),
+    TaskTmRepository::create(),
 );
 
 #region Check for version

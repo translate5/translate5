@@ -893,11 +893,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm', $queryRoute);
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/languageresourceinstance/synchronizetm/batch',
+            'editor/languageresourceinstance/synchronizetm/all',
             [
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',
-                'action' => 'synchronizetmbatch',
+                'action' => 'synchronizetmall',
             ]
         );
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm_batch', $queryRoute);

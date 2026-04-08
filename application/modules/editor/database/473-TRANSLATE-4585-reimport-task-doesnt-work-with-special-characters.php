@@ -47,7 +47,7 @@ $reimportSegmentsActionExecutor = new ReimportSegmentsActionExecutor(
     $logger,
     $queue,
     $languageResourceRepository,
-    new TaskTmRepository(),
+    TaskTmRepository::create(),
 );
 
 $select = $db->select()

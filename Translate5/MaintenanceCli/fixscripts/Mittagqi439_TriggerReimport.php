@@ -60,7 +60,7 @@ class Mittagqi439_TriggerReimport extends FixScriptAbstract
             Zend_Registry::get('logger'),
             new ReimportSegmentsQueue(),
             new LanguageResourceRepository(),
-            new TaskTmRepository(),
+            TaskTmRepository::create(),
         );
 
         foreach ($entries as $entry) {

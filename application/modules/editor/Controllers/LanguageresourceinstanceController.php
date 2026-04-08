@@ -30,6 +30,7 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\ConversionState;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\T5memory\ScheduleAllConverseMemoryWorker;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Export\QueuedExportService;
@@ -61,7 +62,7 @@ use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Localization;
-use MittagQI\ZfExtended\Sanitizer as Sanitizer;
+use MittagQI\ZfExtended\Sanitizer;
 use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 
 /**
@@ -351,20 +352,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $tmConversionService->scheduleConversion($postData['id']);
     }
 
-    public function synchronizetmbatchAction(): void
+    public function synchronizetmallAction(): void
     {
-        $postData = $this->getAllParams();
-        $tmConversionService = TmConversionService::create();
-
         $this->view->success = true;
 
-        foreach ($postData['data'] as $resource) {
-            if (ConversionState::NotConverted !== $tmConversionService->getConversionState((int) $postData)) {
-                continue;
-            }
-
-            $tmConversionService->scheduleConversion((int) $resource);
-        }
+        $worker = new ScheduleAllConverseMemoryWorker();
+        $worker->init();
+        $worker->queue();
     }
 
     /**

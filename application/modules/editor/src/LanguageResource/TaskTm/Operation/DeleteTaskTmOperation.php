@@ -49,7 +49,7 @@ class DeleteTaskTmOperation
     public static function create(): self
     {
         return new self(
-            new TaskTmRepository(),
+            TaskTmRepository::create(),
             new TaskTmTaskAssociationRepository(),
             DeleteLanguageResourceOperation::create(),
         );

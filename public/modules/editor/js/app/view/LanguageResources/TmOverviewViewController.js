@@ -84,16 +84,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
                     return;
                 }
 
-                let resources = [];
-                me.getView()
-                    .getStore()
-                    .each((rec) => resources.push(rec.get('id')));
-
                 Ext.Ajax.request({
-                    url: Editor.data.restpath + 'languageresourceinstance/synchronizetm/batch',
-                    jsonData: {
-                        data: resources,
-                    },
+                    url: Editor.data.restpath + 'languageresourceinstance/synchronizetm/all',
                     method: 'POST',
                     failure: (records, op) =>
                         Editor.app.getController('ServerException').handleException(op.error.response),
