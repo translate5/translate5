@@ -272,8 +272,7 @@ class UserJobRepository
     {
         //order first by matching role, then by the states as defined
         $order = $this->db->quoteInto(
-            'workflowStepName = ? DESC,'
-            . 'state="edit" DESC,'
+            'state="edit" DESC,'
             . 'state="view" DESC,'
             . 'state="unconfirmed" DESC,'
             . 'state="open" DESC,'
@@ -286,6 +285,7 @@ class UserJobRepository
             ->from(UserJobTable::TABLE_NAME)
             ->where('userGuid = ?', $userGuid)
             ->where('taskGuid = ?', $taskGuid)
+            ->where('workflowStepName = ?', $workflowStepName)
             ->where('type != ?', TypeEnum::Coordinator->value)
             ->order(new Zend_Db_Expr($order));
 

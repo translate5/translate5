@@ -35,6 +35,7 @@ use MittagQI\Translate5\ActionAssert\Permission\Exception\PermissionExceptionInt
 use MittagQI\Translate5\JobAssignment\Exception\ConfirmedCompetitiveJobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\CoordinatorHasNotConfirmedCoordinatorGroupJobYetException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\JobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyOneUniqueCoordinatorGroupJobCanBeAssignedPerTaskException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
@@ -48,6 +49,7 @@ interface CreateUserJobOperationInterface
      * @throws ConfirmedCompetitiveJobAlreadyExistsException
      * @throws CoordinatorHasNotConfirmedCoordinatorGroupJobYetException
      * @throws InexistentUserException
+     * @throws JobAlreadyExistsException
      * @throws \ZfExtended_NotAuthenticatedException
      * @throws \ZfExtended_NotFoundException
      * @throws PermissionExceptionInterface

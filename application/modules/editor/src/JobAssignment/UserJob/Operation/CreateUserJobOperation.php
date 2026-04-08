@@ -38,6 +38,7 @@ use MittagQI\Translate5\JobAssignment\DTO\TrackChangesRightsDto;
 use MittagQI\Translate5\JobAssignment\UserJob\Contract\CreateUserJobOperationInterface;
 use MittagQI\Translate5\JobAssignment\UserJob\Event\UserJobCreatedEvent;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\AttemptToAssignCoordinatorGroupUserJobBeforeCoordinatorGroupJobCreatedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\JobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Operation\DTO\NewUserJobDto;
 use MittagQI\Translate5\JobAssignment\UserJob\TypeEnum;
@@ -93,6 +94,16 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
 
         if (! $taskLock->isAcquired() && ! $taskLock->acquire()) {
             throw new RuntimeException('Could not acquire lock for task ' . $dto->taskGuid);
+        }
+
+        $job = $this->userJobRepository->findUserJobInTask(
+            $dto->userGuid,
+            $dto->taskGuid,
+            $dto->workflow->workflowStepName,
+        );
+
+        if (null !== $job) {
+            throw new JobAlreadyExistsException();
         }
 
         try {

@@ -48,6 +48,7 @@ use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidDeadlineDateStrin
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeFormatException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidSegmentRangeSemanticException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\InvalidStateProvidedException;
+use MittagQI\Translate5\JobAssignment\UserJob\Exception\JobAlreadyExistsException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\NotCoordinatorGroupCustomerTaskException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\OnlyCoordinatorCanBeAssignedToCoordinatorGroupJobException;
 use MittagQI\Translate5\JobAssignment\UserJob\Exception\TrackChangesRightsAreNotSubsetOfCoordinatorGroupJobException;
@@ -303,6 +304,14 @@ class JobExceptionTransformer
                 [
                     'id' => [
                         Localization::trans('coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job'),
+                    ],
+                ],
+            ),
+            JobAlreadyExistsException::class => UnprocessableEntity::createResponse(
+                'E1012',
+                [
+                    'userGuid' => [
+                        Localization::trans('The same user cannot be assigned to the same workflow step twice. Please select a different user or a different workflow step.'),
                     ],
                 ],
             ),
