@@ -103,18 +103,7 @@ class editor_ConfigController extends ZfExtended_RestController
 
         $type = $typeManager->getType($this->entity->getTypeClass());
 
-        $error = null;
         $value = (string) $this->data->value; //the value is validated as string, and is saved as string to DB later
-        if (! $type->validateValue($this->entity, $value, $error)) {
-            throw new ZfExtended_UnprocessableEntity('E1363', [
-                'errorMsg' => $error,
-            ]);
-        }
-        if (! $type->isValidInDefaults($this->entity, $value)) {
-            throw new ZfExtended_UnprocessableEntity('E1363', [
-                'errorMsg' => 'The given value(s) is/are not allowed according to the available default values.',
-            ]);
-        }
 
         $userGuid = $this->data->userGuid ?? null;
         if (! empty($userGuid)) {
@@ -144,6 +133,8 @@ class editor_ConfigController extends ZfExtended_RestController
         $logData = [];
         switch ($level) {
             case $this->entity::CONFIG_LEVEL_USER:
+                $this->validateValue($type, $value);
+
                 $userConfig = ZfExtended_Factory::get('editor_Models_UserConfig');
                 /* @var $userConfig editor_Models_UserConfig */
                 $oldValue = $userConfig->getCurrentValue($userGuid, $this->data->name);
@@ -161,6 +152,7 @@ class editor_ConfigController extends ZfExtended_RestController
 
                 break;
             case $this->entity::CONFIG_LEVEL_TASK:
+                $this->validateValue($type, $value);
 
                 $task = ZfExtended_Factory::get('editor_Models_Task');
                 /* @var $task editor_Models_Task */
@@ -201,6 +193,7 @@ class editor_ConfigController extends ZfExtended_RestController
                     $customerConfigService->deleteConfig($customerId, $this->data->name);
                     $this->entity->loadByName($this->data->name);
                 } else {
+                    $this->validateValue($type, $value);
                     $customerConfigService->upsertConfig($customerId, $this->data->name, $value);
                     //this value may not be saved! It is just for setting the return value to the gui.
                     $this->entity->setValue($value);
@@ -216,6 +209,8 @@ class editor_ConfigController extends ZfExtended_RestController
 
                 break;
             case $this->entity::CONFIG_LEVEL_INSTANCE:
+                $this->validateValue($type, $value);
+
                 $configService = ConfigService::create();
                 $configService->updateConfig($this->data->name, $value);
                 $logMessage = 'Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}"';
@@ -387,5 +382,23 @@ class editor_ConfigController extends ZfExtended_RestController
         }
 
         return $configLoader->loadInstanceConfig();
+    }
+
+    /**
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    private function validateValue(ZfExtended_DbConfig_Type_Abstract $type, string $value): void
+    {
+        $error = null;
+        if (! $type->validateValue($this->entity, $value, $error)) {
+            throw new ZfExtended_UnprocessableEntity('E1363', [
+                'errorMsg' => $error,
+            ]);
+        }
+        if (! $type->isValidInDefaults($this->entity, $value)) {
+            throw new ZfExtended_UnprocessableEntity('E1363', [
+                'errorMsg' => 'The given value(s) is/are not allowed according to the available default values.',
+            ]);
+        }
     }
 }
