@@ -273,12 +273,68 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
 
         $zip->close();
 
-        $files = [];
-        foreach (editor_Utils::generatePermutations('tmx') as $patter) {
-            $files[] = glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($patter)) ?: [];
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator($newPath, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
+                function (\SplFileInfo $current) {
+                    return ! str_starts_with($current->getBasename(), '.');
+                }
+            ),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        $notTmxFiles = [];
+        $tmxFiles = [];
+
+        foreach ($files as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
+            if (! $this->isTmxFile($file->getPathname())) {
+                $notTmxFiles[] = str_replace($newPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+
+                continue;
+            }
+
+            $tmxFiles[] = $file->getPathname();
         }
 
-        return array_merge(...$files);
+        if (! empty($notTmxFiles)) {
+            $this->logger->info(
+                'E1772',
+                'The following files in the uploaded zip were skipped as they are not valid TMX files:{files}',
+                [
+                    'files' => PHP_EOL . implode(PHP_EOL, $notTmxFiles),
+                    'languageResource' => $this->languageResource,
+                ]
+            );
+        }
+
+        return $tmxFiles;
+    }
+
+    private function isTmxFile(string $path): bool
+    {
+        $fh = fopen($path, 'rb');
+        if (! $fh) {
+            return false;
+        }
+
+        $head = fread($fh, 65536);
+        fclose($fh);
+
+        if ($head === false || $head === '') {
+            return false;
+        }
+
+        // Strip UTF-8 BOM if present
+        $head = preg_replace('/^\xEF\xBB\xBF/', '', $head);
+
+        // Trim leading whitespace/control-ish
+        $trimmed = ltrim($head);
+
+        return str_starts_with($trimmed, '<?xml') && str_contains($trimmed, '<tmx');
     }
 
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
