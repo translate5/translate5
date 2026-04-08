@@ -124,7 +124,7 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
     updateForm: function() {
         const form = this.lookupReference('associationForm');
 
-        const combo = form.down('combo[name=connectionOption]');
+        const combo = form.down('combo[name=connectionOptions]');
         const store = combo.getStore();
 
         Ext.Ajax.request({
@@ -190,7 +190,8 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
         if (form.isValid()) {
             const
                 association = Ext.create('Editor.model.LanguageResources.SyncAssoc', form.getValues()),
-                lrId = this.getView().languageResource.get('id')
+                lrId = this.getView().languageResource.get('id'),
+                combo = form.owner.down('combo[name=connectionOptions]')
             ;
 
             association.set('sourceLanguageResourceId', lrId);
@@ -199,7 +200,11 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindowViewController', {
                     const
                         store = button.up('window').down('grid').getStore(),
                         url = Editor.model.LanguageResources.SyncAssoc.proxy.url + '?languageResource=' + lrId
+                    ;
                     store.load({url: url});
+
+                    // Clear combo selection and reload its store
+                    combo.clearValue();
                     this.updateForm();
                 }
             });

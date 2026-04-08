@@ -41,6 +41,7 @@ use MittagQI\Translate5\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\ConnectionDeletedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\CustomerAddedEvent;
 use MittagQI\Translate5\CrossSynchronization\Events\CustomerRemovedEvent;
+use MittagQI\Translate5\CrossSynchronization\Exception\SameLanguageResourcePairExistsException;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -98,12 +99,16 @@ class CrossLanguageResourceSynchronizationService
         Language $sourceLang,
         Language $targetLang,
     ): CrossSynchronizationConnection {
-        $connection = $this->connectionRepository->createConnection(
-            $source,
-            $target,
-            $sourceLang,
-            $targetLang,
-        );
+        try {
+            $connection = $this->connectionRepository->createConnection(
+                $source,
+                $target,
+                $sourceLang,
+                $targetLang,
+            );
+        } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+            throw new SameLanguageResourcePairExistsException();
+        }
 
         $this->eventDispatcher->dispatch(new ConnectionCreatedEvent($connection));
 
@@ -253,6 +258,9 @@ class CrossLanguageResourceSynchronizationService
         }
     }
 
+    /**
+     * @throws SameLanguageResourcePairExistsException
+     */
     public function connect(
         LanguageResource $sourceLr,
         LanguageResource $targetLr,
@@ -311,7 +319,7 @@ class CrossLanguageResourceSynchronizationService
 
     /**
      * @param LanguagePair[] $supportedPairs
-     * @param array<string, string> $rfcToIdMap
+     * @param array<string, int> $rfcToIdMap
      */
     private function optionIsInSupportedLanguagePairs(
         PotentialConnectionOption $option,

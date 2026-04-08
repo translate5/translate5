@@ -42,10 +42,13 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
     height: 400,
     modal: true,
     controller: 'languageResourceSyncAssocWindow',
+    layout: {
+        type: 'vbox',
+        align: 'stretch'
+    },
     items: [
         {
             xtype: 'container',
-            region: 'north',
             height: 'auto',
             layout: {
                 type: 'hbox',
@@ -68,17 +71,18 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                             bind: {
                                 fieldLabel: '{l10n.general.targetLanguageResource}',
                             },
-                            name: 'connectionOption',
+                            name: 'connectionOptions',
                             store: {
                                 xtype: 'store',
                                 fields: ['id', 'name'],
                                 data: [] // Initially empty, will be set dynamically
                             },
+                            multiSelect: true,
                             queryMode: 'local',
                             displayField: 'name',
                             valueField: 'id',
                             allowBlank: false,
-                            width: 300,
+                            width: 400,
                             listConfig: {
                                 getInnerTpl: function () {
                                     return '<div style="white-space: nowrap; overflow: visible;">{[Ext.String.htmlEncode(values.name)]}</div>'; // Prevent text wrapping
@@ -151,6 +155,10 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
             },
             bind: {
                 emptyText: '{l10n.crossLanguageResourceSynchronization.emptyTableText}'
+            },
+            scrollable: 'y',
+            viewConfig: {
+                stripeRows: true
             },
             columns: [
                 {

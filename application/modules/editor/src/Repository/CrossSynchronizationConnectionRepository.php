@@ -63,6 +63,10 @@ class CrossSynchronizationConnectionRepository
         return $connection;
     }
 
+    /**
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
     public function createConnection(
         LanguageResource $source,
         LanguageResource $target,

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\CrossSynchronization\CrossSynchronizationConnection;
+use MittagQI\Translate5\CrossSynchronization\Exception\SameLanguageResourcePairExistsException;
 use MittagQI\Translate5\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -122,63 +123,56 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
     {
         $this->decodePutData();
 
-        if (empty($this->data['connectionOption'])) {
-            throw new MismatchException('E2000', ['connectionOption']);
-        }
-
-        $ids = explode(':', $this->data['connectionOption']);
-
-        if (count($ids) !== 3) {
-            throw new MismatchException('E2003', ['connectionOption']);
+        if (empty($this->data['connectionOptions'])) {
+            throw new MismatchException('E2000', ['connectionOptions']);
         }
 
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
+        $syncService = CrossLanguageResourceSynchronizationService::create();
 
-        [$lrId, $sourceLangId, $targetLangId] = array_map('intval', $ids);
+        $options = $this->data['connectionOptions'];
 
-        $source = $this->languageResourceRepository->get((int) ($this->data['sourceLanguageResourceId'] ?? 0));
-        $target = $this->languageResourceRepository->get($lrId);
+        $this->view->rows = [];
+        $parsedOptions = [];
 
-        $sourceLang = $this->languageRepository->get($sourceLangId);
-        $targetLang = $this->languageRepository->get($targetLangId);
+        $lrIds = [];
 
-        CrossLanguageResourceSynchronizationService::create()->connect($source, $target, $sourceLang, $targetLang);
+        foreach ($options as $option) {
+            $ids = explode(':', $option);
 
-        $this->log->info(
-            'E1685',
-            'Synchronisation Audit: {message}',
-            [
-                'message' => sprintf(
-                    'User %s connected %s:%s to %s:%s - %s->%s',
-                    $authUser->getUsernameLong(),
-                    $source->getServiceName(),
-                    $source->getName(),
-                    $target->getServiceName(),
-                    $target->getName(),
-                    $sourceLang->getRfc5646(),
-                    $targetLang->getRfc5646(),
-                ),
-                'userUserGuid' => $authUser->getUserGuid(),
-                'sourceLanguageResourceId' => $source->getId(),
-                'targetLanguageResourceId' => $lrId,
-            ]
-        );
+            if (count($ids) !== 3) {
+                throw new MismatchException('E2003', ['connectionOptions']);
+            }
 
-        $this->view->rows = (object) [
-            'id' => $source->getId() . ':' . $target->getId(),
-            'sourceLanguageResourceId' => $source->getId(),
-            'targetLanguageResourceId' => $target->getId(),
-            'sourceLanguageResourceName' => $source->getServiceName() . ': ' . $source->getName(),
-            'targetLanguageResourceName' => $target->getServiceName() . ': ' . $target->getName(),
-            'sourceLanguage' => $sourceLang->getLangName(),
-            'targetLanguage' => $targetLang->getLangName(),
-        ];
+            [$lrId, $sourceLangId, $targetLangId] = array_map('intval', $ids);
+
+            if (isset($lrIds[$lrId])) {
+                $target = $this->languageResourceRepository->get($lrId);
+                MismatchException::addCodes([
+                    'E2006' => 'Language Resource "{0}" is given multiple times in connectionOptions. Each Language Resource may only be connected once.',
+                ]);
+
+                throw new MismatchException('E2006', [$target->getServiceName() . ': ' . $target->getName()]);
+            }
+
+            $lrIds[$lrId] = true;
+
+            $parsedOptions[] = [$lrId, $sourceLangId, $targetLangId];
+        }
+
+        foreach ($parsedOptions as $option) {
+            $this->view->rows[] = (object) $this->connectLanguageResources($option, $syncService, $authUser);
+        }
     }
 
     public function deleteAction(): void
     {
         $syncService = CrossLanguageResourceSynchronizationService::create();
         $connection = $syncService->findConnection((int) $this->_getParam('id'));
+
+        if ($connection === null) {
+            return;
+        }
 
         $authUser = $this->userRepository->get(ZfExtended_Authentication::getInstance()->getUserid());
 
@@ -208,9 +202,7 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
             ]
         );
 
-        if (null !== $connection) {
-            $syncService->deleteConnection($connection);
-        }
+        $syncService->deleteConnection($connection);
     }
 
     public function queuesynchronizeAction(): void
@@ -240,5 +232,59 @@ class editor_LanguageresourcesyncconnectionController extends ZfExtended_RestCon
         );
 
         SynchronisationDirigent::create()->queueConnectionSynchronization($connection);
+    }
+
+    public function connectLanguageResources(
+        array $option,
+        CrossLanguageResourceSynchronizationService $syncService,
+        \MittagQI\Translate5\User\Model\User $authUser
+    ): array {
+        [$lrId, $sourceLangId, $targetLangId] = $option;
+
+        $source = $this->languageResourceRepository->get((int) ($this->data['sourceLanguageResourceId'] ?? 0));
+        $target = $this->languageResourceRepository->get($lrId);
+
+        $sourceLang = $this->languageRepository->get($sourceLangId);
+        $targetLang = $this->languageRepository->get($targetLangId);
+
+        try {
+            $syncService->connect($source, $target, $sourceLang, $targetLang);
+        } catch (SameLanguageResourcePairExistsException) {
+            MismatchException::addCodes([
+                'E2006' => 'Language Resource "{0}" is given multiple times in connectionOptions. Each Language Resource may only be connected once.',
+            ]);
+
+            throw new MismatchException('E2006', [$target->getServiceName() . ': ' . $target->getName()]);
+        }
+
+        $this->log->info(
+            'E1685',
+            'Synchronisation Audit: {message}',
+            [
+                'message' => sprintf(
+                    'User %s connected %s:%s to %s:%s - %s->%s',
+                    $authUser->getUsernameLong(),
+                    $source->getServiceName(),
+                    $source->getName(),
+                    $target->getServiceName(),
+                    $target->getName(),
+                    $sourceLang->getRfc5646(),
+                    $targetLang->getRfc5646(),
+                ),
+                'userUserGuid' => $authUser->getUserGuid(),
+                'sourceLanguageResourceId' => $source->getId(),
+                'targetLanguageResourceId' => $lrId,
+            ]
+        );
+
+        return [
+            'id' => $source->getId() . ':' . $target->getId(),
+            'sourceLanguageResourceId' => $source->getId(),
+            'targetLanguageResourceId' => $target->getId(),
+            'sourceLanguageResourceName' => $source->getServiceName() . ': ' . $source->getName(),
+            'targetLanguageResourceName' => $target->getServiceName() . ': ' . $target->getName(),
+            'sourceLanguage' => $sourceLang->getLangName(),
+            'targetLanguage' => $targetLang->getLangName(),
+        ];
     }
 }
