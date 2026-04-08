@@ -63,8 +63,8 @@ final readonly class SearchDTO
         public bool $contextCaseSensitive,
         public bool $onlyCount,
     ) {
-        $this->source = preg_replace('/&(?!#?[a-zA-Z0-9]+;)/', '&amp;', $source);
-        $this->target = preg_replace('/&(?!#?[a-zA-Z0-9]+;)/', '&amp;', $target);
+        $this->source = $this->escapeString($source);
+        $this->target = $this->escapeString($target);
     }
 
     public static function fromArray(array $data): static
@@ -128,5 +128,24 @@ final readonly class SearchDTO
             contextCaseSensitive: true,
             onlyCount: false,
         );
+    }
+
+    private function escapeString(string $text): string
+    {
+        // regex to catch all tags - matches opening, closing, and self-closing tags
+        // Includes: <tag>, </tag>, <tag/>, <tag attr="value"/>, <ns:tag>, etc.
+        $tagRegex = '/<[\w|\/][^>]+>/';
+
+        preg_match_all($tagRegex, $text, $tagMatches);
+        $noTagParts = preg_split($tagRegex, $text);
+
+        $result = '';
+
+        foreach ($noTagParts as $index => $part) {
+            $result .= str_replace('"', '&quot;', htmlentities($part, ENT_XML1, double_encode: false));
+            $result .= $tagMatches[0][$index] ?? '';
+        }
+
+        return $result;
     }
 }
