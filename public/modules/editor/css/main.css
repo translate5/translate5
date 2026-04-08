@@ -2294,6 +2294,37 @@ div.internal-tag.number span.full::after {
     min-height: 100%;
 }
 
+@font-face {
+    font-family: 'GoogleSans';
+    src: url('/modules/editor/fonts/googlesans.ttf');
+}
+
+@font-face {
+    font-family: 'GoogleSansVisibleSpaces';
+    src: url('/modules/editor/fonts/googlesans-visible-spaces.ttf');
+}
+
+#segment-grid [id^=t5editor] .ck.ck-editor,
+#segment-grid [id^=t5editor] .ck.ck-editor__main > .ck-editor__editable,
+#segment-grid .segment-tag-column.type-target,
+#segment-grid .segment-tag-column.type-source,
+#segment-grid .segment-content {
+    font-family: GoogleSans, sans-serif !important;
+}
+
+#segment-grid .internal-tag {
+    font-family: sans-serif !important;
+}
+
+#segment-grid.visible-spaces [id^=t5editor] .ck.ck-editor,
+#segment-grid.visible-spaces [id^=t5editor] .ck.ck-editor__main > .ck-editor__editable,
+#segment-grid.visible-spaces .segment-tag-column.type-target,
+#segment-grid.visible-spaces .segment-tag-column.type-source,
+#segment-grid.visible-spaces .segment-tag-container,
+#segment-grid.visible-spaces {
+    font-family: GoogleSansVisibleSpaces, sans-serif !important;
+}
+
 /* TODO FIX THIS */
 #segment-grid [id^=t5editor] .ck.ck-editor__main {
     width: 100%;

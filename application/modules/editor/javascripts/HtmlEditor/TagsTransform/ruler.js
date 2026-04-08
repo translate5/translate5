@@ -16,6 +16,7 @@ export default class Ruler {
         this.rulerElement.style.left = '-1000px';
         this.rulerElement.style.top = '-1000px';
         this.rulerElement.style.visibility = 'hidden';
+        this.rulerElement.style.fontFamily = 'sans-serif';
 
         editorElement.appendChild(this.rulerElement);
     }

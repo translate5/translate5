@@ -211,6 +211,7 @@ Ext.define('Editor.controller.Editor', {
         // -------------------------------------------------------------------------------------
         me.keyMapConfig = {
             'ctrl-d': ['D', {ctrl: true, alt: false}, me.watchSegment, true],
+            'ctrl-f10': [Ext.EventObjectImpl.F10, {ctrl: true, alt: false, shift: false}, function() { me.toggleVisibleSpaces(true); }, true],
             'ctrl-s': ['S', {ctrl: true, alt: false, shift: false}, me.save, true],
             'ctrl-shift-s': ['S', {ctrl: true, alt: false, shift: true}, me.saveDraft, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
@@ -2237,6 +2238,24 @@ Ext.define('Editor.controller.Editor', {
         }
 
         return '';
+    },
+
+    toggleVisibleSpaces: function(isInternalCall) {
+        if (!this.getSegmentGrid())
+        {
+            return;
+        }
+
+        var button = this.getSegmentGrid().down('segmentsToolbar #toggleVisibleSpacesBtn');
+        if (isInternalCall === true) {
+            button.setPressed(!button.pressed);
+        }
+
+        if (button.pressed) {
+            document.querySelector('#segment-grid').classList.add('visible-spaces');
+        } else {
+            document.querySelector('#segment-grid').classList.remove('visible-spaces');
+        }
     },
 
     //

@@ -534,9 +534,7 @@ export default class TagsConversion {
      * @private
      */
     _getSvg(text, width, editorElement) {
-        let prefix = 'data:image/svg+xml;charset=utf-8,',
-            svg = '',
-            styles = this._getStyle(
+        let styles = this._getStyle(
                 editorElement,
                 [
                     'font-size',
@@ -555,13 +553,13 @@ export default class TagsConversion {
             lineHeight = Math.round(styles['font-size'].replace(/px/, ''));
         }
 
-        svg += '<svg xmlns="http://www.w3.org/2000/svg" height="' + lineHeight + '" width="' + width + '">';
+        let svg = '<svg xmlns="http://www.w3.org/2000/svg" height="' + lineHeight + '" width="' + (width + 1) + '">';
         svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
         svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="'
-            + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">';
+            + styles['font-weight'] + '" font-family="sans-serif">';
         svg += htmlEncode(text).replace('&amp;nbsp;', '&nbsp;') + '</text></svg>';
 
-        return prefix + encodeURI(svg);
+        return 'data:image/svg+xml;charset=utf-8,' + encodeURI(svg);
     }
 
     _getStyle(element, styleProps) {

@@ -52,6 +52,7 @@ Ext.define('Editor.view.segments.column.Content', {
   fieldName: null,
   minWidth: 250,
   width: 250,
+  emptyCellText: '',
   //resizable: false,
   //fixed: true,
   isContentColumn: true,

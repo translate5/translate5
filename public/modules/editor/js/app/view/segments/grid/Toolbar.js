@@ -266,6 +266,19 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator',
                 },
                 {
+                    xtype: 'button',
+                    glyph: 'f1dd@FontAwesome5FreeSolid',
+                    itemId: 'toggleVisibleSpacesBtn',
+                    enableToggle: true,
+                    dispatcher: true,
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.toggleVisibleSpaces}',
+                    }
+                },
+                {
+                    xtype: 'tbseparator',
+                },
+                {
                     itemId: 'saveBtn',
                     dispatcher: true,
                     hidden: !~checkedItems.indexOf('saveBtn'),
