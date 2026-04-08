@@ -193,5 +193,16 @@ class ConvertT5MemoryTagServiceTest extends TestCase
                 'target' => 'string <t5:n id="2" r="ccc" n="0.0"/> [<t5:n id="1001" r="utf-char" n="0b"/>] string',
             ],
         ];
+
+        yield 'pair with utf-char tag' => [
+            'pair' => [
+                'source' => 'string 0,0 [] string',
+                'target' => 'string 0.0 [] string',
+            ],
+            'expected' => [
+                'source' => 'string <t5:n id="2" r="0zfQMdAHAA==" n="0,0"/> [<t5:n id="1001" r="utf-char" n="0b"/>] string',
+                'target' => 'string <t5:n id="2" r="0zfQMdAHAA==" n="0.0"/> [<t5:n id="1001" r="utf-char" n="0b"/>] string',
+            ],
+        ];
     }
 }

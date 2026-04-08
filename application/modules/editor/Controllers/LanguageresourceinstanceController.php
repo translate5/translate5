@@ -60,6 +60,7 @@ use MittagQI\Translate5\T5Memory\ExportMemoryWorker;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\Defaults\LanguageResourcesDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Validation\File\MimeTypeValidator;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Sanitizer;
@@ -1543,7 +1544,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         // =============== workaround (end) ============================================
         $upload->addValidators([
-            new Zend_Validate_File_MimeType($allValidMimeTypes),
+            new MimeTypeValidator($allValidMimeTypes),
             new Zend_Validate_File_Extension($validExtension),
         ]);
         // CAUTON: The validators don't know which extensions are allowed for which extension.
