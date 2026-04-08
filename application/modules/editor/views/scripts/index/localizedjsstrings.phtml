@@ -630,31 +630,6 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.task.filter.FilterWindow", {
         override: "Editor.view.admin.task.filter.FilterWindow",
         strings:{
-            workflowLabel: '<?php echo $this->translate->_('Workflow'); ?>',
-        	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status'); ?>',
-        	workflowUserRoleLabel: '<?php echo $this->translate->_('Workflowschritt-Typ'); ?>',
-            workflowUserRoleTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit einem Workflow-Schritt des gewählten Typs zugewiesen ist'); ?>',
-            workflowStepLabel: '<?php echo $this->translate->_('Workflow-Schritt'); ?>',
-            workflowStepTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit dem gewählten Workflow-Schritt zugewiesen ist'); ?>',
-        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer'); ?>',
-        	applyBtn: '<?php echo $this->translate->_('Anwenden'); ?>',
-        	cancelBtn: '<?php echo $this->translate->_('Abbrechen'); ?>',
-        	title:'<?php echo $this->translate->_('Erweiterte Filter'); ?>',
-            min: '<?php echo $this->translate->_('min'); ?>',
-            max: '<?php echo $this->translate->_('max'); ?>',
-            matchRate: '<?php echo $this->translate->_('Matchrate'); ?>',
-            resourceType: '<?php echo $this->translate->_('Typ der Ressource'); ?>',
-            langResources: '<?php echo $this->translate->_('Sprachressourcen'); ?>',
-            anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar'); ?>',
-        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte'); ?>',
-            assignmentDateText:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum'); ?>',
-            finishedDateText:'<?php echo $this->translate->_('Benutzer-Abschlussdatum'); ?>',
-            deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s'); ?>',
-            type:'<?php echo $this->translate->_('Typ'); ?>',
-            translatorStep:'<?php echo $this->translate->_('Übersetzung'); ?>',
-            reviewerStep:'<?php echo $this->translate->_('Lektorat'); ?>',
-            translatorCheckStep:'<?php echo $this->translate->_('Finales Lektorat'); ?>',
-            visitorStep:'<?php echo $this->translate->_('Nur lesen'); ?>'
         }
     });
 
@@ -2233,6 +2208,36 @@ Editor.data.l10n = {
         progress: {
             taskProgress: '<?php echo $this->translate->_('Alles über Fortschritt')?>',
             userProgress: '<?php echo $this->translate->_('Persönlicher Fortschritt')?>',
+        },
+        filterWindow: {
+            fieldset1: '<?php echo $this->translate->_('Relation: Complete task'); ?>',
+            fieldset2: '<?php echo $this->translate->_('Relation: Job assignment / Workflow step'); ?>',
+            fieldset3: '<?php echo $this->translate->_('Relation: Segments within a task'); ?>',
+            workflowLabel: '<?php echo $this->translate->_('Workflow'); ?>',
+            workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status'); ?>',
+            workflowUserRoleLabel: '<?php echo $this->translate->_('Workflowschritt-Typ'); ?>',
+            workflowUserRoleTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit einem Workflow-Schritt des gewählten Typs zugewiesen ist'); ?>',
+            workflowStepLabel: '<?php echo $this->translate->_('Workflow-Schritt'); ?>',
+            workflowStepTip: '<?php echo $this->translate->_('Filtert alle Aufgaben, denen ein Job mit dem gewählten Workflow-Schritt zugewiesen ist'); ?>',
+            userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer'); ?>',
+            applyBtn: '<?php echo $this->translate->_('Anwenden'); ?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen'); ?>',
+            title:'<?php echo $this->translate->_('Erweiterte Filter'); ?>',
+            min: '<?php echo $this->translate->_('min'); ?>',
+            max: '<?php echo $this->translate->_('max'); ?>',
+            matchRate: '<?php echo $this->translate->_('Matchrate'); ?>',
+            resourceType: '<?php echo $this->translate->_('Typ der Ressource'); ?>',
+            langResources: '<?php echo $this->translate->_('Sprachressourcen'); ?>',
+            anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar'); ?>',
+            gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte'); ?>',
+            assignmentDateText:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum'); ?>',
+            finishedDateText:'<?php echo $this->translate->_('Benutzer-Abschlussdatum'); ?>',
+            deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s'); ?>',
+            type:'<?php echo $this->translate->_('Typ'); ?>',
+            translatorStep:'<?php echo $this->translate->_('Übersetzung'); ?>',
+            reviewerStep:'<?php echo $this->translate->_('Lektorat'); ?>',
+            translatorCheckStep:'<?php echo $this->translate->_('Finales Lektorat'); ?>',
+            visitorStep:'<?php echo $this->translate->_('Nur lesen'); ?>'
         }
     },
     taskCustomField: {

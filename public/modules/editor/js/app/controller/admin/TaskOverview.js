@@ -767,7 +767,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             record = filterHolder.selection ? filterHolder.selection : [];
         //reload the usersList store so the new task filter is applied
         Ext.StoreMgr.get('admin.UsersList').load();
-        me.advancedFilterWindow = Ext.widget('editorAdminTaskFilterFilterWindow');
+        me.advancedFilterWindow = Ext.ComponentQuery.query('#editorAdminTaskFilterFilterWindow')[0];
+
+        if (!me.advancedFilterWindow) {
+            me.advancedFilterWindow = Ext.widget('editorAdminTaskFilterFilterWindow');
+        }
+
         me.advancedFilterWindow.loadRecord(record);
         me.advancedFilterWindow.show();
     },

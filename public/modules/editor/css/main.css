@@ -2339,3 +2339,13 @@ ins.tmMatchGridResultTooltip {
 .x-menu-item.isRepeated-include-first {
     border-top: 1px solid gray;
 }
+[data-componentid^="editorAdminTaskFilterFilterWindow-"] legend.x-fieldset-header {
+    padding: 0;
+}
+[data-componentid^="editorAdminTaskFilterFilterWindow-"] .info_image {
+    position: absolute;
+    margin-left: 5px;
+}
+[data-componentid^="editorAdminTaskFilterFilterWindow-"] .x-window-body {
+    overflow-x: clip !important;
+}
