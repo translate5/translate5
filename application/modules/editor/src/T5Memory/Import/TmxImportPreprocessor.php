@@ -43,6 +43,7 @@ use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionP
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\FixCreationTimeProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveDifferentLanguageNodesProcessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TransformTuProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
 use MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract\BrokenTranslationUnitLoggerInterface;
@@ -73,8 +74,9 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
             [
                 RemoveDifferentLanguageNodesProcessor::create(),
                 RemoveCompromisedSegmentsProcessor::create(),
-                ContentProtectionProcessor::create(),
+                TransformTuProcessor::create(),
                 TranslationUnitResegmentProcessor::create(),
+                ContentProtectionProcessor::create(),
                 AddFakeContextProcessor::create(),
                 CapitaliseAuthorProcessor::create(),
                 FixCreationTimeProcessor::create(),

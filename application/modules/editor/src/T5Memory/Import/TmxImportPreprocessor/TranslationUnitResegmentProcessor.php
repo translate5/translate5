@@ -68,7 +68,7 @@ class TranslationUnitResegmentProcessor extends Processor
 
     public function order(): int
     {
-        return 100;
+        return 150;
     }
 
     protected function processTu(

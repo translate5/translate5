@@ -58,6 +58,7 @@ class BrokenTranslationUnitLogger implements BrokenTranslationUnitLoggerInterfac
                 TranslationUnitCollector\UnexpectedStructureCollector::create($artefactDir),
                 TranslationUnitCollector\CompromisedTuCollector::create($artefactDir),
                 TranslationUnitCollector\LanguagePairMismatchCollector::create($artefactDir),
+                TranslationUnitCollector\NotMappedFieldsCollector::create($artefactDir),
             ]
         );
     }

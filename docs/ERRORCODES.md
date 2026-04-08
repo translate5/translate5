@@ -965,10 +965,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1625"></a>E1625 | Content Protection | Protection Tag doesn't has required meta info. Fuzzy searches may return worse match rate | Task was created with older version of code so Protection tags may not have required meta info. If that impacts current work - clone task for re-import |
 
 #### TMX Processing
-| EventCode               | Context        | EventMessage                                                                                                               | Description/Solution                                    |
-|:------------------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------|
-| <a id="E1770"></a>E1770 | TMX Processing | Translation units were skipped for matching config regex: runtimeOptions.tmxImportProcessor.removeCompromisedSegmentsRegex | Regex in config specifies compromised segments          |
-| <a id="E1771"></a>E1771 | TMX Processing | Translation units were skipped as doesn't match language pair of Language resource                                         | Only exact language matches may be imported into memory |
+| EventCode               | Context        | EventMessage                                                                                                               | Description/Solution                                                                    |
+|:------------------------|:---------------|:---------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
+| <a id="E1770"></a>E1770 | TMX Processing | Translation units were skipped for matching config regex: runtimeOptions.tmxImportProcessor.removeCompromisedSegmentsRegex | Regex in config specifies compromised segments                                          |
+| <a id="E1771"></a>E1771 | TMX Processing | Translation units were skipped as doesn't match language pair of Language resource                                         | Only exact language matches may be imported into memory                                 |
+| <a id="E1779"></a>E1779 | TMX Processing | Some translation units had properties or attributes that could not be mapped to t5memory TMX structure                     | Mapping can be provided in config runtimeOptions.tmxImportProcessor.transformTusMapping |
 
 #### Private plug-in for Plunet connection
 
