@@ -46,7 +46,14 @@ class OkapiSegmentationTest extends UnitTestAbstract
         $srx = $bconf->getDefaultBconf()->getSrx('source');
 
         // Text to be splitted by segments
-        $text = 'Herzlich Willkommen zum Verkaufstraining für die barrierefreie Nullschwelle in Verbindung mit dem Schüco AD UP. Nutzen Sie die Abschnitte rechts, um das Produkt kennenzulernen und sich optimal auf die Beratung Ihrer Partner und Kunden vorzubereiten. Am Ende eines Abschnitts werden Sie auf Quizfragen stoßen, die Ihnen helfen, Ihr Wissen zu überprüfen. Beantworten Sie 80% der Fragen richtig für einen erfolgreichen Abschluss. Die Offline-Präsentation wird von David O. McKay und B. H. Roberts durchgeführt. Los geht\'s!';
+        $text =
+            'Herzlich Willkommen zum Verkaufstraining für die barrierefreie Nullschwelle in Verbindung mit dem Test AD UP. ' .
+            'Nutzen Sie die Abschnitte rechts, um das Produkt kennenzulernen und sich optimal auf die Beratung Ihrer Partner und Kunden vorzubereiten. ' .
+            'Am Ende eines Abschnitts werden Sie auf Quizfragen stoßen, die Ihnen helfen, Ihr Wissen zu überprüfen. ' .
+            'Beantworten Sie 80% der Fragen richtig für einen erfolgreichen Abschluss. ' .
+            'Die Offline-Präsentation wird von David O. McKay und B. H. Roberts durchgeführt. ' .
+            'Die Test GmbH + Co. KG mit Sitz in Stuttgart ist cool. ' .
+            'Los geht\'s!';
 
         // Get SRX-based splitting-rules
         $rules = $srx->getSegmentationRules(self::$sourceLangRfc);

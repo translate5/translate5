@@ -58,7 +58,7 @@ class OkapiBconfTest extends JsonTestAbstract
         if (! Zend_Registry::isRegistered('Zend_Locale')) {
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
         }
-
+        // import bconfs to work with
         self::$testBconf = $config->addBconf('TestBconfMinimal', 'minimal/batchConfiguration.t5.bconf');
         self::$xsltBconf = $config->addBconf('TestBconfXsltXlfCdata', 'xslt_xlf_cdata/XsltAndXlfWithCData.bconf');
     }
@@ -85,6 +85,10 @@ class OkapiBconfTest extends JsonTestAbstract
         $input = static::api()->getFile('minimal/batchConfiguration.t5.bconf');
         $output = static::$bconf->getPath();
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
+
+        if (static::api()->isCapturing()) {
+            file_put_contents($input, file_get_contents($output));
+        }
 
         self::assertFileEquals($input, $output, $failureMsg);
 
@@ -207,6 +211,7 @@ class OkapiBconfTest extends JsonTestAbstract
             $config
                 ->addTask('de', 'en')
                 ->addUploadFile('workfiles/TRANSLATE-2266-de-en.txt')
+                ->setMaxWaitTime(100)
         );
     }
 
@@ -227,6 +232,7 @@ class OkapiBconfTest extends JsonTestAbstract
                     'workfiles/TRANSLATE-2266-de-en.txt',
                     'workfiles/TRANSLATE-2266-de-en-2.txt',
                 ])
+                ->setMaxWaitTime(100)
         );
     }
 

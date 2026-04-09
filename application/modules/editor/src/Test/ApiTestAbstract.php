@@ -395,9 +395,15 @@ abstract class ApiTestAbstract extends TestCase
     /**
      * Is called once in the first API-Test of a test-run
      * Creates the appState for the run
+     * Initializes stuff that must be set for any test
      */
     private static function testRunSetup(Helper $api)
     {
+        // ensure, we have a default bconf created, which is a prequesite for a lot of tests to work
+        // this is neccessary when running tests on a recreated test-DB (what deletes all existing BCONFs)
+        $bconf = new \MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity();
+        $bconf->importDefaultWhenNeeded();
+
         // for dev-purposes it may be unwanted to have all the environment-tests before running the test
         // this reduces the requests to a single request on the app-state and an initial login
         if ($api->doSkipPretests()) {

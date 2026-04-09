@@ -54,12 +54,12 @@ class OkapiExportBconfTest extends JsonTestAbstract
         static::assertStringStartsWith(
             'TestBconf',
             self::$bconf1->getName(),
-            'Imported bconf\'s name is not like ' . 'TestBconf' . ' but ' . self::$bconf1->getName()
+            'Imported bconf\'s name is not like TestBconf but ' . self::$bconf1->getName()
         );
         static::assertStringStartsWith(
             'JsonBconf',
             self::$bconf2->getName(),
-            'Imported bconf\'s name is not like ' . 'JsonBconf' . ' but ' . self::$bconf2->getName()
+            'Imported bconf\'s name is not like JsonBconf but ' . self::$bconf2->getName()
         );
     }
 

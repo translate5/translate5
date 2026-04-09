@@ -59,6 +59,7 @@ class OkapiExtensionMappingTest extends JsonTestAbstract
         $task = $config
             ->addTask('en', 'de', -1, 'textfiles-uvw-xyz-en-de.zip')
             ->setImportBconfId(static::$testBconf->getId())
+            ->setMaxWaitTime(100)
             ->setToEditAfterImport();
         $config->import($task);
         $segments = static::api()->getSegments();
@@ -73,6 +74,7 @@ class OkapiExtensionMappingTest extends JsonTestAbstract
         $config = static::getConfig();
         $task = $config
             ->addTask('en', 'de', -1, 'extensions-embedded-matching-en-de.zip')
+            ->setMaxWaitTime(100)
             ->setToEditAfterImport();
         $config->import($task);
         $segments = static::api()->getSegments();
