@@ -35,9 +35,9 @@ use ZfExtended_Models_Entity_Abstract;
 /**
  * User Filter Preset Entity Object
  *
- * @method int getId()
+ * @method string getId()
  * @method void setId(int $id)
- * @method int getUserId()
+ * @method string getUserId()
  * @method void setUserId(int $userId)
  * @method string getTitle()
  * @method void setTitle(string $title)

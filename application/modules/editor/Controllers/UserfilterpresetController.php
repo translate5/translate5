@@ -148,7 +148,7 @@ class editor_UserfilterpresetController extends ZfExtended_RestController
         $this->entityLoad();
 
         // If non-owner is trying to delete the preset - throw an exception
-        if ($this->entity->getUserId() !== $this->user()->getId()) {
+        if ((int) $this->entity->getUserId() !== (int) $this->user()->getId()) {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
 

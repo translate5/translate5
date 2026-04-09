@@ -174,12 +174,12 @@ class Editor_CustomerController extends ZfExtended_RestController
 
         $source = $this->getParam('copyDefaultAssignmentsCustomer', false);
         if (! empty($source)) {
-            $copy->copyUserAssoc($source, $this->entity->getId());
+            $copy->copyUserAssoc($source, (int) $this->entity->getId());
         }
 
         $source = $this->getParam('copyConfigCustomer', false);
         if (! empty($source)) {
-            $copy->copyConfig($source, $this->entity->getId());
+            $copy->copyConfig($source, (int) $this->entity->getId());
         }
     }
 
