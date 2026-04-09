@@ -8298,9 +8298,9 @@ another user has accepted the task <b>{task.taskNr} - {task.taskName}</b> in the
                 <source>Ø Levenshtein distance before the start of the workflow</source>
                 <target>Ø Levenshtein distance before the start of the workflow</target>
             </trans-unit>
-            <trans-unit id="w5ggTGV2ZW5zaHRlaW4gZGlzdGFuY2UgZnJvbSB0aGUgc3RhcnQgb2YgdGhlIHdvcmtmbG93">
-                <source>Ø Levenshtein distance from the start of the workflow</source>
-                <target>Ø Levenshtein distance from the start of the workflow</target>
+            <trans-unit id="w5ggTGV2ZW5zaHRlaW4gZGlzdGFuY2UgZnJvbSBpbXBvcnQvcHJlLXRyYW5zbGF0aW9u">
+                <source>Ø Levenshtein distance from import/pre-translation</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="w5ggTGV2ZW5zaHRlaW4gZGlzdGFuY2Ugd2l0aGluIG9uZSB3b3JrZmxvdyBzdGVw">
                 <source>Ø Levenshtein distance within one workflow step</source>
@@ -8314,9 +8314,9 @@ another user has accepted the task <b>{task.taskNr} - {task.taskName}</b> in the
                 <source>Ø Post-editing time before the beginning of the workflow</source>
                 <target>Ø Post-editing time before the beginning of the workflow</target>
             </trans-unit>
-            <trans-unit id="w5ggUG9zdC1lZGl0aW5nIHRpbWUgZnJvbSB0aGUgYmVnaW5uaW5nIG9mIHRoZSB3b3JrZmxvdw==">
-                <source>Ø Post-editing time from the beginning of the workflow</source>
-                <target>Ø Post-editing time from the beginning of the workflow</target>
+            <trans-unit id="w5ggUG9zdC1lZGl0aW5nIHRpbWUgc2luY2UgaW1wb3J0L3ByZS10cmFuc2xhdGlvbg==">
+                <source>Ø Post-editing time since import/pre-translation</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="w5ggUG9zdC1lZGl0aW5nIHRpbWUgd2l0aGluIG9uZSB3b3JrZmxvdyBzdGVw">
                 <source>Ø Post-editing time within one workflow step</source>
