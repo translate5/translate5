@@ -310,6 +310,37 @@ class UserJobRepository
         return $job;
     }
 
+    public function findPmOverrideJob(string $userGuid, string $taskGuid): ?UserJob
+    {
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('userGuid = ?', $userGuid)
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('isPmOverride = 1')
+            ->where('type != ?', TypeEnum::Coordinator->value)
+        ;
+
+        $row = $this->db->fetchRow($s);
+
+        if (empty($row)) {
+            return null;
+        }
+
+        $job = new UserJob();
+        $job->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $job->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $job;
+    }
+
     /**
      * @return int[]
      */

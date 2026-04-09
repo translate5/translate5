@@ -30,10 +30,13 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Workflow\Assert;
 
+use editor_Models_Task as Task;
+use editor_Models_TaskUserAssoc as Job;
 use editor_Workflow_Default;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use ZfExtended_NoAccessException;
 
@@ -43,6 +46,7 @@ class WriteableWorkflowAssert
         private readonly TaskRepository $taskRepository,
         private readonly UserJobRepository $userJobRepository,
         private readonly editor_Workflow_Manager $workflowManager,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -52,6 +56,7 @@ class WriteableWorkflowAssert
             TaskRepository::create(),
             UserJobRepository::create(),
             new editor_Workflow_Manager(),
+            UserRepository::create(),
         );
     }
 
@@ -73,11 +78,7 @@ class WriteableWorkflowAssert
             $workflow = $this->workflowManager->getByTask($task);
         }
 
-        $tua = $this->userJobRepository->findUserJobInTask(
-            $userGuid,
-            $taskGuid,
-            $task->getWorkflowStepName(),
-        );
+        $tua = $this->findJob($task, $userGuid);
 
         //Excel Re-import happens outside of an opened task, so there is no job with a used state.
         // if the external editing is properly included we should consider to add && $workflow->isWriteable($tua)
@@ -96,5 +97,30 @@ class WriteableWorkflowAssert
 
             throw $e;
         }
+    }
+
+    private function findJob(Task $task, string $userGuid): ?Job
+    {
+        $tua = $this->userJobRepository->findUserJobInTask(
+            $userGuid,
+            $task->getTaskGuid(),
+            $task->getWorkflowStepName(),
+        );
+
+        if (null !== $tua) {
+            return $tua;
+        }
+
+        if ($task->getPmGuid() === $userGuid) {
+            return $this->userJobRepository->findPmOverrideJob($userGuid, $task->getTaskGuid());
+        }
+
+        $user = $this->userRepository->getByGuid($userGuid);
+
+        if ($user->isPm() || $user->isClientPm() || $user->isPmLight()) {
+            return $this->userJobRepository->findPmOverrideJob($userGuid, $task->getTaskGuid());
+        }
+
+        return null;
     }
 }
