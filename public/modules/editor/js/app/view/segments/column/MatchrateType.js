@@ -45,7 +45,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'matchRateType',
     width: 82,
-    text: '#UT#Matchrate Typ',
+    text: '#UT#Match rate type',
     strings: {
         //see in localizedjsstrings
     },

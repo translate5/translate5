@@ -30,16 +30,16 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Codefinder', {
     filterObj: null,
     gridId: '',
     strings: {
-        useCodefinder: '#UT#Codefinder verwenden',
-        add: '#UT#Hinzufügen',
-        remove: '#UT#Entfernen',
-        moveUp: '#UT#Hochschieben',
-        moveDown: '#UT#Untenschieben',
-        modify: '#UT#Ändern',
-        accept: '#UT#Akzeptieren',
-        discard: '#UT#Abbrechen',
-        patterns: '#UT#Muster',
-        testWithAllRules: '#UT#Test mit allen Regeln'
+        useCodefinder: '#UT#Use Code Finder',
+        add: '#UT#Add',
+        remove: '#UT#Remove',
+        moveUp: '#UT#Move up',
+        moveDown: '#UT#Move down',
+        modify: '#UT#Modify',
+        accept: '#UT#Accept',
+        discard: '#UT#Cancel',
+        patterns: '#UT#Patterns',
+        testWithAllRules: '#UT#Test using all rules'
     },
     requires: [
         'Editor.plugins.Okapi.view.fprm.component.CodefinderViewModel',

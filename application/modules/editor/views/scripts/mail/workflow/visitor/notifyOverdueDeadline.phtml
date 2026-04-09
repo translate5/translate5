@@ -30,17 +30,17 @@ END LICENSE AND COPYRIGHT
 
 $this->render('general.phtml');
 
-$title = $this->translate->_('Die Aufgabe "%s" ist "%s" %s überfällig!');
-$daysString = ($this->daysOffset > 1) ? $this->translate->_('Tagen') : $this->translate->_('Tag');
+$title = $this->translate->_('The task “%s” is “%s” %s overdue!');
+$daysString = ($this->daysOffset > 1) ? $this->translate->_('days') : $this->translate->_('day');
 $this->subject = sprintf($title, $this->task->getTaskName(), $this->daysOffset, $daysString);
 
-$mainText = $this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin ist überfällig.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/><br/>', $this->data);
+$mainText = $this->templateApply('please remember to complete your assignment for the project below. The deadline is overdue.Please log in here with your personal access data to process your request:Double-click on the task to enter edit mode.<br/><br/>Please log in here with your personal access data to process your request:<br/><br/>{portalLink}<br/><br/>Double-click on the task to enter edit mode.<br/><br/>', $this->data);
 
 $this->header = $this->header . $mainText;
 
-$taskFragment = $this->templateApply('<br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/>', $this->taskData);
+$taskFragment = $this->templateApply('<br/><br/><b>Project details:</b><br/><br/><b>Project name:</b> {task.taskName}<br/><b>Source language:</b> {sourceLanguageTranslated} <br/><b>Target language:</b> {targetLanguageTranslated} <br/><b>Due by:</b> {deadlineDate}<br/><br/>', $this->taskData);
 
-$footerText = $this->templateApply('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Mit freundlichen Grüßen<br/><br/>{companyName}<br/><br/>', $this->taskData);
+$footerText = $this->templateApply('<br/><br/>If you have any questions about translation or translate5, we are happy to help – just get in touch with us.<br/><br/>Kind regards,<br/><br/>{companyName}<br/><br/>', $this->taskData);
 
 $this->textbody = 'To be able to see the mail layout, you need to use app which supports html.';
 

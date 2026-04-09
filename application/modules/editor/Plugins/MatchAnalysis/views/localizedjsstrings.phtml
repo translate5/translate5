@@ -34,96 +34,96 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
     Ext.define("Editor.locale.plugins.MatchAnalysis.controller.MatchAnalysis", {
         override: "Editor.plugins.MatchAnalysis.controller.MatchAnalysis",
         strings: {
-            finishTask:'<?php echo $this->translate->_("Beenden"); ?>',
-            taskGridIconTooltip:'<?php echo $this->translate->_("Match-Analyse"); ?>',
-            preTranslation:'<?php echo $this->translate->_("Analyse &amp; Vorübersetzungen starten"); ?>',
-            preTranslationTooltip:'<?php echo $this->translate->_("Die Vorübersetzung löst auch eine neue Analyse aus"); ?>',
-            analysis:'<?php echo $this->translate->_("Analyse Starten"); ?>',
-            analysisHint:'<?php echo $this->translate->_("Umfasst eine QS und Terminologie Prüfung"); ?>',
-            analysisNeedRerun:'<?php echo $this->translate->_("Die Analyse muss erneut durchgeführt werden, damit die Match-Rate-Abzüge gespeichert werden und wirksam werden"); ?>',
-            startAnalysisMsg:'<?php echo $this->translate->_("Match-Analyse und Vorübersetzungen werden ausgeführt."); ?>',
-            finishAnalysisMsg:'<?php echo $this->translate->_("Die Match-Analyse und die Vorübersetzung sind abgeschlossen."); ?>',
-            internalFuzzy:'<?php echo $this->translate->_("Zähle interne Fuzzy"); ?>',
-            pretranslateMatchRate:'<?php echo $this->translate->_("TM Vorübersetzungs Match-Rate"); ?>',
-            pretranslateMatchRateTooltip:'<?php echo $this->translate->_("Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist"); ?>',
-            pretranslateTmAndTerm:'<?php echo $this->translate->_("Vorübersetzen (TM &amp; Terme)"); ?>',
-            pretranslateTmAndTermTooltip:'<?php echo $this->translate->_("Treffer aus der Terminologie werden bevorzugt vorübersetzt."); ?>',
-            pretranslateMt:'<?php echo $this->translate->_("Vorübersetzen (MT)"); ?>',
-            pretranslateMtTooltip:'<?php echo $this->translate->_("Wenn diese Option aktiviert ist, werden alle Treffer, die nicht aus dem TM vorübersetzt sind, von der MT vorübersetzt."); ?>',
-            analysisLoadingMsg:'<?php echo $this->translate->_("Analyse läuft"); ?>'
+            finishTask:'<?php echo $this->translate->_('Finish'); ?>',
+            taskGridIconTooltip:'<?php echo $this->translate->_('Match analysis'); ?>',
+            preTranslation:'<?php echo $this->translate->_('Start analysis &amp; pre-translation'); ?>',
+            preTranslationTooltip:'<?php echo $this->translate->_('A pre-translation also triggers a new analysis'); ?>',
+            analysis:'<?php echo $this->translate->_('Start analysis'); ?>',
+            analysisHint:'<?php echo $this->translate->_('Includes a QA and terminology check'); ?>',
+            analysisNeedRerun:'<?php echo $this->translate->_('Analysis should be re-run for penalties to be saved and take effect'); ?>',
+            startAnalysisMsg:'<?php echo $this->translate->_('Match analysis and pre-translations in progress.'); ?>',
+            finishAnalysisMsg:'<?php echo $this->translate->_('The Match analysis and pre-translation have been completed.'); ?>',
+            internalFuzzy:'<?php echo $this->translate->_('With internal fuzzy matches'); ?>',
+            pretranslateMatchRate:'<?php echo $this->translate->_('TM pre-translation match rate'); ?>',
+            pretranslateMatchRateTooltip:'<?php echo $this->translate->_('Use TM matches at or above the selected threshold for pre-translation'); ?>',
+            pretranslateTmAndTerm:'<?php echo $this->translate->_('Pre-translate (TM &amp; terminology)'); ?>',
+            pretranslateTmAndTermTooltip:'<?php echo $this->translate->_('Terminology matches are prioritized in pre-translation'); ?>',
+            pretranslateMt:'<?php echo $this->translate->_('Pre-translate (MT)'); ?>',
+            pretranslateMtTooltip:'<?php echo $this->translate->_('If this option is activated, the segments not pre-translated with the TM will be pre-translated with the MT.'); ?>',
+            analysisLoadingMsg:'<?php echo $this->translate->_('Analysis in progress'); ?>'
         }
     });
 
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.AnalysisPanel", {
         override: "Editor.plugins.MatchAnalysis.view.AnalysisPanel",
         strings: {
-            tabTitle:'<?php echo $this->translate->_("Analyse"); ?>',
+            tabTitle:'<?php echo $this->translate->_('Analysis'); ?>',
         }
     });
 
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.AnalysisGrid", {
         override: "Editor.plugins.MatchAnalysis.view.AnalysisGrid",
         strings: {
-            noMatch:'<?php echo $this->translate->_("Keine Treffer"); ?>',
-            matchCount:'<?php echo $this->translate->_("Summe"); ?>',
-            exportAnalysis:'<?php echo $this->translate->_("Export als Excel"); ?>',
-            exportAnalysisXML:'<?php echo $this->translate->_("Export Trados-like XML"); ?>',
-            noAnalysis:'<?php echo $this->translate->_("Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“"); ?>',
-            languageResources:'<?php echo $this->translate->_("Sprachressourcen"); ?>',
-            analysisDate:'<?php echo $this->translate->_("Datum der Analyse"); ?>',
-            languageResourceName:'<?php echo $this->translate->_("Name"); ?>',
-            repetitions:'<?php echo $this->translate->_("Wiederholungen:"); ?>',
-            totalSum:'<?php echo $this->translate->_("Summe:"); ?>',
-            internalFuzzy:'<?php echo $this->translate->_("Interne Fuzzy verwendet"); ?>',
-            matchRate:'<?php echo $this->translate->_("Match-Rate"); ?>',
-            edit100PercentMatchDisabledMessage:'<?php echo $this->translate->_("Gesperrte 100%-Matches sind nicht Teil der Analyse."); ?>',
-            wordBased:'<?php echo $this->translate->_("Wortbasiert"); ?>',
-            characterBased:'<?php echo $this->translate->_("Zeichenbasiert"); ?>',
-            basedOn:'<?php echo $this->translate->_("Basiert auf"); ?>',
-            fromImportedFile:'<?php echo $this->translate->_("Aus importierter Datei"); ?>',
-            hasErrors:'<?php echo $this->translate->_("Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut."); ?>'
+            noMatch:'<?php echo $this->translate->_('No matches'); ?>',
+            matchCount:'<?php echo $this->translate->_('Sum'); ?>',
+            exportAnalysis:'<?php echo $this->translate->_('Export as Excel'); ?>',
+            exportAnalysisXML:'<?php echo $this->translate->_('Export in Trados-style XML'); ?>',
+            noAnalysis:'<?php echo $this->translate->_('No analysis has been created yet. Please start an analysis in the “Language resources” tab'); ?>',
+            languageResources:'<?php echo $this->translate->_('Language resources'); ?>',
+            analysisDate:'<?php echo $this->translate->_('Date of the analysis'); ?>',
+            languageResourceName:'<?php echo $this->translate->_('Name'); ?>',
+            repetitions:'<?php echo $this->translate->_('Repetitions:'); ?>',
+            totalSum:'<?php echo $this->translate->_('Sum:'); ?>',
+            internalFuzzy:'<?php echo $this->translate->_('Internal fuzzy matches used'); ?>',
+            matchRate:'<?php echo $this->translate->_('Match rate'); ?>',
+            edit100PercentMatchDisabledMessage:'<?php echo $this->translate->_('Locked 100% matches are not part of the analysis.'); ?>',
+            wordBased:'<?php echo $this->translate->_('word-based'); ?>',
+            characterBased:'<?php echo $this->translate->_('character-based'); ?>',
+            basedOn:'<?php echo $this->translate->_('Based on'); ?>',
+            fromImportedFile:'<?php echo $this->translate->_('From imported file'); ?>',
+            hasErrors:'<?php echo $this->translate->_('During the analysis, {0} error(s) occurred while communicating with the language resources. <br />As a result, the analysis may be incomplete. Please check the task events and system log, and re-run the analysis if necessary.'); ?>'
         }
     });
 
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.LanguageResources", {
         override: "Editor.plugins.MatchAnalysis.view.LanguageResources",
         strings: {
-            wizardTitle:'<?php echo $this->translate->_("Sprachressourcen zuweisen"); ?>'
+            wizardTitle:'<?php echo $this->translate->_('Associate language resources'); ?>'
         }
     });
 
     Editor.data.l10n.MatchAnalysis = {
         analysisWindow:{
-            title: '<?php echo $this->translate->_('Match-Analyse'); ?>',
-            summary: '<?php echo $this->translate->_('Summe'); ?>',
-            amount: '<?php echo $this->translate->_('Betrag'); ?>',
-            finalAmount: '<?php echo $this->translate->_('Endgültiger Betrag'); ?>',
-            notDefined: '<?php echo $this->translate->_('Kein Preis für die Kombination von Ausgangs- und Zielsprache festgelegt'); ?>',
+            title: '<?php echo $this->translate->_('Match analysis'); ?>',
+            summary: '<?php echo $this->translate->_('Sum'); ?>',
+            amount: '<?php echo $this->translate->_('Amount'); ?>',
+            finalAmount: '<?php echo $this->translate->_('Final amount'); ?>',
+            notDefined: '<?php echo $this->translate->_('No pricing set for this language pair'); ?>',
         },
         pricing: {
             preset: {
-                combo: '<?php echo $this->translate->_('Preisvorlage'); ?>',
-                create: '<?php echo $this->translate->_('Neue Vorlage erstellen'); ?>',
-                clone: '<?php echo $this->translate->_('Klonen'); ?>',
-                rename: '<?php echo $this->translate->_('Umbenennen'); ?>',
-                refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
-                search: '<?php echo $this->translate->_('Suche'); ?>',
-                title: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise'); ?>',
-                name: '<?php echo $this->translate->_('Vorlagenname'); ?>',
+                combo: '<?php echo $this->translate->_('Pricing preset'); ?>',
+                create: '<?php echo $this->translate->_('Create new preset'); ?>',
+                clone: '<?php echo $this->translate->_('Clone'); ?>',
+                rename: '<?php echo $this->translate->_('Rename'); ?>',
+                refresh: '<?php echo $this->translate->_('Refresh'); ?>',
+                search: '<?php echo $this->translate->_('Search'); ?>',
+                title: '<?php echo $this->translate->_('Match ranges &amp; pricing'); ?>',
+                name: '<?php echo $this->translate->_('Preset name'); ?>',
                 unitType: {
-                    text: '<?php echo $this->translate->_('Typ'); ?>',
-                    character: '<?php echo $this->translate->_('Zeichenbasiert'); ?>',
-                    word: '<?php echo $this->translate->_('Wortbasiert'); ?>'
+                    text: '<?php echo $this->translate->_('Type'); ?>',
+                    character: '<?php echo $this->translate->_('character-based'); ?>',
+                    word: '<?php echo $this->translate->_('word-based'); ?>'
                 },
-                desc: '<?php echo $this->translate->_('Beschreibung'); ?>',
-                priceAdjustment: '<?php echo $this->translate->_('Preisanpassung'); ?>',
+                desc: '<?php echo $this->translate->_('Description'); ?>',
+                priceAdjustment: '<?php echo $this->translate->_('Adjust price by'); ?>',
                 isDefault: {
-                    text: '<?php echo $this->translate->_('Standard'); ?>',
-                    tooltip: '<?php echo $this->translate->_('Standardmäßig bei der Projektanlage ausgewählte Vorlage, falls nicht auf Kundenebene überschrieben'); ?>'
+                    text: '<?php echo $this->translate->_('Default'); ?>',
+                    tooltip: '<?php echo $this->translate->_('Pricing preset selected by default on project creation if not overwritten on client-level'); ?>'
                 },
                 isCustomerDefault: {
-                    text: '<?php echo $this->translate->_('Kundenstandard'); ?>',
-                    tooltip: '<?php echo $this->translate->_('Standardmäßig für diesen Kunden bei der Projektanlage ausgewählte Vorlage'); ?>'
+                    text: '<?php echo $this->translate->_('Client default'); ?>',
+                    tooltip: '<?php echo $this->translate->_('Pricing preset selected by default on project creation for this client'); ?>'
                 },
                 isTqeDefault: {
                     text: '<?php echo $this->translate->_('TQE default');?>',
@@ -135,45 +135,45 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
                 },
                 prices: {
                     text: '<?php echo $this->translate->_('Prices'); ?>',
-                    tooltip: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise konfigurieren'); ?>'
+                    tooltip: '<?php echo $this->translate->_('Configure match ranges &amp; prices'); ?>'
                 },
                 actions: {
-                    text: '<?php echo $this->translate->_('Aktionen'); ?>',
-                    clone: '<?php echo $this->translate->_('Klonen'); ?>',
-                    delete: '<?php echo $this->translate->_('Löschen'); ?>',
+                    text: '<?php echo $this->translate->_('Actions'); ?>',
+                    clone: '<?php echo $this->translate->_('Clone'); ?>',
+                    delete: '<?php echo $this->translate->_('Delete'); ?>',
                 }
             },
             prices: {
-                title: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise in Vorlage'); ?>',
-                create: '<?php echo $this->translate->_('Preise für neue Sprachkombinationen anlegen'); ?>',
-                search: '<?php echo $this->translate->_('Nach Preis oder Sprache suchen'); ?>',
-                refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
-                sourceLangs: '<?php echo $this->translate->_('Quellsprache auswählen'); ?>',
-                targetLangs: '<?php echo $this->translate->_('Zielsprache auswählen'); ?>',
-                cloneFor: '<?php echo $this->translate->_('Klonen der Preise für'); ?>',
-                createFor: '<?php echo $this->translate->_('Neu Anlegen der Preise für'); ?>',
-                sourceLang: '<?php echo $this->translate->_('Quellsprache'); ?>',
-                targetLang: '<?php echo $this->translate->_('Zielsprache'); ?>',
-                currency: '<?php echo $this->translate->_('Währung'); ?>',
-                noMatch: '<?php echo $this->translate->_('Keine Treffer'); ?>',
+                title: '<?php echo $this->translate->_('Match ranges &amp; prices in preset'); ?>',
+                create: '<?php echo $this->translate->_('Create prices for new language pair'); ?>',
+                search: '<?php echo $this->translate->_('Search for price or language'); ?>',
+                refresh: '<?php echo $this->translate->_('Refresh'); ?>',
+                sourceLangs: '<?php echo $this->translate->_('Select source languages'); ?>',
+                targetLangs: '<?php echo $this->translate->_('Select target language'); ?>',
+                cloneFor: '<?php echo $this->translate->_('Clone prices for'); ?>',
+                createFor: '<?php echo $this->translate->_('Create prices for'); ?>',
+                sourceLang: '<?php echo $this->translate->_('Source language'); ?>',
+                targetLang: '<?php echo $this->translate->_('Target language'); ?>',
+                currency: '<?php echo $this->translate->_('Currency'); ?>',
+                noMatch: '<?php echo $this->translate->_('No matches'); ?>',
                 actions: {
-                    header: '<?php echo $this->translate->_('Aktionen'); ?>',
-                    edit: '<?php echo $this->translate->_('Bearbeiten'); ?>',
-                    clone: '<?php echo $this->translate->_('Klonen'); ?>',
-                    delete: '<?php echo $this->translate->_('Löschen'); ?>'
+                    header: '<?php echo $this->translate->_('Actions'); ?>',
+                    edit: '<?php echo $this->translate->_('Edit'); ?>',
+                    clone: '<?php echo $this->translate->_('Clone'); ?>',
+                    delete: '<?php echo $this->translate->_('Delete'); ?>'
                 }
             },
             range: {
-                create: '<?php echo $this->translate->_('Neuen Bereich anlegen'); ?>',
-                delete: '<?php echo $this->translate->_('Bereiche löschen'); ?>',
-                selectToDelete: '<?php echo $this->translate->_('Bitte zu löschenden Bereich auswählen'); ?>',
-                hint: '<?php echo $this->translate->_('Zum Bearbeiten der Match-Bereiche klicken Sie auf die Spaltenüberschriften'); ?>',
-                edit: '<?php echo $this->translate->_('Bereich editieren'); ?>',
-                less: '<?php echo $this->translate->_('Der Startwert muss kleiner oder gleich dem Endwert sein!'); ?>',
-                greater: '<?php echo $this->translate->_('Der Endwert muss größer oder gleich dem Startwert sein!'); ?>',
-                overlaps: '<?php echo $this->translate->_('Dieser Wert überlappt den Bereich'); ?>',
-                from: '<?php echo $this->translate->_('Von'); ?>',
-                till: '<?php echo $this->translate->_('Bis'); ?>'
+                create: '<?php echo $this->translate->_('Create new range'); ?>',
+                delete: '<?php echo $this->translate->_('Delete range'); ?>',
+                selectToDelete: '<?php echo $this->translate->_('Select ranges to be deleted'); ?>',
+                hint: '<?php echo $this->translate->_('Click on the column headings to edit the match ranges'); ?>',
+                edit: '<?php echo $this->translate->_('Edit range'); ?>',
+                less: '<?php echo $this->translate->_('Start value must be lesser or equal to end value!'); ?>',
+                greater: '<?php echo $this->translate->_('End value must be bigger or equal to start value!'); ?>',
+                overlaps: '<?php echo $this->translate->_('This value overlaps the range'); ?>',
+                from: '<?php echo $this->translate->_('From'); ?>',
+                till: '<?php echo $this->translate->_('To'); ?>'
             }
         }
     };

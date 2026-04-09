@@ -28,20 +28,33 @@
 
 namespace Translate5\MaintenanceCli\L10n;
 
+use MittagQI\Translate5\Export\Exception;
+
+/**
+ * Clones a ZXLIFF to a new file exchanging all targets with changed target-strings
+ * The sources will not be changed, sources not present in the given new translations will be removed
+ * Also provides an API to change the source-strings and leave the targets fixed
+ */
 class XliffCloner extends AbstractXliffProcessor
 {
     public function __construct(
         string $absoluteFilePath,
         private readonly string $absoluteSourcePath,
         bool $prefillUntranslated = false,
-        bool $markUntranslated = false
+        bool $markUntranslated = false,
     ) {
         parent::__construct($absoluteFilePath, $prefillUntranslated, $markUntranslated);
     }
 
+    /**
+     * @param array<string, string> $translations
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function clone(array $translations, bool $doWriteFile = false): void
     {
         $this->numUntranslated = 0;
+        $this->numStrings = 0;
         $untranslated = [];
         $strings = $this->loadStringsToClone();
         sort($strings, SORT_NATURAL);
@@ -60,6 +73,7 @@ class XliffCloner extends AbstractXliffProcessor
                 $this->addTransUnit($string, '');
                 $this->numUntranslated++;
             }
+            $this->numStrings = 0;
         }
 
         if (count($untranslated) > 0) {
@@ -84,10 +98,65 @@ class XliffCloner extends AbstractXliffProcessor
         }
     }
 
+    /**
+     * @param array<string, string> $sourceMap
+     * @throws Exception
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
+    public function exchange(array $sourceMap, array $exchangedStrings, bool $doWriteFile = false): void
+    {
+        $translations = [];
+
+        foreach ($this->loadTranslations() as $source => $target) {
+            if (array_key_exists($source, $exchangedStrings)) {
+                if (array_key_exists($source, $sourceMap)) {
+                    $translations[$sourceMap[$source]] = $target;
+                } else {
+                    throw new Exception(
+                        'Source not found in sourceMap, file “' . $this->absoluteFilePath . '”, source: “' . $source . '”'
+                    );
+                }
+            } else {
+                // if not exchanged in the code, the translation stays as it is ...
+                $translations[$source] = $target;
+                error_log('Localized source-string was not exchanged: "' . $source . '"');
+            }
+        }
+
+        $this->assemble(array_keys($translations), $translations);
+
+        if ($doWriteFile) {
+            $this->flush();
+        }
+
+        if (L10nConfiguration::DO_DEBUG) { // @phpstan-ignore-line
+            error_log(
+                "\n======================================\n" .
+                'Exchanged sources in ' . $this->absoluteFilePath . ' with ' . count($translations) .
+                ' strings and ' . $this->numUntranslated . ' untranslated strings' .
+                "\n--------------------------------------\n"
+            );
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     * @throws \ZfExtended_Exception
+     */
     private function loadStringsToClone(): array
+    {
+        return array_keys($this->loadTranslations());
+    }
+
+    /**
+     * @return array<string, string>
+     * @throws \ZfExtended_Exception
+     */
+    private function loadTranslations(): array
     {
         $parser = new XliffParser($this->absoluteSourcePath);
 
-        return array_keys($parser->getTranslations());
+        return $parser->getTranslations();
     }
 }

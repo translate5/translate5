@@ -35,6 +35,12 @@ use ZipArchive;
 
 class L10nUpdater
 {
+    /**
+     * If set, all JSON localizations will be saved regardless if changed
+     * can be used to normalize the JSON files
+     */
+    private const bool FLUSH_ALL_JSON = false;
+
     private string $locale;
 
     private string $basePath;
@@ -55,6 +61,16 @@ class L10nUpdater
 
     private array $missingByModule;
 
+    private int $numXliffs;
+
+    private int $numXliffsChanged;
+
+    private array $jsons;
+
+    private int $numJsons;
+
+    private int $numJsonsChanged;
+
     public function __construct(
         private bool $doUpdateXliffs = false,
         private bool $doCollectData = false,
@@ -63,24 +79,33 @@ class L10nUpdater
         private bool $fillUntranslated = false,
         private ?string $markFillLocale = null,
     ) {
-        $this->locale = Localization::PRIMARY_LOCALE;
         $this->basePath = L10nHelper::getBaseDir();
         $this->saveDir = L10nHelper::getStore();
         // find plugins
         $basePluginDir = L10nHelper::getPluginDir();
         foreach (L10nHelper::getAllPluginNames() as $pluginName) {
             $pluginDir = $basePluginDir . '/' . $pluginName;
-            $pluginXliff = $pluginDir . '/locales/' . $this->locale . Localization::FILE_EXTENSION_WITH_DOT;
+            $pluginXliff = $pluginDir . '/locales/' . Localization::PRIMARY_LOCALE . Localization::FILE_EXTENSION_WITH_DOT;
             if (file_exists($pluginXliff)) {
                 $this->localizedPluginPathes[] = $pluginDir;
             }
         }
     }
 
-    public function process(): void
+    /**
+     * @return array{ numXliffs: int, numXliffsChanged: int, numJsons: int, numJsonsChanged: int }
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
+    public function process(): array
     {
+        $this->jsons = [];
         $this->missing = [];
         $this->missingByModule = [];
+        $this->numXliffs = 0;
+        $this->numXliffsChanged = 0;
+        $this->numJsons = 0;
+        $this->numJsonsChanged = 0;
 
         if ($this->doCollectData) {
             if (is_dir($this->saveDir)) {
@@ -94,14 +119,21 @@ class L10nUpdater
             foreach (Localization::SECONDARY_LOCALES as $locale) {
                 mkdir($this->saveDir . '/' . $locale);
             }
-            $this->copyJsonFiles();
         }
+        $this->processJson();
         $this->processPrimary();
         $this->processSecondary();
 
         if ($this->doCollectData) {
             $this->createImportZips();
         }
+
+        return [
+            'numXliffs' => $this->numXliffs,
+            'numXliffsChanged' => $this->numXliffsChanged,
+            'numJsons' => $this->numJsons,
+            'numJsonsChanged' => $this->numJsonsChanged,
+        ];
     }
 
     public function getBrokenMatches(): array
@@ -144,10 +176,61 @@ class L10nUpdater
     }
 
     /**
+     * Clones changes from the primary JSON-files over to the secondary ones
+     */
+    private function processJson(): void
+    {
+        $finder = new JsonFiles($this->basePath);
+        $primaryJsons = $finder->findFiles(Localization::PRIMARY_LOCALE);
+        $this->jsons[Localization::PRIMARY_LOCALE] = $primaryJsons;
+        $secondaryLocales = array_diff(L10nHelper::getAllLocales(), [Localization::PRIMARY_LOCALE]);
+        foreach ($secondaryLocales as $locale) {
+            $this->jsons[$locale] = [];
+        }
+
+        foreach ($primaryJsons as $jsonFile) {
+            if (! str_ends_with($jsonFile, Localization::PRIMARY_LOCALE . '.json')) {
+                throw new \ZfExtended_Exception('Invalidly named JSON localization file: ' . $jsonFile);
+            }
+            $parser = new JsonParser($jsonFile, Localization::PRIMARY_LOCALE);
+            $primaryJson = $parser->getJson();
+            $primaryIdentifier = $parser->getIdentifier();
+            $this->numJsons++;
+            if (self::FLUSH_ALL_JSON && $parser->flush()) { // @phpstan-ignore-line
+                $this->numJsonsChanged++;
+            }
+            // process secondary JSON locales
+            foreach ($secondaryLocales as $locale) {
+                // the file will end with <locale>.json
+                $secondaryFile = L10nHelper::createLocalizedJsonPath(
+                    $jsonFile,
+                    Localization::PRIMARY_LOCALE,
+                    $locale
+                );
+                $this->jsons[$locale][] = $secondaryFile;
+                $parser = new JsonParser($secondaryFile, $locale);
+                $this->numJsons++;
+                // set structure of primary to secondary if changed
+                if ($parser->getIdentifier() !== $primaryIdentifier) {
+                    $parser->setJson($primaryJson);
+                    if ($parser->flush()) {
+                        $this->numJsonsChanged++;
+                    }
+                } elseif (self::FLUSH_ALL_JSON && $parser->flush()) { // @phpstan-ignore-line
+                    $this->numJsonsChanged++;
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the primary locale from source-files
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
      */
     private function processPrimary(): void
     {
+        $this->locale = Localization::PRIMARY_LOCALE;
         $this->prefillMissing = $this->fillUntranslated && $this->markFillLocale === $this->locale;
         $this->markMissing = ! $this->prefillMissing && $this->markUntranslated && $this->markFillLocale === $this->locale;
 
@@ -201,8 +284,12 @@ class L10nUpdater
         $editorXliffPath = L10nHelper::getModuleXliff('editor', $this->locale);
         $xliffUpdater = new XliffUpdater($editorXliffPath, $this->prefillMissing, $this->markMissing);
         $xliffUpdater->update($this->editorStrings, $primaryTranslations, $this->doUpdateXliffs);
+        $this->numXliffs++;
+        if ($xliffUpdater->fileChanged()) {
+            $this->numXliffsChanged++;
+        }
         if ($this->doCollectData) {
-            $xliffUpdater->saveAs($this->createXliffExportName($editorXliffPath));
+            $xliffUpdater->saveAsImport($this->createExportSaveName($editorXliffPath));
             // add all JSON files if we collect data
             $this->copyJsonFiles();
         }
@@ -211,6 +298,8 @@ class L10nUpdater
 
     /**
      * Updates the secondary locales
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
      */
     private function processSecondary(): void
     {
@@ -253,8 +342,12 @@ class L10nUpdater
             foreach ($xliffs as $xliff => $data) {
                 $cloner = new XliffCloner($xliff, $data['path'], $this->prefillMissing, $this->markMissing);
                 $cloner->clone($translations, $this->doUpdateXliffs);
+                $this->numXliffs++;
+                if ($cloner->fileChanged()) {
+                    $this->numXliffsChanged++;
+                }
                 if ($this->doCollectData) {
-                    $cloner->saveAs($this->createXliffExportName($xliff));
+                    $cloner->saveAsImport($this->createExportSaveName($xliff));
                 }
                 $this->addNumUntranslated($data['name'], $this->locale, $cloner->getNumUntranslated());
             }
@@ -296,8 +389,12 @@ class L10nUpdater
         $strings = $this->extractModuleString($modulePathes, [], $skipEditorTranslations);
         $xliffUpdater = new XliffUpdater($xliffPath, $this->prefillMissing, $this->markMissing);
         $xliffUpdater->update($strings, $translations, $this->doUpdateXliffs);
+        $this->numXliffs++;
+        if ($xliffUpdater->fileChanged()) {
+            $this->numXliffsChanged++;
+        }
         if ($this->doCollectData) {
-            $xliffUpdater->saveAs($this->createXliffExportName($xliffPath));
+            $xliffUpdater->saveAsImport($this->createExportSaveName($xliffPath));
         }
         $this->addNumUntranslated($moduleName, $this->locale, $xliffUpdater->getNumUntranslated());
     }
@@ -353,7 +450,7 @@ class L10nUpdater
         $strings = [];
         foreach ($modulePathes as $modulePath) {
             $files = new PhpFiles($this->basePath . $modulePath);
-            foreach ($files->findFiles($excludedDirs, true) as $file) {
+            foreach ($files->findFiles($excludedDirs) as $file) {
                 $extractor = new PhpExtractor($file);
                 foreach ($extractor->extract() as $string) {
                     if (
@@ -372,18 +469,14 @@ class L10nUpdater
 
     private function copyJsonFiles(): void
     {
-        $files = new JsonFiles($this->basePath);
-        foreach ($files->findFiles($this->locale) as $file) {
-            copy($this->basePath . '/' . $file, $this->createJsonExportName($file));
+        foreach ($this->jsons[$this->locale] as $file) {
+            $exportJsonpath = $this->createExportSaveName($file);
+            $parser = new JsonParser($file, $this->locale);
+            $parser->saveAsImportZxliff($exportJsonpath . Localization::FILE_EXTENSION_WITH_DOT);
         }
     }
 
-    private function createJsonExportName(string $file): string
-    {
-        return $this->saveDir . '/' . $this->locale . '/' . L10nHelper::createExportFileName($file);
-    }
-
-    private function createXliffExportName(string $file): string
+    private function createExportSaveName(string $file): string
     {
         return $this->saveDir . '/' . $this->locale . '/' .
             L10nHelper::createExportFileName(substr($file, strlen($this->basePath)));

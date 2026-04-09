@@ -39,10 +39,10 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     extend: 'Ext.app.Controller',
     strings: {
-        taskCloseTitle: '#UT#Aufgabe in anderem Fenster geschlossen',
-        taskCloseMsg: '#UT#Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.',
-        taskCloseClose: '#UT#Schließen',
-        taskCloseReload: '#UT#Erneut öffnen'
+        taskCloseTitle: '#UT#Task closed in another window',
+        taskCloseMsg: '#UT#You have closed the task in another window. Please close this window too, or reload it to reopen the task.',
+        taskCloseClose: '#UT#Close',
+        taskCloseReload: '#UT#Reopen'
     },
     listen: {
         messagebus: {

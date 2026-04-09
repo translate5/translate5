@@ -54,10 +54,10 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
     },
     
     strings:{
-        skipPreTranslation:'#UT#Globalese Vorübersetzung überspringen',
-        username:'#UT#Globalese Benutzer',
-        apiKey:'#UT#API Schlüssel',
-        wizardTitle:'#UT#Globalese Authentifizierung'
+        skipPreTranslation:'#UT#Skip Globalese pre-translation',
+        username:'#UT#Globalese username',
+        apiKey:'#UT#API Key',
+        wizardTitle:'#UT#Globalese authentication'
     },
     initConfig: function(instanceConfig) {
         var me = this,

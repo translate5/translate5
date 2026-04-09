@@ -49,17 +49,17 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         selector:'#searchreplacetabpanel'
     }],
     strings: {
-        noConnection: '#UT#Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.',
-        noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
-        inUseTitle: '#UT#Segment bereits in Bearbeitung',
-        inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
-        inUseMsg: '#UT#Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.',
-        currentUser: '#UT#Aktueller Bearbeiter',
-        editors: '#UT#Bearbeiter: ',
-        myself: '#UT#Ich',
-        selectedBy: '#UT#Ausgewählt von',
-        segmentChangedOnServerTitle: '#UT#Segment wurde auf der Serverseite geändert.',
-        segmentChangedOnServerMessage: '#UT#Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:<b><br/>{source}<br/><b>Zieltext:<b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?',
+        noConnection: '#UT#You are experiencing connection problems. <br />Please check the stability of your Internet connection. <br />If you keep seeing this message, it may also indicate <br />that the WebSocket protocol (wss://) is blocked by your firewall.',
+        noConnectionSeg: '#UT#Without a connection to the server, you cannot edit a segment.',
+        inUseTitle: '#UT#Segment already in use',
+        inUse: '#UT#Another user was quicker and has currently locked the segment for editing.',
+        inUseMsg: '#UT#The selected segment is already in use by another user and cannot be opened.',
+        currentUser: '#UT#Current editor',
+        editors: '#UT#Editors:',
+        myself: '#UT#Myself',
+        selectedBy: '#UT#Selected by',
+        segmentChangedOnServerTitle: '#UT#Segment was changed on server side',
+        segmentChangedOnServerMessage: '#UT#Segment was changed on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?',
     },
 
     listen: {

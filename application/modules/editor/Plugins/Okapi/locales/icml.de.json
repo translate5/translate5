@@ -5,5 +5,5 @@
     "extractMasterSpreads": "Musterseiten extrahieren",
     "skipThreshold": "Maximalgröße Musterseiten",
     "skipThresholdTooltip": "Musterseiten ignorieren, die größer sind als dieser Wert (in KByte)",
-    "newTuOnBr": "Neuen Textabschnitt erzeugen bei harten Zeilenumbrüchen<br/>(&lt;br/&gt; elements) [BETA]"
+    "newTuOnBr": "Neuen Textabschnitt erzeugen bei harten Zeilenumbrüchen<br/>(<br> elements) [BETA]"
 }

@@ -72,7 +72,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
                     'E1591',
                     [
                         'contentRecognitionId' => [
-                            Localization::trans('Sie verwenden diese Regel bereits für diese Sprache'),
+                            Localization::trans('You already use this rule for this language'),
                         ],
                     ],
                     [
@@ -87,7 +87,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
                     'E1591',
                     [
                         'priority' => [
-                            Localization::trans('Regel mit dieser Priorität existiert bereits'),
+                            Localization::trans('Rule with this priority already exists'),
                         ],
                     ],
                     [

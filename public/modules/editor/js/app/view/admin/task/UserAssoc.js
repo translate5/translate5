@@ -39,22 +39,22 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     alias: 'widget.adminTaskUserAssoc',
     itemId: 'adminTaskUserAssoc',
     strings: {
-        fieldStep: '#UT#Workflowschritt',
+        fieldStep: '#UT#Workflow step',
         fieldState: '#UT#Status',
-        fieldUser: '#UT#Benutzer',
-        btnSave: '#UT#Speichern',
-        btnCancel: '#UT#Abbrechen',
-        formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
-        formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
+        fieldUser: '#UT#Users',
+        btnSave: '#UT#Save',
+        btnCancel: '#UT#Cancel',
+        formTitleAdd: '#UT#Add user association:',
+        formTitleEdit: '#UT#Edit user “{0}”',
         fieldDeadline: '#UT#Deadline',
-        fieldSegmentrange: '#UT#Editierbare Segmente',
-        fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
-        deadlineDateInfoTooltip: '#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
+        fieldSegmentrange: '#UT#Editable segments',
+        fieldSegmentrangeInfo: '#UT#Example: 1-3,5,8-9 (If the role of this user allows editing and editable segments are assigned to any user of this role, all other users of this role may only edit the segments assigned to them.)',
+        deadlineDateInfoTooltip: '#UT#translate5 will send a deadline reminder by default 2 days before and 2 days after the set date and time (+/- 10 min). This can be changed by your administrator.'
     },
     viewModel: {
         type: 'taskuserassoc'
     },
-    title: '#UT#Benutzer-Plural',
+    title: '#UT#Users',
     layout: 'border',
     border: 0,
     task: null,

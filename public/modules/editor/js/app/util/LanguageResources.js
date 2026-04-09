@@ -31,10 +31,10 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.LanguageResources', {
 	strings: {
-		exactMatch:'#UT#101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.',
-        repetitionMatch:'#UT#102% ist eine Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.',
-		contextMatch:'#UT#103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.',
-		termcollectionMatch:'#UT#104% ist ein 100% Treffer, der aus einer Termcollection kommt.'
+		exactMatch:'#UT#A 101% match is a 100% match that originates from a file with the same name.',
+        repetitionMatch:'#UT#A 102% match is a repetition. A repetition is an identical match that reoccurs within the current task.',
+		contextMatch:'#UT#The displayed match rate can result from TM penalties as follows:<br/>First value in brackets = original match rate<br/>Second value = set penalty deduction<br/>Third value = set sublanguage penalty',
+		termcollectionMatch:'#UT#A 104% match is a 100% match coming from a TermCollection.'
     },
     
     statics: {

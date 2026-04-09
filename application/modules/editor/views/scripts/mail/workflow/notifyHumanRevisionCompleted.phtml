@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
 $this->render('general.phtml');
 
 // Setup subject
-$this->subject = $this->translate->_('Menschliche revision fertiggestellt')
+$this->subject = $this->translate->_('Human revision completed')
     . ' - ' . $this->project->getTaskName() . '"';
 
 $url = $this->data['portalUrl'] . '/' . $this->url;
@@ -47,7 +47,7 @@ $data = [
 ];
 
 $data['body'] = $this->templateApply(
-    'die menschliche Revision der Datei {fileName} wurde beendet und steht unter {url} als Download zur Verfügung.',
+    'Human revision of the file “{fileName}” has been finished, and you can download it here {url}.',
     $data
 );
 

@@ -78,7 +78,7 @@ class SegmentDataProvider
             //if field is editable (source or target), show the edited data
             if ($field->editable) {
                 $fieldsToShow[$sfm->getEditIndex($field->name)] = sprintf(
-                    $this->translate->_('%s - bearbeitet'),
+                    $this->translate->_('%s – edited'),
                     $this->translate->_($field->label)
                 );
             }
@@ -86,17 +86,17 @@ class SegmentDataProvider
 
         $header = new SegmentDataHeader();
 
-        $header->add(SegmentDataHeader::FIELD_NR, $this->translate->_('Nr.'));
+        $header->add(SegmentDataHeader::FIELD_NR, $this->translate->_('No.'));
 
         foreach ($fieldsToShow as $id => $label) {
             $header->add($id, $label);
         }
 
         $header->add(SegmentDataHeader::FIELD_STATUS, $this->translate->_('Status'));
-        $header->add(SegmentDataHeader::FIELD_MANUAL_QS, $this->translate->_('Manuelle QS (ganzes Segment)'));
-        $header->add(SegmentDataHeader::FIELD_EDIT_STATUS, $this->translate->_('Bearbeitungsstatus'));
-        $header->add(SegmentDataHeader::FIELD_MATCH_RATE, $this->translate->_('Matchrate'));
-        $header->add(SegmentDataHeader::FIELD_COMMENTS, $this->translate->_('Kommentare'));
+        $header->add(SegmentDataHeader::FIELD_MANUAL_QS, $this->translate->_('Manual QA (complete segment)'));
+        $header->add(SegmentDataHeader::FIELD_EDIT_STATUS, $this->translate->_('Processing status'));
+        $header->add(SegmentDataHeader::FIELD_MATCH_RATE, $this->translate->_('Match rate'));
+        $header->add(SegmentDataHeader::FIELD_COMMENTS, $this->translate->_('Comments'));
 
         if ($segments === null) {
             $segments = $this->segmentRepository->getSegmentsViewData($task);
@@ -112,7 +112,8 @@ class SegmentDataProvider
 
             foreach ($header->getFields() as $field) {
                 $statusMsg = $this->segmentUtility->convertStateId($segment->getValue('stateId'));
-                $row[$field] = match ($field->id) {
+                // TODO FIXME: This is very type-unsafe and phpstans complains are valid ...
+                $row[$field] = match ($field->id) { // @phpstan-ignore-line
                     SegmentDataHeader::FIELD_NR => $segment->getValue('segmentNrInTask'),
                     SegmentDataHeader::FIELD_STATUS => $this->translate->_($statusMsg),
                     SegmentDataHeader::FIELD_MANUAL_QS => $segment->getValue('qualities') ?? [],

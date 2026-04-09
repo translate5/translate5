@@ -45,7 +45,7 @@ Ext.define('Editor.controller.MetaPanel', {
         'Editor.store.quality.Segment'],
     models: ['SegmentUserAssoc'],
     messages: {
-        stateIdSaved: '#UT#Der Segment Status wurde gespeichert'
+        stateIdSaved: '#UT#The segment’s state has been saved'
     },
     refs: [{
         ref: 'metaPanel',

@@ -47,11 +47,11 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
         'Editor.view.LanguageResources.services.Microsoft.SynonymSearch'
     ],
     strings: {
-        searchTitle: '#UT#Konkordanzsuche',
+        searchTitle: '#UT#Concordance search',
         matchTitle:'#UT#Matches',
-        sourceEmptyText:'#UT#Suche im Ausgangstext',
-        targetEmptyText:'#UT#Suche im Zieltext',
-        panelTitle:'#UT#Matches und Konkordanz-Suche'
+        sourceEmptyText:'#UT#Search in the source text',
+        targetEmptyText:'#UT#Search in the target text',
+        panelTitle:'#UT#Matches and concordance search'
     },
     bind: {
         hidden: '{taskIsReadonly || hideLanguageResourcePanel}'

@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 $this->render('general.phtml');
 
-$this->subject = $this->translate->_('Translate5 - Aufgabe mit Fehlern / Warnungen importiert') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+$this->subject = $this->translate->_('translate5 – Task imported with errors / warnings / notices') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
 
 //is automatically merged with data from general.phtml
 $data = [
@@ -56,15 +56,15 @@ $data['messages'] = join("</tr><tr>", array_map(function ($item) {
 }, $this->logs));
 
 $mailBody = $this->templateApply('{header}
-Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit der Bitte um Beachtung.<br />
+The following task was imported with errors, warnings, or informational messages. Please review accordingly.<br />
 <br />
 {taskFragment}
 <br />
 <br />
-<table><tr><th style="text-align:left;padding-right:10px;">Datum:</th>
-<th style="text-align:left;padding-right:10px;">Typ:</th>
+<table><tr><th style="text-align:left;padding-right:10px;">Date:</th>
+<th style="text-align:left;padding-right:10px;">Type:</th>
 <th style="text-align:left;padding-right:10px;">Code:</th>
-<th style="text-align:left;padding-right:10px;">Meldung:</th></tr>
+<th style="text-align:left;padding-right:10px;">Message:</th></tr>
 <tr>{messages}</tr></table>
 {footer}', $data);
 

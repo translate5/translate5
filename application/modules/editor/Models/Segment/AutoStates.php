@@ -39,13 +39,13 @@ use MittagQI\Translate5\Repository\SegmentHistoryRepository;
 class editor_Models_Segment_AutoStates
 {
     /**
-     * "translated" / 'Übersetzt' ehemals 'Nicht lektoriert'
+     * "translated" / 'Translated' ehemals 'Nicht lektoriert'
      * @var integer
      */
     public const TRANSLATED = 0;
 
     /**
-     * "reviewed" / 'Geprüft' ehemals 'Lektoriert'
+     * "reviewed" / 'Geprüft' ehemals 'Reviewed'
      * @var integer
      */
     public const REVIEWED = 1;
@@ -57,7 +57,7 @@ class editor_Models_Segment_AutoStates
     public const REVIEWED_AUTO = 2;
 
     /**
-     * "locked" / 'Gesperrt' => locking of 100% matches
+     * "locked" / 'Locked' => locking of 100% matches
      * @var integer
      */
     public const LOCKED = 3;
@@ -154,34 +154,34 @@ class editor_Models_Segment_AutoStates
      */
     public const PENDING = 999;
 
-    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
-    public const NOT_SET_MSG = 'Nicht gesetzt';
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsg]
+    public const NOT_SET_MSG = 'no status set';
 
-    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
-    public const PENDING_MSG = 'wird ermittelt...';
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsg]
+    public const PENDING_MSG = 'calculating...';
 
-    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
-    public const EDITING_BY_USER_MSG = 'In Bearbeitung';
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsg]
+    public const EDITING_BY_USER_MSG = 'Being processed';
 
-    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsgArray]
     protected array $states = [
-        self::TRANSLATED => 'Übersetzt',
-        self::TRANSLATED_AUTO => 'Übersetzt, auto',
-        self::NOT_TRANSLATED => 'Nicht übersetzt',
-        self::REVIEWED => 'Lektoriert',
-        self::REVIEWED_AUTO => 'Lektoriert, auto',
-        self::BLOCKED => 'Dauerhaft gesperrt',
-        self::LOCKED => 'Gesperrt',
-        self::REVIEWED_UNTOUCHED => 'Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss',
-        self::REVIEWED_UNCHANGED => 'Lektoriert, unverändert',
-        self::REVIEWED_UNCHANGED_AUTO => 'Lektoriert, unverändert, auto',
-        self::REVIEWED_TRANSLATOR => '2. Lektorat',
-        self::REVIEWED_TRANSLATOR_AUTO => '2. Lektorat, auto',
-        self::REVIEWED_PM => 'PM lektoriert',
-        self::REVIEWED_PM_AUTO => 'PM lektoriert, auto',
-        self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
-        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
-        self::PRETRANSLATED => 'Vorübersetzt',
+        self::TRANSLATED => 'Translated',
+        self::TRANSLATED_AUTO => 'Translated, auto-set',
+        self::NOT_TRANSLATED => 'Not translated',
+        self::REVIEWED => 'Reviewed',
+        self::REVIEWED_AUTO => 'Reviewed, auto-set',
+        self::BLOCKED => 'Blocked',
+        self::LOCKED => 'Locked',
+        self::REVIEWED_UNTOUCHED => 'Reviewed, untouched, auto-set at finish of workflow step',
+        self::REVIEWED_UNCHANGED => 'Reviewed, unchanged',
+        self::REVIEWED_UNCHANGED_AUTO => 'Reviewed, unchanged, auto-set',
+        self::REVIEWED_TRANSLATOR => '2nd revision',
+        self::REVIEWED_TRANSLATOR_AUTO => '2nd revision, auto',
+        self::REVIEWED_PM => 'PM reviewed',
+        self::REVIEWED_PM_AUTO => 'PM reviewed, auto-set',
+        self::REVIEWED_PM_UNCHANGED => 'PM reviewed, unchanged',
+        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM reviewed, unchanged, auto-set',
+        self::PRETRANSLATED => 'Pre-translated',
         self::DRAFT => 'Draft',
     ];
 

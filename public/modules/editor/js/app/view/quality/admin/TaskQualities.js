@@ -34,7 +34,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
     alias: 'widget.taskQualities',
     itemId:'taskQualities',
     extraParams: [], // Extra params property used for store proxy binding
-    title: '#UT#Qualitätssicherung',
+    title: '#UT#Quality assurance',
     //card type, used for card display order
     importType: 'postimport',
     store: null,
@@ -50,18 +50,18 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         type: 'taskQualities'
     },
     strings: {
-        category: '#UT#Kategorie',
-        total: '#UT#Anzahl',
-        errors: '#UT#Fehler',
-        falsePositives: '#UT#Falsch erkannte Fehler',
+        category: '#UT#Category',
+        total: '#UT#Amount',
+        errors: '#UT#Error',
+        falsePositives: '#UT#False positives',
         status: '#UT#Status',
-        completeTipCaption: '#UT#Alle Segmente wurden seit der letzten Änderung geprüft',
-        incompleteTipCaption: '#UT#Segmente unvollständig geprüft',
-        incompleteTipText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig geprüft',
-        startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben',
-        faultyTipCaption: '#UT#Interne Tag Fehler',
-        faultyTipText: '#UT#Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern',
-        newAnalysis: '#UT#Neu überprüfen',
+        completeTipCaption: '#UT#All segments have been checked since the last segment modification',
+        incompleteTipCaption: '#UT#Segment check incomplete',
+        incompleteTipText: '#UT#This category was not or only partly analysed',
+        startAnalysisHint: '#UT#Please initiate a new re-check below to resolve the problem',
+        faultyTipCaption: '#UT#Internal tag errors',
+        faultyTipText: '#UT#There are problems with internal tags that prevent exporting this task',
+        newAnalysis: '#UT#Re-check',
     },
     publishes: {
         //publish this field so it is bindable

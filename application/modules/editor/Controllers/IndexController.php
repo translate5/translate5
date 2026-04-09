@@ -47,7 +47,6 @@ use MittagQI\ZfExtended\CsrfProtection;
  */
 #[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.segments.qualityFlags', 'default')]
 #[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.segments.stateFlags', 'default')]
-#[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.segments.autoStateFlags', 'default')]
 #[MittagQI\ZfExtended\Localization\LocalizableConfigValue('runtimeOptions.extJs.theme', 'defaults')]
 class Editor_IndexController extends ZfExtended_Controllers_Action
 {
@@ -274,8 +273,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (! empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
-            $msg = $this->translate->_('Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.');
-            $msgBoxConf->initialMessages[] = sprintf($msg, $onlineVersion, $currentVersion);
+            $msg = $this->translate->_(
+                'translate5 is available in version {onlineVersion}, version {currentVersion} is currently used. ' .
+                '<br/>Please use the installation and update script to install the latest version.'
+            );
+            $msgBoxConf->initialMessages[] = str_replace(
+                ['{onlineVersion}', '{currentVersion}'],
+                [$onlineVersion, $currentVersion],
+                $msg
+            );
         }
     }
 
@@ -459,7 +465,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         /* @var $config editor_Models_Config */
         $this->view->Php2JsVars()->set('frontend.config.configLabelMap', $config->getLabelMap());
 
-        $tmFileUploadSizeText = $this->translate->_("Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.");
+        $tmFileUploadSizeText = $this->translate->_('Your file is larger than the allowed limit of {upload_max_filesize} MB. To be able to upload larger files, please contact the translate5 support.');
         $uploadMaxFilesize = preg_replace('/\D/', '', ini_get('upload_max_filesize'));
 
         $tmFileUploadSizeText = str_replace('{upload_max_filesize}', $uploadMaxFilesize, $tmFileUploadSizeText);

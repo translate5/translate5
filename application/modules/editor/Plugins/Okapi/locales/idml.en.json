@@ -17,7 +17,7 @@
     "extractIndexTopics": "Extract index topics",
     "extractHyperlinkTextSourcesInline": "Extract hyperlink text sources inline",
     "extractExternalHyperlinks": "Extract external hyperlinks",
-    "specialCharacterPattern": "Protect listed whitespace characters<br>(Important: Do NOT use in translate5 – see tooltip)",
+    "specialCharacterPattern": "Protect listed whitespace characters<br/>(Important: Do NOT use in translate5 – see tooltip)",
     "specialCharacterPatternTooltip": "The whitespace needs to be left unprotected in the initial file format conversion from IDML to XLIFF. The reason is that translate5 needs to protect whitespace in its own way to ensure correct TM matching, rather than using the Okapi approach (since Okapi is used under the hood for converting IDML to XLIFF in translate5).",
     "ignoreCharacterKerning": "Ignore character kerning",
     "characterKerningMinIgnoranceThreshold": "Ignore character kerning: minimum threshold",

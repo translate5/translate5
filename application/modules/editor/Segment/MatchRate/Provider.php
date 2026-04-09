@@ -115,7 +115,7 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
 
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Nutzung von TM-Treffern');
+        return $translate->_('Usage of TM matches');
     }
 
     public function translateCategory(
@@ -124,8 +124,8 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH => $translate->_('Unbearbeiteter Fuzzy'),
-            editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH => $translate->_('Bearbeiteter 100% Match'),
+            editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH => $translate->_('Unedited fuzzy match'),
+            editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH => $translate->_('Edited 100% match'),
             default => null,
         };
     }

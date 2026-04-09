@@ -69,11 +69,11 @@ Ext.define('Editor.controller.ChangeAlike', {
   stores: ['AlikeSegments','Segments'],
   views: ['changealike.Window'],
   messages: {
-    alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
-    alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
-    alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.',
-    alikesFailure: '#UT#Die Wiederholungen konnten nicht gespeichert werden',
-    alikesScheduled: '#UT#Wiederholungen zur Bearbeitung vorgesehen'
+    alikeSingular: '#UT#{0} repetition processed and saved',
+    alikePlural: '#UT#{0} repetitions processed and saved',
+    alikesDisabled: '#UT#The task contains alternative translations. The repetition editor was therefore deactivated.',
+    alikesFailure: '#UT#The repetitions could not be saved',
+    alikesScheduled: '#UT#{0} repetitions scheduled for processing'
   },
   alikesToProcess: null,
   fetchedAlikes: null,

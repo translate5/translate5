@@ -31,8 +31,9 @@ use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
- * Testcase for TRANSLATE-2362 Mixing XLF id and rid values led to wrong tag numbering
- * For details see the issue.
+ * Tests for the Internal localization tasks
+ * TODO FIXME: currently just a test, if a zxliff can be exported after editing
+ * The logic of the internal localization changed a lot so this test tests anything specific anymore ...
  */
 class InternalTranslationTaskTest extends JsonTestAbstract
 {
@@ -41,8 +42,9 @@ class InternalTranslationTaskTest extends JsonTestAbstract
     protected static function setupImport(Config $config): void
     {
         $config
-            ->addTask('de', 'it')
+            ->addTask('en', 'it')
             ->addUploadFolder('testfiles')
+            ->setMaxWaitTime(50)
             ->setToEditAfterImport();
     }
 

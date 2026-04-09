@@ -47,26 +47,26 @@ $params = [
 if (! empty($this->responsibleUser)) {
     $params['responsibleUser'] = $this->responsibleUser;
     //put in separate template fragment, so that clients can overwrite (or disable by overwriting) that data
-    $params['responsibleUser'] = $this->templateApply('{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br />', $params);
+    $params['responsibleUser'] = $this->templateApply('{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) is now in charge of the task.<br />', $params);
 }
 
 $taskNr = $this->task->getTaskNr();
 if (! empty($taskNr)) {
     $taskNr .= ' - ';
 }
-$this->subject = $this->translate->_('Translate5 - Aufgabe durch anderen Benutzer übernommen') . ' "' . $taskNr . $this->task->getTaskName() . '"';
+$this->subject = $this->translate->_('translate5 – another user accepted the task') . ' "' . $taskNr . $this->task->getTaskName() . '"';
 $this->textbody = strip_tags($this->templateApply('{header}
     
-ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+another user has accepted the task <b>{task.taskNr} - {task.taskName}</b> in the projectportal {portalLink}.<br />
 <br />
-<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<b>Your association to the task was automatically removed.</b><br />
 <br />{responsibleUser}
 {footer}', $params));
 
 echo $this->templateApply('{header}
     
-ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+another user has accepted the task <b>{task.taskNr} - {task.taskName}</b> in the projectportal {portalLink}.<br />
 <br />
-<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<b>Your association to the task was automatically removed.</b><br />
 <br />{responsibleUser}
 {footer}', $params);

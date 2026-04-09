@@ -48,7 +48,7 @@ Ext.define('Editor.store.Files', {
       }
   },
   root: {
-    text: '#UT#Dateien',
+    text: '#UT#Files',
     id: 0,
     expanded: false
   },

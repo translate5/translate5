@@ -263,7 +263,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
         ]);
 
         // Prompt client-side confirmation
-        $this->confirm(Localization::trans('Are you sure you want to delete prices for this language combination?'));
+        $this->confirm(Localization::trans('Are you sure you want to delete prices for this language pair?'));
 
         // If confirmed - do delete
         $this->entity->delete();

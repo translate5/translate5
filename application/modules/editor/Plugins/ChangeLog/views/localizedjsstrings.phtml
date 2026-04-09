@@ -31,23 +31,23 @@ END LICENSE AND COPYRIGHT
 Editor.controller.Localizer.addPluginInit('changeLog', function() {
     Ext.define("Editor.locale.plugins.ChangeLog.controller.Changelog", {
         override: "Editor.plugins.ChangeLog.controller.Changelog",
-        btnText: '<?php echo $this->translate->_('Änderungsprotokoll der Version '); ?>'
+        btnText: '<?php echo $this->translate->_('Changelog of version'); ?>'
     });
     
     Ext.define("Editor.locale.plugins.ChangeLog.view.Changelog", {
         override: "Editor.plugins.ChangeLog.view.Changelog",
         strings: {
-            date: '<?php echo $this->translate->_('Datum'); ?>',
-            jiranumber: '<?php echo $this->translate->_('Änderungsnr.'); ?>',
-            description: '<?php echo $this->translate->_('Beschreibung'); ?>',
-            title: '<?php echo $this->translate->_('Aktuelle Änderungen an der Anwendung'); ?>',
-            close: '<?php echo $this->translate->_('Schließen'); ?>'
+            date: '<?php echo $this->translate->_('Date'); ?>',
+            jiranumber: '<?php echo $this->translate->_('Change no.'); ?>',
+            description: '<?php echo $this->translate->_('Description'); ?>',
+            title: '<?php echo $this->translate->_('Latest changes to the application'); ?>',
+            close: '<?php echo $this->translate->_('Close'); ?>'
         }
     });
     Ext.define("Editor.locale.plugins.ChangeLog.view.TypeColumn", {
         override: "Editor.plugins.ChangeLog.view.TypeColumn",
         strings: {
-            type: '<?php echo $this->translate->_('Typ'); ?>'
+            type: '<?php echo $this->translate->_('Type'); ?>'
         },
         types: {
             bugfix: '<?php echo $this->translate->_('Bugfix'); ?>',

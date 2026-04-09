@@ -186,7 +186,7 @@ class editor_Models_KPI
             }
             $results[$key] = (isset($time[$timeBy]) ? round(
                 $time[$timeBy]
-            ) : 0) . ' ' . $this->translate->_('Tage');
+            ) : 0) . ' ' . $this->translate->_('days');
         }
 
         return $results;
@@ -253,7 +253,7 @@ class editor_Models_KPI
         );
 
         if (empty($stats)) {
-            $results[self::KPI_DURATION] = $this->translate->_('Daten nicht verfügbar');
+            $results[self::KPI_DURATION] = $this->translate->_('Data unavailable');
 
             return $results;
         }

@@ -329,8 +329,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         if ($this->isUsed()) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1061', [
                 Localization::trans(
-                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, ' .
-                    'da der Benutzer diese aktuell benutzt.'
+                    'The assignment between a task and a user could not be ' .
+                    'removed because the user is currently using the task.'
                 ),
             ], [
                 'job' => $this,
@@ -341,8 +341,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         if ($task->isLocked($taskGuid, $this->getUserGuid())) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1062', [
                 Localization::trans(
-                    'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden,' .
-                    ' da die Aufgabe durch den Benutzer gesperrt ist.'
+                    'The assignment between a task and a user could not be ' .
+                    'removed because the task is currently locked by the user.'
                 ),
             ], [
                 'job' => $this,

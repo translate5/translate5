@@ -43,9 +43,8 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.LanguageResources.services.Default', {
     id: 'Default',
-
-    exportTooltip:'#UT#Exportieren',
-    log:'#UT#Log',
+    exportTooltip:'#UT#Download file-based TermCollection and save locally',
+    log:'#UT#Call up log',
     
     /**
      * returns the row css class for the associated service in the tm overview panel

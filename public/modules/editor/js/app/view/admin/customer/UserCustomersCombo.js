@@ -35,7 +35,7 @@ Ext.define('Editor.view.admin.customer.UserCustomersCombo', {
     requires: [
         'Editor.store.admin.UserCustomers'
     ],
-    fieldLabel:'#UT#Kunde',
+    fieldLabel:'#UT#Client',
     displayField: 'name',
     valueField: 'id',
     store:'userCustomers',

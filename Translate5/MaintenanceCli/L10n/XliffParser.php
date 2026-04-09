@@ -31,7 +31,7 @@ namespace Translate5\MaintenanceCli\L10n;
 use editor_Models_Import_FileParser_XmlParser;
 
 /**
- * Helper class to load translations from existing xliff files
+ * Helper class to load translations from existing xliff or zxliff files
  */
 class XliffParser extends editor_Models_Import_FileParser_XmlParser
 {

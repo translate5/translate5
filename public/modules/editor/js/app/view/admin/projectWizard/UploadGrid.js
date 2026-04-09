@@ -64,21 +64,21 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
     },
 
     strings:{
-        gridEmptyText:'#UT#Ziehen Sie die Dateien entweder hierher, um sie als Arbeitsdateien hinzuzufügen, oder klicken Sie auf eine der obigen Schaltflächen, um andere Dateitypen zu wählen.',
-        workFilesFilesButton:'#UT#Arbeitsdatei(en)',
-        pivotFilesFilesButton:'#UT#Pivot-Datei(en)',
-        removeFilesFilesButton:'#UT#Datei löschen',
-        targetLang:'#UT#Zielsprache',
-        file:'#UT#Datei',
-        type:'#UT#Typ',
-        size:'#UT#Größe',
-        errorColumnText:'#UT#Fehler',
-        workFilesTypeText:'#UT#Arbeitsdatei',
-        pivotFilesTypeText:'#UT#Pivot-Datei',
-        fileMix:'#UT#Wählen Sie entweder eine ZIP-Datei oder mehrere andere Dateien. Ein Mix aus ZIP-Dateien und anderen Dateien ist nicht möglich!',
-        referenceFilesFilesButton:'#UT#Referenz-Dateien(en)',
-        referenceFilesTypeText:'#UT#Referenz-Datei',
-        workfilesAreRequired:'#UT#Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.'
+        gridEmptyText:'#UT#Either drag and drop files here to add them as work files, or drop them to one of the buttons above to add them for different file usage.',
+        workFilesFilesButton:'#UT#Work file(s)',
+        pivotFilesFilesButton:'#UT#Pivot file(s)',
+        removeFilesFilesButton:'#UT#Remove file',
+        targetLang:'#UT#Target language',
+        file:'#UT#File',
+        type:'#UT#Type',
+        size:'#UT#Size',
+        errorColumnText:'#UT#Error',
+        workFilesTypeText:'#UT#work file',
+        pivotFilesTypeText:'#UT#pivot file',
+        fileMix:'#UT#Select either one ZIP file or multiple other files. A mix of ZIP files and other files is not possible!',
+        referenceFilesFilesButton:'#UT#Reference file(s)',
+        referenceFilesTypeText:'#UT#reference file',
+        workfilesAreRequired:'#UT#There were no uploaded work files found, or the uploaded files are exceeding the maximum allowed size.'
     },
 
     initConfig: function(instanceConfig) {

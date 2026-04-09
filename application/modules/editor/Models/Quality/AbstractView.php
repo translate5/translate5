@@ -234,7 +234,7 @@ abstract class editor_Models_Quality_AbstractView
         if ($this->hasCheckboxes) {
             $root->checked = $this->getCheckedVal($root->qtype, $root->qcategory);
         }
-        $root->text = $this->manager->getTranslate()->_('Alle Kategorien');
+        $root->text = $this->manager->getTranslate()->_('All categories');
         $root->children = $this->rows;
 
         return [$root];

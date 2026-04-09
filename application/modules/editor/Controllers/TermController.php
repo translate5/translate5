@@ -188,7 +188,7 @@ class editor_TermController extends ZfExtended_RestController
             // so in that case we make sure user will get explicitly MsgBox saying 'Done'
             $this->view->assign([
                 'success' => true,
-                'msg' => $this->_translate->_('Erledigt'),
+                'msg' => $this->_translate->_('Done'),
             ]);
         }
     }
@@ -282,7 +282,7 @@ class editor_TermController extends ZfExtended_RestController
             if (array_intersect($termEntryIdA['target'], $termEntryIdA['source'])) {
                 // Flush failure
                 $this->jflush(false, $this->_translate->_(
-                    'Beide Benennungen bereits vorhanden in ausgewählter TermCollection.'
+                    'Both terms already exist within selected TermCollection'
                 ));
 
                 // Else if at least one termEntryId found for target term
@@ -302,7 +302,7 @@ class editor_TermController extends ZfExtended_RestController
 
                     // Else flush a message to indicate confirmation is needed to proceed
                 } elseif ($this->getParam('answer') !== 'yes') {
-                    $this->confirm($this->_translate->_('Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?'));
+                    $this->confirm($this->_translate->_('This term already exists in another entry.<br />Do you really want to add it to the TermCollection?'));
                 }
 
                 // Else if at least one termEntryId found for source term

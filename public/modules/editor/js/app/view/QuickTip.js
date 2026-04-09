@@ -35,7 +35,7 @@ Ext.define('Editor.view.QuickTip', {
     alias: 'widget.editorquicktip',
     loadedTipText: null,
     strings: {
-        loading: '#UT#Lade...'
+        loading: '#UT#Loading...'
     },
     /**
      * Overridden to return true if data-qtipurl is set & to create & set the loader

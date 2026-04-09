@@ -269,7 +269,7 @@ class LoginController extends ZfExtended_Controllers_Login
             $this->view->errors = true;
             //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
             $this->_form->addError(
-                $this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.')
+                $this->_translate->_('Login with Single Sign-On failed, please try again.')
             );
             $log = Zend_Registry::get('logger');
             /* @var $log ZfExtended_Logger */

@@ -183,7 +183,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         if ((int) $this->config->runtimeOptions->plugins->transit->writeInfoField->enabled !== 1) {
             return;
         }
-        $infoFieldContent = $this->translate->_('###RefMat-Update ');
+        $infoFieldContent = $this->translate->_('Updating the reference files');
         $segment = $this->getSegment($segId);
 
         //fill only edited (and therefore editable) segments

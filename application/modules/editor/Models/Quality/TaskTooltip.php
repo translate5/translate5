@@ -90,7 +90,7 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
                     '<br>'
                     . $this->getStatusSymbol('incomplete')
                     . ' '
-                    . $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');
+                    . $this->translate->_('This category was not or only partly analysed');
             }
             if ($addFaultsComment) {
                 $html .=
@@ -98,7 +98,7 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
                     . $this->getStatusSymbol('error')
                     . ' '
                     . $this->translate->_(
-                        'Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern'
+                        'There are problems with internal tags that prevent exporting this task'
                     );
             }
             if ($addCriticalErrorsComment) {
@@ -106,7 +106,7 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
                     '<br>'
                     . $this->getStatusSymbol('error')
                     . ' '
-                    . $this->translate->_('Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden');
+                    . $this->translate->_('All errors of the following category should be solved OR set to “false positive”');
             }
             $html .= '</td></tr>';
         }

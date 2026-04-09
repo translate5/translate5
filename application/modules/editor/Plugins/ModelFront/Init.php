@@ -115,7 +115,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract
 
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $metaData = new stdClass();
-        $metaData->name = $translate->_('Matchrate');
+        $metaData->name = $translate->_('Match rate');
         $metaData->value = 'ModelFront';
 
         foreach ($view->rows as &$row) {

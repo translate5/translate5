@@ -139,7 +139,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         $this->confirm(str_replace(
             '{name}',
             $name,
-            Localization::trans('Are you sure you want to delete pricing preset “{name}”?')
+            Localization::trans('Are you sure you want to delete the pricing preset “{name}”?')
         ));
 
         // If confirmed - do delete

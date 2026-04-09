@@ -150,7 +150,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
 
     public function translateTypeTooltipCriticalSuffix(ZfExtended_Zendoverwrites_Translate $translate): string
     {
-        return $translate->_('Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden');
+        return $translate->_('All errors of the following category should be solved OR set to “false positive”');
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         string $category,
         editor_Models_Task $task
     ): string {
-        return $translate->_('Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden');
+        return $translate->_('All errors of the following category should be solved OR set to “false positive”');
     }
 
     /* *************** REST view API *************** */

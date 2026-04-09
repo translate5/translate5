@@ -46,9 +46,9 @@ class editor_Services_T5Memory_Resource extends editor_Models_LanguageResources_
     {
         return [
             self::STRIP_FRAMING_TAGS_VALUES => [
-                [StripFramingTags::None->value, Localization::trans('Entfernt keine')],
-                [StripFramingTags::All->value, Localization::trans('Alle')],
-                [StripFramingTags::Paired->value, Localization::trans('Tagpaare')],
+                [StripFramingTags::None->value, Localization::trans('None')],
+                [StripFramingTags::All->value, Localization::trans('All')],
+                [StripFramingTags::Paired->value, Localization::trans('Tag pairs')],
             ],
             self::FILE_EXTENSIONS => ['.tmx', '.zip'],
         ];

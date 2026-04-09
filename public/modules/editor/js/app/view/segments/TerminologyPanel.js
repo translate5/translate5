@@ -34,7 +34,7 @@ Ext.define('Editor.view.segments.TerminologyPanel', {
     bodyPadding: 10,
     scrollable: 'y',
     frameHeader: false,
-    title: '#UT#Terminologie',
+    title: '#UT#Terminology',
     bind: {
         title: '{l10n.TermTagger.termPortletFieldset.title}',
     },

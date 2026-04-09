@@ -35,6 +35,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\L10n\L10nHelper;
 use Translate5\MaintenanceCli\L10n\XliffFormatter;
 
+/**
+ * OUTDATED: localized strings are managed by extraction only
+ */
 class L10nAddCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")

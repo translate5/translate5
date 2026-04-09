@@ -39,7 +39,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
     itemId: 'projectPanel',
     controller:'projectPanel',
     helpSection: 'project',
-    title: '#UT#Projekte',
+    title: '#UT#Projects',
     glyph: 'xf0e8@FontAwesome5FreeSolid',
     layout: {
         type: 'border',
@@ -55,7 +55,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
     },
 
     strings:{
-    	projectTasksTitle:'#UT#Aufgaben für das Projekt'
+    	projectTasksTitle:'#UT#Tasks for the project'
     },
     listen:{
         'deactivate':'onProjectPanelDeactivate'

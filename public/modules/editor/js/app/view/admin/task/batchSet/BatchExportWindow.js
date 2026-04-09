@@ -64,16 +64,16 @@ Ext.define('Editor.view.admin.task.batchSet.BatchExportWindow', {
         borderWidth: 0
     },
     strings: {
-        title: '#UT#Exportieren',
-        btnExport: '#UT#Exportieren',
-        info: '#UT#Originalformat, übersetzt/lektoriert',
-        tooManyTasks: '#UT#Es können nur maximal {0} Aufgaben als Batch verarbeitet werden',
-        lockedTasksUnselectable: '#UT#Gesperrte Augfgaben können nicht ausgewählt werden',
-        colId: '#UT#Id',
+        title: '#UT#Export',
+        btnExport: '#UT#Export',
+        info: '#UT#Original format, translated/reviewed',
+        tooManyTasks: '#UT#Only up to {0} tasks can be processed in a batch',
+        lockedTasksUnselectable: '#UT#Locked tasks cannot be selected, please wait until these are open again.',
+        colId: '#UT#ID',
         colName: '#UT#Name',
-        exportSelected: '#UT#Alle selektierten exportieren',
-        exportFiltered: '#UT#Alle in Filterung exportieren',
-        reloadTooltip: '#UT#Aktualisieren Sie die Liste, falls gesperrte Aufgaben (rot) enthalten sind, um zu prüfen, ob sie jetzt wieder verfügbar sind'
+        exportSelected: '#UT#Export all selected',
+        exportFiltered: '#UT#Export all in current filtering',
+        reloadTooltip: '#UT#Refresh the list if blocked tasks (red) are included to check whether they are now available again'
     },
     viewModel: {
         data: {

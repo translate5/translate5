@@ -83,7 +83,7 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
 
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Interne Tags');
+        return $translate->_('Internal tags');
     }
 
     public function translateCategory(
@@ -92,13 +92,13 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            TagComparision::TAGS_MISSING => $translate->_('Interne Tags fehlen'),
-            TagComparision::TAGS_ADDED => $translate->_('Interne Tags wurden hinzugefügt'),
-            TagComparision::WHITESPACE_MISSING => $translate->_('Whitespace wurde entfernt'),
-            TagComparision::WHITESPACE_ADDED => $translate->_('Whitespace wurde hinzugefügt'),
-            TagComparision::TAG_STRUCTURE_FAULTY => $translate->_('Interne Tags haben eine ungültige Struktur'),
+            TagComparision::TAGS_MISSING => $translate->_('Internal tags missing'),
+            TagComparision::TAGS_ADDED => $translate->_('Internal tags have been added'),
+            TagComparision::WHITESPACE_MISSING => $translate->_('Whitespace has been removed'),
+            TagComparision::WHITESPACE_ADDED => $translate->_('Whitespace has been added'),
+            TagComparision::TAG_STRUCTURE_FAULTY => $translate->_('Internal tags have an incorrect structure'),
             TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE => $translate->_(
-                'Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur'
+                'Internal tags of non-editable segments have an incorrect structure'
             ),
             default => null,
         };

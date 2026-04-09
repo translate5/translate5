@@ -264,7 +264,7 @@ class Editor_CustomerController extends ZfExtended_RestController
 
             throw ZfExtended_UnprocessableEntity::createResponse('E1104', [
                 'domain' => [
-                    'duplicateDomain' => Localization::trans('Diese Domain wird bereits verwendet.'),
+                    'duplicateDomain' => Localization::trans('This domain is already in use.'),
                 ],
             ]);
         }
@@ -275,7 +275,7 @@ class Editor_CustomerController extends ZfExtended_RestController
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1063', [
             'number' => [
-                'duplicateClientNumber' => Localization::trans('Diese Kundennummer wird bereits verwendet.'),
+                'duplicateClientNumber' => Localization::trans('This client-number is already in use.'),
             ],
         ]);
     }

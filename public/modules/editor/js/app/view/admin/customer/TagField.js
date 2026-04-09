@@ -31,7 +31,7 @@ Ext.define('Editor.view.admin.customer.TagField', {
     alias: 'widget.customers',
     itemId: 'customers',
     name: 'customers',
-    fieldLabel: '#UT#Endkunde',
+    fieldLabel: '#UT#Client',
     /* client restriction makes it neccessary to select a customer when a new user is created */
     allowBlank: !Editor.data.app.user.isClientRestricted,
     typeAhead: true,

@@ -93,17 +93,17 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 <div class="container">
     <div class="header">
         <img class="logo" src="/images/translate5.png" alt="translate5">
-        <h1><?php echo $translate->_('Visual als PDF exportieren'); ?></h1>
+        <h1><?php echo $translate->_('Export Visual as PDF'); ?></h1>
     </div>
-    <p class="export-running-message"><?php echo $translate->_('Der Export wird ausgeführt. Bitte warten ...'); ?></p>
+    <p class="export-running-message"><?php echo $translate->_('Export is running. Please wait...'); ?></p>
     <div class="loading"></div>
     <div class="result hidden">
-        <p><?php echo $translate->_('Das PDF kann heruntergeladen werden!'); ?></p>
-        <a href="#" class="btn download hidden"><?php echo $translate->_('Herunterladen'); ?></a>
+        <p><?php echo $translate->_('The PDF is now available for download!'); ?></p>
+        <a href="#" class="btn download hidden"><?php echo $translate->_('Download'); ?></a>
     </div>
     <div class="error hidden"></div>
 
-    <div><h4 style="color: #ff004b"><?php echo $translate->_('Hinweis: Alle Seiten und Dateien werden in einem einzelnen PDF zusammengefasst.'); ?></h4></div>
+    <div><h4 style="color: #ff004b"><?php echo $translate->_('<u>Hint:</u><br />All pages and files of the Visual will be merged to a single PDF. In case of Website downloads or HTML imports, it can happen that pages can not be printed due to technical deficiencies of the page. In these cases, a blank page is generated instead.'); ?></h4></div>
 </div>
 
 <script>
@@ -141,8 +141,8 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     function showExportError() {
         document.querySelector('.loading').classList.add('hidden');
         document.querySelector('.export-running-message').classList.add('hidden');
-        document.querySelector('.error').textContent = '<?= $translate->_('Es ist ein Fehler aufgetreten!') . ' '; ?>';
-        document.querySelector('.error').textContent += '<?= $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
+        document.querySelector('.error').textContent = '<?= $translate->_('An error occurred!') . ' '; ?>';
+        document.querySelector('.error').textContent += '<?= $translate->_('For more info, check the result log.'); ?>';
         document.querySelector('.error').classList.remove('hidden');
     }
 

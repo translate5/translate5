@@ -44,17 +44,17 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         'Editor.model.LanguageResources.pivot.Assoc'
     ],
     strings: {
-        empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
-        checked: '#UT#Ressource in Aufgabe verwenden',
+        empty: '#UT#No language resource available for the language pair and client of the opened task.',
+        checked: '#UT#Use resource in task',
         name: '#UT#Name',
-        source: '#UT#Quellsprache',
-        relaisLang: '#UT#Pivotsprache',
-        serviceName: '#UT#Ressource',
-        taskGuid:'#UT#Aufgabename',
-        workerQueued:'#UT#Pivot-Vorübersetzung läuft',
-        startPretranslationButtonText:'#UT#Vorübersetzung',
-        assocSave: '#UT#Eintrag gespeichert!',
-        assocDeleted: '#UT#Eintrag gelöscht!'
+        source: '#UT#Source language',
+        relaisLang: '#UT#Pivot language',
+        serviceName: '#UT#Resource',
+        taskGuid: '#UT#Task name',
+        workerQueued: '#UT#Pivot pre-translation is running',
+        startPretranslationButtonText: '#UT#Pre-translation',
+        assocSave: '#UT#Entry saved!',
+        assocDeleted: '#UT#Entry deleted!'
     },
     padding: 0,
     layout:'fit',

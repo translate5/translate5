@@ -37,7 +37,7 @@ Ext.define('Editor.view.MaintenancePanel', {
         de: 'l, d. F, Y H:i:s (T)'
     },
     tpl: null,
-    maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
+    maintenanceMessage: '#UT#<p>Warning! System maintenance will start shortly.</p><p>The application will be temporarily unavailable from this time.</p><p>Scheduled time: {0}</p>',
     initConfig: function(instanceConfig) {
         var me = this,
             config = {

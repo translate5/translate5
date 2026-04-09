@@ -283,7 +283,7 @@ class editor_Services_T5Memory_HttpApi extends editor_Services_Connector_HttpApi
             $this->error->url = $this->http->getUri(true);
             $this->error->error =
                 $translate->_(
-                    'Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.'
+                    'The segment could only be saved to the task, but not to the TM. Segments longer than 2048 bytes cannot be saved to the TM.'
                 );
 
             return new stdClass();

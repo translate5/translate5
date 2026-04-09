@@ -36,19 +36,19 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 $this->render('general.phtml');
 
-$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+$this->subject = $this->translate->_('translate5 – task associated') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
 
 //is automatically merged with data from general.phtml
 $data = [
     'header' => $this->header,
     'footer' => $this->footer,
-    'role' => $this->translate->_('Pm'),
+    'role' => $this->translate->_('PM (all clients)'),
 ];
 
 $mailBody = $this->templateApply('{header}
-Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
+In the project portal {portalLink}, a task was assigned to you.<br />
 <br />
-<b>Rolle:</b> {role}<br/>
+<b>Role:</b> {role}<br/>
 {taskFragment}{footer}', $data);
 
 $this->textbody = strip_tags($mailBody);

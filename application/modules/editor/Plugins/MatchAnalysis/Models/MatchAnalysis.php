@@ -298,7 +298,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 //check if the language resource is not initialized by group initializer
                 if (! isset($groupedResults[$rowKey]['resourceName']) && $res['languageResourceid'] > 0) {
                     //the resource is removed for the assoc, but the analysis stays
-                    $newName = $translate->_('Diese Sprachressource wurde entfernt (ID: %s)');
+                    $newName = $translate->_('This language resource was removed (ID: %s)');
                     $groupedResults[$rowKey]['resourceName'] = sprintf(
                         $newName,
                         $isInternalFuzzy
@@ -353,7 +353,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $fuzzyString = $isInternalFuzzy ? $translate->_("Ja") : $translate->_("Nein");
+        $fuzzyString = $isInternalFuzzy ? $translate->_('Yes') : $translate->_('No');
 
         //create empty group for given key,name and color
         $initRow = function ($key, $name, $color, $type) use ($analysisData, $fuzzyString) {
@@ -429,7 +429,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
                 $initGroups = $initGroups + $initRow(
                     $this->getFuzzyName($resourceId),
-                    sprintf($translate->_('Interne Fuzzys (%s)'), "$name $resourceNumber"),
+                    sprintf($translate->_('Internal fuzzy matches (%s)'), "$name $resourceNumber"),
                     '',
                     editor_Models_Segment_MatchRateType::TYPE_TM
                 );

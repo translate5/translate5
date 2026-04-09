@@ -45,9 +45,9 @@ Ext.define('Editor.view.HeadPanel', {
         type: 'fit'
     },
     strings: {
-        logout: '#UT# Abmelden',
-        readonly: '#UT# - [LESEMODUS]',
-        erpModuleButtonText:'#UT#Zurück zum ERP'
+        logout: '#UT#Logout',
+        readonly: '#UT#– [READ-ONLY]',
+        erpModuleButtonText:'#UT#Back to ERP'
     },
     
     initConfig: function(instanceConfig) {

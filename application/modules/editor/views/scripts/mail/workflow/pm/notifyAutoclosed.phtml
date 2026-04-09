@@ -36,13 +36,13 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 $this->render('general.phtml');
 
-$this->subject = $this->translate->_('Translate5 - Aufgabe automatisch abgeschlossen') . ': ' . $this->task->getTaskName();
+$this->subject = $this->translate->_('translate5 – task finished automatically') . ': ' . $this->task->getTaskName();
 
 //is automatically merged with data from general.phtml
 $data = [
     'header' => $this->header,
     'body' => sprintf(
-        $this->translate->_('Die Aufgabe %s wurde von translate5 automatisch abgeschlossen und ist nicht mehr bearbeitbar für den zugewiesenen Benutzer.'),
+        $this->translate->_('The task %s has been auto-closed by translate5 and is no longer editable for the assigned user.'),
         $this->task->getTaskName()
     ),
     'footer' => $this->footer,

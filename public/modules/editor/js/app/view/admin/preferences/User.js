@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.preferences.User', {
     ],
     controller: 'preferencesUser',
     alias: 'widget.preferencesUser',
-    title: '#UT#Meine Einstellungen',
+    title: '#UT#My settings',
     glyph: 'xf4fe@FontAwesome5FreeSolid',
     //layout: 'fit',
 

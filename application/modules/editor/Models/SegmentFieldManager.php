@@ -34,10 +34,13 @@ class editor_Models_SegmentFieldManager
     /**
      * This are the default labels, they are translated on sending the output (in SegmentfieldController)
      */
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const LABEL_SOURCE = 'Ausgangstext';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const LABEL_TARGET = 'Zieltext';
 
+    #[MittagQI\ZfExtended\Localization\LocalizableProp]
     public const LABEL_RELAIS = 'Relaissprache';
 
     public const _MAP_DELIM = '#';

@@ -58,10 +58,10 @@ Ext.define('Editor.view.ApplicationInfoPanel', {
         '</tpl>'
     ],
     strings: {
-        task: '#UT#Aufgabe',
-        loggedinAs: '#UT# Eingeloggter Benutzer',
-        loginName: '#UT# Loginname',
-        readonly: '#UT# - [LESEMODUS]',
+        task: '#UT#Task',
+        loggedinAs: '#UT#Authenticated user',
+        loginName: '#UT#Login name',
+        readonly: '#UT#– [READ-ONLY]',
     },
     /***
      * Get the default tpl data

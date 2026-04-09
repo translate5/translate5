@@ -103,7 +103,7 @@ class SearchQueryDtoFactory
     {
         if (strlen($searchField) === 0) {
             $errors = [
-                'searchField' => $this->translate->_('Das Suchfeld ist leer.'),
+                'searchField' => $this->translate->_('The search field is empty.'),
             ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
@@ -114,7 +114,7 @@ class SearchQueryDtoFactory
         $length = mb_strlen($searchField);
         if ($length > 1024) {
             $errors = [
-                'searchField' => $this->translate->_('Der Suchbegriff ist zu groß.'),
+                'searchField' => $this->translate->_('The search term is too long.'),
             ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);

@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.config.ConfigWizard', {
     task:null,
     autoScroll: true,
     strings:{
-        wizardTitle:'#UT#Konfiguration'
+        wizardTitle:'#UT#System configuration'
     },
     listeners:{
         activate:'onConfigWizardActivate'

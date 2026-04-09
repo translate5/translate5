@@ -178,17 +178,17 @@ Ext.define('Editor.controller.SearchReplace', {
     requiredParams: ['searchInField', 'searchField', 'searchType'],
 
     strings: {
-        searchInfoMessage: '#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
-        comboFieldLabel: '#UT#Ersetzen',
-        noSearchResults: '#UT#Keine Ergebnisse für die aktuelle Suche!',
-        replaceAllWindowBtnText: '#UT#Alle Ergebnisse ersetzen',
-        cancelReplaceAllWindowBtnText: '#UT#Abbrechen',
-        replaceAllWindowTitle: '#UT#Ergebnisse ersetzen',
-        replaceAllWindowMessage: '#UT#übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert',
-        characterLimitError: '#UT#Der Suchstring ist zu groß',
-        noIndexFound: '#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
-        searchAndReplaceMenuItem: '#UT#Suchen und ersetzen',
-        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die “Alles Ersetzen” Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
+        searchInfoMessage: '#UT#The search will be performed only on the filtered segments',
+        comboFieldLabel: '#UT#Replace',
+        noSearchResults: '#UT#No results for the current search!',
+        replaceAllWindowBtnText: '#UT#Replace all results',
+        cancelReplaceAllWindowBtnText: '#UT#Cancel',
+        replaceAllWindowTitle: '#UT#Replace results',
+        replaceAllWindowMessage: '#UT#matches found. Do you really want to replace all of them? All found segments will be changed, including auto-status and last editor',
+        characterLimitError: '#UT#The search string is too big',
+        noIndexFound: '#UT#The segment is not included in your current filtering.',
+        searchAndReplaceMenuItem: '#UT#Search and replace',
+        replaceAllErrors: '#UT#The automated replacements could not be applied to all found segments. This can have various causes. Please use the “Search and replace” window without using the “Replace all” function in order to find and edit the segments individually.'
     },
 
     initConfig: function () {

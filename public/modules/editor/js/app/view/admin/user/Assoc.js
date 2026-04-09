@@ -48,19 +48,19 @@ Ext.define('Editor.view.admin.user.Assoc', {
     },
 
     glyph: 'xf0c0@FontAwesome5FreeSolid',
-    title: '#UT#Standard-Benutzerzuweisungen',
+    title: '#UT#User assignment defaults',
     strings: {
-        fieldWorkflowStepName: '#UT#Workflow-Schritt',
+        fieldWorkflowStepName: '#UT#Workflow step',
         fieldWorkflow: '#UT#Workflow',
         fieldState: '#UT#Status',
-        fieldUser: '#UT#Benutzer',
-        btnSave: '#UT#Speichern',
-        btnCancel: '#UT#Abbrechen',
-        formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
-        formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
+        fieldUser: '#UT#Users',
+        btnSave: '#UT#Save',
+        btnCancel: '#UT#Cancel',
+        formTitleAdd: '#UT#Add user association:',
+        formTitleEdit: '#UT#Edit user “{0}”',
         fieldDeadline: '#UT#Deadline',
-        deadlineDateInfoTooltip: '#UT#Definiert die Anzahl Tage, die die Deadline in der Zukunft liegen soll - gesehen vom Zeitpunkt der Projektanlage an. Wert setzt selbe Konfiguration, die auch die "Überschreibung der Systemkonfiguration" mit Namen "Default deadline date" setzt.',
-        wizardTitle: '#UT#Standard-Benutzerzuweisungen'
+        deadlineDateInfoTooltip: '#UT#Defines the number of days the deadline should be set in the future, calculated from the time the project is created. This value uses the same configuration as the system configuration setting “Default deadline date”.',
+        wizardTitle: '#UT#User assignment defaults'
     },
 
     customerId: null,

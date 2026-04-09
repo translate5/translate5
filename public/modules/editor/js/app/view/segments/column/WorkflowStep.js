@@ -41,7 +41,7 @@ Ext.define('Editor.view.segments.column.WorkflowStep', {
     requires: ['Editor.view.admin.task.WorkflowStepFilter'],
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'workflowStep',
-    text: '#UT#bearbeitet bei',
+    text: '#UT#edited at',
     tdCls: 'workflowStep-field',
     showInMetaTooltip: true,
     filter: {

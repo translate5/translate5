@@ -112,7 +112,7 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Leere Segmente');
+        return $translate->_('Empty segments');
     }
 
     /**
@@ -123,7 +123,7 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
      */
     public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate): string
     {
-        return $translate->_('Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.');
+        return $translate->_('The target segment only contains tags, spaces or punctuation, but the source segment does not.');
     }
 
     public function translateCategory(

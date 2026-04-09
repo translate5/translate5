@@ -31,11 +31,11 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     alias: 'controller.projectGrid',
     requires: ['Editor.view.mixin.UserFilterPresetable'],
     strings: {
-    	deleteProjectDialogTitle:'#UT#Projekt "{0}" komplett löschen?',
-    	deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
-    	projectDeleteButtonText:'#UT#Projekt löschen',
-    	projectCanceltButtonText:'#UT#Nein',
-    	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!'
+    	deleteProjectDialogTitle:'#UT#Delete “{0}” project completely?',
+    	deleteProjectDialogMessage:'#UT#Should the project and all tasks included in the project be deleted?',
+    	projectDeleteButtonText:'#UT#Delete project',
+    	projectCanceltButtonText:'#UT#No',
+    	projectRemovedMessage:'#UT#The project “{0}” was successfully removed!'
     },
     mixins: {
         userFilterPresetable: 'Editor.view.mixin.UserFilterPresetable'

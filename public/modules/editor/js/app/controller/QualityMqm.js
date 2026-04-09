@@ -70,8 +70,8 @@ Ext.define('Editor.controller.QualityMqm', {
         }
     },
     strings: {
-        buttonTooltip10: '#UT# (ALT+{0})',
-        buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
+        buttonTooltip10: '#UT#(ALT + {0})',
+        buttonTooltip20: '#UT#(ALT + SHIFT + {0})'
     },
 
     handleInitEditor: function () {

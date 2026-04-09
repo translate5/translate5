@@ -99,6 +99,6 @@ class TaskBatchExport implements TaskBatchExportInterface
     {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        return "/editor/queuedexport/{$this->token}?title=" . $translate->_('Exportieren');
+        return "/editor/queuedexport/{$this->token}?title=" . $translate->_('Export');
     }
 }

@@ -29,9 +29,9 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 $config = Zend_Registry::get('config');
 ?>
-  <h2><?php echo $this->translate->_('Anwendungsfehler'); ?></h2>
-  <p><?php echo $this->translate->_('Wir bitten um Entschuldigung für die aufgetretene Störung!'); ?></p>
-  <p><?php echo $this->translate->_('Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.'); ?></p>
+  <h2><?php echo $this->translate->_('Application error'); ?></h2>
+  <p><?php echo $this->translate->_('We apologize for the problem you encountered!'); ?></p>
+  <p><?php echo $this->translate->_('Our administrators are automatically notified of the error. If you have any questions or concerns, please contact our support team.'); ?></p>
 <?php
 if (! headers_sent() && getenv('T5_REDIRECT_ON_ERROR')) {
     echo '<p><b>You will be redirected automatically to our status page.</b></p>';

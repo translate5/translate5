@@ -33,11 +33,11 @@ Ext.define('Editor.MessageBox', {
     instance: null,
     msgCt: null,
     titles: {
-        ok: '#UT# Ok!',
-        error: '#UT# Fehler!',
-        directError: '#UT# Es ist ein Fehler aufgetreten!',
-        warning: '#UT# Warnung!',
-        notice: '#UT# Hinweis!'
+        ok: '#UT#OK!',
+        error: '#UT#Error!',
+        directError: '#UT#An error occurred!',
+        warning: '#UT#Warning!',
+        notice: '#UT#Note!'
     },
     statics: {
         SUCCESS: 'ok',

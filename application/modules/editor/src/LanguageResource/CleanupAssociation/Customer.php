@@ -83,11 +83,11 @@ class Customer extends Base
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1447', [
             'errorMessages' => [
-                Localization::trans('Die entfernten Kunden werden in den folgenden Aufgaben verwendet:'),
+                Localization::trans('The removed client(s) are used in the folowing tasks:'),
                 Localization::trans(
-                    'Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben ' .
-                    'dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden ' .
-                    'aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.'
+                    'Removing those clients will unassign this language resource from the tasks ' .
+                    'of those clients. Do you want to unassign it? Only then you can remove the ' .
+                    'client from this language resource here in the language resource management.'
                 ),
             ],
         ], extraData: [

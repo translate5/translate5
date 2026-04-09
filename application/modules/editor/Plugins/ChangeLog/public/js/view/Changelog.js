@@ -40,11 +40,11 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     header:true,
     layout:'fit',
     strings: {
-        date: '#UT#Datum',
-        jiranumber: '#UT#Änderungsnr.',
-        description: '#UT#Beschreibung',
-        title:'#UT#Aktuelle Änderungen an der Anwendung',
-        close:'#UT#Schließen'
+        date: '#UT#Date',
+        jiranumber: '#UT#Change no.',
+        description: '#UT#Description',
+        title:'#UT#Latest changes to the application',
+        close:'#UT#Close'
     },
     listeners: {
         afterlayout: function() {

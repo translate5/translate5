@@ -184,7 +184,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             throw ErrorException::createResponse(
                 'E1688',
                 [
-                    Localization::trans('Ungültiger Löschtyp angegeben.'),
+                    Localization::trans('Invalid deletion type specified.'),
                 ],
             );
         } catch (editor_Services_Connector_Exception $exception) {
@@ -275,7 +275,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             'E1377' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    Localization::trans('Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.'),
+                    Localization::trans('Memory status: {status}. Please try again in a while.'),
                 ],
                 [
                     'status' => $exception->getExtra('status'),
@@ -284,16 +284,16 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             'E1611' => ErrorException::createResponse(
                 $errorCode,
                 [
-                    Localization::trans('Angefordertes Segment nicht gefunden. Wahrscheinlich wurde es gelöscht.'),
+                    Localization::trans('The segment you are trying to save has already been deleted by another process.'),
                 ],
             ),
             'E1612' => ErrorException::createResponse(
                 $errorCode,
                 [
                     Localization::trans(
-                        'Die gefundene Segment-ID weicht von der gesuchten ab, ' .
-                        'wahrscheinlich wurde sie inzwischen gelöscht oder bearbeitet. ' .
-                        'Sie müssen Ihre Suche aktualisieren.'
+                        'The segment could not be saved. <br />Please try to refresh your search. ' .
+                        '<br />The found segment-id on the server differs from the requested one. <br />' .
+                        'Probably the segment index changed on the server due to other operations.'
                     ),
                 ],
             ),
@@ -301,8 +301,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                 $errorCode,
                 [
                     Localization::trans(
-                        'Das Segment konnte nicht gelöscht werden, wahrscheinlich wurde es inzwischen ' .
-                        'gelöscht oder bearbeitet. Sie müssen Ihre Suche aktualisieren.'
+                        'Could not delete segment. <br />Please refresh your search and try again. <br />' .
+                        'Found segment id differs from the requested one. <br />' .
+                        'Probably the segment index changed on the server due to other operations.'
                     ),
                 ],
             ),
@@ -310,7 +311,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                 $errorCode,
                 [
                     Localization::trans(
-                        'Das Segment konnte nicht im TM gespeichert werden. Bitte versuchen Sie es erneut.'
+                        'The segment could not be saved to the TM. <br />Please try again later.<br />' .
+                        'If this message persists, please try to refresh your search. <br />' .
+                        'If the message still persists, please notify the system support.'
                     ),
                 ],
             ),

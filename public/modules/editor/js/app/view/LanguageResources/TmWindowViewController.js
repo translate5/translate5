@@ -34,7 +34,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmwindowviewcontroller',
     messages: {
-        notConfigured: '#UT#Die Sprachressource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}',
+        notConfigured: '#UT#The language resource “{0}” needs to be configured first. Further information: {1}',
     },
     listen: {
         component: {

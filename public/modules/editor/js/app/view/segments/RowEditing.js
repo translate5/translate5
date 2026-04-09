@@ -49,7 +49,7 @@ Ext.define('Editor.view.segments.RowEditing', {
 
     messages: {
         previousSegmentNotSaved: 'Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!',
-        edit100pWarning: '#UT#Achtung, Sie editieren einen 100% Match!'
+        edit100pWarning: '#UT#Warning, You are editing a 100% match!'
     },
 
     requires: [

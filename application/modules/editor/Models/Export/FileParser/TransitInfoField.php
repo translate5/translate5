@@ -247,7 +247,7 @@ class editor_Models_Export_FileParser_TransitInfoField
         }
 
         if (! empty($sourceTermsToTrack) || ! empty($targetTermsToTrack)) {
-            $this->transitInfoString .= '; ' . $this->translate->_('QuellTerme') . ': ' . join(', ', $sourceTermsToTrack) . '; ' . $this->translate->_('ZielTerme') . ': ' . join(', ', $targetTermsToTrack) . ';';
+            $this->transitInfoString .= '; ' . $this->translate->_('Source terms') . ': ' . join(', ', $sourceTermsToTrack) . '; ' . $this->translate->_('Target terms') . ': ' . join(', ', $targetTermsToTrack) . ';';
         }
     }
 

@@ -94,7 +94,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
 
         $t = $this->view->translate; // @phpstan-ignore-line
         if (empty($this->segments)) {
-            return '<b>' . $t->_('Es wurden keine Segmente verändert!') . '</b>';
+            return '<b>' . $t->_('No segments have been modified!') . '</b>';
         }
 
         /* @var $task editor_Models_Task */
@@ -110,7 +110,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
 
         $result = [];
         $result[] = '<br/>';
-        $header = $t->_('Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />');
+        $header = $t->_('Below you can see the changes made by the previous role <b>{previousRole}</b>:<br />');
         $header = str_replace('{previousRole}', $t->_($this->view->triggeringStep), $header); // @phpstan-ignore-line
 
         $result[] = $header;

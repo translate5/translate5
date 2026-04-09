@@ -31,8 +31,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.TaskDeadlineChangeHandler', {
 
     strings:{
-        deadlineDateMesssageTitle:'#UT#Deadline Datum',
-        deadlineDateMesssage:'#UT#Hinweis: Einige Benutzer haben individuelle Aufgabenfristen. Bitten prüfen und passen Sie diese bei Bedarf an.',
+        deadlineDateMesssageTitle:'#UT#Deadline date',
+        deadlineDateMesssage:'#UT#Note: Some users have individual deadline dates set. Please review and adjust them manually if necessary.',
     },
 
 

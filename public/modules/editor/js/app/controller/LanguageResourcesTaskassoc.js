@@ -41,9 +41,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
     models: ['Editor.model.LanguageResources.TaskAssoc'],
     stores: ['Editor.store.LanguageResources.TaskAssocStore'],
     strings: {
-        assocSave: '#UT#Eintrag gespeichert!',
-        assocDeleted: '#UT#Eintrag gelöscht!',
-        assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
+        assocSave: '#UT#Entry saved!',
+        assocDeleted: '#UT#Entry deleted!',
+        assocSaveError: '#UT#Error while saving changes!'
     },
     refs: [{
         ref: 'taskTabs',

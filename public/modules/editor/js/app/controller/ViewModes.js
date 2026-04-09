@@ -90,8 +90,8 @@ Ext.define('Editor.controller.ViewModes', {
             }
         }
     },
-    messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lesemodus" ist.',
-    messageIsViewModeDueHiddenTags: '#UT#Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.',
+    messageIsViewMode: '#UT#This segment is not editable since the task is read-only.',
+    messageIsViewModeDueHiddenTags: '#UT#The segment cannot be edited because tags are hidden. Click on “Settings” and choose the short or full tag view in order to make tags visible.',
     
     /**
      * Flag when true, editor can not be set into a non readonly mode

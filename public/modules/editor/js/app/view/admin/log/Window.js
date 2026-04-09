@@ -32,9 +32,9 @@ Ext.define('Editor.view.admin.log.Window', {
     requires: ['Editor.view.admin.log.WindowViewController'],
     controller: 'editorlogWindowViewController',
     strings: {
-        close: '#UT#Fenster schließen',
-        details: '#UT#Detailansicht',
-        btnBack: '#UT#Zurück zu den Ereignissen'
+        close: '#UT#close window',
+        details: '#UT#Detailed view',
+        btnBack: '#UT#Back to the events'
     },
     closeAction: 'destroy',
     layout: 'fit',

@@ -45,10 +45,10 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
     reference: 'adminTaskTaskManagement',
     header:false,
     strings: {
-        close: '#UT#Fenster schließen',
-        events: '#UT#Ereignisse',
-        config : '#UT#Standardkonfiguration Kunde überschreiben',
-        pivotAssoc: '#UT#Pivot-Sprachressourcen'
+        close: '#UT#close window',
+        events: '#UT#Events',
+        config : '#UT#Configuration',
+        pivotAssoc: '#UT#Pivot language resources'
     },
     layout: 'fit',
     viewModel: {

@@ -54,7 +54,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     autoScroll: true,
     
     strings:{
-        wizardTitle:'#UT#Sprachressourcen zuweisen'
+        wizardTitle:'#UT#Associate language resources'
     },
     listeners: {
         activate:function (panel) {

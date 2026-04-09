@@ -43,7 +43,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     stateId: 'preferencesOverviewPanel',
     helpSection: 'preferences',
     stateful: true,
-    title: '#UT#Einstellungen',
+    title: '#UT#Preferences',
     defaults: {
         iconAlign: 'left',
         textAlign: 'left'

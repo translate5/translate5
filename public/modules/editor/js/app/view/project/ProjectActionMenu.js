@@ -34,8 +34,8 @@ Ext.define('Editor.view.project.ProjectActionMenu', {
 	  type:'projectActionMenu'
   },
   messages: {
-      actionDeleteProject: '#UT#Projekt komplett löschen',
-      actionReloadProject: '#UT#Projekt aktualisieren',
+      actionDeleteProject: '#UT#Delete project completely',
+      actionReloadProject: '#UT#Refresh project',
   },
   alias: 'widget.projectActionMenu',
 

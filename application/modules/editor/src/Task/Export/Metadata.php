@@ -94,32 +94,32 @@ class Metadata
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.excel.metadata');
 
-        $this->kpiTypeLocales['processingTime'] = $this->translate->_('Ø Bearbeitungszeit') . ' / ';
-        $this->kpiTypeLocales['workflowStep'] = $this->translate->_('Workflow Schritt');
-        $type = $this->translate->_('Typ');
+        $this->kpiTypeLocales['processingTime'] = $this->translate->_('Ø Processing time') . ' / ';
+        $this->kpiTypeLocales['workflowStep'] = $this->translate->_('Workflow step');
+        $type = $this->translate->_('Type');
 
         $this->kpiTypeLocales[editor_Models_KPI::KPI_REVIEWER] =
-            $type . ' ' . $this->translate->_('Lektorat');
+            $type . ' ' . $this->translate->_('Review');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR] =
-            $type . ' ' . $this->translate->_('Übersetzung');
+            $type . ' ' . $this->translate->_('Translation');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR_CHECK] =
-            $type . ' ' . $this->translate->_('Finales Lektorat');
+            $type . ' ' . $this->translate->_('Final review');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_START] =
-            $this->translate->_('Ø Levenshtein-Distanz vor Beginn des Workflows');
+            $this->translate->_('Ø Levenshtein distance before the start of the workflow');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_START] =
-            $this->translate->_('Ø Nachbearbeitungszeit vor Beginn des Workflows');
+            $this->translate->_('Ø Post-editing time before the beginning of the workflow');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION] =
-            $this->translate->_('Ø Nachbearbeitungszeit innerhalb eines Workflowschritts');
+            $this->translate->_('Ø Post-editing time within one workflow step');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS] =
-            $this->translate->_('Ø Levenshtein-Abstand innerhalb eines Workflowschritts');
+            $this->translate->_('Ø Levenshtein distance within one workflow step');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_TOTAL] =
             $this->translate->_('Ø Post-editing time since import/pre-translation');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL] =
             $this->translate->_('Ø Levenshtein distance from import/pre-translation');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_END] =
-            $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');
+            $this->translate->_('Ø Levenshtein distance after the end of the workflow');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_END] =
-            $this->translate->_('Ø Nachbearbeitungszeit nach Ende des Workflows');
+            $this->translate->_('Ø Post-editing time after the end of the workflow');
     }
 
     /**
@@ -294,7 +294,7 @@ class Metadata
         }
 
         $this->excelMetadata->addKPI($this->kpiStatistics['excelExportUsage']
-            . ' ' . $this->translate->_('Excel-Export Nutzung'));
+            . ' ' . $this->translate->_('Excel export usage'));
 
         // add data: tasks
         foreach ($this->tasks as $task) {

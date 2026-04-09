@@ -41,7 +41,7 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   views: ['Editor.plugins.ChangeLog.view.Changelog'],
   models: ['Editor.plugins.ChangeLog.model.Changelog'],
   stores:['Editor.plugins.ChangeLog.store.Changelog'],
-  btnText: '#UT#Änderungsprotokoll der Version ',
+  btnText: '#UT#Changelog of version',
   refs:[{
       ref: 'ChangeLogWindow',
       selector: '#changeLogWindow'

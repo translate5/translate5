@@ -98,7 +98,7 @@ class editor_CoordinatorgroupController extends ZfExtended_RestController
                 'E2000',
                 [
                     'name' => [
-                        Localization::trans('Name (Angabe notwendig)'),
+                        Localization::trans('Name (mandatory)'),
                     ],
                 ],
                 [
@@ -144,7 +144,7 @@ class editor_CoordinatorgroupController extends ZfExtended_RestController
 
         $name = $this->getRequest()->getData(true)['name'] ?? null;
         if (! $name || $name !== $group->getName()) {
-            throw new ZfExtended_NoAccessException($this->getTranslator()->_('Falscher Name'));
+            throw new ZfExtended_NoAccessException($this->getTranslator()->_('Wrong name'));
         }
 
         try {

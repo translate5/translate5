@@ -55,8 +55,8 @@ Ext.define('Editor.view.admin.TaskUpload', {
     importType:'postimport',
     
     strings:{
-        wizardTitle:'#UT#Dateien werden hochgeladen',
-        finishButton:'#UT#Schließen',
+        wizardTitle:'#UT#File upload in progress',
+        finishButton:'#UT#Close',
     },
     
     initConfig: function(instanceConfig) {

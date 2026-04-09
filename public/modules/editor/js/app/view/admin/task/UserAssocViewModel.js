@@ -34,14 +34,14 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
        'Editor.model.admin.User'
     ],
     strings: {
-        editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
-        segmentrangeError: '#UT#Nicht zugewiesene Segmente',
-        translator: '#UT#Übersetzer',
-        translatorCheck: '#UT#Zweiter Lektor',
-        reviewer: '#UT#Lektor',
-        visitor: '#UT#Besucher',
-        allEditedByUsers:'#UT#(alle Segmente können von allen Nutzern editiert werden)',
-        canNotBeEditedByUsers:'#UT#(können derzeit von niemandem bearbeitet werden)'
+        editInfo: '#UT#Choose an entry in the table to edit it!',
+        segmentrangeError: '#UT#Unassigned segments',
+        translator: '#UT#Translator',
+        translatorCheck: '#UT#Second Reviewer',
+        reviewer: '#UT#Reviewer',
+        visitor: '#UT#visitor',
+        allEditedByUsers:'#UT#(all segments can be edited by all users)',
+        canNotBeEditedByUsers:'#UT#(cannot be edited by anyone right now)'
     },
     
     stores: {

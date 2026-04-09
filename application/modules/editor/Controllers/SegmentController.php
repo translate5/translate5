@@ -384,7 +384,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         if (! $result || empty($result)) {
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-            $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
+            $this->view->message = $t->_('No results for the current search!');
 
             return;
         }
@@ -436,7 +436,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
         if ($this->isMqmTask($parameters['taskGuid'])) {
-            $this->view->message = $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
+            $this->view->message = $t->_('“Replace all” is not supported for tasks with segments with manual QA tags');
             $this->view->hasMqm = true;
 
             return;
@@ -449,7 +449,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $results = $searchService->search($searchQuery);
 
         if (empty($results)) {
-            $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
+            $this->view->message = $t->_('No results for the current search!');
 
             return;
         }
@@ -716,7 +716,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             if ($result->status === TagValidationTracking::WARN) {
                 $t = ZfExtended_Zendoverwrites_Translate::getInstance();
                 /* @var $t ZfExtended_Zendoverwrites_Translate */
-                $result->warning = $t->_('Ein oder mehrere Segmente konnten nicht auf finalen Prozessstatus gesetzt werden, weil sie Tag-Fehler enthalten. Filtern Sie in der AutoQA nach dieser Kategorie um die Segmente erneut zu prüfen.');
+                $result->warning = $t->_('One or more segments could not be set to final processing state because they contain tag errors. Filter by this category in the AutoQA to check the segment(s) again.');
             }
             echo Zend_Json::encode($result);
             if ($result->status !== TagValidationTracking::WAIT) {
@@ -802,19 +802,19 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         //add translations
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $data['locales']['entryAttrs'] = $translate->_('Attribute auf Eintragsebene');
-        $data['locales']['languageAttrs'] = $translate->_('Attribute auf Sprachebene');
-        $data['locales']['termAttrs'] = $translate->_('Attribute auf Benennungsebene');
+        $data['locales']['entryAttrs'] = $translate->_('Entry-level attributes');
+        $data['locales']['languageAttrs'] = $translate->_('Language-level attributes');
+        $data['locales']['termAttrs'] = $translate->_('Term-level attributes');
         if ($data['noTerms']) {
-            $data['locales']['noTermsMessage'] = $translate->_('Keine Terminologie vorhanden!');
+            $data['locales']['noTermsMessage'] = $translate->_('No terminology available!');
         }
 
         $data['termStatus'] = [
-            TermModel::STAT_MAP_PERMITTED => $translate->_('erlaubte Benennung'),
-            TermModel::STAT_MAP_FORBIDDEN => $translate->_('verbotene Benennung'),
-            TermModel::STAT_MAP_STANDARDIZED => $translate->_('Standardisiert'),
-            TermModel::STAT_MAP_PREFERRED => $translate->_('Vorzugsbenennung'),
-            'unknown' => $translate->_('Unbekannter Term Status'),
+            TermModel::STAT_MAP_PERMITTED => $translate->_('permitted designation'),
+            TermModel::STAT_MAP_FORBIDDEN => $translate->_('Forbidden term'),
+            TermModel::STAT_MAP_STANDARDIZED => $translate->_('Standardized'),
+            TermModel::STAT_MAP_PREFERRED => $translate->_('Preferred designation'),
+            'unknown' => $translate->_('Unknown term-entry status'),
         ];
 
         echo Zend_Json::encode($data, Zend_Json::TYPE_OBJECT);
@@ -862,7 +862,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             /* @var $t ZfExtended_Zendoverwrites_Translate */
 
             $errors = [
-                'searchField' => $t->_('Das Suchfeld ist leer.'),
+                'searchField' => $t->_('The search field is empty.'),
             ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
@@ -876,7 +876,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             /* @var $t ZfExtended_Zendoverwrites_Translate */
 
             $errors = [
-                'searchField' => $t->_('Der Suchbegriff ist zu groß.'),
+                'searchField' => $t->_('The search term is too long.'),
             ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);

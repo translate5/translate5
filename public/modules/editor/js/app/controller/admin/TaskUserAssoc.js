@@ -57,12 +57,12 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         selector: '#adminTaskTaskManagement'
     }],
     messages: {
-        assocSave: '#UT#Eintrag gespeichert!',
-        assocDeleted: '#UT#Eintrag gelöscht!',
-        assocSaveError: '#UT#Fehler beim Speichern der Änderungen!',
-        finishAutoQaCheck: '#UT#Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.',
-        finishAutoQaCheckQuestion: '#UT#Trotzdem Status auf "abgeschlossen" setzen?',
-        noFinishDueDraftSegments: '#UT#Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.'
+        assocSave: '#UT#Entry saved!',
+        assocDeleted: '#UT#Entry deleted!',
+        assocSaveError: '#UT#Error while saving changes!',
+        finishAutoQaCheck: '#UT#Some mandatory criteria of the AutoQA still have errors.',
+        finishAutoQaCheckQuestion: '#UT#Nevertheless set status to “finished”?',
+        noFinishDueDraftSegments: '#UT#The task still contains segments in draft status. Open the task and change the status.'
     },
     //***********************************************************************************
     //Begin Events

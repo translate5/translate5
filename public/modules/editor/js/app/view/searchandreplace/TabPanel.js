@@ -48,14 +48,14 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
     },
     
     strings:{
-        searchTabTitle:'#UT#Suchen',
-        replaceTabTitle:'#UT#Ersetzen',
-        closeButton:'#UT#Schließen',
-        replaceAllButton:'#UT#Alles ersetzen',
-        searchButton:'#UT#Suchen',
-        replaceButton:'#UT#Ersetzen',
-        mqmNotSupporterTooltip:'#UT#Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt',
-        multiUsersTooltip:'#UT#Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe'
+        searchTabTitle:'#UT#Search',
+        replaceTabTitle:'#UT#Replace',
+        closeButton:'#UT#Close',
+        replaceAllButton:'#UT#Replace all',
+        searchButton:'#UT#Search',
+        replaceButton:'#UT#Replace',
+        mqmNotSupporterTooltip:'#UT#“Replace all” is not supported for tasks with segments with manual QA tags',
+        multiUsersTooltip:'#UT#Multiple users editing the same task simultaneously'
         	
     },
     

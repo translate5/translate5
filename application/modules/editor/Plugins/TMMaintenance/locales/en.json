@@ -1,132 +1,132 @@
 {
-  "logout": "Logout",
-  "localeStore": [
-    {
-      "locale": "en",
-      "name": "English"
+    "logout": "Logout",
+    "localeStore": [
+        {
+            "locale": "en",
+            "name": "English"
+        },
+        {
+            "locale": "de",
+            "name": "German"
+        }
+    ],
+    "modeCombo": [
+        {
+            "name": "contains",
+            "value": "contains"
+        },
+        {
+            "name": "exact match",
+            "value": "exact"
+        }
+    ],
+    "modeComboSourceTarget": [
+        {
+            "name": "contains",
+            "value": "contains"
+        },
+        {
+            "name": "match full segment",
+            "value": "exact"
+        }
+    ],
+    "selectTm": {
+        "title": "Select TM",
+        "name": "Name",
+        "sourceLanguage": "Source language",
+        "targetLanguage": "Target language",
+        "clients": "Clients",
+        "taskTm": "Task TM",
+        "select": "Select",
+        "close": "Close",
+        "emptyText": "No records available"
     },
-    {
-      "locale": "de",
-      "name": "German"
+    "searchForm": {
+        "tm": "TM",
+        "mode": "Mode",
+        "source": "Source",
+        "target": "Target",
+        "author": "Created by",
+        "additionalInfo": "Additional info",
+        "document": "Document name",
+        "creationDateFrom": "Created after",
+        "creationDateTo": "Created before",
+        "search": "Search",
+        "deleteAll": "Delete all",
+        "deleteAllTooltip": "All segments that match the current search settings are deleted",
+        "deleteAllDisabledTooltip": "All segments that match the current search settings are deleted. <br> This function is only available if there are at least 20 search results, as “Delete all” triggers a reorganization of the TM, <br> which can take some time during which the TM is not available.",
+        "sourceLanguage": "Source language",
+        "targetLanguage": "Target language",
+        "caseSensitive": "Case-sensitive"
+    },
+    "createForm": {
+        "title": "Create new translation unit",
+        "sourceText": "Source text",
+        "targetText": "Target text",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "deleteBatch": {
+        "no": "Cancel",
+        "yes": "Delete all",
+        "warningText": "All segments in the current result list will be deleted, and the TM will be reorganized afterwards. This may take some time. Do you still want to delete all segments?",
+        "warningTextOneByOne": "Each segment of the current search will be deleted individually, which may take some time. The UI will be blocked until the process is complete. If you wish to use TM Maintenance during this time, please open a new tab."
+    },
+    "list": {
+        "title": "Segments",
+        "totalAmount": "Total segments found: ",
+        "calculating": "Calculating...",
+        "loadingSegmentPlaceholder": "Loading...",
+        "loadingSegmentNumber": "Loading segment #",
+        "loadedSoFar": "Loaded {0} segments so far",
+        "saving": "Saving... Please wait.",
+        "columns": {
+            "sourceText": "Source text",
+            "targetText": "Target text",
+            "author": "Created by",
+            "additionalInfo": "Additional info",
+            "document": "Document",
+            "context": "Context",
+            "creationDate": "Creation date",
+            "actions": "Actions",
+            "sourceLanguage": "Source language",
+            "targetLanguage": "Target language"
+        },
+        "edit": "Edit",
+        "editSource": "Edit source",
+        "editTarget": "Edit target",
+        "delete": "Delete",
+        "deleteBySource": "Delete all segments having same source as the current one",
+        "deleteBySourceAndTarget": "Delete all segments having same source AND target as the current one",
+        "create": "Create",
+        "save": "Save (CTRL + S)",
+        "cancel": "Cancel (ESC)",
+        "saveGoToPrevious": "Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)",
+        "saveGoToNext": "Save and open next editable segment (CTRL + ALT + ENTER)",
+        "closeGoToPrevious": "Don’t save and open previous editable segment (CTRL + ALT + ↑)",
+        "closeGoToNext": "Don’t save and open next editable segment (CTRL + ALT + ↓)"
+    },
+    "error": {
+        "title": "An error occurred",
+        "infoTitle": "Info",
+        "couldNotProcessRequest": "Error while saving or reading data. Please contact our support team!",
+        "close": "Close",
+        "responseFromServer": "Response from server",
+        "messageFromServer": "Message from server",
+        "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct this segment and try again."
+    },
+    "deleteSegment": {
+        "title": "Delete segment",
+        "text": "Do you really want to delete this segment?",
+        "bySource": {
+            "title": "Delete all segments having same source",
+            "text": "{0} - all segments having such a source will be deleted regardless of the current filtering. Proceed?"
+        },
+        "bySourceAndTarget": {
+            "title": "Delete all segments having same source AND target",
+            "text": "{0} => {1} - all segments having these source AND target will be deleted regardless of the current filtering. Proceed?"
+        },
+        "yes": "Yes",
+        "no": "No"
     }
-  ],
-  "modeCombo": [
-    {
-      "name": "contains",
-      "value": "contains"
-    },
-    {
-      "name": "exact match",
-      "value": "exact"
-    }
-  ],
-  "modeComboSourceTarget": [
-    {
-      "name": "contains",
-      "value": "contains"
-    },
-    {
-      "name": "match full segment",
-      "value": "exact"
-    }
-  ],
-  "selectTm": {
-    "title": "Select TM",
-    "name": "Name",
-    "sourceLanguage": "Source language",
-    "targetLanguage": "Target language",
-    "clients": "Clients",
-    "taskTm": "Task TM",
-    "select": "Select",
-    "close": "Close",
-    "emptyText": "No records available"
-  },
-  "searchForm": {
-    "tm": "TM",
-    "mode": "Mode",
-    "source": "Source",
-    "target": "Target",
-    "author": "Created by",
-    "additionalInfo": "Additional info",
-    "document": "Document name",
-    "creationDateFrom": "Created after",
-    "creationDateTo": "Created before",
-    "search": "Search",
-    "deleteAll": "Delete all",
-    "deleteAllTooltip": "All segments that match the current search settings are deleted",
-    "deleteAllDisabledTooltip": "All segments that match the current search settings are deleted. <br> This function is only available if there are at least 20 search results, as “Delete all” triggers a reorganization of the TM, <br> which can take some time during which the TM is not available.",
-    "sourceLanguage": "Source language",
-    "targetLanguage": "Target language",
-    "caseSensitive": "Case-sensitive"
-  },
-  "createForm": {
-    "title": "Create new translation unit",
-    "sourceText": "Source text",
-    "targetText": "Target text",
-    "save": "Save",
-    "cancel": "Cancel"
-  },
-  "deleteBatch": {
-    "no": "Cancel",
-    "yes": "Delete all",
-    "warningText": "All segments in the current result list will be deleted, and the TM will be reorganized afterwards. This may take some time. Do you still want to delete all segments?",
-    "warningTextOneByOne": "Each segment of the current search will be deleted individually, which may take some time. The UI will be blocked until the process is complete. If you wish to use TM Maintenance during this time, please open a new tab."
-  },
-  "list": {
-    "title": "Segments",
-    "totalAmount": "Total segments found: ",
-    "calculating": "Calculating...",
-    "loadingSegmentPlaceholder": "Loading...",
-    "loadingSegmentNumber": "Loading segment #",
-    "loadedSoFar": "Loaded {0} segments so far",
-    "saving": "Saving... Please wait.",
-    "columns": {
-      "sourceText": "Source text",
-      "targetText": "Target text",
-      "author": "Created by",
-      "additionalInfo": "Additional info",
-      "document": "Document",
-      "context": "Context",
-      "creationDate": "Creation date",
-      "actions": "Actions",
-      "sourceLanguage": "Source language",
-      "targetLanguage": "Target language"
-    },
-    "edit": "Edit",
-    "editSource": "Edit source",
-    "editTarget": "Edit target",
-    "delete": "Delete",
-    "deleteBySource": "Delete all segments having same source as the current one",
-    "deleteBySourceAndTarget": "Delete all segments having same source AND target as the current one",
-    "create": "Create",
-    "save": "Save (CTRL + S)",
-    "cancel": "Cancel (ESC)",
-    "saveGoToPrevious": "Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)",
-    "saveGoToNext": "Save and open next editable segment (CTRL + ALT + ENTER)",
-    "closeGoToPrevious": "Don’t save and open previous editable segment (CTRL + ALT + ↑)",
-    "closeGoToNext": "Don’t save and open next editable segment (CTRL + ALT + ↓)"
-  },
-  "error": {
-    "title": "An error occurred",
-    "infoTitle": "Info",
-    "couldNotProcessRequest": "Error while saving or reading data. Please contact our support team!",
-    "close": "Close",
-    "responseFromServer": "Response from server",
-    "messageFromServer": "Message from server",
-    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct this segment and try again."
-  },
-  "deleteSegment": {
-    "title": "Delete segment",
-    "text": "Do you really want to delete this segment?",
-    "bySource": {
-      "title": "Delete all segments having same source",
-      "text": "{0} - all segments having such a source will be deleted regardless of the current filtering. Proceed?"
-    },
-    "bySourceAndTarget": {
-      "title": "Delete all segments having same source AND target",
-      "text": "{0} => {1} - all segments having these source AND target will be deleted regardless of the current filtering. Proceed?"
-    },
-    "yes": "Yes",
-    "no": "No"
-  }
 }

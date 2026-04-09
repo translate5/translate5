@@ -165,7 +165,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
                     return '#' . $item->nr . ': ' . $item->comment;
                 }, $this->segmentErrors)),
             ]);
-            $msg = $translate->_('Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:');
+            $msg = $translate->_('The Excel file could be reimported, but the following segments contain errors that need to be corrected:');
             $restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function (excelExImportSegmentContainer $item) {
                 return [
                     'type' => $item->nr,

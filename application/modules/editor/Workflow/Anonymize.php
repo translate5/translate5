@@ -189,7 +189,7 @@ class editor_Workflow_Anonymize
      */
     protected function renderAnonymizedUserName($value)
     {
-        $userPrefix = $this->translate->_('Benutzer');
+        $userPrefix = $this->translate->_('Users');
         $this->taskUserTracking->loadEntry($this->taskGuid, $this->userGuid);
         if (! $this->taskUserTracking->hasEntry()) {
             return $userPrefix;

@@ -33,7 +33,13 @@ use MittagQI\ZfExtended\Localization;
 
 class L10nFormatter
 {
-    public function process(): int
+    /**
+     * @return array{ count:int, changed:int }
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \Zend_Exception
+     * @throws \ZfExtended_Exception
+     */
+    public function process(): array
     {
         $xliffs = [];
 
@@ -55,11 +61,19 @@ class L10nFormatter
             }
         }
 
+        $numChanged = 0;
+
         foreach ($xliffs as $xliff) {
             $formatter = new XliffFormatter($xliff);
             $formatter->format();
+            if ($formatter->fileChanged()) {
+                $numChanged++;
+            }
         }
 
-        return count($xliffs);
+        return [
+            'count' => count($xliffs),
+            'changed' => $numChanged,
+        ];
     }
 }

@@ -33,8 +33,9 @@ use ZfExtended_Exception;
 
 /**
  * Writes a new ZXLIFF file for the given locale into the given dir
+ * Does overwrite existing files
  */
-class ZXliffWriter extends AbstractXliffProcessor
+class XliffWriter extends AbstractXliffProcessor
 {
     public function __construct(string $absoluteFolderPath, string $locale)
     {
@@ -45,21 +46,13 @@ class ZXliffWriter extends AbstractXliffProcessor
         $this->prefillUntranslated = false;
         $this->markUntranslated = false;
 
-        $sourceLocale = ($locale === Localization::PRIMARY_LOCALE) ?
-            Localization::DEFAULT_SOURCE_LOCALE : Localization::PRIMARY_LOCALE;
-
-        $this->header =
-            '<?xml version="1.0" ?>' . "\n" .
-            '<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">' . "\n" .
-            '    <file original="php-sourcecode" source-language="' . $sourceLocale . '" target-language="' . $locale . '" datatype="php">' . "\n" .
-            '        <body>';
-
-        $this->footer = "\n" .
-            '        </body>' . "\n" .
-            '    </file>' . "\n" .
-            '</xliff>';
+        $this->header = $this->createHeader($locale);
+        $this->footer = self::FOOTER_TPL;
     }
 
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     */
     public function write($translations): void
     {
         foreach ($translations as $source => $target) {

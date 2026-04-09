@@ -47,8 +47,8 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
     task:null,
     autoScroll: true,
     strings:{
-        wizardTitle:'#UT#Pivot-Sprachressourcen',
-        pivotFilesZipMessage:'#UT#Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.'
+        wizardTitle:'#UT#Pivot language resources',
+        pivotFilesZipMessage:'#UT#If the ZIP package to be imported contains files for filling the pivot column, settings made here will be ignored.'
     },
     listeners:{
         activate:'onPivotWizardActivate'

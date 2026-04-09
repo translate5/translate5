@@ -41,8 +41,8 @@ Ext.define('Editor.view.ToolTip', {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
         history: '#UT#HISTORY',
-        notrackchangesplugin: '#UT#TrackChanges found, but Plugin is not activated.',
-        severity: '#UT#Gewichtung'
+        notrackchangesplugin: '#UT#Tracked changes found, but TrackChanges plug-in is not activated.',
+        severity: '#UT#Severity'
     },
     userStore: null,
     listeners: {

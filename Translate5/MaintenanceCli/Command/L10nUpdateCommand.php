@@ -62,6 +62,13 @@ class L10nUpdateCommand extends Translate5AbstractCommand
             'The missing translations of the  given locale will be marked. If no locale is provided, “' .
             Localization::FALLBACK_LOCALE . '” is used.'
         );
+
+        $this->addOption(
+            'show-warnings',
+            'w',
+            InputOption::VALUE_NONE,
+            'Shows warnings about extractions that could not be evaluated.'
+        );
     }
 
     /**
@@ -77,6 +84,10 @@ class L10nUpdateCommand extends Translate5AbstractCommand
             '--update' => null,
             '--amend-missing' => null,
         ];
+
+        if (! $input->getOption('show-warnings')) {
+            $commandData['--hide-warnings'] = null;
+        }
 
         if ($input->hasParameterOption(['--mark-missing', '-m'], true)) {
             $locale = $input->getOption('mark-missing');

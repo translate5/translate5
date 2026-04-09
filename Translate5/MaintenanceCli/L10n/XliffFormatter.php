@@ -34,11 +34,19 @@ namespace Translate5\MaintenanceCli\L10n;
  */
 class XliffFormatter extends AbstractXliffProcessor
 {
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function format(): void
     {
         $this->process([], [], [], 'Formatted');
     }
 
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function add(string $string, string $primaryTranslation = ''): int
     {
         return $this->process([
@@ -46,16 +54,28 @@ class XliffFormatter extends AbstractXliffProcessor
         ], [], [], 'Added');
     }
 
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function remove(string $string): int
     {
         return $this->process([], [$string], [], 'Removed');
     }
 
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function replace(string $string, string $replacement): int
     {
         return $this->process([], [], [$string, $replacement], 'Replaced');
     }
 
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     private function process(array $added, array $removed, array $replaced, string $process): int
     {
         $parser = new XliffParser($this->absoluteFilePath);

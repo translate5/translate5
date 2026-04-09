@@ -47,16 +47,16 @@ Ext.define('Editor.view.segments.grid.Header', {
     ],
     controller: 'segmentsHeader',
     strings: {
-        progressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
-        leaveBtn: '#UT#Zurück zur Aufgabenübersicht',
-        leaveTaskWindowTitle:'#UT#Zurück zur Aufgabenübersicht',
-        closeBtn: '#UT#Anwendung verlassen',
-        error: '#UT#Fehler',
-        showDesc: '#UT#Projektbeschr. anzeigen',
-        hideDesc: '#UT#Projektbeschr. ausblenden',
-        leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',
-        leaveTaskWindowFinishBtn:'#UT#Alles fertig - Aufgabe abschließen',
-        leaveTaskWindowCancelBtn:'#UT#Aufgabe später weiterbearbeiten'
+        progressTooltip:'#UT#% completed by assigned users in the current workflow step',
+        leaveBtn: '#UT#Back to task list',
+        leaveTaskWindowTitle:'#UT#Back to task list',
+        closeBtn: '#UT#Leave application',
+        error: '#UT#Error',
+        showDesc: '#UT#Show project description',
+        hideDesc: '#UT#Hide project description',
+        leaveTaskWindowMessage:'#UT#Do you want to finish the task and submit it, or edit it again later?',
+        leaveTaskWindowFinishBtn:'#UT#All done – finish task',
+        leaveTaskWindowCancelBtn:'#UT#Continue task later'
     },
     initConfig: function(instanceConfig) {
         var me = this,

@@ -28,27 +28,14 @@
 
 namespace Translate5\MaintenanceCli\L10n;
 
+/**
+ * Updates an existing ZXLIFF file with new translations
+ */
 class XliffUpdater extends AbstractXliffProcessor
 {
-    private array $existingStrings = [];
-
-    public function __construct(
-        string $absoluteFilePath,
-        bool $prefillUntranslated = false,
-        bool $markUntranslated = false
-    ) {
-        parent::__construct($absoluteFilePath, $prefillUntranslated, $markUntranslated);
-
-        // find existing strings
-        preg_replace_callback('~<trans-unit[^>]+>~', function ($matches) {
-            if (preg_match('~\s+id\s*=\s*["\']{1}([^"\']+)["\']{1}~', $matches[0], $idMatch) === 1) {
-                $this->existingStrings[] = base64_decode($idMatch[1]);
-            }
-
-            return '';
-        }, $this->existingBody);
-    }
-
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     */
     public function update(array $strings, array $translations, bool $doWriteFile = false): void
     {
         $numUntranslated = $this->assemble($strings, $translations);

@@ -72,6 +72,19 @@ class L10nHelper
         return array_merge([Localization::PRIMARY_LOCALE], Localization::SECONDARY_LOCALES);
     }
 
+    /**
+     * Creates the source-locale for bilingual localization files
+     * TODO FIXME: For the primary locale we use "ha" as source not to create "en" => "en" tasks
+     */
+    public static function createSourceLocale(string $targetLocale): string
+    {
+        if ($targetLocale === Localization::PRIMARY_LOCALE) {
+            return Localization::DEFAULT_SOURCE_LOCALE;
+        }
+
+        return Localization::PRIMARY_LOCALE;
+    }
+
     public static function getModuleXliff(string $module, string $locale = null): string
     {
         if (! array_key_exists($module, L10nConfiguration::MODULES)) {
@@ -91,24 +104,46 @@ class L10nHelper
         return L10nConfiguration::MODULES[$module]['code'];
     }
 
-    public static function createExportFileName(string $xliffPath): string
+    public static function createExportFileName(string $filePath): string
     {
-        $filename = basename($xliffPath);
+        if (str_starts_with($filePath, self::getBaseDir())) {
+            $filePath = substr($filePath, strlen(self::getBaseDir()));
+        }
+        $filename = basename($filePath);
         if (str_ends_with($filename, '.xliff')) {
             $filename = substr($filename, 0, -6) . Localization::FILE_EXTENSION_WITH_DOT;
         }
 
-        return str_replace('/', '-', trim(dirname($xliffPath), './')) . '_' . $filename;
+        return str_replace('/', '-', trim(dirname($filePath), './')) . '_' . $filename;
+    }
+
+    public static function createTaskName(string $locale): string
+    {
+        return 'Translate5-localization-' . \ZfExtended_Utils::getAppVersion() . '-' . $locale;
     }
 
     public static function createTaskZipName(string $locale): string
     {
-        $sourceLocale = ($locale === Localization::PRIMARY_LOCALE) ?
-            Localization::DEFAULT_SOURCE_LOCALE : Localization::PRIMARY_LOCALE;
-
-        return 'Translate5-Localization-Task-' . $sourceLocale . '-' . $locale . '.zip';
+        return 'Translate5-localization-' . \ZfExtended_Utils::getAppVersion() . '-' . $locale . '.zip';
     }
 
+    public static function createTaskZipNameRegex(string $locale): string
+    {
+        return '~Translate5-localization-[a-zA-Z0-9][a-zA-Z0-9\.]+-' . $locale . '~';
+    }
+
+    /**
+     * Changes Locales in JSON pathes
+     */
+    public static function createLocalizedJsonPath(string $filePath, string $currentLocale, string $newLocale): string
+    {
+        return substr($filePath, 0, -1 * strlen($currentLocale . '.json')) . $newLocale . '.json';
+    }
+
+    /**
+     * Retrieves all ZXLIFFs for the given module
+     * @throws \Zend_Exception
+     */
     public static function evaluateXliffModule(string $module): ?array
     {
         $xliffs = [];

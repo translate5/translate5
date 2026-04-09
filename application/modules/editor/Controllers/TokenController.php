@@ -51,16 +51,16 @@ class editor_TokenController extends ZfExtended_RestController
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
 
         if (empty($userId)) {
-            $errors['userId'] = $t->_('Die Parameter "userId" und "description" sind erforderlich.');
+            $errors['userId'] = $t->_('Parameters “userId” and “description” are required.');
         }
         if (empty($description)) {
-            $errors['description'] = $t->_('Die Parameter "userId" und "description" sind erforderlich.');
+            $errors['description'] = $t->_('Parameters “userId” and “description” are required.');
         }
 
         $expirationDate = $expires ? new DateTime($expires) : null;
 
         if ($expirationDate && $expirationDate < new DateTime()) {
-            $errors['expires'] = $t->_('Das Ablaufdatum darf nicht kürzer sein als heute');
+            $errors['expires'] = $t->_('Expiration date must not be earlier than today');
         }
 
         if (! empty($errors)) {
@@ -93,7 +93,7 @@ class editor_TokenController extends ZfExtended_RestController
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
 
             $this->handleErrors([
-                'expires' => $t->_('Das Ablaufdatum darf nicht kürzer sein als heute'),
+                'expires' => $t->_('Expiration date must not be earlier than today'),
             ]);
 
             return;

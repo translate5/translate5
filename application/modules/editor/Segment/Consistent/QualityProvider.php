@@ -157,7 +157,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
                 }
 
                 // If there is smth to be deleted - do delete
-                if ($categoriesByAction['del'] ?? 0) {
+                if (array_key_exists('del', $categoriesByAction)) {
                     $qualityM->removeBySegmentAndType($segmentIdA[$segmentNr], static::$type, $categoriesByAction['del']);
                 }
             }
@@ -198,7 +198,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Einheitlichkeit');
+        return $translate->_('Consistency');
     }
 
     public function translateCategory(
@@ -207,8 +207,8 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            editor_Segment_Consistent_Check::SOURCE => $translate->_('Uneinheitliche Quelle'),
-            editor_Segment_Consistent_Check::TARGET => $translate->_('Uneinheitliches Ziel'),
+            editor_Segment_Consistent_Check::SOURCE => $translate->_('Inconsistent source'),
+            editor_Segment_Consistent_Check::TARGET => $translate->_('Inconsistent target'),
             default => null,
         };
     }
@@ -221,8 +221,8 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task): string
     {
         switch ($category) {
-            case editor_Segment_Consistent_Check::SOURCE: return $translate->_('Findet Segmente mit dem selben Ziel, aber unterschiedlicher Quelle (Tags werden ignoriert)');
-            case editor_Segment_Consistent_Check::TARGET: return $translate->_('Findet Segmente mit der selben Quelle, aber unterschiedlichem Ziel (Tags werden ignoriert)');
+            case editor_Segment_Consistent_Check::SOURCE: return $translate->_('Finds segments with the same target, but different source segment content (tags ignored)');
+            case editor_Segment_Consistent_Check::TARGET: return $translate->_('Finds segments with the same source, but different target segment content (tags ignored)');
         }
 
         return '';

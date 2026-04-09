@@ -65,22 +65,22 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
     referenceHolder: true,
     
     strings:{
-        wizardTitle:'#UT#Standard-Benutzerzuweisungen',
-        sourceLang: '#UT#Quellsprache',
-        targetLang: '#UT#Zielsprache',
-        fieldWorkflowStepName: '#UT#Workflow-Schritt',
+        wizardTitle:'#UT#User assignment defaults',
+        sourceLang: '#UT#Source language',
+        targetLang: '#UT#Target language',
+        fieldWorkflowStepName: '#UT#Workflow step',
         fieldWorkflow: '#UT#Workflow',
         fieldState: '#UT#Status',
-        fieldUser: '#UT#Benutzer',
-        btnSave: '#UT#Speichern',
-        btnCancel: '#UT#Abbrechen',
-        formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
-        formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
+        fieldUser: '#UT#Users',
+        btnSave: '#UT#Save',
+        btnCancel: '#UT#Cancel',
+        formTitleAdd: '#UT#Add user association:',
+        formTitleEdit: '#UT#Edit user “{0}”',
         fieldDeadline:'#UT#Deadline',
-        deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.',
-        usageModeCoop: "#UT#Sequentielles Arbeiten",
-        usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
-        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten"
+        deadlineDateInfoTooltip:'#UT#translate5 will send a deadline reminder by default 2 days before and 2 days after the set date and time (+/- 10 min). This can be changed by your administrator.',
+        usageModeCoop: '#UT#Sequential work',
+        usageModeCompetitive: '#UT#Competing assignment',
+        usageModeSimultaneous: '#UT#Simultaneous work'
     },
 
     listeners:{

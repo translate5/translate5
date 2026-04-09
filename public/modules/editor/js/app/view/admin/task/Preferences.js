@@ -44,9 +44,9 @@ Ext.define('Editor.view.admin.task.Preferences', {
     layout: {
         type: 'border'
     },
-    title: '#UT#My Tab',
+    title: '#UT#User special properties',
     workflow_label: '#UT#Workflow',
-    editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
+    editInfo: '#UT#Choose an entry in the table to edit it!',
 
     //TODO: uncomment me when internal event listeners are used here
     //defaultListenerScope:true,

@@ -29,9 +29,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.component.Grid', {
     filterObj: null,
     gridCols: {},
     strings: {
-        actions: '#UT#Aktionen',
-        actionDelete: '#UT#Löschen',
-        actionClone: '#UT#Klonen'
+        actions: '#UT#Actions',
+        actionDelete: '#UT#Delete',
+        actionClone: '#UT#Clone'
     },
 
     constructor: function(filterObj){

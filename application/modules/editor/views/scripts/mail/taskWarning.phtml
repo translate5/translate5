@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 $this->render('general.phtml');
 
-$this->subject = $this->translate->_('Translate5 - Warnung zu Aufgabe') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+$this->subject = $this->translate->_('translate5 – Warning for task') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
 
 //is automatically merged with data from general.phtml
 $data = [
@@ -50,12 +50,12 @@ if (! empty($this->event->eventCode)) {
 }
 
 $mailBody = $this->templateApply('{header}
-Im Projektportal {portalLink} gab es zu nachfolgender Aufgabe folgende Warnung: <br />
+In the project portal {portalLink}, the following warning was issued for the task below:<br />
 <br />
-<b>Warnung:</b> {warning}<br />
-<b>Code:</b> {code}<br />
-<b>Bereich:</b> {domain}<br />
-Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften im Reiter Ereignisse. <br /><br />
+<b>Warning:</b>{warning}<br />
+<b>Code:</b>{code}<br />
+<b>Area:</b>{domain}<br />
+Further details can be found in the application in the task’s properties, in the “Events” tab.<br /><br />
 {taskFragment}{footer}', $data);
 
 $this->textbody = strip_tags($mailBody);

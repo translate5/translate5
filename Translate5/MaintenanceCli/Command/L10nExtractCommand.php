@@ -28,12 +28,12 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\ZfExtended\Localization;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\L10n\L10nConfiguration;
+use Translate5\MaintenanceCli\L10n\L10nHelper;
 use Translate5\MaintenanceCli\L10n\L10nUpdater;
 
 class L10nExtractCommand extends Translate5AbstractCommand
@@ -100,6 +100,13 @@ class L10nExtractCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'Defines the locale to mark/fill.'
         );
+
+        $this->addOption(
+            'hide-warnings',
+            null,
+            InputOption::VALUE_NONE,
+            'Hides the warnings about extractions that could not be evaluated.'
+        );
     }
 
     /**
@@ -121,6 +128,7 @@ class L10nExtractCommand extends Translate5AbstractCommand
         $fillUntranslated = $input->getOption('fill-untranslated');
         $markUntranslated = $input->getOption('mark-untranslated');
         $locale = $input->getOption('locale');
+        $hideWarnings = $input->getOption('hide-warnings');
 
         if (! $isUpdate && ! $isExport) {
             $this->io->error('An option is required. Use --update or --export');
@@ -140,27 +148,44 @@ class L10nExtractCommand extends Translate5AbstractCommand
             return self::FAILURE;
         }
 
-        if (($markUntranslated || $fillUntranslated) &&
-            $locale !== Localization::PRIMARY_LOCALE &&
-            ! in_array($locale, Localization::SECONDARY_LOCALES, true)
-        ) {
+        if (($markUntranslated || $fillUntranslated) && ! in_array($locale, L10nHelper::getAllLocales(), true)) {
             $this->io->error('The given locale is no valid primary or secondary locale.');
 
             return self::FAILURE;
         }
 
-        $extraction = new L10nUpdater(
-            $isUpdate,
-            $isExport,
-            $doAmendMissing,
-            $markUntranslated,
-            $fillUntranslated,
-            $locale
-        );
-        $extraction->process();
+        try {
+            $extraction = new L10nUpdater(
+                $isUpdate,
+                $isExport,
+                $doAmendMissing,
+                $markUntranslated,
+                $fillUntranslated,
+                $locale
+            );
+            $data = $extraction->process();
+        } catch (\MittagQI\ZfExtended\FileWriteException $e) {
+            $this->io->error($e->getMessage() . "\n" . self::CODEFILE_WRITE_ERROR);
+
+            return self::FAILURE;
+        } catch (\Throwable $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         if ($isUpdate) {
-            $this->io->success('Extracted and updated the XLIFFs.');
+            if ($data['numJsonsChanged'] + $data['numXliffsChanged'] === 0) {
+                $this->io->success(
+                    'Extracted and updated the localizations: No files have been changed'
+                );
+            } else {
+                $this->io->success(
+                    'Extracted and updated the localizations: ' . "\n" .
+                    'Updated ' . $data['numXliffsChanged'] . ' of ' . $data['numXliffs'] . ' XLIFFs' . "\n" .
+                    'Updated ' . $data['numJsonsChanged'] . ' of ' . $data['numJsons'] . ' JSONs'
+                );
+            }
         }
 
         if ($isExport) {
@@ -181,7 +206,7 @@ class L10nExtractCommand extends Translate5AbstractCommand
             $this->io->success('No translations are missing in the ZXLIFFs');
         }
 
-        if ($extraction->hasBrokenMatches()) {
+        if (! $hideWarnings && $extraction->hasBrokenMatches()) {
             $rows = [];
             foreach ($extraction->getBrokenMatches() as $match) {
                 $rows[] = [$match];

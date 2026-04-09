@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.SegmentQm', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.segmentQm',
-    title: "#UT#Manuelle QS (ganzes Segment)",
+    title: '#UT#Manual QA (complete segment)',
     requires: [
         'Editor.view.quality.SegmentQmController'
     ],

@@ -32,21 +32,21 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     store: 'admin.task.UserPrefs',
 
     strings: {
-        defaultEntry: '#UT# Standard Eintrag',
-        confirmDeleteTitle: '#UT#Eintrag löschen?',
-        confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
-        colStep: '#UT#Workflow Schritt',
-        colUsername: '#UT#Benutzer',
-        colTargets: '#UT#Spalten (vorhanden)',
-        colNotEditContent: '#UT#Nur manuelle QS im Segment bearbeiten',
-        colAnonymous: '#UT#Anonymisiert',
-        colVisibility: '#UT#Sichtbarkeit',
-        add: '#UT#Eintrag hinzufügen',
-        reload: '#UT#Aktualisieren',
-        remove: '#UT#Eintrag löschen',
-        vis_show: '#UT#anzeigen',
-        vis_hide: '#UT#ausblenden',
-        vis_disable: '#UT#nicht vorhanden'
+        defaultEntry: '#UT#Default entry',
+        confirmDeleteTitle: '#UT#Delete entry?',
+        confirmDelete: '#UT#Do you really want to delete this entry?',
+        colStep: '#UT#Workflow step',
+        colUsername: '#UT#Users',
+        colTargets: '#UT#Columns (available)',
+        colNotEditContent: '#UT#Edit only manual QA inside segments',
+        colAnonymous: '#UT#Anonymized',
+        colVisibility: '#UT#Visibility',
+        add: '#UT#Add entry',
+        reload: '#UT#Refresh',
+        remove: '#UT#Delete entry',
+        vis_show: '#UT#show',
+        vis_hide: '#UT#hide',
+        vis_disable: '#UT#not available'
     },
     bind:{
     	store:{

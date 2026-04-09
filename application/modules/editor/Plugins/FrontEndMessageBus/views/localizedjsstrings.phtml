@@ -33,27 +33,27 @@ Editor.controller.Localizer.addPluginInit('frontEndMessageBus', function() {
     Ext.define("Editor.locale.plugins.FrontEndMessageBus.controller.MessageBus", {
         override: "Editor.plugins.FrontEndMessageBus.controller.MessageBus",
         strings: {
-            taskCloseTitle: '<?php echo $this->translate->_('Aufgabe in anderem Fenster geschlossen'); ?>',
-            taskCloseMsg: '<?php echo $this->translate->_('Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.'); ?>',
-            taskCloseClose: '<?php echo $this->translate->_('Schließen'); ?>',
-            taskCloseReload: '<?php echo $this->translate->_('Erneut öffnen'); ?>'
+            taskCloseTitle: '<?php echo $this->translate->_('Task closed in another window'); ?>',
+            taskCloseMsg: '<?php echo $this->translate->_('You have closed the task in another window. Please close this window too, or reload it to reopen the task.'); ?>',
+            taskCloseClose: '<?php echo $this->translate->_('Close'); ?>',
+            taskCloseReload: '<?php echo $this->translate->_('Reopen'); ?>'
         }
     });
 
     Ext.define("Editor.locale.plugins.FrontEndMessageBus.controller.MultiUserUsage", {
         override: "Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage",
         strings: {
-            noConnection: '<?php echo $this->translate->_('Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.'); ?>',
-            noConnectionSeg: '<?php echo $this->translate->_('Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.'); ?>',
-            inUseTitle: '<?php echo $this->translate->_('Segment bereits in Bearbeitung'); ?>',
-            inUseMsg: '<?php echo $this->translate->_('Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.'); ?>',
-            inUse: '<?php echo $this->translate->_('Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.'); ?>',
-            currentUser: '<?php echo $this->translate->_('Aktueller Bearbeiter'); ?>',
-            editors: '<?php echo $this->translate->_('Bearbeiter: '); ?>',
-            myself: '<?php echo $this->translate->_('Ich'); ?>',
-            selectedBy: '<?php echo $this->translate->_('Ausgewählt von'); ?>',
-            segmentChangedOnServerTitle: '<?= $this->translate->_('Segment wurde auf der Serverseite geändert') ?>',
-            segmentChangedOnServerMessage: '<?= $this->translate->_('Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:</b><br/>{source}<br/><b>Zieltext:</b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?'); ?>',
+            noConnection: '<?php echo $this->translate->_('You are experiencing connection problems. <br />Please check the stability of your Internet connection. <br />If you keep seeing this message, it may also indicate <br />that the WebSocket protocol (wss://) is blocked by your firewall.'); ?>',
+            noConnectionSeg: '<?php echo $this->translate->_('Without a connection to the server, you cannot edit a segment.'); ?>',
+            inUseTitle: '<?php echo $this->translate->_('Segment already in use'); ?>',
+            inUseMsg: '<?php echo $this->translate->_('The selected segment is already in use by another user and cannot be opened.'); ?>',
+            inUse: '<?php echo $this->translate->_('Another user was quicker and has currently locked the segment for editing.'); ?>',
+            currentUser: '<?php echo $this->translate->_('Current editor'); ?>',
+            editors: '<?php echo $this->translate->_('Editors:'); ?>',
+            myself: '<?php echo $this->translate->_('Myself'); ?>',
+            selectedBy: '<?php echo $this->translate->_('Selected by'); ?>',
+            segmentChangedOnServerTitle: '<?= $this->translate->_('Segment was changed on server side') ?>',
+            segmentChangedOnServerMessage: '<?= $this->translate->_('Segment was changed on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?'); ?>',
         }
     });
 });

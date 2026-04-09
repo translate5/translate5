@@ -22,12 +22,13 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
     statusStrip: null,
 
     strings: {
-        tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
-        tagMissingText: '#UT#Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
-        tagDuplicatedText: '#UT#Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}',
-        tagExcessText: '#UT#Die folgenden Tags existieren nicht in der Quellsprache:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
-        tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
-        cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
+        tagOrderErrorText: '#UT#Some of the tags used in the segment are in the wrong order (closing tag before opening tag).',
+        tagMissingText: '#UT#The following tags are missing:<br/><ul><li>{0}</li></ul>This is how to solve the error:<br/><ul><li>Click “OK” to close this window</li><li>Press ESC to leave the segment without saving</li><li>Reopen the segment</li></ul>Re-apply your changes.<br/>Alternatively, use the help button and search for the keyboard shortcut to enter the missing tags from the source',
+        tagDuplicatedText: '#UT#The following tags were duplicated during editing; the segment cannot be saved. Delete the duplicated tags. <br />Duplicated tags:{0}',
+        tagExcessTextSource: 'Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
+        tagExcessTextTarget: 'Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
+        tagRemovedText: '#UT#Tags with missing opening or closing tag have been removed!',
+        cantEditContents: '#UT#You are not allowed to edit segment content. Please use CTRL + Z to undo your changes or completely cancel editing.',
     },
 
     initComponent: function () {

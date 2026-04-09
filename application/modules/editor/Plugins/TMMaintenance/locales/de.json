@@ -1,132 +1,132 @@
 {
-  "logout": "Abmelden",
-  "localeStore": [
-    {
-      "locale": "en",
-      "name": "Englisch"
+    "logout": "Abmelden",
+    "localeStore": [
+        {
+            "locale": "en",
+            "name": "Englisch"
+        },
+        {
+            "locale": "de",
+            "name": "Deutsch"
+        }
+    ],
+    "modeCombo": [
+        {
+            "name": "enthält",
+            "value": "enthält"
+        },
+        {
+            "name": "exakter Treffer",
+            "value": "exakt"
+        }
+    ],
+    "modeComboSourceTarget": [
+        {
+            "name": "enthält",
+            "value": "enthält"
+        },
+        {
+            "name": "nur ganze Segmente",
+            "value": "exakt"
+        }
+    ],
+    "selectTm": {
+        "title": "TM auswählen",
+        "name": "Name",
+        "sourceLanguage": "Quellsprache",
+        "targetLanguage": "Zielsprache",
+        "clients": "Kunde",
+        "taskTm": "Aufgaben-TM",
+        "select": "Auswählen",
+        "close": "Schließen",
+        "emptyText": "Keine Datensätze verfügbar."
     },
-    {
-      "locale": "de",
-      "name": "Deutsch"
+    "searchForm": {
+        "tm": "TM",
+        "mode": "Modus",
+        "source": "Quellsegment",
+        "target": "Zielsegment",
+        "author": "Erstellt von",
+        "additionalInfo": "Zusätzliche Info",
+        "document": "Dokumentname",
+        "creationDateFrom": "Angelegt nach",
+        "creationDateTo": "Angelegt vor",
+        "search": "Suche",
+        "deleteAll": "Alle löschen",
+        "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht.",
+        "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. <br> Diese Funktion ist erst ab 20 Treffern verfügbar, da „Alle löschen“ eine Re-Organisation des TMs nach sich zieht,<br> die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
+        "sourceLanguage": "Quellsprache",
+        "targetLanguage": "Zielsprache",
+        "caseSensitive": "Groß- und Kleinschreibung beachten"
+    },
+    "createForm": {
+        "title": "Neue Übersetzungseinheit anlegen",
+        "sourceText": "Quellsegment",
+        "targetText": "Zielsegment",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+    },
+    "deleteBatch": {
+        "no": "Abbrechen",
+        "yes": "Alle löschen",
+        "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM wird anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?",
+        "warningTextOneByOne": "Jedes Segment der aktuellen Suche wird einzeln gelöscht, was einige Zeit dauern kann. Die Benutzeroberfläche wird blockiert, bis der Vorgang abgeschlossen ist. Wenn Sie die TM Maintenance während dieser Zeit nutzen möchten, öffnen Sie bitte einen neuen Tab."
+    },
+    "list": {
+        "title": "Segmente",
+        "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
+        "calculating": "Wird berechnet...",
+        "loadingSegmentPlaceholder": "Lade...",
+        "loadingSegmentNumber": "Lade Segment #",
+        "loadedSoFar": "{0} Segmente geladen bis jetzt",
+        "saving": "Speichere, bitte warten.",
+        "columns": {
+            "sourceText": "Quellsegment",
+            "targetText": "Zielsegment",
+            "author": "Erstellt von",
+            "additionalInfo": "Zusätzliche Info",
+            "document": "Dokumentname",
+            "context": "Kontext",
+            "creationDate": "Erstellungsdatum",
+            "actions": "Aktionen",
+            "sourceLanguage": "Quellsprache",
+            "targetLanguage": "Zielsprache"
+        },
+        "edit": "Bearbeiten",
+        "editSource": "Quellsegment bearbeiten",
+        "editTarget": "Ziel bearbeiten",
+        "delete": "Löschen",
+        "deleteBySource": "Löschen Sie alle Segmente, die dieselbe Quelle wie das aktuelle Segment haben.",
+        "deleteBySourceAndTarget": "Löschen Sie alle Segmente, die dieselbe Quelle UND dasselbe Ziel wie das aktuelle Segment haben.",
+        "create": "Neu anlegen",
+        "save": "Speichern (STRG + S)",
+        "cancel": "Abbrechen (ESC)",
+        "saveGoToPrevious": "Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)",
+        "saveGoToNext": "Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)",
+        "closeGoToPrevious": "Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)",
+        "closeGoToNext": "Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)"
+    },
+    "error": {
+        "title": "Es ist ein Fehler aufgetreten!",
+        "infoTitle": "Info",
+        "couldNotProcessRequest": "Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!",
+        "close": "Schließen",
+        "responseFromServer": "Meldung vom Server",
+        "messageFromServer": "Nachricht vom Server",
+        "wrongTagsOrdering": "Einige der im Segment verwendeten Tags sind in der falschen Reihenfolge (schließendes vor öffnendem Tag oder zugehöriges Tag fehlt komplett). Bitte korrigieren das Segment und versuchen Sie es erneut."
+    },
+    "deleteSegment": {
+        "title": "Löschen",
+        "text": "Wollen Sie das Segment wirklich löschen?",
+        "bySource": {
+            "title": "Alle Segmente mit derselben Quelle löschen",
+            "text": "{0} – Alle Segmente mit einer solchen Quelle werden unabhängig von der aktuellen Filterung gelöscht. Fortfahren?"
+        },
+        "bySourceAndTarget": {
+            "title": "Löschen Sie alle Segmente, die dieselbe Quelle UND dasselbe Ziel haben.",
+            "text": "{0} => {1} – Alle Segmente mit dieser Quelle UND diesem Ziel werden unabhängig von der aktuellen Filterung gelöscht. Fortfahren?"
+        },
+        "yes": "Ja",
+        "no": "Nein"
     }
-  ],
-  "modeCombo": [
-    {
-      "name": "enthält",
-      "value": "enthält"
-    },
-    {
-      "name": "exakter Treffer",
-      "value": "exakt"
-    }
-  ],
-  "modeComboSourceTarget": [
-    {
-      "name": "enthält",
-      "value": "enthält"
-    },
-    {
-      "name": "nur ganze Segmente",
-      "value": "exakt"
-    }
-  ],
-  "selectTm": {
-    "title": "TM auswählen",
-    "name": "Name",
-    "sourceLanguage": "Quellsprache",
-    "targetLanguage": "Zielsprache",
-    "clients": "Kunde",
-    "taskTm": "Aufgaben-TM",
-    "select": "Auswählen",
-    "close": "Schließen",
-    "emptyText": "Keine Datensätze verfügbar."
-  },
-  "searchForm": {
-    "tm": "TM",
-    "mode": "Modus",
-    "source": "Quellsegment",
-    "target": "Zielsegment",
-    "author": "Erstellt von",
-    "additionalInfo": "Zusätzliche Info",
-    "document": "Dokumentname",
-    "creationDateFrom": "Angelegt nach",
-    "creationDateTo": "Angelegt vor",
-    "search": "Suche",
-    "deleteAll": "Alle löschen",
-    "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht.",
-    "deleteAllDisabledTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht. <br> Diese Funktion ist erst ab 20 Treffern verfügbar, da „Alle löschen“ eine Re-Organisation des TMs nach sich zieht,<br> die einige Zeit in Anspruch nehmen kann, während der das TM nicht verfügbar ist.",
-    "sourceLanguage": "Quellsprache",
-    "targetLanguage": "Zielsprache",
-    "caseSensitive": "Groß- und Kleinschreibung beachten"
-  },
-  "createForm": {
-    "title": "Neue Übersetzungseinheit anlegen",
-    "sourceText": "Quellsegment",
-    "targetText": "Zielsegment",
-    "save": "Speichern",
-    "cancel": "Abbrechen"
-  },
-  "deleteBatch": {
-    "no": "Abbrechen",
-    "yes": "Alle löschen",
-    "warningText": "Alle Segmente der aktuell angezeigten Liste werden gelöscht und das TM wird anschließend re-organisiert, was einige Zeit in Anspruch nehmen kann. Möchten Sie dennoch alle Segmente löschen?",
-    "warningTextOneByOne": "Jedes Segment der aktuellen Suche wird einzeln gelöscht, was einige Zeit dauern kann. Die Benutzeroberfläche wird blockiert, bis der Vorgang abgeschlossen ist. Wenn Sie die TM Maintenance während dieser Zeit nutzen möchten, öffnen Sie bitte einen neuen Tab."
-  },
-  "list": {
-    "title": "Segmente",
-    "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
-    "calculating": "Wird berechnet...",
-    "loadingSegmentPlaceholder": "Lade...",
-    "loadingSegmentNumber": "Lade Segment #",
-    "loadedSoFar": "{0} Segmente geladen bis jetzt",
-    "saving": "Speichere, bitte warten.",
-    "columns": {
-      "sourceText": "Quellsegment",
-      "targetText": "Zielsegment",
-      "author": "Erstellt von",
-      "additionalInfo": "Zusätzliche Info",
-      "document": "Dokumentname",
-      "context": "Kontext",
-      "creationDate": "Erstellungsdatum",
-      "actions": "Aktionen",
-      "sourceLanguage": "Quellsprache",
-      "targetLanguage": "Zielsprache"
-    },
-    "edit": "Bearbeiten",
-    "editSource": "Quellsegment bearbeiten",
-    "editTarget": "Ziel bearbeiten",
-    "delete": "Löschen",
-    "deleteBySource": "Löschen Sie alle Segmente, die dieselbe Quelle wie das aktuelle Segment haben.",
-    "deleteBySourceAndTarget": "Löschen Sie alle Segmente, die dieselbe Quelle UND dasselbe Ziel wie das aktuelle Segment haben.",
-    "create": "Neu anlegen",
-    "save": "Speichern (STRG + S)",
-    "cancel": "Abbrechen (ESC)",
-    "saveGoToPrevious": "Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)",
-    "saveGoToNext": "Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)",
-    "closeGoToPrevious": "Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)",
-    "closeGoToNext": "Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)"
-  },
-  "error": {
-    "title": "Es ist ein Fehler aufgetreten!",
-    "infoTitle": "Info",
-    "couldNotProcessRequest": "Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!",
-    "close": "Schließen",
-    "responseFromServer": "Meldung vom Server",
-    "messageFromServer": "Nachricht vom Server",
-    "wrongTagsOrdering": "Einige der im Segment verwendeten Tags sind in der falschen Reihenfolge (schließendes vor öffnendem Tag oder zugehöriges Tag fehlt komplett). Bitte korrigieren das Segment und versuchen Sie es erneut."
-  },
-  "deleteSegment": {
-    "title": "Löschen",
-    "text": "Wollen Sie das Segment wirklich löschen?",
-    "bySource": {
-      "title": "Alle Segmente mit derselben Quelle löschen",
-      "text": "{0} – Alle Segmente mit einer solchen Quelle werden unabhängig von der aktuellen Filterung gelöscht. Fortfahren?"
-    },
-    "bySourceAndTarget": {
-      "title": "Löschen Sie alle Segmente, die dieselbe Quelle UND dasselbe Ziel haben.",
-      "text": "{0} => {1} – Alle Segmente mit dieser Quelle UND diesem Ziel werden unabhängig von der aktuellen Filterung gelöscht. Fortfahren?"
-    },
-    "yes": "Ja",
-    "no": "Nein"
-  }
 }

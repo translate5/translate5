@@ -90,7 +90,7 @@ class editor_SessionController extends ZfExtended_SessionController
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1342',
                 [
-                    'login' => Localization::trans('Der Parameter login mit dem gewünschten Benutzernamen fehlt.'),
+                    'login' => Localization::trans('The parameter login containing the desired username is missing.'),
                 ]
             );
         }

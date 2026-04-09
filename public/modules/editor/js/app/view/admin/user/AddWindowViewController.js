@@ -29,8 +29,8 @@ Ext.define('Editor.view.admin.user.AddWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminUserAddWindow',
     strings: {
-        userSaved: '#UT#Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.',
-        userAdded: '#UT#Der Benutzer "{0}" wurde erfolgreich erstellt.',
+        userSaved: '#UT#The changes for user “{0}” were saved successfully.',
+        userAdded: '#UT#User “{0}” was created successfully.',
     },
     listen: {
         component: {

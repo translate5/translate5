@@ -94,9 +94,9 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
     },
 
     strings:{
-        deleteUserMessage: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
-        deleteUserTitle: '#UT#Eintrag löschen?',
-        assocSaved: '#UT#Benutzerzuweisung gespeichert'
+        deleteUserMessage: '#UT#Do you really want to delete this entry?',
+        deleteUserTitle: '#UT#Delete entry?',
+        assocSaved: '#UT#User association saved'
     },
 
     onOverflowMenuItemClick: function(menuitem) {

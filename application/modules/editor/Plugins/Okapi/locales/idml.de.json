@@ -17,7 +17,7 @@
     "extractIndexTopics": "Index-Elemente extrahieren",
     "extractHyperlinkTextSourcesInline": "Hyperlink-Textquellen inline extrahieren",
     "extractExternalHyperlinks": "Externe Hyperlinks extrahieren",
-    "specialCharacterPattern": "Aufgelistete Leerraum-Zeichen schützen<br>(Wichtig: NICHT in translate5 verwenden – siehe Tooltip.)",
+    "specialCharacterPattern": "Aufgelistete Leerraum-Zeichen schützen<br/>(Wichtig: NICHT in translate5 verwenden – siehe Tooltip.)",
     "specialCharacterPatternTooltip": "Der Leerraum muss bei der anfänglichen Dateiformatkonvertierung von IDML nach XLIFF ungeschützt bleiben. Der Grund: Damit ein korrekter TM-Abgleich möglich ist, muss translate5 Leerräume auf seine eigene Weise schützen können – und nicht auf die von Okapi (das von translate5 intern zur Konvertierung von IDML nach XLIFF genutzt wird).",
     "ignoreCharacterKerning": "Unterschneidung ignorieren",
     "characterKerningMinIgnoranceThreshold": "Unterschneidung ignorieren: unterer Grenzwert",

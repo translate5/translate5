@@ -1,14 +1,130 @@
 <?xml version="1.0" ?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
-    <file original="php-sourcecode" source-language="de" target-language="it" datatype="php">
+    <file original="php-sourcecode" source-language="en" target-language="it" datatype="php">
         <body>
-            <trans-unit id="RHLDvGNrZW4gU2llIEN0cmwrUiwgdW0gVm9yc2NobMOkZ2UgYXVzenV3w6RobGVuIG9kZXIgcmVjaHRzLWtsaWNrZW4gU2llIGF1ZiBkaWVzZXMgV29ydC4gRGVyIEN1cnNvciBtdXNzIHNpY2ggaW5uZXJoYWxiIGRlcyBGZWhsZXJzIGJlZmluZGVuLg==">
-                <source>Drücken Sie Ctrl+R, um Vorschläge auszuwählen oder rechts-klicken Sie auf dieses Wort. Der Cursor muss sich innerhalb des Fehlers befinden.</source>
+            <trans-unit id="PGI+UHJlc3MgQ1RSTCArIFI8L2I+IHRvIHNlbGVjdCBzdWdnZXN0aW9ucywgb3IgcmlnaHQtY2xpY2sgdGhpcyB3b3JkLiBDdXJzb3IgaGFzIHRvIGJlIGluc2lkZSBlcnJvci4=">
+                <source><b>Press CTRL + R</b> to select suggestions, or right-click this word. Cursor has to be inside error.</source>
                 <target>Premere Ctrl+R per selezionare dei suggerimenti oppure fare clic con il tasto destro del mouse su questa parola. Il cursore deve trovarsi in corrispondenza dell’errore.</target>
             </trans-unit>
-            <trans-unit id="TWVociBJbmZvcm1hdGlvbmVu">
-                <source>Mehr Informationen</source>
+            <trans-unit id="QW4gaW5jb3JyZWN0IHRlcm0gb3IgYSB0ZXJtIGZyb20gdGhlIHdyb25nIGRvbWFpbiB3YXMgdXNlZCwgb3IgdGVybXMgYXJlIHVzZWQgaW5jb25zaXN0ZW50bHku">
+                <source>An incorrect term or a term from the wrong domain was used, or terms are used inconsistently.</source>
+                <target>È stato utilizzato un termine errato o proveniente dal dominio sbagliato, oppure i termini vengono utilizzati in modo incoerente.</target>
+            </trans-unit>
+            <trans-unit id="Q29udGVudCBoYXMgYmVlbiBkdXBsaWNhdGVkIGltcHJvcGVybHku">
+                <source>Content has been duplicated improperly.</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="RHVwbGljYXRpb24=">
+                <source>Duplication</source>
+                <target>Duplicazione</target>
+            </trans-unit>
+            <trans-unit id="R2VuZXJhbCBzdHlsZQ==">
+                <source>General style</source>
+                <target>Stile generale</target>
+            </trans-unit>
+            <trans-unit id="SW50ZXJuYXRpb25hbGl6YXRpb24=">
+                <source>Internationalization</source>
+                <target>Internazionalizzazione</target>
+            </trans-unit>
+            <trans-unit id="TGFuZ3VhZ2VUb29s">
+                <source>LanguageTool</source>
+                <target>LanguageTool</target>
+            </trans-unit>
+            <trans-unit id="TGVnYWw=">
+                <source>Legal</source>
+                <target>Legale</target>
+            </trans-unit>
+            <trans-unit id="TG9jYWxlLXNwZWNpZmljIGNvbnRlbnQ=">
+                <source>Locale-specific content</source>
+                <target>Contenuto specifico varietà locale</target>
+            </trans-unit>
+            <trans-unit id="TW9yZSBpbmZvcm1hdGlvbg==">
+                <source>More information</source>
                 <target>Maggiori informazioni</target>
+            </trans-unit>
+            <trans-unit id="Tm9uLWNvbmZvcm1hbmNl">
+                <source>Non-conformance</source>
+                <target>Non conformità</target>
+            </trans-unit>
+            <trans-unit id="TnVtYmVyIGZvcm1hdHRpbmc=">
+                <source>Number formatting</source>
+                <target>Formattazione numeri</target>
+            </trans-unit>
+            <trans-unit id="UGF0dGVybiBwcm9ibGVt">
+                <source>Pattern problem</source>
+                <target>Problema del pattern</target>
+            </trans-unit>
+            <trans-unit id="U3RhdGlzdGljYWxseSBkZXRlY3Qgd3JvbmcgdXNlIG9mIHdvcmRzIHRoYXQgYXJlIGVhc2lseSBjb25mdXNlZA==">
+                <source>Statistically detect wrong use of words that are easily confused</source>
+                <target>Individuare statisticamente l’uso errato di parole facilmente confondibili</target>
+            </trans-unit>
+            <trans-unit id="VGV4dCB2aW9sYXRlcyBub3JtcyBmb3IgdGhlIGludGVuZGVkIGxvY2FsZS4=">
+                <source>Text violates norms for the intended locale.</source>
+                <target>Il testo viola le norme per la varietà locale prevista.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIGlzc3VlIGVpdGhlciBoYXMgbm90IGJlZW4gY2F0ZWdvcml6ZWQgb3IgY2Fubm90IGJlIGNhdGVnb3JpemVkLg==">
+                <source>The issue either has not been categorized or cannot be categorized.</source>
+                <target>Il problema non è stato categorizzato oppure non può esserlo.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIGxvY2FsaXphdGlvbiBjb250YWlucyBjb250ZW50IHRoYXQgZG9lcyBub3QgYXBwbHkgdG8gdGhlIGxvY2FsZSBmb3Igd2hpY2ggaXQgd2FzIHByZXBhcmVkLg==">
+                <source>The localization contains content that does not apply to the locale for which it was prepared.</source>
+                <target>La localizzazione contiene contenuti che non si applicano alla varietà locale per la quale è stata preparata.</target>
+            </trans-unit>
+            <trans-unit id="VGhlcmUgaXMgYSBtaXNtYXRjaCBpbiB3aGl0ZXNwYWNlIGJldHdlZW4gc291cmNlIGFuZCB0YXJnZXQgY29udGVudCwgb3IgdGhlIHRleHQgdmlvbGF0ZXMgc3BlY2lmaWMgcnVsZXMgcmVsYXRlZCB0byB0aGUgdXNlIG9mIHdoaXRlc3BhY2Uu">
+                <source>There is a mismatch in whitespace between source and target content, or the text violates specific rules related to the use of whitespace.</source>
+                <target>È presente una discrepanza nei whitespace tra il contenuto origine e quello di destinazione oppure il testo viola regole specifiche relative all’utilizzo dei whitespace.</target>
+            </trans-unit>
+            <trans-unit id="VGhlcmUgaXMgYW4gaXNzdWUgcmVsYXRlZCB0byB0aGUgaW50ZXJuYXRpb25hbGl6YXRpb24gb2YgY29udGVudC4=">
+                <source>There is an issue related to the internationalization of content.</source>
+                <target>È presente un problema legato all’internazionalizzazione dei contenuti.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgY29udGFpbnMgYSBncmFtbWF0aWNhbCBlcnJvciAoaW5jbHVkaW5nIHN5bnRheCBhbmQgbW9ycGhvbG9neSBlcnJvcnMpLg==">
+                <source>The text contains a grammatical error (including syntax and morphology errors).</source>
+                <target>Il testo contiene un errore grammaticale (inclusi errori di sintassi e morfologia).</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgY29udGFpbnMgYSBtaXNzcGVsbGluZy4=">
+                <source>The text contains a misspelling.</source>
+                <target>Il testo contiene un errore di ortografia.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgY29udGFpbnMgY2hhcmFjdGVycyB0aGF0IGFyZSBnYXJibGVkIG9yIGluY29ycmVjdCwgb3IgdGhhdCBhcmUgbm90IHVzZWQgaW4gdGhlIGxhbmd1YWdlIGluIHdoaWNoIHRoZSBjb250ZW50IGFwcGVhcnMu">
+                <source>The text contains characters that are garbled or incorrect, or that are not used in the language in which the content appears.</source>
+                <target>Il testo contiene caratteri confusi, errati o che non sono utilizzati nella lingua in cui appare il contenuto.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgY29udGFpbnMgc3R5bGlzdGljIGVycm9ycy4=">
+                <source>The text contains stylistic errors.</source>
+                <target>Il testo contiene errori stilistici.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgZmFpbHMgdG8gbWF0Y2ggYSBwYXR0ZXJuIHRoYXQgZGVmaW5lcyBhbGxvd2FibGUgY29udGVudCAob3IgbWF0Y2hlcyBvbmUgdGhhdCBkZWZpbmVzIG5vbi1hbGxvd2FibGUgY29udGVudCku">
+                <source>The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).</source>
+                <target>Il testo non corrisponde a un modello che definisce i contenuti consentiti (oppure corrisponde a uno che definisce i contenuti non consentiti).</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgaGFzIHR5cG9ncmFwaGljYWwgZXJyb3JzIHN1Y2ggYXMgb21pdHRlZC9pbmNvcnJlY3QgcHVuY3R1YXRpb24sIGluY29ycmVjdCBjYXBpdGFsaXphdGlvbiwgZXRjLg==">
+                <source>The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.</source>
+                <target>Il testo contiene errori tipografici come punteggiatura omessa/non corretta, capitalizzazione errata ecc.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgaXMgaW5jb25zaXN0ZW50IHdpdGggaXRzZWxmIG9yIGlzIHRyYW5zbGF0ZWQgaW5jb25zaXN0ZW50bHkgKE5COiBub3QgZm9yIHVzZSB3aXRoIHRlcm1pbm9sb2d5IGluY29uc2lzdGVuY3kpLg==">
+                <source>The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).</source>
+                <target>Il testo è incoerente con se stesso o tradotto in modo incoerente (N.B.: da non utilizzare per le incoerenze terminologiche).</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgaXMgbGVnYWxseSBwcm9ibGVtYXRpYyAoZS5nLiwgaXQgaXMgc3BlY2lmaWMgdG8gdGhlIHdyb25nIGxlZ2FsIHN5c3RlbSku">
+                <source>The text is legally problematic (e.g., it is specific to the wrong legal system).</source>
+                <target>Il testo è problematico dal punto di vista giuridico (ad es. è specifico per il sistema giuridico sbagliato).</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHRleHQgaXMgd3JpdHRlbiBpbiB0aGUgd3JvbmcgbGluZ3Vpc3RpYyByZWdpc3RlciBvciB1c2VzIHNsYW5nIG9yIG90aGVyIGxhbmd1YWdlIHZhcmlhbnRzIGluYXBwcm9wcmlhdGUgdG8gdGhlIHRleHQu">
+                <source>The text is written in the wrong linguistic register or uses slang or other language variants inappropriate to the text.</source>
+                <target>Il testo è scritto in un registro linguistico errato e utilizza gergo o altre varianti linguistiche inappropriate.</target>
+            </trans-unit>
+            <trans-unit id="VHlwb2dyYXBoaWNhbA==">
+                <source>Typographical</source>
+                <target>Tipografico</target>
+            </trans-unit>
+            <trans-unit id="VW5jYXRlZ29yaXplZA==">
+                <source>Uncategorized</source>
+                <target>Non categorizzato</target>
+            </trans-unit>
+            <trans-unit id="V2hpdGVzcGFjZQ==">
+                <source>Whitespace</source>
+                <target>Whitespace</target>
             </trans-unit>
         </body>
     </file>

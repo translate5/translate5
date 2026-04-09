@@ -33,12 +33,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 /* @var $this Zend_View */
-$this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+$this->subject = $this->translate->_('translate5 – task opened') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
 
 $this->render('general.phtml');
 
 $this->textbody = strip_tags($this->templateApply('{header}
-Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
+In the project portal {portalLink}, the task <b>{task.taskNr} – {task.taskName}</b> has become available for you.<br />
 {changedSegments}
 {footer}', [
     'task' => $this->task->getDataObject(),
@@ -49,7 +49,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 ]));
 
 echo $this->templateApply('{header}
-Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
+In the project portal {portalLink}, the task <b>{task.taskNr} – {task.taskName}</b> has become available for you.<br />
 {changedSegments}
 {footer}', [
     //just overwrite the changedSegments

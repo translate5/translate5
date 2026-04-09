@@ -37,14 +37,14 @@ $this->render('general.phtml');
 
 //Define Action String
 if ($this->isCron) {
-    $this->subject = $this->translate->_('Translate5 - Aufgabe automatisch abgeschlossen') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
-    $action = $this->templateApply('Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br />', [
+    $this->subject = $this->translate->_('translate5 – task finished automatically') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+    $action = $this->templateApply('In the project portal {portalLink}, the task {task.taskNr} <b>{task.taskNr} – {task.taskName}</b> was automatically finished for all users of the role <i>{previousRole}</i> due to a deadline overrun.<br />', [
         'task' => $this->task->getDataObject(),
         'previousRole' => $this->translate->_($this->triggeringStep),
     ]);
 } else {
-    $this->subject = $this->translate->_('Translate5 - Aufgabe abgeschlossen') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
-    $action = $this->templateApply('Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br />', [
+    $this->subject = $this->translate->_('Translate5 – task finished') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+    $action = $this->templateApply('In the project portal {portalLink}, the task {task.taskNr} <b>{task.taskNr} – {task.taskName}</b> has been completed by all users in the role <i>{previousRole}</i>.<br />', [
         'task' => $this->task->getDataObject(),
         'previousRole' => $this->translate->_($this->triggeringStep),
     ]);
@@ -52,36 +52,36 @@ if ($this->isCron) {
 
 //Define User List of next role users
 if (empty($this->nextStep) && in_array($this->triggeringStep, $this->workflow->getSteps())) {
-    $userNotificationHTML = $this->templateApply('Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
+    $userNotificationHTML = $this->templateApply('The task has been fully processed, no further users are assigned to the task.<br />
 <br />
 ');
-    $userNotificationText = $this->templateApply('Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
+    $userNotificationText = $this->templateApply('The task has been fully processed, no further users are assigned to the task.<br />
 <br />
 ', [
         'userList' => $this->htmlOnly,
     ]);
 } elseif (! empty($this->nextStep) && in_array($this->triggeringStep, $this->workflow->getSteps())) {
     //Fucking here up with role and step. Since in the heavily overwritten texts we still have nextRole we set the nextStep just the into the nextRole param
-    $userNotificationHTML = $this->templateApply('Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
+    $userNotificationHTML = $this->templateApply('The task has now automatically been made available to the following users with the role <i>{nextRole}</i>:<br />
 {userList}<br />
-Die Benutzer wurden per E-Mail darüber informiert.<br />
+The users have been informed accordingly via e-mail.<br />
 <br />
 ', [
         'nextRole' => $this->translate->_($this->nextStep),
         'userList' => $this->workflowNotifyMail()->renderUserList($this->users),
     ]);
-    $userNotificationText = $this->templateApply('Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
+    $userNotificationText = $this->templateApply('The task has now automatically been made available to the following users with the role <i>{nextRole}</i>:<br />
 {userList}<br />
-Die Benutzer wurden per E-Mail darüber informiert.<br />
+The users have been informed accordingly via e-mail.<br />
 <br />
 ', [
         'userList' => $this->htmlOnly,
     ]);
 } else {
-    $userNotificationHTML = $this->templateApply('Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
+    $userNotificationHTML = $this->templateApply('The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.<br />
 <br />
 ');
-    $userNotificationText = $this->templateApply('Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
+    $userNotificationText = $this->templateApply('The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.<br />
 <br />
 ', [
         'userList' => $this->htmlOnly,
@@ -89,12 +89,12 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
 }
 
 //list of previous users:
-$userPreviousText = $this->templateApply('Benutzer der vorherigen Rolle <i>{previousRole}</i>:
+$userPreviousText = $this->templateApply('Users of previous role <i>{previousRole}</i>:
 {previousUsers}<br/>
 ', [
     'previousUsers' => $this->htmlOnly,
 ]);
-$userPreviousHTML = $this->templateApply('Benutzer der vorherigen Rolle <i>{previousRole}</i>:
+$userPreviousHTML = $this->templateApply('Users of previous role <i>{previousRole}</i>:
 {previousUsers}<br/>
 ', [
     'previousUsers' => $this->workflowNotifyMail()->renderUserList($this->previousUsers),

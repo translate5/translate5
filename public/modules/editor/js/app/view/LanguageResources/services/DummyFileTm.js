@@ -35,7 +35,7 @@ Ext.define('Editor.view.LanguageResources.services.DummyFileTm', {
     extend: 'Editor.view.LanguageResources.services.Default',
     id: 'DummyFile TM',
 
-    addTooltip: '#UT#Weitere Daten in Form einer TMX Datei importieren und dem Dummy TM hinzufügen',
+    addTooltip: '#UT#Import TMX to TM',
 
     /**
      * Get download language reources action icon class

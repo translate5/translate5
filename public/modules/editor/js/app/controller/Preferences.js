@@ -42,7 +42,7 @@ Ext.define('Editor.controller.Preferences', {
   views: ['preferences.Window'],
   storageKey: 'EditorPreferences',
   messages: {
-    preferencesSaved: '#UT#Einstellungen für diese Sitzung gespeichert!'
+    preferencesSaved: '#UT#Settings saved for current session!'
   },
   window: null,
   refs:[{

@@ -36,13 +36,13 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 $this->render('general.phtml');
 
-$this->subject = $this->translate->_('Translate5 - Excel mit Fehlern importiert') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+$this->subject = $this->translate->_('translate5 – Excel imported with errors') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
 
 //is automatically merged with data from general.phtml
 $data = [
     'header' => $this->header,
     'footer' => $this->footer,
-    'role' => $this->translate->_('Pm'),
+    'role' => $this->translate->_('PM (all clients)'),
 ];
 
 $data['segments'] = join("</tr><tr>", array_map(function (excelExImportSegmentContainer $item) {
@@ -50,13 +50,12 @@ $data['segments'] = join("</tr><tr>", array_map(function (excelExImportSegmentCo
 }, $this->segmentErrors));
 
 $mailBody = $this->templateApply('{header}
-Die folgende Aufgabe wurde aus einer Excel Datei re-importiert. Dabei wurden die abschließend aufgelisteten inhaltlichen Fehler in Excel festgestellt.<br />
-Die Fehler müssen nachträglich in der Anwendung korrigiert werden.<br /><br />
+The following task was re-imported from an Excel file. The errors listed below were identified in Excel.<br />
+They must be corrected in the application.<br /><br />
 {taskFragment}
 <br />
 <br />
-<b>Segment Fehler:</b><br />
-<table><tr><th>Segment Nr.:</th><th>Fehler:</th></tr><tr>
+<b>Segment error:</b><br /><table><tr><th>Segment no.:</th><th>Error:</th></tr><tr>
 {segments}
 </tr></table>
 {footer}', $data);

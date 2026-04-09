@@ -119,7 +119,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Zahlen');
+        return $translate->_('Numbers');
     }
 
     public function translateCategory(
@@ -128,20 +128,20 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            editor_Segment_Numbers_Check::NUM1 => $translate->_('Zahlen Quelle ≠ Ziel'),
-            editor_Segment_Numbers_Check::NUM2 => $translate->_('Alphanumerische Zeichenfolgen: Unterschiede'),
-            editor_Segment_Numbers_Check::NUM3 => $translate->_('Formatänderung (Datumsangaben u.ä.)'),
-            editor_Segment_Numbers_Check::NUM4 => $translate->_('Trenner nicht lokalisiert'),
-            editor_Segment_Numbers_Check::NUM5 => $translate->_('Formatierung 1000er-Zahl geändert'),
-            editor_Segment_Numbers_Check::NUM6 => $translate->_('Unterschiedliche Minuszeichen'),
-            editor_Segment_Numbers_Check::NUM7 => $translate->_('Trenner aus Quelle geändert'),
-            editor_Segment_Numbers_Check::NUM8 => $translate->_('Zahlwort aus Quelle als Zahl in Ziel gefunden'),
-            editor_Segment_Numbers_Check::NUM9 => $translate->_('Zahl aus Quelle als Zahlwort in Ziel gefunden'),
-            editor_Segment_Numbers_Check::NUM10 => $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)'),
-            editor_Segment_Numbers_Check::NUM11 => $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall'),
-            editor_Segment_Numbers_Check::NUM12 => $translate->_('1000er-Trenner nicht erlaubt'),
-            editor_Segment_Numbers_Check::NUM13 => $translate->_('Dubiose Zahl aus Quelle unverändert in Ziel'),
-            editor_Segment_Numbers_Check::NUM14 => $translate->_('(Ggf. fehlerhafter) Trenner aus Quelle unverändert in Ziel übernommen'),
+            editor_Segment_Numbers_Check::NUM1 => $translate->_('Numbers source segment ≠ target segment'),
+            editor_Segment_Numbers_Check::NUM2 => $translate->_('Alphanumerical character sequences: Differences'),
+            editor_Segment_Numbers_Check::NUM3 => $translate->_('Format alteration (date information etc.)'),
+            editor_Segment_Numbers_Check::NUM4 => $translate->_('Separator(s) not localized'),
+            editor_Segment_Numbers_Check::NUM5 => $translate->_('Formatting of 1000s number altered'),
+            editor_Segment_Numbers_Check::NUM6 => $translate->_('Different minus characters'),
+            editor_Segment_Numbers_Check::NUM7 => $translate->_('Separator from source altered'),
+            editor_Segment_Numbers_Check::NUM8 => $translate->_('Numeral from source segment found as number in target segment'),
+            editor_Segment_Numbers_Check::NUM9 => $translate->_('Number from source segment found as numeral in target segment'),
+            editor_Segment_Numbers_Check::NUM10 => $translate->_('Format alteration (ordinal numbers, leading zero etc.)'),
+            editor_Segment_Numbers_Check::NUM11 => $translate->_('Different character/formatting for number interval'),
+            editor_Segment_Numbers_Check::NUM12 => $translate->_('1000-separator not allowed'),
+            editor_Segment_Numbers_Check::NUM13 => $translate->_('Potentially incorrect number taken over unchanged from the source segment'),
+            editor_Segment_Numbers_Check::NUM14 => $translate->_('(Possibly incorrect) separator from source segment found unchanged in target segment'),
             default => null,
         };
     }
@@ -155,9 +155,9 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
     {
         switch ($category) {
             case editor_Segment_Numbers_Check::NUM13:
-                return $translate->_('Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.');
+                return $translate->_('If this is not a decimal number but a list with missing spaces after the commas, please insert spaces between the list items in the target segment. If the decimal separator is incorrectly used in the source segment, this message can be ignored.');
             case editor_Segment_Numbers_Check::NUM14:
-                return $translate->_('Bitte prüfen, ob es sich um eine echte Zahl vs. eine Produktnummer o.ä. handelt. Bei verwendetem Trenner in einer eine Produktnummer o.ä. handelt in SRC bitte ignorieren.');
+                return $translate->_('Please verify whether this is a real number or a product number. If a separator is used for a product number in the source segment, ignore this message.');
         }
 
         return '';

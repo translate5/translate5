@@ -30,14 +30,13 @@ END LICENSE AND COPYRIGHT
  * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
  * ============================================
 
-    $translate->_('Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
-<strong>Project ID:</strong> {projectId} <br />
+    $translate->_('A new {projectType} has been created in the project portal .Project ID:{portalLink}.<br /><strong>Project ID:</strong> {projectId}<br />
 <strong>Project Name:</strong> {projectName}');
 
-    $translate->_('Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
-<strong>Project ID:</strong> {projectId} <br />
+    $translate->_('A new {projectType} has been created in the project portal {portalLink}.<br />
+<strong>Project ID: </strong> {projectId} <br />
 <strong>Project Name:</strong> {projectName} <br />
-<strong>Erstellt von:</strong> {createdByUser}');
+<strong>Created by:</strong>{createdByUser}');
 
  */
 
@@ -46,7 +45,7 @@ END LICENSE AND COPYRIGHT
 $this->render('general.phtml');
 
 // Setup subject
-$this->subject = $this->translate->_('Translate5 - Projekt erstellt')
+$this->subject = $this->translate->_('translate5 – Project created')
     . ' "' . $this->project->getId()
     . ' - ' . $this->project->getTaskName() . '"';
 
@@ -60,13 +59,12 @@ $data = [
     'projectType' => $this->translate->_('taskType::' . $this->project->getTaskType()->id()),
 ];
 
-$message = 'Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
-<strong>Project ID:</strong> {projectId} <br />
+$message = 'A new {projectType} has been created in the project portal .Project ID:{portalLink}.<br /><strong>Project ID:</strong> {projectId}<br />
 <strong>Project Name:</strong> {projectName}';
 
 if(!empty($this->showTaskDescription)){
     $data['taskDescription'] = $this->project->getDescription();
-    $message .= '<br /> <strong>'.$this->translate->_('Projektbeschreibung').':</strong> {taskDescription}';
+    $message .= '<br /> <strong>'.$this->translate->_('Project description').':</strong> {taskDescription}';
 }
 
 if ($this->createdByUser) {

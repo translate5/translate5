@@ -95,11 +95,11 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         <img class="logo" src="/images/translate5.png" alt="Company Logo">
         <h1><?= $this->title ?></h1>
     </div>
-    <p class="export-running-message"><?= $translate->_('Der Export wird ausgeführt. Bitte warten ...'); ?></p>
+    <p class="export-running-message"><?= $translate->_('Export is running. Please wait...'); ?></p>
     <div class="loading"></div>
     <div class="result hidden">
-        <p><?= $translate->_('Die Datei kann heruntergeladen werden!'); ?></p>
-        <a href="#" class="btn download hidden"><?= $translate->_('Herunterladen'); ?></a>
+        <p><?= $translate->_('The file is available for download!'); ?></p>
+        <a href="#" class="btn download hidden"><?= $translate->_('Download'); ?></a>
     </div>
     <div class="error hidden"></div>
 </div>
@@ -129,7 +129,7 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
                     window.close();
                 } else {
                     // If the popup was blocked, show an alert to the user
-                    alert("<?= $translate->_('allow_download_popup_alert'); ?>");
+                    alert("<?= $translate->_('Please allow pop-ups for this site to automatically download the file.'); ?>");
 
                     document.querySelector('.loading').classList.add('hidden');
                     document.querySelector('.export-running-message').classList.add('hidden');
@@ -145,8 +145,8 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             .catch(error => {
                 document.querySelector('.loading').classList.add('hidden');
                 document.querySelector('.export-running-message').classList.add('hidden');
-                document.querySelector('.error').textContent = '<?= $translate->_('Es ist ein Fehler aufgetreten!') . ' '; ?>';
-                document.querySelector('.error').textContent += '<?= $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
+                document.querySelector('.error').textContent = '<?= $translate->_('An error occurred!') . ' '; ?>';
+                document.querySelector('.error').textContent += '<?= $translate->_('For more info, check the result log.'); ?>';
                 document.querySelector('.error').classList.remove('hidden');
             });
     }

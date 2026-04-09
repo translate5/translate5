@@ -5,7 +5,7 @@
     "tabCodeFinder": "Code Finder",
     "fallbackToID": "Use trans-unit ID attribute for the text unit name if there is no resname",
     "ignoreInputSegmentation": "Ignore segmentation information in the input",
-    "alwaysUseSegSource": "Always use the content of seg-source even if there are differences between<br>source",
+    "alwaysUseSegSource": "Always use the content of seg-source even if there are differences between<br/>source",
     "useSdlXliffWriter": "Use SDLXLIFF Writer",
     "escapeGT": "Escape greater-than characters",
     "addTargetLanguage": "Add target-language attribute if not present",
@@ -31,11 +31,11 @@
     "iwsTransStatusValue": "Default translation_status value",
     "iwsTransTypeValue": "Default translation_type value",
     "iwsRemoveTmOrigin": "Remove tm_origin attribute",
-    "iwsBlockLockStatus": "Set finished segments to lock_status=\"locked\" attribute to<br>translate=\"no\"",
+    "iwsBlockLockStatus": "Set finished segments to lock_status=\"locked\" attribute to<br/>translate=\"no\"",
     "iwsBlockTmScore": "Set segments with matching tm_score attribute value to translate=\"no\"",
     "iwsBlockTmScoreValue": "Value of the tm_score to match",
-    "iwsIncludeMultipleExact": "Include segments with multiple_exact=\"has_multiple_exact\" attribute<br>regardless of their tm_score",
-    "iwsBlockMultipleExact": "Set finished segments with multiple_exact=\"has_multiple_exact\"<br>attribute to translate=\"no\"",
-    "cdataSubfilter": "Process CDATA content with this subfilter<br>(e.g. “okf_html”; leave blank to disable)",
-    "pcdataSubfilter": "Process PCDATA content with this subfilter<br>(leave blank to disable)"
+    "iwsIncludeMultipleExact": "Include segments with multiple_exact=\"has_multiple_exact\" attribute<br/>regardless of their tm_score",
+    "iwsBlockMultipleExact": "Set finished segments with multiple_exact=\"has_multiple_exact\"<br/>attribute to translate=\"no\"",
+    "cdataSubfilter": "Process CDATA content with this subfilter<br/>(e.g. “okf_html”; leave blank to disable)",
+    "pcdataSubfilter": "Process PCDATA content with this subfilter<br/>(leave blank to disable)"
 }

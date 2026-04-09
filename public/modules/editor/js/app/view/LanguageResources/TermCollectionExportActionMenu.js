@@ -31,9 +31,9 @@ Ext.define('Editor.view.LanguageResources.TermCollectionExportActionMenu', {
 	alias: 'widget.termCollectionExportActionMenu',
 
 	strings:{
-		exportProposal:'#UT#Vorschläge exportieren',
-		exportCollection:'#UT#Als TBX exportieren',
-		exportSpreadsheet:'#UT#Als XSLS exportieren',
+		exportProposal:'#UT#Proposals export',
+		exportCollection:'#UT#Export as TBX',
+		exportSpreadsheet:'#UT#Export as XLSX',
 	},
 
 	record : null, // current language resources record

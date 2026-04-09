@@ -49,14 +49,22 @@ class L10nUpgradeClientSpecificCommand extends Translate5AbstractCommand
         // the full command description shown when running the command with
         // the "--help" option
             ->setHelp(
-                'Upgrades existing client-specific localizations to the new "zxliff"-format'
+                'Upgrades existing client-specific localizations to the new "zxliff"-format. ' .
+                ' Updates keys after lokalization strings have been renamed'
             );
 
         $this->addOption(
             'report-only',
             'r',
             InputOption::VALUE_NONE,
-            'If set only unonverted files will be reported'
+            'If set only unconverted files will be reported'
+        );
+
+        $this->addOption(
+            'directory',
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'If set xliff/zxliff files in the given directory will be upgraded'
         );
     }
 
@@ -73,7 +81,14 @@ class L10nUpgradeClientSpecificCommand extends Translate5AbstractCommand
         $this->writeTitle('Translate5 L10n maintenance - upgrade client-specific localizations');
         $reportOnly = (bool) $this->input->getOption('report-only');
 
-        $converter = new L10nXliffZXliffConverter(APPLICATION_ROOT . '/client-specific/locales');
+        $directory = $this->input->getOption('directory');
+        if (empty($directory)) {
+            $directory = APPLICATION_ROOT . '/client-specific/locales';
+        } elseif (! is_dir($directory)) {
+            $this->io->error('The directory “' . $directory . '” does not exist or is no directory');
+        }
+
+        $converter = new L10nXliffZXliffConverter($directory);
         if ($reportOnly) {
             $warnings = $converter->upgrade(false);
             if (count($warnings) > 0) {

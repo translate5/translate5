@@ -142,7 +142,7 @@ class editor_UserfilterpresetController extends ZfExtended_RestController
     public function deleteAction()
     {
         // Show confirmation prompt, but for XHR-requests only
-        $this->confirm(Localization::trans('Sind Sie sicher?'));
+        $this->confirm(Localization::trans('Are you sure?'));
 
         // Load entity
         $this->entityLoad();

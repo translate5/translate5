@@ -39,7 +39,7 @@ Ext.define('Editor.view.help.HelpButton', {
     alias: 'widget.helpButton',
     controller: 'helpButton',
     itemId: 'mainHelpButton',
-    text: '#UT#Hilfe',
+    text: '#UT#Help',
     hidden: true,
     initConfig: function(instanceConfig) {
         var me = this,

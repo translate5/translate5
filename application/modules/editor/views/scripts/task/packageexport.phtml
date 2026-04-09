@@ -101,17 +101,17 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 <div class="container">
     <div class="header">
         <img class="logo" src="/images/translate5.png" alt="Company Logo">
-        <h1><?php echo $translate->_('Übersetzerpaket herunterladen'); ?></h1>
+        <h1><?php echo $translate->_('Export translator package'); ?></h1>
     </div>
-    <p class="export-running-message"><?php echo $translate->_('Der Export wird ausgeführt. Bitte warten ...'); ?></p>
+    <p class="export-running-message"><?php echo $translate->_('Export is running. Please wait...'); ?></p>
     <div class="loading"></div>
     <div class="result hidden">
-        <p><?php echo $translate->_('Die Datei kann heruntergeladen werden!'); ?></p>
-        <a href="#" class="btn download hidden"><?php echo $translate->_('Herunterladen'); ?></a>
+        <p><?php echo $translate->_('The file is available for download!'); ?></p>
+        <a href="#" class="btn download hidden"><?php echo $translate->_('Download'); ?></a>
     </div>
     <div class="error hidden"></div>
 
-    <div><h4 style="color: #ff004b"><?php echo $translate->_('Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.'); ?></h4></div>
+    <div><h4 style="color: #ff004b"><?php echo $translate->_('Warning: Please do NOT use segment merge or splitting in another translation tool with the downloaded package. translate5 does not support segment merge/split and such segments will be ignored on re-import.'); ?></h4></div>
 </div>
 
 <script>
@@ -143,8 +143,8 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             .catch(error => {
                 document.querySelector('.loading').classList.add('hidden');
                 document.querySelector('.export-running-message').classList.add('hidden');
-                document.querySelector('.error').textContent = '<?php echo $translate->_('Es ist ein Fehler aufgetreten!') . ' '; ?>';
-                document.querySelector('.error').textContent += '<?php echo $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
+                document.querySelector('.error').textContent = '<?php echo $translate->_('An error occurred!') . ' '; ?>';
+                document.querySelector('.error').textContent += '<?php echo $translate->_('For more info, check the result log.'); ?>';
                 document.querySelector('.error').classList.remove('hidden');
             });
     }

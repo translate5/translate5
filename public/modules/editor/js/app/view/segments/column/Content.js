@@ -58,8 +58,8 @@ Ext.define('Editor.view.segments.column.Content', {
   isContentColumn: true,
   variableRowHeight: true,
   strings: {
-      missingSource: '#UT#ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT',
-      missingTarget: '#UT#ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT'
+      missingSource: '#UT#ATTENTION: SOURCE IS CONTENT CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT',
+      missingTarget: '#UT#ATTENTION: TARGET CONTENT IS CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT'
   },
   constructor: function(conf) {
       var field = conf.fieldName;

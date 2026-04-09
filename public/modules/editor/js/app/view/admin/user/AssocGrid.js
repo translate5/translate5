@@ -36,23 +36,23 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
     requires: [
     ],
     strings: {
-        sourceLang: '#UT#Quellsprache',
-        targetLang: '#UT#Zielsprache',
-        userGuidCol: '#UT#Benutzer',
-        roleCol: '#UT#Rolle',
-        addUser: '#UT#Hinzufügen',
-        addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
-        removeUser: '#UT#Entfernen',
-        removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
-        save: '#UT#Änderungen speichern',
-        reload: '#UT#Aktualisieren',
-        cancel: '#UT#Abbrechen',
+        sourceLang: '#UT#Source language',
+        targetLang: '#UT#Target language',
+        userGuidCol: '#UT#Users',
+        roleCol: '#UT#Role',
+        addUser: '#UT#Add',
+        addUserTip: '#UT#Add a user to this task.',
+        removeUser: '#UT#Remove',
+        removeUserTip: '#UT#Remove the selected user from this task.',
+        save: '#UT#Save changes',
+        reload: '#UT#Refresh',
+        cancel: '#UT#Cancel',
         deadlineDateLable: '#UT#Deadline',
-        notifyButtonText: '#UT#Benutzer nach Import benachrichtigen',
-        notifyButtonTooltip: '#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
-        workflowStepNameCol:'#UT#Workflow-Schritt',
+        notifyButtonText: '#UT#Notify users after import',
+        notifyButtonTooltip: '#UT#Notify all assigned users about their assignment via e-mail',
+        workflowStepNameCol:'#UT#Workflow step',
         fieldWorkflow: '#UT#Workflow',
-        typeCol: '#UT#Typ'
+        typeCol: '#UT#Type'
     },
 
     viewModel: {

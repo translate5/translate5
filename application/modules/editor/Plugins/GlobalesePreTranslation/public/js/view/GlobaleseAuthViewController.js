@@ -41,11 +41,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
     alias: 'controller.globaleseAuthPanel',
 
     strings:{
-        noEnginesFoundMsg:'#UT#Keine Globalese Übersetzungs-Engine verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.',
-        noGroupsFoundMsg:'#UT#Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.',
-        authErrorMsg:'#UT#Benutzer oder Passwort sind nicht valide.',
-        loadingWindowMessage:"#UT#Laden",
-        noEnginesForLanguageComboMsg:'#UT#Für die aktuelle Sprachkombination existiert keine Engine in Globalese. Bitte überspringen Sie den Globalese Schritt für diesen Import.'
+        noEnginesFoundMsg:'#UT#No Globalese translation engine available (for your Globalese username and language pair). Please change the Globalese username or skip pre-translation.',
+        noGroupsFoundMsg:'#UT#No Globalese user group available (for your Globalese username and language pair). Please change the Globalese username or skip pre-translation.',
+        authErrorMsg:'#UT#Username or password is not valid.',
+        loadingWindowMessage:'#UT#Loading',
+        noEnginesForLanguageComboMsg:'#UT#There is no Globalese engine for the selected language pair. Please skip the Globalese step in the import process.'
         
     },
     

@@ -195,17 +195,17 @@ final class editor_Models_Import_UploadProcessor
         }
         switch ($errorType) {
             case self::ERROR_INVALID_FILE:
-                $msg = $msg ?? Localization::trans('Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.');
+                $msg = $msg ?? Localization::trans('The file-type “{ext}” of the selected file “{filename}” is not supported.');
 
                 break;
             case self::ERROR_EMPTY_FILE:
-                $msg = $msg ?? Localization::trans('Die ausgewählte Datei war leer!');
+                $msg = $msg ?? Localization::trans('The selected file is empty!');
 
                 break;
             case self::ERROR_NO_WORKFILES:
                 $msg = Localization::trans(
-                    'Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien ' .
-                    'überschreiten die maximal zulässige Größe.'
+                    'There were no uploaded work files found, or the ' .
+                    'uploaded files are exceeding the maximum allowed size.'
                 );
 
                 break;

@@ -37,11 +37,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
     removeUnmodified: true,
     errorSummary: false,
     strings: {
-        infosMissing: '#UT#Informationen fehlen',
-        nameMustBeChanged: '#UT#Der ursprüngliche Name muss verändert werden',
-        nameMustBeSupplied: '#UT#Es muss ein endeutiger Name angegeben werden',
-        nameMustNotBeLikeT5: '#UT#Der Name darf nicht den Begriff "translate5" enthalten',
-        extensionMustBeSupplied: '#UT#Es muss mindestens ein Dateityp angegeben werden'
+        infosMissing: '#UT#Information missing',
+        nameMustBeChanged: '#UT#The original name has to be changed',
+        nameMustBeSupplied: '#UT#A unique name must be provided',
+        nameMustNotBeLikeT5: '#UT#The name must not contain the term “translate5”',
+        extensionMustBeSupplied: '#UT#At least one file type must be specified'
     },
     onEnterKey: function(){}, // deactivates the save-on-enter feature with interferes with the tagfields add-item-on-enter
     listeners: {

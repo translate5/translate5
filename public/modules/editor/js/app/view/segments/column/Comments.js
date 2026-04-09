@@ -44,10 +44,10 @@ Ext.define('Editor.view.segments.column.Comments', {
         type: 'string'
     },
     showInMetaTooltip: true,
-    text: '#UT#Kommentare',
-    text_morecomments: '#UT#({0} weitere Kommentare)',
-    text_morecomment: '#UT#({0} weiterer Kommentar)',
-    text_tooltip_icon: '#UT#Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)',
+    text: '#UT#Comments',
+    text_morecomments: '#UT#({0} further comments)',
+    text_morecomment: '#UT#({0} further comment)',
+    text_tooltip_icon: '#UT#Add a comment to the select segment. (ALT + C)',
     tdCls: 'comments-field',
     statics: {
         /**

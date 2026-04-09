@@ -1,7 +1,31 @@
 <?xml version="1.0" ?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
-    <file original="php-sourcecode" source-language="ha" target-language="de" datatype="php">
+    <file original="php-sourcecode" source-language="en" target-language="de" datatype="php">
         <body>
+            <trans-unit id="Q291bGQgbm90IGRlbGV0ZSBzZWdtZW50LiA8YnIgLz5QbGVhc2UgcmVmcmVzaCB5b3VyIHNlYXJjaCBhbmQgdHJ5IGFnYWluLiA8YnIgLz5Gb3VuZCBzZWdtZW50IGlkIGRpZmZlcnMgZnJvbSB0aGUgcmVxdWVzdGVkIG9uZS4gPGJyIC8+UHJvYmFibHkgdGhlIHNlZ21lbnQgaW5kZXggY2hhbmdlZCBvbiB0aGUgc2VydmVyIGR1ZSB0byBvdGhlciBvcGVyYXRpb25zLg==">
+                <source>Could not delete segment. <br />Please refresh your search and try again. <br />Found segment id differs from the requested one. <br />Probably the segment index changed on the server due to other operations.</source>
+                <target>Segment konnte nicht gelöscht werden. <br />Bitte aktualisieren Sie Ihre Suche und versuchen Sie es erneut. <br />Die gefundene Segment-ID weicht von der angeforderten ab. <br />Wahrscheinlich hat sich der Segmentindex auf dem Server aufgrund anderer Vorgänge geändert.</target>
+            </trans-unit>
+            <trans-unit id="SW52YWxpZCBkZWxldGlvbiB0eXBlIHNwZWNpZmllZC4=">
+                <source>Invalid deletion type specified.</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="TWVtb3J5IHN0YXR1czoge3N0YXR1c30uIFBsZWFzZSB0cnkgYWdhaW4gaW4gYSB3aGlsZS4=">
+                <source>Memory status: {status}. Please try again in a while.</source>
+                <target>Speicherstatus: {status}. Bitte versuchen Sie es in Kürze erneut.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlZ21lbnQgY291bGQgbm90IGJlIHNhdmVkLiA8YnIgLz5QbGVhc2UgdHJ5IHRvIHJlZnJlc2ggeW91ciBzZWFyY2guIDxiciAvPlRoZSBmb3VuZCBzZWdtZW50LWlkIG9uIHRoZSBzZXJ2ZXIgZGlmZmVycyBmcm9tIHRoZSByZXF1ZXN0ZWQgb25lLiA8YnIgLz5Qcm9iYWJseSB0aGUgc2VnbWVudCBpbmRleCBjaGFuZ2VkIG9uIHRoZSBzZXJ2ZXIgZHVlIHRvIG90aGVyIG9wZXJhdGlvbnMu">
+                <source>The segment could not be saved. <br />Please try to refresh your search. <br />The found segment-id on the server differs from the requested one. <br />Probably the segment index changed on the server due to other operations.</source>
+                <target>Segment kann nicht gespeichert werden. <br />Versuchen Sie, Ihre Suche zu aktualisieren. <br />Die auf dem Server gefundene Segment-ID weicht von der angeforderten ab. <br />Wahrscheinlich hat sich der Segmentindex auf dem Server aufgrund anderer Vorgänge geändert.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlZ21lbnQgY291bGQgbm90IGJlIHNhdmVkIHRvIHRoZSBUTS4gPGJyIC8+UGxlYXNlIHRyeSBhZ2FpbiBsYXRlci48YnIgLz5JZiB0aGlzIG1lc3NhZ2UgcGVyc2lzdHMsIHBsZWFzZSB0cnkgdG8gcmVmcmVzaCB5b3VyIHNlYXJjaC4gPGJyIC8+SWYgdGhlIG1lc3NhZ2Ugc3RpbGwgcGVyc2lzdHMsIHBsZWFzZSBub3RpZnkgdGhlIHN5c3RlbSBzdXBwb3J0Lg==">
+                <source>The segment could not be saved to the TM. <br />Please try again later.<br />If this message persists, please try to refresh your search. <br />If the message still persists, please notify the system support.</source>
+                <target>Das Segment konnte nicht im TM gespeichert werden. <br />Bitte versuchen Sie es später noch einmal. <br />Wenn diese Meldung weiterhin besteht, aktualisieren Sie bitte Ihre Suche. <br />Wenn diese Meldung dann weiterhin besteht, benachrichtigen Sie bitte den Systemsupport.</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlZ21lbnQgeW91IGFyZSB0cnlpbmcgdG8gc2F2ZSBoYXMgYWxyZWFkeSBiZWVuIGRlbGV0ZWQgYnkgYW5vdGhlciBwcm9jZXNzLg==">
+                <source>The segment you are trying to save has already been deleted by another process.</source>
+                <target>Das Segment, dass Sie speichern möchten, wurde bereits durch anderen Prozess gelöscht.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

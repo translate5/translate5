@@ -243,8 +243,8 @@ class TqeConflictChecker
                 $translate->_('The selected customers are already assigned as TQE default for other language resources with the same language combinations.'),
                 $translate->_('Would you like to remove the TQE assignments from the other resources and assign them to this resource?'),
             ] : [
-                $translate->_('The selected customers are already assigned as TQE Instant-Translate default for other language resources with the same language combinations.'),
-                $translate->_('Would you like to remove the TQE Instant-Translate assignments from the other resources and assign them to this resource?'),
+                $translate->_('The selected customers are already assigned as TQE InstantTranslate default for other language resources with the same language combinations.'),
+                $translate->_('Would you like to remove the TQE InstantTranslate assignments from the other resources and assign them to this resource?'),
             ];
 
         throw ZfExtended_UnprocessableEntity::createResponse($errorCode, [

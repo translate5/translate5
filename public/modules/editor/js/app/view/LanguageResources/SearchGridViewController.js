@@ -74,13 +74,13 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         selector:'#searchResultTab'
     }],
     strings: {
-        loading: '#UT#wird geladen...',
-        noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
-        searchResultGridTitle: '#UT#{0} Ergebnisse',
-        serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
-        serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
-        serverErrorMsg502: '#UT#Es gibt Probleme mit dem angefragten Dienst.',
-        serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.'
+        loading: '#UT#loading...',
+        noresults: '#UT#No results found.',
+        searchResultGridTitle: '#UT#{0} results',
+        serverErrorMsgDefault: '#UT#The language resource did not respond in a reasonable time.',
+        serverErrorMsg500: '#UT#The request produced an error in the queried service.',
+        serverErrorMsg502: '#UT#There are problems with the queried service.',
+        serverErrorMsg408: '#UT#The language resource did not respond in a reasonable time.'
     },
     assocStore : null,
     executedRequests:new Ext.util.HashMap(),

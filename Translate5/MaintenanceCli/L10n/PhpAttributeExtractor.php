@@ -32,6 +32,8 @@ namespace Translate5\MaintenanceCli\L10n;
 use MittagQI\ZfExtended\Localization\ExtractableLocalization;
 use MittagQI\ZfExtended\Localization\LocalizableArrayProp;
 use MittagQI\ZfExtended\Localization\LocalizableConfigValue;
+use MittagQI\ZfExtended\Localization\LocalizableMsg;
+use MittagQI\ZfExtended\Localization\LocalizableMsgArray;
 use MittagQI\ZfExtended\Localization\LocalizableProp;
 use MittagQI\ZfExtended\Localization\LocalizableString;
 use MittagQI\ZfExtended\Localization\LocalizableTableColumn;
@@ -45,13 +47,36 @@ class PhpAttributeExtractor
 
     public const NAMESPACE_PATTERN = '~\n[\t\r ]*namespace\s+([a-zA-Z0-9_\x80-\xff\\\\]+)\s*;~';
 
-    public function __construct(
-        private readonly string $content,
-        private readonly string $absoluteFilePath,
-    ) {
+    public static function getClassShortName(string $className): string
+    {
+        return substr($className, strrpos($className, '\\') + 1);
     }
 
-    private array $brokenMatches = [];
+    protected array $brokenMatches = [];
+
+    protected array $classExtractors = [
+        LocalizableString::class,
+        LocalizableTableColumn::class,
+        LocalizableConfigValue::class,
+    ];
+
+    protected array $propertyConstantExtractors = [
+        LocalizableMsg::class,
+        LocalizableMsgArray::class,
+        LocalizableProp::class,
+        LocalizableArrayProp::class,
+    ];
+
+    protected array $extractorShortnames = [];
+
+    public function __construct(
+        protected string $content,
+        protected readonly string $absoluteFilePath,
+    ) {
+        foreach (array_merge($this->classExtractors, $this->propertyConstantExtractors) as $className) {
+            $this->extractorShortnames[] = self::getClassShortName($className);
+        }
+    }
 
     /**
      * Extracts the localized source-strings from a PHP file by PHP attributes
@@ -61,18 +86,10 @@ class PhpAttributeExtractor
         $strings = [];
         // reflection is expensive, so only do it when there are possible matches ...
         // and exclude this class and the Attribute-classes
-        if (! str_contains($this->absoluteFilePath, 'MaintenanceCli/L10n/PhpAttributeExtractor') &&
-            ! str_contains($this->absoluteFilePath, 'ZfExtended/Localization/Localizable') &&
-            // TODO FIXME: checking classnames manuually is bad when adding new attributes, better ideas ?
-            (str_contains($this->content, 'LocalizableArrayProp') ||
-                str_contains($this->content, 'LocalizableProp') ||
-                str_contains($this->content, 'LocalizableString') ||
-                str_contains($this->content, 'LocalizableTableColumn') ||
-                str_contains($this->content, 'LocalizableConfigValue'))
-        ) {
+        if ($this->containsExtractableShortname($this->content)) {
             foreach ($this->extractClassNames() as $className) {
                 try {
-                    // crucial: Controller-Classes are loaded by zend and must be included first ...
+                    // crucial: Controller-Classes are loaded by zend and must be included before instantiation ...
                     if (! class_exists('\\' . $className)) {
                         include($this->absoluteFilePath);
                     }
@@ -80,7 +97,6 @@ class PhpAttributeExtractor
                     $reflector = new \ReflectionClass('\\' . $className);
                     // LocalizableString, LocalizableConfigValue, LocalizableTableColumn from class attributes
                     foreach ($reflector->getAttributes() as $attribute) {
-                        // echo "\n\nCHECK ATTRIBUTE: " . $attribute->getName();
                         switch ($attribute->getName()) {
                             case LocalizableString::class:
                             case LocalizableTableColumn::class:
@@ -95,58 +111,15 @@ class PhpAttributeExtractor
                                 break;
                         }
                     }
+                    // we need them to gather values of \ReflectionProperties
+                    $defaultProps = $reflector->getDefaultProperties();
                     // LocalizableProp Attributes in constants
                     foreach ($reflector->getReflectionConstants() as $reflectionConstant) {
-                        foreach ($reflectionConstant->getAttributes(LocalizableProp::class) as $attribute) {
-                            // echo "\n\nFOUND LocalizableProp in constant " . $reflectionConstant->getName() . ': "' . $reflectionConstant->getValue() . '"';
-                            $strings[] = (string) $reflectionConstant->getValue();
-                        }
-                        foreach ($reflectionConstant->getAttributes(LocalizableArrayProp::class) as $attribute) {
-                            if (! is_array($reflectionConstant->getValue())) {
-                                throw new \Exception(
-                                    'LocalizableArrayProp attribute for constant which is no array “' .
-                                    $reflectionConstant->getName() . '”'
-                                );
-                            }
-                            // echo "\n\nFOUND LocalizableArrayProp in constant " . $reflectionConstant->getName() . ': "' . print_r($reflectionConstant->getValue(), true) . '"';
-                            foreach (array_values($reflectionConstant->getValue()) as $value) {
-                                $strings[] = $value;
-                            }
-                        }
+                        $this->extractFromConstantOrProperty($reflectionConstant, $defaultProps, $strings);
                     }
                     // LocalizableProp Attributes in properties
-                    $defaultProps = $reflector->getDefaultProperties();
                     foreach ($reflector->getProperties() as $reflectionProperty) {
-                        foreach ($reflectionProperty->getAttributes(LocalizableProp::class) as $attribute) {
-                            $propName = $reflectionProperty->getName();
-                            if (array_key_exists($propName, $defaultProps)) {
-                                // echo "\n\nFOUND LocalizableProp in property " . $propName . ': "' . $defaultProps[$propName] . '"';
-                                $strings[] = (string) $defaultProps[$propName];
-                            } else {
-                                throw new \Exception(
-                                    'LocalizableProp attribute for property without value “' . $propName . '”'
-                                );
-                            }
-                        }
-                        foreach ($reflectionProperty->getAttributes(LocalizableArrayProp::class) as $attribute) {
-                            $propName = $reflectionProperty->getName();
-                            if (array_key_exists($propName, $defaultProps)) {
-                                if (! is_array($defaultProps[$propName])) {
-                                    throw new \Exception(
-                                        'LocalizableArrayProp attribute for property which is no array “' .
-                                        $propName . '”'
-                                    );
-                                }
-                                // echo "\n\nFOUND LocalizableArrayProp in property " . $propName . ': "' . implode(', ', $defaultProps[$propName]) . '"';
-                                foreach (array_values($defaultProps[$propName]) as $value) {
-                                    $strings[] = $value;
-                                }
-                            } else {
-                                throw new \Exception(
-                                    'LocalizableArrayProp attribute for property without value “' . $propName . '”'
-                                );
-                            }
-                        }
+                        $this->extractFromConstantOrProperty($reflectionProperty, $defaultProps, $strings);
                     }
                 } catch (\Throwable $e) {
                     $this->brokenMatches[] = 'ERROR EXTRACTING ATTRIBUTES:' . $e->getMessage() .
@@ -158,6 +131,74 @@ class PhpAttributeExtractor
         return $strings;
     }
 
+    protected function containsExtractableShortname(string $content): bool
+    {
+        foreach ($this->extractorShortnames as $name) {
+            if (str_contains($content, $name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function extractFromConstantOrProperty(
+        \ReflectionClassConstant|\ReflectionProperty $prop,
+        array $defaultProps,
+        array &$strings,
+    ): void {
+        $attributes = [];
+        $extractor = '';
+        $type = ($prop instanceof \ReflectionProperty) ? 'property' : 'constant';
+        foreach ($this->propertyConstantExtractors as $className) {
+            foreach ($prop->getAttributes($className) as $attribute) {
+                $attributes[] = $attribute;
+                $extractor = self::getClassShortName($className);
+            }
+        }
+        if (count($attributes) > 1) {
+            throw new \Exception(
+                'Multiple attributes for property or constant  “' . $prop->getName() . '” in file ' .
+                $this->absoluteFilePath
+            );
+        } elseif (count($attributes) < 1) {
+            return;
+        }
+        $propName = $prop->getName();
+        $isArray = str_contains($extractor, 'Array');
+        if ($prop instanceof \ReflectionProperty) {
+            if (array_key_exists($propName, $defaultProps)) {
+                // echo "\n\nFOUND " . $extractor . ' in ' . $type . ' ' . $propName . ': "' . ($isArray ? implode('", "', $defaultProps[$propName]) : $defaultProps[$propName]) . '"';
+                $value = $defaultProps[$propName];
+            } else {
+                throw new \Exception(
+                    $extractor . ' attribute for ' . $type . ' without value “' . $propName . '” in file ' .
+                    $this->absoluteFilePath
+                );
+            }
+        } else {
+            $value = $prop->getValue();
+        }
+        if ($isArray && ! is_array($value)) {
+            throw new \Exception(
+                $extractor . ' attribute for ' . $type . ' which is no array “' . $propName . '” in file ' .
+                $this->absoluteFilePath
+            );
+        } elseif (! $isArray && (! is_string($value) || empty($value))) {
+            throw new \Exception(
+                $extractor . ' attribute for ' . $type . ' which is no string or empty “' . $propName . '” in file ' .
+                $this->absoluteFilePath
+            );
+        }
+        if ($isArray) {
+            foreach (array_values($value) as $string) {
+                $strings[] = (string) $string;
+            }
+        } else {
+            $strings[] = $value;
+        }
+    }
+
     /**
      * Retrieves files where attributes seemed present but errors occured extracting them
      */
@@ -166,7 +207,7 @@ class PhpAttributeExtractor
         return $this->brokenMatches;
     }
 
-    private function extractClassNames(): array
+    protected function extractClassNames(): array
     {
         $classes = [];
         $namespace = '';

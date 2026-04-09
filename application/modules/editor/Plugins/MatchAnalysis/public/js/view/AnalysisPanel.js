@@ -50,7 +50,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     itemId: 'matchAnalysisPanel',
 
     strings: {
-        tabTitle: "#UT#Datum der Analyse",
+        tabTitle: '#UT#Date of the analysis',
     },
 
     listeners: {

@@ -48,7 +48,7 @@ Ext.define('Editor.store.ReferenceFiles', {
       }
   },
   root: {
-    text: '#UT#Referenz-Dateien',
+    text: '#UT#Reference files',
     id: 0,
     expanded: false
   },

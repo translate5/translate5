@@ -56,14 +56,14 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	           'Editor.util.LanguageResources'
 	],
 	strings: {
-        source: '#UT#Ausgangstext',
-        target: '#UT#Zieltext',
-        match: '#UT#Matchrate',
-		ctrl: '#UT#STRG',
-        tooltipMsg: '#UT#Diesen Match in das geöffnete Segment übernehmen.',
+        source: '#UT#Source text',
+        target: '#UT#Target text',
+        match: '#UT#Match rate',
+		ctrl: '#UT#CTRL',
+        tooltipMsg: '#UT#Take over this match into the opened segment.',
         atributeTooltipMsg: '#UT#Attribute:',
-        lastEditTooltipMsg: '#UT#letzte Änderung:',
-        createdTooltipMsg: '#UT#erstellt:'
+        lastEditTooltipMsg: '#UT#last change:',
+        createdTooltipMsg: '#UT#created:'
     },
 	stores:[
 		'Editor.store.LanguageResources.TaskAssocStore'

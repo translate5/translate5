@@ -29,10 +29,15 @@
 namespace Translate5\MaintenanceCli\L10n;
 
 /**
- * Formats an existing localization-XLIFF: Sorts the keys naturally & normalizes the whitespace
+ * Imports new targets for a ZXLIFF from an exported reviewed task.
+ * Will renew all targets there were present in the passed import ZXLIFF
  */
 class XliffImporter extends AbstractXliffProcessor
 {
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function import(string $importPath): void
     {
         $parser = new XliffParser($this->absoluteFilePath);

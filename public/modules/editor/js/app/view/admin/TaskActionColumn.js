@@ -36,11 +36,11 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
   width: 90,
   menuText: null,
   messages: {
-      projectOverview:'#UT#Zum Projekt springen – wechselt in die Projektliste',
-      taskOverview:'#UT#zur Aufgabe springen',
-      taskActionMenu:'#UT#Aufgabenmenü anzeigen',
-      projectActionMenu:'#UT#Projektmenü anzeigen',
-      actionEdit: '#UT# Aufgabe bearbeiten'
+      projectOverview:'#UT#jump to project – switches to the project list',
+      taskOverview:'#UT#jump to task',
+      taskActionMenu:'#UT#Show task menu',
+      projectActionMenu:'#UT#Show project menu',
+      actionEdit: '#UT#Edit task'
   },
   
   /**

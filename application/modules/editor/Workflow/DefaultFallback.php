@@ -38,7 +38,7 @@ class editor_Workflow_DefaultFallback extends editor_Workflow_Default
         $this->definition = ZfExtended_Factory::get('editor_Workflow_CachableDefinition');
 
         $this->definition->name = $name;
-        $this->definition->label = Localization::trans('Standard Workflow');
+        $this->definition->label = Localization::trans('Standard workflow');
 
         $this->definition->stepChain[] = self::STEP_NO_WORKFLOW;
         $this->definition->stepChain[] = 'translation';

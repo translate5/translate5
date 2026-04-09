@@ -52,22 +52,22 @@ class UsageExporter
 {
     private const CHUNKS_BUFFER = 1000000; //number of log entries per excel file
 
-    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsgArray]
     protected array $labels = [
-        "langageResourceType" => "Typ der Ressource",
-        "langageResourceName" => "Name der Ressource",
-        "langageResourceServiceName" => "Ressource",
-        "customerId" => "Kunde",
-        "sourceLang" => "Quellsprache",
-        "targetLang" => "Zielsprache",
-        "yearAndMonth" => "Jahr/Monat",
-        "totalCharacters" => "Übersetzte Zeichen",
-        "timestamp" => "Zeitstempel",
-        "charactersPerCustomer" => "Übersetzte Zeichen",
-        "taskCount" => "Anzahl der mit InstantTranslate übersetzten Dokumente",
-        "customers" => "Kunden",
-        "repetition" => "Wiederholung",
-        "userGuid" => "Benutzer",
+        'langageResourceType' => 'Resource type',
+        'langageResourceName' => 'Resource name',
+        'langageResourceServiceName' => 'Resource',
+        'customerId' => 'Client',
+        'sourceLang' => 'Source language',
+        'targetLang' => 'Target language',
+        'yearAndMonth' => 'Year/month',
+        'totalCharacters' => 'Characters translated',
+        'timestamp' => 'Timestamp',
+        'charactersPerCustomer' => 'Characters translated',
+        'taskCount' => 'Number of documents translated with InstantTranslate',
+        'customers' => 'Clients',
+        'repetition' => 'Repetition',
+        'userGuid' => 'Users',
     ];
 
     protected string $spreadSheetName;
@@ -223,7 +223,7 @@ class UsageExporter
         }
 
         $this->excel->open($this->xlsFolder . $this->xlsName, false);
-        $this->excel->loadArrayData($this->labels, [[$this->translate->_('Es wurden keine Ergebnisse gefunden')]]);
+        $this->excel->loadArrayData($this->labels, [[$this->translate->_('No results found')]]);
         $this->excel->close();
     }
 
@@ -238,9 +238,8 @@ class UsageExporter
         $usageLogByCustomer = $this->usageLogger->loadByCustomer($customerId);
         $documentUsage = $this->taskUsageLog->loadByTypeAndCustomer($customerId, $this->documentTaskType);
 
-        $unset = ["customerId", "yearAndMonth", "timestamp", "customers", "userGuid"];
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages */
+        $unset = ['customerId', 'yearAndMonth', 'timestamp', 'customers', 'userGuid'];
+        $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $languages = $languages->loadAllKeyValueCustom('id', 'rfc5646');
 
         //filter out and convert fields
@@ -396,9 +395,9 @@ class UsageExporter
     {
         //add row wich explains the current worksheet
         $comment = $this->translate->_(
-            'Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.'
+            'This data contains all requests to the language resources, be it from usage in tasks or with InstantTranslate.'
         );
-        $this->addWorkSheet($data, $this->translate->_('Ressourcen-Nutzung pro Monat'), $comment);
+        $this->addWorkSheet($data, $this->translate->_('Resource usage per month'), $comment);
     }
 
     /**
@@ -409,10 +408,10 @@ class UsageExporter
     {
         //add row wich explains the current worksheet
         $comment = $this->translate->_(
-            'Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.'
+            'This data contains all requests to the language resources, be it from usage in tasks or with InstantTranslate.'
         );
-        $comment .= $this->translate->_('Jede Zeile korrespondiert mit einer Anfrage an eine Sprachressource.');
-        $this->addWorkSheet($data, $this->translate->_('Log der Ressouren-Nutzung'), $comment);
+        $comment .= $this->translate->_('Each line corresponds to one request to a language resource.');
+        $this->addWorkSheet($data, $this->translate->_('Resource usage log'), $comment);
     }
 
     /**
@@ -422,18 +421,18 @@ class UsageExporter
     protected function addUsageInDocumentsSheet(array $data): void
     {
         //add row wich explains the current worksheet
-        $comment = $this->translate->_('Anzahl der mit InstantTranslate übersetzten Dokumente');
-        $this->addWorkSheet($data, $this->translate->_('Dokumente pro Monat'), $comment);
+        $comment = $this->translate->_('Number of documents translated with InstantTranslate');
+        $this->addWorkSheet($data, $this->translate->_('Documents per month'), $comment);
     }
 
     private function setFileName(?int $customerId): void
     {
         if (! empty($customerId)) {
             $this->spreadSheetName = $this->translate->_(
-                "Ressourcen-Nutzung fuer Kunde"
+                'Resource usage for client'
             ) . ' ' . $this->customersForNormalization[$customerId]['name'];
         } else {
-            $this->spreadSheetName = $this->translate->_("Ressourcen-Nutzung fuer alle Kunden");
+            $this->spreadSheetName = $this->translate->_('Resource usage for all clients');
         }
     }
 

@@ -41,7 +41,7 @@ class L10nReimporter
 
     private array $xliffPathes = [];
 
-    private array $xliffReimports = [];
+    private array $zxliffReimports = [];
 
     private array $jsonReimports = [];
 
@@ -66,6 +66,10 @@ class L10nReimporter
         $this->xliffPathes[] = L10nHelper::getModuleXliff('erp');
     }
 
+    /**
+     * @throws \MittagQI\ZfExtended\FileWriteException
+     * @throws \ZfExtended_Exception
+     */
     public function process(bool $doCreateNonExistant = false): void
     {
         $existingZips = [];
@@ -76,7 +80,7 @@ class L10nReimporter
         }
         foreach (L10nHelper::getAllLocales() as $locale) {
             $sourceDir = $this->saveDir . '/' . $locale;
-            $taskZip = $this->findSimilarTaskFile(L10nHelper::createTaskZipName($locale), $existingZips);
+            $taskZip = $this->findSimilarTaskFile($locale, $existingZips);
             if ($taskZip !== null) {
                 $zip = new ZipArchive();
                 if (is_dir($this->saveDir . '/' . $locale)) {
@@ -85,6 +89,7 @@ class L10nReimporter
                 if ($zip->open($this->saveDir . '/' . $taskZip) === true) {
                     $zip->extractTo($sourceDir);
                     $zip->close();
+                    @unlink($this->saveDir . '/' . $taskZip);
                 }
             }
             if (is_dir($sourceDir)) {
@@ -92,15 +97,14 @@ class L10nReimporter
                 foreach ($this->xliffPathes as $xliffPathTpl) {
                     $xliffPath = str_replace('@locale@', $locale, $xliffPathTpl);
                     $xliffRepoPath = substr($xliffPath, strlen($this->basePath));
-                    $importPath = $sourceDir . '/' .
-                        L10nHelper::createExportFileName($xliffRepoPath);
+                    $importPath = $sourceDir . '/' . L10nHelper::createExportFileName($xliffRepoPath);
                     if (file_exists($importPath)) {
                         if (! file_exists($xliffPath)) {
                             if ($doCreateNonExistant) {
                                 // write an empty ZXLIFF file for the language based on the base-language
                                 $readPath = str_replace('@locale@', Localization::PRIMARY_LOCALE, $xliffPathTpl);
                                 $reader = new XliffParser($readPath);
-                                $writer = new ZXliffWriter(dirname($xliffPath), $locale);
+                                $writer = new XliffWriter(dirname($xliffPath), $locale);
                                 $writer->write($reader->getTranslations());
                             } else {
                                 $this->errors[] = 'The localization-file “' . $xliffPath . '” does not exist';
@@ -110,7 +114,7 @@ class L10nReimporter
                         }
                         $importer = new XliffImporter($xliffPath);
                         $importer->import($importPath);
-                        $this->xliffReimports[] = $xliffRepoPath;
+                        $this->zxliffReimports[] = $xliffRepoPath;
                     }
                 }
                 // import/update JSONs
@@ -119,8 +123,7 @@ class L10nReimporter
                 if (empty($files)) {
                     if ($doCreateNonExistant) {
                         foreach ($finder->findFiles(Localization::PRIMARY_LOCALE) as $file) {
-                            $files[] = substr($file, 0, -1 * strlen(Localization::PRIMARY_LOCALE . '.json')) .
-                                $locale . '.json';
+                            $files[] = L10nHelper::createLocalizedJsonPath($file, Localization::PRIMARY_LOCALE, $locale);
                         }
                     } else {
                         $this->errors[] = 'No JSON-files for locale “' . $locale . '” could be found';
@@ -129,19 +132,30 @@ class L10nReimporter
                     }
                 }
                 foreach ($files as $file) {
-                    $importPath = $sourceDir . '/' . L10nHelper::createExportFileName($file);
+                    $importPath = $sourceDir . '/' . L10nHelper::createExportFileName($file) .
+                        Localization::FILE_EXTENSION_WITH_DOT;
                     if (file_exists($importPath)) {
-                        copy($importPath, $this->basePath . '/' . $file);
+                        $xliffParser = new JsonXliffParser($importPath, $locale);
+                        $parser = new JsonParser($file, $locale);
+                        $parser->setStringMap($xliffParser->getTargetMap());
+                        $parser->flush();
                         $this->jsonReimports[] = ltrim($file, '.');
                     }
                 }
+                \ZfExtended_Utils::recursiveDelete($sourceDir);
             }
         }
     }
 
+    /**
+     * @return array{ zxliff: string[], json: string[] }
+     */
     public function getReimportedPathes(): array
     {
-        return array_merge($this->xliffReimports, $this->jsonReimports);
+        return [
+            'zxliff' => $this->zxliffReimports,
+            'json' => $this->jsonReimports,
+        ];
     }
 
     /**
@@ -157,11 +171,11 @@ class L10nReimporter
         return count($this->errors) > 0;
     }
 
-    private function findSimilarTaskFile($taskZip, $existingZips): ?string
+    private function findSimilarTaskFile(string $locale, array $existingZips): ?string
     {
-        $filename = pathinfo($taskZip, PATHINFO_FILENAME);
+        $taskZipPattern = L10nHelper::createTaskZipNameRegex($locale);
         foreach ($existingZips as $existingZip) {
-            if (str_starts_with($existingZip, $filename)) {
+            if (preg_match($taskZipPattern, $existingZip) === 1) {
                 return $existingZip;
             }
         }

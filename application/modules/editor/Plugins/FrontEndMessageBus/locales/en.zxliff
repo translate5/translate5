@@ -1,62 +1,62 @@
 <?xml version="1.0" ?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
-    <file original="php-sourcecode" source-language="de" target-language="en" datatype="php">
+    <file original="php-sourcecode" source-language="ha" target-language="en" datatype="php">
         <body>
-            <trans-unit id="QWt0dWVsbGVyIEJlYXJiZWl0ZXI=">
-                <source>Aktueller Bearbeiter</source>
-                <target>Current editor</target>
-            </trans-unit>
-            <trans-unit id="QXVmZ2FiZSBpbiBhbmRlcmVtIEZlbnN0ZXIgZ2VzY2hsb3NzZW4=">
-                <source>Aufgabe in anderem Fenster geschlossen</source>
-                <target>Task closed in another window</target>
-            </trans-unit>
-            <trans-unit id="QXVzZ2V3w6RobHQgdm9u">
-                <source>Ausgewählt von</source>
-                <target>Selected by</target>
-            </trans-unit>
-            <trans-unit id="QmVhcmJlaXRlcjog">
-                <source>Bearbeiter: </source>
-                <target>Editors:</target>
-            </trans-unit>
-            <trans-unit id="RGFzIGF1c2dld8OkaGx0ZSBTZWdtZW50IHdpcmQgdm9uIGVpbmVtIGFuZGVyZW4gQmVudXR6ZXIgYmVyZWl0cyBiZWFyYmVpdGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlw7ZmZm5ldCB3ZXJkZW4u">
-                <source>Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</source>
-                <target>The selected segment is already in use by another user and cannot be opened.</target>
-            </trans-unit>
-            <trans-unit id="RWluIGFuZGVyZXIgQmVudXR6ZXIgd2FyIHNjaG5lbGxlciB1bmQgaGF0IGltIE1vbWVudCBkYXMgU2VnbWVudCB6dXIgQmVhcmJlaXR1bmcgZ2VzcGVycnQu">
-                <source>Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.</source>
+            <trans-unit id="QW5vdGhlciB1c2VyIHdhcyBxdWlja2VyIGFuZCBoYXMgY3VycmVudGx5IGxvY2tlZCB0aGUgc2VnbWVudCBmb3IgZWRpdGluZy4=">
+                <source>Another user was quicker and has currently locked the segment for editing.</source>
                 <target>Another user was quicker and has currently locked the segment for editing.</target>
             </trans-unit>
-            <trans-unit id="RXJuZXV0IMO2ZmZuZW4=">
-                <source>Erneut öffnen</source>
-                <target>Reopen</target>
+            <trans-unit id="Q3VycmVudCBlZGl0b3I=">
+                <source>Current editor</source>
+                <target>Current editor</target>
             </trans-unit>
-            <trans-unit id="SWNo">
-                <source>Ich</source>
+            <trans-unit id="RWRpdG9yczo=">
+                <source>Editors:</source>
+                <target>Editors:</target>
+            </trans-unit>
+            <trans-unit id="TXlzZWxm">
+                <source>Myself</source>
                 <target>Myself</target>
             </trans-unit>
-            <trans-unit id="U2VnbWVudCBiZXJlaXRzIGluIEJlYXJiZWl0dW5n">
-                <source>Segment bereits in Bearbeitung</source>
+            <trans-unit id="UmVvcGVu">
+                <source>Reopen</source>
+                <target>Reopen</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudCBhbHJlYWR5IGluIHVzZQ==">
+                <source>Segment already in use</source>
                 <target>Segment already in use</target>
             </trans-unit>
-            <trans-unit id="U2VnbWVudCB3dXJkZSBhdWYgZGVyIFNlcnZlcnNlaXRlIGdlw6RuZGVydA==">
-                <source>Segment wurde auf der Serverseite geändert</source>
+            <trans-unit id="U2VnbWVudCB3YXMgY2hhbmdlZCBvbiBzZXJ2ZXIgc2lkZQ==">
+                <source>Segment was changed on server side</source>
                 <target>Segment was changed on server side</target>
             </trans-unit>
-            <trans-unit id="U2VnbWVudCB3dXJkZSBhdWYgZGVyIFNlcnZlcnNlaXRlIGdlw6RuZGVydC48YnIvPjxiPlF1ZWxsdGV4dDo8L2I+PGJyLz57c291cmNlfTxici8+PGI+WmllbHRleHQ6PC9iPjxici8+e3RhcmdldH08YnIvPk3DtmNodGVuIFNpZSBkaWUgw4RuZGVydW5nZW4gYWt6ZXB0aWVyZW4/">
-                <source>Segment wurde auf der Serverseite geändert.<br/><b>Quelltext:</b><br/>{source}<br/><b>Zieltext:</b><br/>{target}<br/>Möchten Sie die Änderungen akzeptieren?</source>
+            <trans-unit id="U2VnbWVudCB3YXMgY2hhbmdlZCBvbiBzZXJ2ZXIgc2lkZS48YnIvPjxici8+PGI+U291cmNlIHRleHQ6PC9iPjxici8+e3NvdXJjZX08YnIvPjxici8+PGI+VGFyZ2V0IHRleHQ6PC9iPjxici8+e3RhcmdldH08YnIvPjxici8+RG8geW91IHdhbnQgdG8gYWNjZXB0IGNoYW5nZXM/">
+                <source>Segment was changed on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?</source>
                 <target>Segment was changed on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?</target>
             </trans-unit>
-            <trans-unit id="U2llIGhhYmVuIFZlcmJpbmR1bmdzcHJvYmxlbWUgenVtIEludGVybmV0LiA8YnIgLz5CaXR0ZSBwcsO8ZmVuIFNpZSBkaWUgU3RhYmlsaXTDpHQgSWhyZXIgSW50ZXJuZXR2ZXJiaW5kdW5nLiA8YnIgLz5Tb2xsdGUgZGllc2UgTWVsZHVuZyBkYXVlcmhhZnQgenUgc2VoZW4gc2Vpbiwga2FubiBlcyBhdWNoIHNlaW4sIDxiciAvPmRhc3MgZGFzIFdlYnNvY2tldC1Qcm90b2tvbGwgd3NzOi8vIGluIElocmVyIEZpcmV3YWxsIGJsb2NraWVydCBpc3Qu">
-                <source>Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.</source>
+            <trans-unit id="U2VsZWN0ZWQgYnk=">
+                <source>Selected by</source>
+                <target>Selected by</target>
+            </trans-unit>
+            <trans-unit id="VGFzayBjbG9zZWQgaW4gYW5vdGhlciB3aW5kb3c=">
+                <source>Task closed in another window</source>
+                <target>Task closed in another window</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlbGVjdGVkIHNlZ21lbnQgaXMgYWxyZWFkeSBpbiB1c2UgYnkgYW5vdGhlciB1c2VyIGFuZCBjYW5ub3QgYmUgb3BlbmVkLg==">
+                <source>The selected segment is already in use by another user and cannot be opened.</source>
+                <target>The selected segment is already in use by another user and cannot be opened.</target>
+            </trans-unit>
+            <trans-unit id="V2l0aG91dCBhIGNvbm5lY3Rpb24gdG8gdGhlIHNlcnZlciwgeW91IGNhbm5vdCBlZGl0IGEgc2VnbWVudC4=">
+                <source>Without a connection to the server, you cannot edit a segment.</source>
+                <target>Without a connection to the server, you cannot edit a segment.</target>
+            </trans-unit>
+            <trans-unit id="WW91IGFyZSBleHBlcmllbmNpbmcgY29ubmVjdGlvbiBwcm9ibGVtcy4gPGJyIC8+UGxlYXNlIGNoZWNrIHRoZSBzdGFiaWxpdHkgb2YgeW91ciBJbnRlcm5ldCBjb25uZWN0aW9uLiA8YnIgLz5JZiB5b3Uga2VlcCBzZWVpbmcgdGhpcyBtZXNzYWdlLCBpdCBtYXkgYWxzbyBpbmRpY2F0ZSA8YnIgLz50aGF0IHRoZSBXZWJTb2NrZXQgcHJvdG9jb2wgKHdzczovLykgaXMgYmxvY2tlZCBieSB5b3VyIGZpcmV3YWxsLg==">
+                <source>You are experiencing connection problems. <br />Please check the stability of your Internet connection. <br />If you keep seeing this message, it may also indicate <br />that the WebSocket protocol (wss://) is blocked by your firewall.</source>
                 <target>You are experiencing connection problems. <br />Please check the stability of your Internet connection. <br />If you keep seeing this message, it may also indicate <br />that the WebSocket protocol (wss://) is blocked by your firewall.</target>
             </trans-unit>
-            <trans-unit id="U2llIGhhYmVuIGRpZSBBdWZnYWJlIGluIGFuZGVyZW0gRmVuc3RlciBnZXNjaGxvc3Nlbi4gU2NobGllw59lbiBTaWUgZGllc2VzIEZlbnN0ZXIgZWJlbmZhbGxzLCBvZGVyIGxhZGVuIFNpZSBkYXMgRmVuc3RlciBuZXUgdW0gZGllIEF1ZmdhYmUgZXJuZXV0IHp1IMO2ZmZuZW4u">
-                <source>Sie haben die Aufgabe in anderem Fenster geschlossen. Schließen Sie dieses Fenster ebenfalls, oder laden Sie das Fenster neu um die Aufgabe erneut zu öffnen.</source>
+            <trans-unit id="WW91IGhhdmUgY2xvc2VkIHRoZSB0YXNrIGluIGFub3RoZXIgd2luZG93LiBQbGVhc2UgY2xvc2UgdGhpcyB3aW5kb3cgdG9vLCBvciByZWxvYWQgaXQgdG8gcmVvcGVuIHRoZSB0YXNrLg==">
+                <source>You have closed the task in another window. Please close this window too, or reload it to reopen the task.</source>
                 <target>You have closed the task in another window. Please close this window too, or reload it to reopen the task.</target>
-            </trans-unit>
-            <trans-unit id="U2llIGvDtm5uZW4ga2VpbiBTZWdtZW50IGVkaXRpZXJlbiwgc28gbGFuZ2Uga2VpbmUgVmVyYmluZHVuZyB6dW0gU2VydmVyIGJlc3RlaHQu">
-                <source>Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.</source>
-                <target>Without a connection to the server, you cannot edit a segment.</target>
             </trans-unit>
         </body>
     </file>

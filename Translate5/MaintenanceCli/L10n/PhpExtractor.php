@@ -40,18 +40,18 @@ class PhpExtractor
      * Extractor for argument delimited by single quotes
      * see https://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
      */
-    private string $regexSingleQuoted = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
+    protected string $regexSingleQuoted = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
 
     /**
      * Extractor for argument delimited by single quotes
      * see https://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
      */
-    private string $regexDoubleQuoted = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
+    protected string $regexDoubleQuoted = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
 
     /**
      * Defines the function-signatures we are searching for
      */
-    private array $signatures = [
+    protected array $signatures = [
         // calls like Localization::trans(...)
         [
             'before' => 'Localization\s*::\s*trans\s*\(',
@@ -72,10 +72,10 @@ class PhpExtractor
         ],
     ];
 
-    private array $brokenMatches = [];
+    protected array $brokenMatches = [];
 
     public function __construct(
-        private readonly string $absoluteFilePath
+        protected readonly string $absoluteFilePath
     ) {
     }
 
@@ -85,6 +85,10 @@ class PhpExtractor
      */
     public function extract(): array
     {
+        // no need to process files of the localization API itself
+        if ($this->isLocalizationApiFile()) {
+            return [];
+        }
         $strings = [];
         $content = file_get_contents($this->absoluteFilePath);
 
@@ -163,7 +167,12 @@ class PhpExtractor
         return $this->brokenMatches;
     }
 
-    private function prepareMatch(string $match, string $quote): ?string
+    public function hasBrokenMatches(): bool
+    {
+        return ! empty($this->brokenMatches);
+    }
+
+    protected function prepareMatch(string $match, string $quote): ?string
     {
         $string = trim(trim($match), $quote);
         // important: in double-quoted strings, we need to expand them programmatically
@@ -176,5 +185,14 @@ class PhpExtractor
         }
 
         return $string;
+    }
+
+    /**
+     * Files of the Localization API do not need to be processed ...
+     */
+    protected function isLocalizationApiFile(): bool
+    {
+        return str_contains($this->absoluteFilePath, 'MaintenanceCli/L10n/') ||
+            str_contains($this->absoluteFilePath, 'ZfExtended/Localization/');
     }
 }

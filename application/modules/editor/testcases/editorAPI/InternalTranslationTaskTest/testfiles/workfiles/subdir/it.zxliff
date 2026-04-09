@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="en" target-language="it" datatype="php">
+        <body>
+            <trans-unit id="RGF0ZWlmb3JtYXRrb252ZXJ0aWVydW5n">
+                <source>Dateiformatkonvertierung</source>
+                <target></target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

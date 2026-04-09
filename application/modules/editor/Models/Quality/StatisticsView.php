@@ -161,7 +161,7 @@ class editor_Models_Quality_StatisticsView
     {
         $issue = new stdClass();
         $issue->children = $this->task->getMqmTypesTranslated(false);
-        $issue->text = ($this->onlyMqm) ? $this->translate->_('Alle Kategorien') : $this->manager->translateQualityType(editor_Segment_Tag::TYPE_MQM);
+        $issue->text = ($this->onlyMqm) ? $this->translate->_('All categories') : $this->manager->translateQualityType(editor_Segment_Tag::TYPE_MQM);
         $issue->id = -1;
         $issues = [$issue];
 

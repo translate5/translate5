@@ -105,8 +105,8 @@ Ext.define('Editor.controller.LanguageResources', {
       }
   },
   strings: {
-      msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
-      msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
+      msgDisabledMatchRate: '#UT#The task contains alternative translations. When using matches, the segment match rate will therefore not be changed.',
+      msgDisabledSourceEdit: '#UT#When editing the source language column, no matches can be taken over.',
       instantTranslate:'#UT#InstantTranslate'
   },
   init: function() {

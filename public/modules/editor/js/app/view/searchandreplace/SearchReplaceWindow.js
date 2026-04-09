@@ -48,8 +48,8 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
     x: 10,
     y: 10,
     strings:{
-        windowTitle:'#UT#Suchen und ersetzen',
-        helpButtonTooltip:'#UT#Info zum Suchen und Ersetzen'
+        windowTitle:'#UT#Search and replace',
+        helpButtonTooltip:'#UT#Info about the Search and replace window'
     },
     applyState: function(state) {
         var me = this,

@@ -44,9 +44,9 @@ if (! $customerId) {
 $portal = $this->config->runtimeOptions->server->protocol . $currentDomain;
 
 $salutation = match ($this->receiver->gender) {
-    'f' => $this->translate->_('Sehr geehrte Frau'),
-    'm' => $this->translate->_('Sehr geehrter Herr'),
-    default => $this->translate->_('Sehr geehrte(r)'),
+    'f' => $this->translate->_('Dear Ms.'),
+    'm' => $this->translate->_('Dear Mr.'),
+    default => $this->translate->_('Dear'),
 };
 
 //fill data with generally needed variables
@@ -91,7 +91,7 @@ if (isset($this->previousUsers) && ! empty($this->previousUsers)) {
 }
 
 //prepare the htmlOnly disclaimer
-$this->htmlOnly = $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -');
+$this->htmlOnly = $this->translate->_('– The data is only available in the HTML version of that e-mail! –');
 
 //prepare the default taskFragment if a task is provided
 if (! empty($this->pm)) {
@@ -141,11 +141,11 @@ if (! empty($this->task)) {
     //we have to pre-apply the relaisLang Fragment to inject the language itself
     $taskData['relaisLanguageFragment'] = $this->templateApply($taskData['relaisLanguageFragment'], $taskData);
 
-    $data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
-<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
-<b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
-<b>Wortanzahl:</b> {wordCount}<br />', $taskData);
+    $data['taskFragment'] = $this->templateApply('<b>Task name:</b> {task.taskName}<br />
+<b>Source language:</b> {sourceLanguageTranslated}<br />
+<b>Target language:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Deadline:</b> {deadlineDate}<br />
+<b>Word count:</b> {wordCount}<br />', $taskData);
 
 }
 
@@ -155,11 +155,11 @@ $this->header = $this->templateApply('{salutation} {surName},<br/>
 
 //prepare the footer
 $this->footer = $this->templateApply('<br/>
-<br/>Vielen Dank und viele Grüße,
-<br/>Ihr Projektmanagement Team
+<br/>Many thanks and best regards,
+<br/>The project management team
 <br/>{companyName}
 <br/>
-<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!', $data);
+<br/>This e-mail has been generated automatically. Please do not reply to this e-mail.', $data);
 
 //set the variables, so they can be used when this template is rendered in other views
 $this->data = $data;

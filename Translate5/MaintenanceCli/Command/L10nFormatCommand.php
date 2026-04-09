@@ -64,11 +64,23 @@ class L10nFormatCommand extends Translate5AbstractCommand
 
         $this->writeTitle('Translate5 L10n maintenance - formatting xliff-files');
 
-        $formatter = new L10nFormatter();
-        $count = $formatter->process();
+        try {
+            $formatter = new L10nFormatter();
+            $data = $formatter->process();
+        } catch (\MittagQI\ZfExtended\FileWriteException $e) {
+            $this->io->error($e->getMessage() . "\n" . self::CODEFILE_WRITE_ERROR);
 
-        $this->io->success('Formatted ' . $count . ' localization xliff-files');
-        ;
+            return self::FAILURE;
+        } catch (\Throwable $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
+
+        $this->io->success(
+            $data['changed'] . ' of ' . $data['count'] .
+            ' localization xliff-files needed to be formatted'
+        );
 
         return self::SUCCESS;
     }

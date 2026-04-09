@@ -35,7 +35,7 @@ Ext.define('Editor.view.help.Documentation', {
     header:false,
 
     strings:{
-        btnOpenInBrowserText:'#UT#In neuem Browser-Tab öffnen'
+        btnOpenInBrowserText:'#UT#Open in new browser tab'
     },
 
     url:'',

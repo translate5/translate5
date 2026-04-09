@@ -49,11 +49,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
     importType:'postimport',
     
     strings:{
-        wizardTitle:'#UT#Globalese Einstellungen',
-        nextButtonText:'#UT#Importieren',
-        groupComboLabel:'#UT#Globalese Benutzergruppe',
+        wizardTitle:'#UT#Globalese settings',
+        nextButtonText:'#UT#Import',
+        groupComboLabel:'#UT#Globalese user group',
         engineComboLabel:'#UT#Globalese engine',
-        emptyComboText:'#UT#Bitte wählen'
+        emptyComboText:'#UT#Please select'
     },
     initConfig: function(instanceConfig) {
         var me = this,

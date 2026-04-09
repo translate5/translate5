@@ -47,26 +47,26 @@ class editor_Workflow_CachableDefinition
      * labels of the states, roles and steps. Can be changed / added in constructor
      * @var array
      */
-    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsgArray]
     public $labels = [
         'STATE_IMPORT' => 'import',
-        'STATE_WAITING' => 'wartend',
-        'STATE_UNCONFIRMED' => 'unbestätigt',
-        'STATE_FINISH' => 'abgeschlossen',
-        'STATE_AUTO_FINISH' => 'automatisch abgeschlossen',
-        'STATE_OPEN' => 'offen',
-        'STATE_EDIT' => 'selbst in Arbeit',
-        'STATE_VIEW' => 'selbst geöffnet',
-        'ROLE_TRANSLATOR' => 'Übersetzer',
-        'ROLE_REVIEWER' => 'Lektor',
-        'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
-        'ROLE_VISITOR' => 'Besucher',
+        'STATE_WAITING' => 'waiting',
+        'STATE_UNCONFIRMED' => 'unconfirmed',
+        'STATE_FINISH' => 'finished',
+        'STATE_AUTO_FINISH' => 'auto-closed',
+        'STATE_OPEN' => 'open',
+        'STATE_EDIT' => 'in work by myself',
+        'STATE_VIEW' => 'opened by myself',
+        'ROLE_TRANSLATOR' => 'Translator',
+        'ROLE_REVIEWER' => 'Reviewer',
+        'ROLE_TRANSLATORCHECK' => 'Second Reviewer',
+        'ROLE_VISITOR' => 'visitor',
         'ROLE_VISUALAPPROVER' => 'Visual Approver',
-        'STEP_NO_WORKFLOW' => 'Kein Workflow',
-        'STEP_PM_CHECK' => 'PM Prüfung',
-        'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
-        'STEP_REVIEWING' => 'Lektorat',
-        'STEP_TRANSLATORCHECK' => 'Zweites Lektorat',
+        'STEP_NO_WORKFLOW' => 'No workflow',
+        'STEP_PM_CHECK' => 'PM review',
+        'STEP_WORKFLOW_ENDED' => 'Workflow finished',
+        'STEP_REVIEWING' => 'Review',
+        'STEP_TRANSLATORCHECK' => 'Second Review',
     ];
 
     /**

@@ -69,8 +69,8 @@ class editor_Plugins_ManualStatusCheck_Bootstrap extends ZfExtended_Plugin_Abstr
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1045', [
                 Localization::trans(
-                    'Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt ' .
-                     'haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.'
+                    'The task can not be finished, because some segments do not have a ' .
+                     'status set. Please use the segment filter to get the affected segments.'
                 ),
             ], [
                 'task' => $event->getParam('task'),

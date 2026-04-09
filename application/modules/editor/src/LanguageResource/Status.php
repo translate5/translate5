@@ -76,20 +76,20 @@ class Status
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
         return match ($status) {
-            self::NOTCHECKED => $translate->_('Nicht geprüft'),
-            self::ERROR => $translate->_('Fehler'),
-            self::AVAILABLE => $translate->_('verfügbar'),
-            self::NOCONNECTION => $translate->_('Keine Verbindung!'),
-            self::NOVALIDLICENSE => $translate->_('Keine gültige Lizenz.'),
-            self::QUOTA_EXCEEDED => $translate->_('Kontingent überschritten'),
-            self::REORGANIZE_IN_PROGRESS => $translate->_('Wird reorganisiert'),
-            self::REORGANIZE_FAILED => $translate->_('Reorganisation gescheitert'),
-            self::TUNING_IN_PROGRESS => $translate->_('Wird trainiert'),
-            self::WAITING_FOR_LOADING => $translate->_('Wartet auf Laden'),
-            self::LOADING => $translate->_('Wird geladen'),
-            self::FAILED_TO_OPEN => $translate->_('Ladefehler'),
-            self::CONVERTING => $translate->_('language_resource.status.converting'),
-            default => $translate->_('unbekannt'),
+            self::NOTCHECKED => $translate->_('Not checked'),
+            self::ERROR => $translate->_('Error'),
+            self::AVAILABLE => $translate->_('available'),
+            self::NOCONNECTION => $translate->_('No connection!'),
+            self::NOVALIDLICENSE => $translate->_('No valid license.'),
+            self::QUOTA_EXCEEDED => $translate->_('Quota exceeded'),
+            self::REORGANIZE_IN_PROGRESS => $translate->_('Reorganization in progress'),
+            self::REORGANIZE_FAILED => $translate->_('Reorganization failed'),
+            self::TUNING_IN_PROGRESS => $translate->_('Training in progress'),
+            self::WAITING_FOR_LOADING => $translate->_('Wait until loading is complete'),
+            self::LOADING => $translate->_('Loading'),
+            self::FAILED_TO_OPEN => $translate->_('Failed to load'),
+            self::CONVERTING => $translate->_('Converting'),
+            default => $translate->_('unknown'),
         };
     }
 }

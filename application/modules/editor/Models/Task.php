@@ -185,34 +185,34 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     /**
      * the matching of col-names as set in Editor.view.admin.TaskGrid
      */
-    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsgArray]
     public const TASKGRID_TEXTCOLS = [
-        'customerId' => 'Endkunde',
-        'edit100PercentMatch' => '100%-Treffer editierbar',
-        'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
-        'enableSourceEditing' => 'Quellsprache bearbeitbar',
-        'fileCount' => 'Dateien',
-        'fullMatchEdit' => 'Unveränderte 100% TM Matches sind editierbar',
-        'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
-        'orderdate' => 'Bestelldatum',
-        'enddate' => 'Enddatum',
-        'pmGuid' => 'Projektmanager',
-        'pmName' => 'Projektmanager',
-        'referenceFiles' => 'Referenzdateien',
-        'relaisLang' => 'Relaissprache',
-        'sourceLang' => 'Quellsprache',
+        'customerId' => 'Client',
+        'edit100PercentMatch' => '100% matches editable',
+        'emptyTargets' => 'Translation job (no review)',
+        'enableSourceEditing' => 'Source language editable',
+        'fileCount' => 'Files',
+        'fullMatchEdit' => 'Edit unchanged 100% TM matches',
+        'lockLocked' => 'For SDLXLIFF import files only: Explicitly locked segments in files are also locked in translate5',
+        'orderdate' => 'Order date',
+        'enddate' => 'Ended date',
+        'pmGuid' => 'Project manager',
+        'pmName' => 'Project manager',
+        'referenceFiles' => 'Reference files',
+        'relaisLang' => 'Pivot language',
+        'sourceLang' => 'Source language',
         'state' => 'Status',
-        'targetLang' => 'Zielsprache',
-        'taskActions' => 'Aktionen',
-        'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
-        'taskName' => 'Aufgabenname',
-        'taskNr' => 'Auftragsnr.',
-        'terminologie' => 'Terminologie',
-        'users' => 'Benutzer',
-        'wordCount' => 'Wörter',
-        'wordCountTT' => 'Anzahl Wörter',
+        'targetLang' => 'Target language',
+        'taskActions' => 'Actions',
+        'taskassocs' => 'Number of assigned language resources',
+        'taskName' => 'Task name',
+        'taskNr' => 'Order no.',
+        'terminologie' => 'Terminology',
+        'users' => 'Users',
+        'wordCount' => 'Words',
+        'wordCountTT' => 'Number of words',
         'workflow' => 'Workflow',
-        'userCount' => 'Zahl zugewiesener Benutzer',
+        'userCount' => 'Number of assigned users',
     ];
 
     /**
@@ -1166,7 +1166,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
-                Localization::trans('Der aktuelle Status der Aufgabe verbietet diese Aktion!'),
+                Localization::trans('The current status of the task prohibits this action!'),
             ], [
                 'task' => $this,
                 'isLocked' => $this->isLocked($this->getTaskGuid()),
@@ -1191,11 +1191,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         // check if there are running exports
         if ($model->hasWaitingWorker($this->getTaskGuid(), $exportClass)) {
             ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1538' => 'Task export: the task already contains running or pending exports. Try again later',
+                'E1538' => 'Task export: the task already contains running or pending exports. Please try again later',
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1538', [
-                Localization::trans('Task export: the task already contains running or pending exports. Try again later'),
+                Localization::trans('Task export: the task already contains running or pending exports. Please try again later'),
             ], [
                 'task' => $this,
             ]);

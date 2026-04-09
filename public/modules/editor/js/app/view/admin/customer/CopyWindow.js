@@ -54,15 +54,15 @@ Ext.define('Editor.view.admin.customer.CopyWindow', {
     modal: true,
     shrinkWrapDock:true, // resize the window based on the title
     strings: {
-        title: '#UT#Kundeneinstellungen in den aktuellen Kunden übernehmen',
-        copyUserAssocLabel:'#UT#Standard-Benutzerzuweisungen kopieren von',
-        copyUserAssocTooltip:'#UT#Alle Standard-Benutzerzuweisungen des ausgewählten Kunden, einschließlich des ausgewählten Mehrbenutzermodus und Workflows, in den aktuellen Kunden kopieren',
-        copyConfigLabel:'#UT#Konfigurationen kopieren von',
-        copyConfigTooltip:'#UT#Alle überschriebenen Systemkonfigurationen des ausgewählten Kunden in den aktuellen Kunden kopieren, außer <i>Initial workflow on task creation</i> und <i>Multi user task editing mode</i>',
-        copySuccess:'#UT#Kopieren erfolgreich',
-        copyFromText:'#UT#Kopieren von',
-        copyBtnText:'#UT#Kopieren',
-        noCustomerSelected:'#UT#Mindestens ein Kunde muss ausgewählt sein'
+        title: '#UT#Copy client settings to current client',
+        copyUserAssocLabel:'#UT#Copy default user assignments from',
+        copyUserAssocTooltip:'#UT#Copy all user assignment defaults from the selected client to the current client, including selected multi-user mode and selected workflow for this client',
+        copyConfigLabel:'#UT#Copy configuration from',
+        copyConfigTooltip:'#UT#Copy all overridden system settings from the selected client to the current client, except <i>Initial workflow on task creation</i> and <i>Multi user task editing mode</i>',
+        copySuccess:'#UT#Copying successfully completed',
+        copyFromText:'#UT#Copy from',
+        copyBtnText:'#UT#Copy',
+        noCustomerSelected:'#UT#At least one client must be selected'
     },
     record: null,
 

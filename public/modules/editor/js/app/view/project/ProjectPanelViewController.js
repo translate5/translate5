@@ -35,9 +35,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     alias: 'controller.projectPanel',
 
     strings:{
-        noProjectMessage:'#UT#Das angeforderte Projekt existiert nicht',
-        noProjectTaskMessage:'#UT#Die angeforderte Projektaufgabe existiert nicht',
-        noProjectInFilter:'#UT#Projekt im aktuellen Filter nicht gefunden'
+        noProjectMessage:'#UT#The requested project does not exist',
+        noProjectTaskMessage:'#UT#The requested project task does not exist',
+        noProjectInFilter:'#UT#Project not found in the current filter'
     },
 
     routes:{

@@ -82,15 +82,15 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
         selector: 'adminTaskUserAssocGrid'
     }],
     strings: {
-        taskWorkflowChangeConfirm: '#UT#Bestätigen Sie die Änderung des Workflows',
-        taskWorkflowSaved: '#UT#Änderung des Workflows der Aufgabe gespeichert!',
-        taskWorkflowChangeWarning: '#UT#Eine Änderung des Aufgaben-Workflows führt zur Löschung aller Auftragszuweisungen. Möchten Sie fortfahren?',
-        entrySaved: '#UT#Eintrag gespeichert',
-        entryDeleted: '#UT#Eintrag gelöscht',
-        entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
-        forAll: '#UT#für alle',
-        customerTip: '#UT#Kunde der Aufgabe (Angabe notwendig)',
-        customerLabel: '#UT#Kunde'
+        taskWorkflowChangeConfirm: '#UT#Confirm workflow change',
+        taskWorkflowSaved: '#UT#Workflow changes saved!',
+        taskWorkflowChangeWarning: '#UT#Change of task workflow will result in deletion of all job assignments. Would you like to continue?',
+        entrySaved: '#UT#Entry saved',
+        entryDeleted: '#UT#Entry deleted',
+        entrySaveError: '#UT#Error while saving changes!',
+        forAll: '#UT#for all',
+        customerTip: '#UT#Task client (mandatory)',
+        customerLabel: '#UT#Client'
     },
     actualTask: null,
     alias: 'controller.taskPreferencesController',

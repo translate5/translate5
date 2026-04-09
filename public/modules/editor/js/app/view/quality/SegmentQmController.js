@@ -34,8 +34,8 @@ Ext.define('Editor.view.quality.SegmentQmController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.segmentQm',
     messages: {
-        qmHasBeenAdded: '#UT#Die Qualität wurde hinzugefügt',
-        qmHasBeenRemoved: '#UT#Die Qualität wurde entfernt'
+        qmHasBeenAdded: '#UT#The quality category has been added',
+        qmHasBeenRemoved: '#UT#The quality category has been removed'
     },
     /**
      * Handler to sync the new state with the server

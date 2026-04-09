@@ -30,12 +30,12 @@ Ext.define('Editor.view.admin.user.GridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminUserGrid',
     strings: {
-        confirmDeleteTitle: '#UT#Benutzer endgültig löschen?',
-        confirmDeleteMsg: '#UT#Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?',
-        confirmResetPwTitle: '#UT#Passwort zurücksetzen?',
-        confirmResetPwMsg: '#UT#Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.',
-        deletionForbidden: '#UT#Sie sind nicht berechtigt, diesen Benutzer zu entfernen.',
-        error: '#UT#Fehler'
+        confirmDeleteTitle: '#UT#Permanently delete user?',
+        confirmDeleteMsg: '#UT#Do you really want to permanently delete the user “{0}”?',
+        confirmResetPwTitle: '#UT#Reset password?',
+        confirmResetPwMsg: '#UT#Do you really want to reset the password for user “{0}”?<br /> The user will be notified by e-mail that they need to request a new password.',
+        deletionForbidden: '#UT#You are not allowed to remove this user.',
+        error: '#UT#Error'
     },
     listen: {
         component: {

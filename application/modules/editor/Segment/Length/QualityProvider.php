@@ -108,7 +108,7 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
 
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Längen Prüfung');
+        return $translate->_('Length check');
     }
 
     public function translateCategory(
@@ -118,11 +118,11 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     ): ?string {
         switch ($category) {
             case editor_Segment_Length_Check::TOO_LONG:
-                return $translate->_('Segment ist länger als erlaubt');
+                return $translate->_('Segment longer than allowed');
 
             case editor_Segment_Length_Check::NOT_LONG_ENOUGH:
                 $translation = $translate->_(
-                    'Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)'
+                    'Segment relevantly shorter than allowed (more than {0}% shorter or at least {1} pixels shorter or at least {2} characters shorter)'
                 );
                 // ugly: we need the task-config to evaluate the translation
                 $taskConfig = $task ? $task->getConfig() : Zend_Registry::get('config');
@@ -139,10 +139,10 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
                 );
 
             case editor_Segment_Length_Check::TOO_SHORT:
-                return $translate->_('Segment ist kürzer als erlaubt');
+                return $translate->_('Segment shorter than allowed');
 
             case editor_Segment_Length_Check::TOO_MANY_LINES:
-                return $translate->_('Zu viele Zeilenumbrüche im Segment');
+                return $translate->_('Segment has too many lines');
         }
 
         return null;

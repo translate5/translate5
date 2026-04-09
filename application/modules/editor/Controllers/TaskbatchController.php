@@ -73,7 +73,7 @@ class Editor_TaskbatchController extends ZfExtended_RestController
 
     public function indexAction(): void
     {
-        $invalidValueProvidedMessage = Localization::trans('Ungültiger Wert bereitgestellt');
+        $invalidValueProvidedMessage = Localization::trans('Invalid value provided');
 
         if ($this->getParam('countTasks')) {
             $request = $this->getRequest();
@@ -169,7 +169,7 @@ class Editor_TaskbatchController extends ZfExtended_RestController
         }
         if (count($taskIds) > $tasksMax) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            $this->view->error = str_replace('{0}', (string) $tasksMax, $translate->_('Es können nur maximal {0} Aufgaben als Batch verarbeitet werden'));
+            $this->view->error = str_replace('{0}', (string) $tasksMax, $translate->_('Only up to {0} tasks can be processed in a batch'));
             $this->view->success = false;
         } elseif (count($taskIds) > 0) {
             $taskRepository = TaskRepository::create();

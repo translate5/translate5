@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.customer.Combo', {
     alias: 'widget.customersCombo',
     name:'customersCombo',
 
-    fieldLabel:'#UT#Endkunde',
+    fieldLabel:'#UT#Client',
 
     allowBlank: false,
     typeAhead: true,

@@ -33,7 +33,7 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
     requires:['Editor.view.segments.SpecialCharactersButton'],
 
     strings:{
-        title:'#UT#Sonderzeichen hinzufügen:'
+        title:'#UT#Add special characters'
     },
 
     columns: 8,

@@ -109,8 +109,8 @@ class Metadata
         $this->excelExport = new ExcelExport();
         $this->excelExport->initDefaultFormat();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $this->sheetNameTaskOverview = $this->translate->_('Aufgaben');
-        $this->sheetNameMetadata = $this->translate->_('Meta-Daten');
+        $this->sheetNameTaskOverview = $this->translate->_('Tasks');
+        $this->sheetNameMetadata = $this->translate->_('Meta data');
         $this->locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
         $this->workflowManager = new editor_Workflow_Manager();
         $this->languageRepository = LanguageRepository::create();

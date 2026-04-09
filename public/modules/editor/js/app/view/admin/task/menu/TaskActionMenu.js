@@ -34,28 +34,28 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
     },
     requires: ['Editor.view.admin.task.menu.TaskActionMenuViewModel'],
     messages: {
-        actionOpen: '#UT#Aufgabe öffnen (schreibgeschützt)',
-        actionEdit: '#UT#Aufgabe bearbeiten',
-        actionClone: '#UT#Aufgabe klonen',
-        actionFinish: '#UT#Aufgabe abschließen',
-        actionUnFinish: '#UT#Aufgabe wieder öffnen',
-        actionFinishAll: '#UT#Aufgabe für alle Benutzer abschließen',
-        actionUnFinishAll: '#UT#Aufgabe für alle Benutzer wieder öffnen',
-        actionEnd: '#UT#Aufgabe komplett Beenden',
-        actionReOpen: '#UT#beendete Aufgabe wieder öffnen',
-        actionDelete: '#UT#Aufgabe komplett löschen',
-        actionCancel: '#UT#Import abbrechen',
-        actionLog: '#UT#Ereignis-Protokoll',
-        taskPrefs: '#UT#Aufgabenspezifische Einstellungen',
+        actionOpen: '#UT#Open task (read-only)',
+        actionEdit: '#UT#Edit task',
+        actionClone: '#UT#Clone task',
+        actionFinish: '#UT#Finish task',
+        actionUnFinish: '#UT#Reopen task',
+        actionFinishAll: '#UT#Finish task for all users',
+        actionUnFinishAll: '#UT#Reopen task for all users',
+        actionEnd: '#UT#End task completely',
+        actionReOpen: '#UT#Reopen ended task',
+        actionDelete: '#UT#Delete task completely',
+        actionCancel: '#UT#abort import',
+        actionLog: '#UT#Task event log',
+        taskPrefs: '#UT#Task properties',
         exp: '#UT#Export',
-        actionExcelReimport: '#UT#Excel Re-Importieren',
-        projectOverview: '#UT#Zum Projekt springen – wechselt in die Projektliste',
-        taskOverview: '#UT#zur Aufgabe springen',
-        actionDeleteProject: '#UT#Projekt komplett löschen'
+        actionExcelReimport: '#UT#Re-import Excel',
+        projectOverview: '#UT#jump to project – switches to the project list',
+        taskOverview: '#UT#jump to task',
+        actionDeleteProject: '#UT#Delete project completely'
     },
 
     strings:{
-        cancelImportText: '#UT#Import abbrechen'
+        cancelImportText: '#UT#abort import'
     },
 
     constructor: function (instanceConfig) {

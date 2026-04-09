@@ -98,7 +98,7 @@ class JobExceptionTransformer
      */
     public function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
-        $invalidValueProvidedMessage = Localization::trans('Ungültiger Wert bereitgestellt');
+        $invalidValueProvidedMessage = Localization::trans('Invalid value provided');
 
         return match ($e::class) {
             InvalidTypeProvidedException::class => UnprocessableEntity::createResponse(
@@ -145,24 +145,26 @@ class JobExceptionTransformer
                 'E1161',
                 [
                     'id' => Localization::trans(
-                        'Sie können den Job zur Zeit nicht bearbeiten, ' .
-                        'der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.'
+                        'The job can not be modified, since the user ' .
+                        'has already opened the task for editing.'
                     ),
                 ]
             ),
             InvalidSegmentRangeFormatException::class => UnprocessableEntity::createResponse(
                 'E1280',
                 [
-                    'id' => Localization::trans('Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9'),
+                    'id' => Localization::trans(
+                        'The format of the segment range assigned to the user is not valid. Example: 1-3,5,8-9'
+                    ),
                 ]
             ),
             InvalidSegmentRangeSemanticException::class => UnprocessableEntity::createResponse(
                 'E1280',
                 [
                     'id' => Localization::trans(
-                        'Der Inhalt für die editierbaren Segmente ist nicht valide. Die Zahlen müssen in der ' .
-                        'richtigen Reihenfolge angegeben sein und dürfen nicht überlappen, weder innerhalb der ' .
-                        'Eingabe noch mit anderen Usern von derselben Rolle.'
+                        'The content of the segment range assigned to the user is not ' .
+                        'valid. Make sure that the values are not reverse and do not ' .
+                        'overlap (neither in itself nor with other users of the same role).'
                     ),
                 ]
             ),
@@ -178,8 +180,8 @@ class JobExceptionTransformer
                 'E1061',
                 [
                     Localization::trans(
-                        'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, ' .
-                        'da der Benutzer diese aktuell benutzt.'
+                        'The assignment between a task and a user could not be ' .
+                        'removed because the user is currently using the task.'
                     ),
                 ],
                 [
@@ -190,8 +192,8 @@ class JobExceptionTransformer
                 'E1062',
                 [
                     Localization::trans(
-                        'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, ' .
-                        'da die Aufgabe durch den Benutzer gesperrt ist.'
+                        'The assignment between a task and a user could not be ' .
+                        'removed because the task is currently locked by the user.'
                     ),
                 ],
                 [
@@ -202,7 +204,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        Localization::trans('job-assignment.create.only-coordinator-can-be-assigned-to-coordinator-group-job'),
+                        Localization::trans('Only Coordinator can be assigned to Coordinator group job'),
                     ],
                 ],
             ),
@@ -210,7 +212,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        Localization::trans('job-assignment.update.assigned-user-can-be-changed-only-for-coordinator-group-job'),
+                        Localization::trans('Assigned user can be changed only for Coordinator group job'),
                     ],
                 ],
             ),
@@ -218,7 +220,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        Localization::trans('not-coordinator-group-customer-task'),
+                        Localization::trans('The task does not belong to one of the Coordinator group customers'),
                     ],
                 ],
             ),
@@ -226,7 +228,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        Localization::trans('coordinator-dont-belong-to-coordinator-group'),
+                        Localization::trans('Coordinator does not belong to Coordinator group'),
                     ],
                 ],
             ),
@@ -234,7 +236,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        Localization::trans('job-assignment.create.group-user-job-can-not-be-created-before-coordinator-group-job'),
+                        Localization::trans('Coordinator group user cannot be assigned to a job before the Coordinator group job has been created'),
                     ],
                 ],
             ),
@@ -242,7 +244,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'userGuid' => [
-                        Localization::trans('job-assignment.create.parent-coordinator-group-does-not-have-appropriate-job'),
+                        Localization::trans('Parent Coordinator group does not have appropriate job assignment'),
                     ],
                 ],
             ),
@@ -250,7 +252,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'permission' => [
-                        Localization::trans('job-assignment.track-changes-rights-are-not-subset-of-coordinator-group-job'),
+                        Localization::trans('The permissions of the Coordinator group user job should be a subset of the permissions of the Coordinator group job.'),
                     ],
                 ],
             ),
@@ -258,7 +260,7 @@ class JobExceptionTransformer
                 'E1162',
                 [
                     'id' => [
-                        Localization::trans('job-assignment.delete.there-is-un-deletable-bound-job'),
+                        Localization::trans('Coordinator group job has related jobs that cannot be deleted.'),
                     ],
                 ],
             ),
@@ -279,7 +281,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        Localization::trans('Es gibt bereits eine bestätigte konkurrierende Auftragsvergabe'),
+                        Localization::trans('Confirmed competitive job assignment already exsists'),
                     ],
                 ],
             ),
@@ -287,7 +289,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        Localization::trans('job-assignment.create.coordinator-group-job-already-exists'),
+                        Localization::trans('Job for current Coordinator group and workflow step already exists.'),
                     ],
                 ],
             ),
@@ -295,7 +297,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        Localization::trans('coordinator-has-not-yet-confirmed-the-coordinator-group-job'),
+                        Localization::trans('Coordinator has not yet confirmed the Coordinator group job'),
                     ],
                 ],
             ),
@@ -303,7 +305,7 @@ class JobExceptionTransformer
                 'E1012',
                 [
                     'id' => [
-                        Localization::trans('coordinator-of-parent-group-has-not-yet-confirmed-the-coordinator-group-job'),
+                        Localization::trans('The Coordinator of the higher-level Coordinator group has not yet confirmed the Coordinator group job'),
                     ],
                 ],
             ),

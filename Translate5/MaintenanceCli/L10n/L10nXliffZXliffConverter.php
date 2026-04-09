@@ -29,31 +29,53 @@ declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\L10n;
 
+use MittagQI\ZfExtended\Localization;
+
 /**
  * Simple Converter to normalize Xliff to ZXliff files in a given folder
  */
 class L10nXliffZXliffConverter
 {
+    /**
+     * @var array<string, string>>
+     */
+    private array $exchangeMap;
+
     public function __construct(
         private readonly string $directory
     ) {
+        $this->exchangeMap = include APPLICATION_DATA . '/' . L10nConfiguration::EXCHANGE_MAP_PATH;
     }
 
     public function upgrade(bool $doUpgrade = true): array
     {
         $messages = [];
         foreach (L10nHelper::getAllLocales() as $locale) {
-            $path = rtrim($this->directory, '/') . '/' . $locale . '.xliff';
-            if (file_exists($path)) {
-                $writer = new ZXliffWriter(dirname($path), $locale);
-                if (file_exists($writer->getPath())) {
-                    $messages[] = 'The localization-file “' . $path . '” was already upgraded';
-                } elseif ($doUpgrade) {
-                    $parser = new XliffParser($path);
-                    $writer->write($parser->getTranslations());
-                    $messages[] = 'The localization-file “' . $path . '” was upgraded to “' . $writer->getFileName() . '”';
+            $xliffPath = rtrim($this->directory, '/') . '/' . $locale . '.xliff';
+            $zxliffPpath = rtrim($this->directory, '/') . '/' . $locale . Localization::FILE_EXTENSION_WITH_DOT;
+            $adjusted = false;
+            $zxliffExists = file_exists($zxliffPpath);
+            if (file_exists($xliffPath) || $zxliffExists) {
+                $writer = new XliffWriter(dirname($xliffPath), $locale);
+                $parser = $zxliffExists ? new XliffParser($zxliffPpath) : new XliffParser($xliffPath);
+                $translations = [];
+                foreach ($parser->getTranslations() as $source => $target) {
+                    if (array_key_exists($source, $this->exchangeMap)) {
+                        $adjusted = true;
+                        $translations[$this->exchangeMap[$source]] = $target;
+                    } else {
+                        $translations[$source] = $target;
+                    }
+                }
+                if ($doUpgrade && ($adjusted || ! $zxliffExists)) {
+                    $writer->write($translations);
+                }
+                if (! $zxliffExists) {
+                    $messages[] = 'The localization-file “' . $xliffPath . '” was upgraded to “' . $zxliffPpath . '”';
+                } elseif ($adjusted) {
+                    $messages[] = 'The localization-file “' . $zxliffPpath . '” needed to be adjusted';
                 } else {
-                    $messages[] = 'The localization-file “' . $path . '” needs to be upgraded';
+                    $messages[] = 'The localization-file “' . $zxliffPpath . '” was already upgraded';
                 }
             }
         }

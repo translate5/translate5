@@ -40,9 +40,9 @@ Ext.define('Editor.view.LanguagesCombo', {
     valueField: 'id',
     allowBlank: false,
     strings: {
-        source: '#UT#Quellsprache',
-        target: '#UT#Zielsprache',
-        neutral: '#UT#Sprache'
+        source: '#UT#Source language',
+        target: '#UT#Target language',
+        neutral: '#UT#Language'
     },
     initConfig: function(instanceConfig) {
         var me = this,

@@ -93,7 +93,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
                 'E1015',
                 [
                     'name' => [
-                        Localization::trans('Regelname existiert bereits für Typ {type}'),
+                        Localization::trans('Provided Rule name already exists for type {type}'),
                     ],
                 ],
                 [

@@ -37,8 +37,8 @@ Ext.define('Editor.view.LanguageResources.services.T5Memory', {
     extend: 'Editor.view.LanguageResources.services.Default',
     id: 'T5Memory',
     
-    addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
-    download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
+    addTooltip: '#UT#Import TMX to TM',
+    download: '#UT#Download and save file-based TM locally',
     
     /***
      * Add/import new resoucres button default tooltip. This is rendered in the language resources grid.

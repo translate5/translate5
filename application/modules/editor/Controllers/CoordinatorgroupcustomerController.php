@@ -102,7 +102,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2000',
                 [
                     'customer' => [
-                        Localization::trans('Kunde nicht angegeben'),
+                        Localization::trans('Customer not provided'),
                     ],
                 ],
                 [
@@ -122,7 +122,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2002',
                 [
                     'customer' => [
-                        Localization::trans('Der referenzierte Kunde existiert nicht (mehr).'),
+                        Localization::trans('The referenced customer does not exist (anymore).'),
                     ],
                 ],
                 [
@@ -135,7 +135,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2003',
                 [
                     'customer' => [
-                        Localization::trans('Sie können den Kunden "{id}" hier nicht angeben'),
+                        Localization::trans('You can’t provide customer “id” here'),
                     ],
                 ],
                 [
@@ -147,7 +147,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E2003',
                 [
                     'customer' => [
-                        Localization::trans('Sie können den Kunden "{id}" hier nicht angeben'),
+                        Localization::trans('You can’t provide customer “id” here'),
                     ],
                 ],
                 [
@@ -182,7 +182,7 @@ class editor_CoordinatorgroupcustomerController extends ZfExtended_RestControlle
                 'E1676',
                 [
                     'id' => [
-                        Localization::trans('job-assignment.delete.there-is-un-deletable-bound-job'),
+                        Localization::trans('Coordinator group job has related jobs that cannot be deleted.'),
                     ],
                 ],
             ),

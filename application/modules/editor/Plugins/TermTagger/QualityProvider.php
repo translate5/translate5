@@ -280,7 +280,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Terminologie');
+        return $translate->_('Terminology');
     }
 
     public function translateCategory(
@@ -289,14 +289,14 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            self::GROUP_NOT_FOUND_IN_TARGET => $translate->_('Nicht gefunden in Ziel'),
-            self::NOT_FOUND_IN_TARGET_ADMITTED => $translate->_('Erlaubtes'),
-            self::NOT_FOUND_IN_TARGET_PREFERRED => $translate->_('Vorzugs'),
-            self::NOT_FOUND_IN_TARGET_STANDARDIZED => $translate->_('Standardisiert'),
-            self::NOT_FOUND_IN_TARGET_OTHERS => $translate->_('Andere'),
-            self::NOT_DEFINED_IN_TARGET => $translate->_('Nicht definiert in zielsprachl. Terminologie'),
-            self::FORBIDDEN_IN_TARGET => $translate->_('Verboten in Ziel'),
-            self::FORBIDDEN_IN_SOURCE => $translate->_('Verboten in Quelle'),
+            self::GROUP_NOT_FOUND_IN_TARGET => $translate->_('Not found in target segment'),
+            self::NOT_FOUND_IN_TARGET_ADMITTED => $translate->_('Admitted'),
+            self::NOT_FOUND_IN_TARGET_PREFERRED => $translate->_('Preferred'),
+            self::NOT_FOUND_IN_TARGET_STANDARDIZED => $translate->_('Standardized'),
+            self::NOT_FOUND_IN_TARGET_OTHERS => $translate->_('Others'),
+            self::NOT_DEFINED_IN_TARGET => $translate->_('Not defined in target language terminology'),
+            self::FORBIDDEN_IN_TARGET => $translate->_('Forbidden in target'),
+            self::FORBIDDEN_IN_SOURCE => $translate->_('Forbidden in source'),
             default => null,
         };
     }

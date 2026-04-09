@@ -1201,18 +1201,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         /* @var $t ZfExtended_Zendoverwrites_Translate */
 
         // sample label-translations
-        $excel->setLabel('termEntryId', $t->_('Eintrag'));
+        $excel->setLabel('termEntryId', $t->_('Entry'));
         $excel->setLabel('definition', $t->_('Definition'));
-        $excel->setLabel('language', $t->_('Sprache'));
-        $excel->setLabel('termTbxId', $t->_('Term-Id'));
+        $excel->setLabel('language', $t->_('Language'));
+        $excel->setLabel('termTbxId', $t->_('Term ID'));
         $excel->setLabel('term', $t->_('Term'));
-        $excel->setLabel('termProposal', $t->_('Änderung zu bestehendem Term'));
-        $excel->setLabel('processStatus', $t->_('Prozess-Status'));
-        $excel->setLabel('attributeName', $t->_('Attributs-Schlüssel'));
-        $excel->setLabel('attribute', $t->_('Attributs-Wert'));
-        $excel->setLabel('attributeProposal', $t->_('Änderung zu bestehendem Attributs-Wert'));
-        $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
-        $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
+        $excel->setLabel('termProposal', $t->_('Change to existing term'));
+        $excel->setLabel('processStatus', $t->_('Process status'));
+        $excel->setLabel('attributeName', $t->_('Attribute key'));
+        $excel->setLabel('attribute', $t->_('Attribute value'));
+        $excel->setLabel('attributeProposal', $t->_('Change to existing attribute'));
+        $excel->setLabel('lastEditor', $t->_('Last editor'));
+        $excel->setLabel('lastEditedDate', $t->_('Last modification date'));
 
         $autosizeCells = function ($phpExcel) use ($excel) {
             foreach ($phpExcel->getWorksheetIterator() as $worksheet) {

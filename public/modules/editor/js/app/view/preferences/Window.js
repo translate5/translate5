@@ -44,7 +44,7 @@ Ext.define('Editor.view.preferences.Window', {
     itemId: 'preferencesWindow',
     width: 460,
     resizable: false, //needed for boxLabel width
-    title: '#UT#Einstellungen',
+    title: '#UT#Preferences',
     modal: true,
 
     initConfig: function(instanceConfig) {

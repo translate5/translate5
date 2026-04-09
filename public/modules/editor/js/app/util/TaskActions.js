@@ -36,18 +36,18 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.TaskActions', {
     strings: {
-        taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
-        forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
-        confirmFinish: "#UT#Noch etwas zu tun?",
-        confirmFinishMsg: "#UT#Möchten Sie später weitermachen?",
-        taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
-        taskConfirmed: '#UT#Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.',
-        taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
-        taskClosing: '#UT#Aufgabe wird verlassen...',
-        taskCancelImport: '#UT#Import wird abgebrochen...',
-        taskConfirming: '#UT#Aufgabe wird bestätigt...',
-        taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
-        saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
+        taskOpening: '#UT#Opening task...',
+        forcedReadOnly: '#UT#Task is being edited by user “{0}” and is therefore read-only!',
+        confirmFinish: '#UT#Still something to do?',
+        confirmFinishMsg: '#UT#Would you like to continue later?',
+        taskClosed: '#UT#Task left successfully.',
+        taskConfirmed: '#UT#Task was approved and can be edited now.',
+        taskFinished: '#UT#Task finished successfully.',
+        taskClosing: '#UT#Leaving task...',
+        taskCancelImport: '#UT#aborting import...',
+        taskConfirming: '#UT#Approving task...',
+        taskFinishing: '#UT#Leaving and finishing task...',
+        saveSegmentFirst: '#UT#The desired action cannot be processed! The currently open segment must be saved/closed first.',
     },
     statics: {
         /**

@@ -36,9 +36,9 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
 	filterLabel:null,//this should be set from the instance config
 	filterProperty:null,//this should be set from the instance config
 	strings:{
-		eqText: '#UT#am',
-		gtText: '#UT#nach',
-		ltText: '#UT#bevor'
+		eqText: '#UT#at',
+		gtText: '#UT#after',
+		ltText: '#UT#before'
 	},
 	initConfig: function(instanceConfig) {
         var me = this,

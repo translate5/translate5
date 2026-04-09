@@ -36,12 +36,14 @@ class PhpFiles
     ) {
     }
 
-    public function findFiles(array $excludePathes = [], bool $asAbsolutePath = false): array
+    public function findFiles(array $excludePathes = [], bool $asAbsolutePath = true): array
     {
         $cwd = getcwd();
         chdir($this->rootPath);
-
-        $notPathes = [];
+        $notPathes = [
+            '-not -path "./data/*"',
+            '-not -path "./testdata/*"',
+        ];
         foreach ($excludePathes as $excludePath) {
             if (str_starts_with($excludePath, $this->rootPath)) {
                 $excludePath = substr($excludePath, strlen($this->rootPath));
@@ -49,26 +51,24 @@ class PhpFiles
             }
             $excludePath = rtrim($excludePath, '/*') . '/*';
 
-            $notPathes[] = ' -not -path "' . $excludePath . '"';
+            $notPathes[] = '-not -path "' . $excludePath . '"';
         }
-        $find = 'find -iname "*.php" -o -iname "*.phtml"' . implode('', $notPathes);
+        $find = 'find ./ ' . implode(' ', $notPathes) . ' \( -iname "*.php" -o -iname "*.phtml" \)';
         $filesData = shell_exec($find);
         chdir($cwd);
 
         $files = [];
         foreach (explode("\n", trim($filesData)) as $file) {
             // exclude database-updates & PrivatePlugins
-            if (! str_contains($file, '/database/') && ! str_contains($file, '/PrivatePlugins/')) {
-                $files[] = $file;
+            $absolutePath = $this->rootPath . '/' . ltrim($file, './');
+            if (! str_contains($file, '/database/') &&
+                ! str_contains($file, '/PrivatePlugins/') &&
+                ! is_link($absolutePath)
+            ) {
+                $files[] = $asAbsolutePath ? $absolutePath : $file;
             }
         }
 
-        if ($asAbsolutePath) {
-            foreach ($files as &$file) {
-                $file = $this->rootPath . '/' . ltrim($file, './');
-            }
-        }
-
-        return $files;
+        return array_values(array_unique($files));
     }
 }

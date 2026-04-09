@@ -55,7 +55,7 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider
 
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Manuelle QS (im Segment)');
+        return $translate->_('Manual QA (inside segment)');
     }
 
     public function translateCategory(

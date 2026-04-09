@@ -69,10 +69,10 @@ Ext.define('Editor.controller.Segments', {
     //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
     views: ['segments.RowEditing', 'segments.new.EditorNew', 'ToolTip'],
     messages: {
-        sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
-        segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
-        noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
-        otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind'
+        sortCleared: '#UT#The segment sorting has been reset!',
+        segmentNotSaved: '#UT#Saving the last opened segment (no. {0}) failed.',
+        noSegmentToFilter: '#UT#No segment in this file fulfils the filter criteria',
+        otherFiltersActive: '#UT#WARNING: Another filter is set. It is possible, that not all bookmarked segments are visible'
     },
     /**
      * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.

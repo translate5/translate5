@@ -267,7 +267,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             if (empty($resource)) {
                 $lrData['status'] = LanguageResourceStatus::ERROR;
-                $lrData['statusInfo'] = $translate->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
+                $lrData['statusInfo'] = $translate->_('The used resource was removed from the configuration.');
             } else {
                 // retrieves an assoc with 'status' and 'statusInfo' keys
                 foreach ($resource->getInitialStatus($specificData, (int) $lrData['id'], $translate) as $key => $value) {
@@ -474,7 +474,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         if ($resource === null) {
             $this->view->rows->status = LanguageResourceStatus::NOCONNECTION;
-            $this->view->rows->statusInfo = $t->_('Keine Verbindung zur Ressource oder Ressource nicht gefunden.');
+            $this->view->rows->statusInfo = $t->_('No connection to the resource or resource not found');
 
             return;
         }
@@ -935,7 +935,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         if ($resource && ! $resource->getCreatable()) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1041', [
-                Localization::trans('Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.'),
+                Localization::trans('Language resource of selected resource type can not be created in UI.'),
             ]);
         }
 
@@ -1419,10 +1419,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $t ZfExtended_Zendoverwrites_Translate */
 
         if (! $hasSourceLang) {
-            $errors['sourceLang'] = $t->_('Diese Quellsprache wird von der Ressource nicht unterstützt!');
+            $errors['sourceLang'] = $t->_('This source language is not supported by the resource!');
         }
         if (! $hasTargetLang) {
-            $errors['targetLang'] = $t->_('Diese Zielsprache wird von der Ressource nicht unterstützt!');
+            $errors['targetLang'] = $t->_('This target language is not supported by the resource!');
         }
 
         $e = new ZfExtended_ValidateException();
@@ -1442,7 +1442,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if (! $connector->ping($this->entity->getResource(), $this->getConfig())) {
             throw ZfExtended_UnprocessableEntity::createResponse(
                 'E1282',
-                [Localization::trans('Server für den angefragten Dienst ist nicht erreichbar.')]
+                [Localization::trans('Server for the queried service is not reachable.')]
             );
         }
 
@@ -1480,7 +1480,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $importInfo = $this->handleFileUpload($connector);
 
         if (empty($importInfo)) {
-            $this->uploadErrors[] = Localization::trans('Keine Datei hochgeladen!');
+            $this->uploadErrors[] = Localization::trans('No file uploaded!');
 
             return;
         }
@@ -1577,11 +1577,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //currently, an error means wrong filetype
         if ($upload->hasErrors()) {
-            $this->uploadErrors[] = Localization::trans('Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!');
+            $this->uploadErrors[] = Localization::trans('The selected resource cannot process files of this type!');
         }
 
         if (empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
-            $this->uploadErrors[] = Localization::trans('Die ausgewählte Datei war leer!');
+            $this->uploadErrors[] = Localization::trans('The selected file is empty!');
         }
 
         return $importInfo;

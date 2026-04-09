@@ -29,17 +29,21 @@ END LICENSE AND COPYRIGHT
 $this->render('general.phtml');
 
 //Define Action String
-$this->subject = $this->translate->_('Translate5 - Aufgabe teilweise abgeschlossen') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
-$action = $this->templateApply('Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle <i>{currentRole}</i> abgeschlossen:<br />', [
+$this->subject = $this->translate->_('translate5 – task partly finished') . ' "' . $this->task->getTaskNr() . ' - ' . $this->task->getTaskName() . '"';
+$action = $this->templateApply('In the project portal , the task {task.taskNr} {portalLink}, the task <b>{task.taskNr} – {task.taskName}</b> has been completed by a user of the role <i>{currentRole}</i>:<br />', [
     'task' => $this->task->getDataObject(),
     'currentRole' => $this->translate->_($this->triggeringStep),
 ]);
 
 //list of current users:
-$usersCurrentText = $this->templateApply("Alle Benutzer der aktuellen Rolle <i>{currentRole}</i>:\n{currentUsers}<br/>\n", [
+$usersCurrentText = $this->templateApply('All users with the current role <i>{currentRole}</i>:
+{currentUsers}<br/>
+', [
     'currentUsers' => $this->htmlOnly,
 ]);
-$usersCurrentHTML = $this->templateApply("Alle Benutzer der aktuellen Rolle <i>{currentRole}</i>:\n{currentUsers}<br/>\n", [
+$usersCurrentHTML = $this->templateApply('All users with the current role <i>{currentRole}</i>:
+{currentUsers}<br/>
+', [
     'currentUsers' => $this->workflowNotifyMail()->renderUserList($this->currentUsers),
 ]);
 

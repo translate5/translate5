@@ -30,26 +30,26 @@ END LICENSE AND COPYRIGHT
 
 $this->render('general.phtml');
 
-$this->subject = sprintf($this->translate->_('Termin-Erinnerung für die Aufgabe "%s"'), $this->task->getTaskName());
+$this->subject = sprintf($this->translate->_('Deadline reminder for the task “%s”'), $this->task->getTaskName());
 
 $headers = [];
 $headers[] = $this->header;
-$headers[] = $this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
+$headers[] = $this->templateApply('please remember to complete your assignment for the project below. The deadline is approaching.<br/><br/>Please log in here with your personal access data for processing:<br/><br/>{portalLink}<br/><br/>Double-click on the task to enter edit mode.You can also interrupt the processing of your task at any time and resume it at a later time.<br/><br/>You can also interrupt the processing of your task at any time and resume it at a later time.<br/>', $this->data);
 
 if (isset($this->taskUserAssoc) &&
     ! empty($this->taskUserAssoc['deadlineDate']) &&
     $this->task->getConfig()->runtimeOptions->workflow->autoCloseJobs
 ) {
     $headers[] = sprintf(
-        $this->translate->_('Dieser Auftrag wird automatisch beim Erreichen der Aufgabenfrist am %s geschlossen.'),
+        $this->translate->_('This job will be closed automatically on %s when the task deadline is reached.'),
         $this->taskUserAssoc['deadlineDate']
     );
 }
 $this->header = implode('', $headers);
 
-$taskFragment = $this->templateApply('<br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/>', $this->taskData);
+$taskFragment = $this->templateApply('<br/><br/><b>Project details:</b><br/><br/><b>Project name:</b> {task.taskName}<br/><b>Source language:</b> {sourceLanguageTranslated} <br/><b>Target language:</b> {targetLanguageTranslated} <br/><b>Due by:</b> {deadlineDate}<br/><br/>', $this->taskData);
 
-$footerText = $this->templateApply('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Mit freundlichen Grüßen<br/><br/>{companyName}<br/><br/>', $this->taskData);
+$footerText = $this->templateApply('<br/><br/>If you have any questions about translation or translate5, we are happy to help – just get in touch with us.<br/><br/>Kind regards,<br/><br/>{companyName}<br/><br/>', $this->taskData);
 
 $this->textbody = "To be able to see the mail layout, you need to use app which supports html.";
 

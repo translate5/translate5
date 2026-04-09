@@ -83,9 +83,9 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     strings:{
-        customerLabelText: '#UT#Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)',
-        customerInfoIconTooltip: '#UT#Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.',
-        allCustomers: '#UT#Alle Kunden'
+        customerLabelText: '#UT#Assigned clients (affected roles: PM, InstantTranslate, TM Maintenance and TermPortal)',
+        customerInfoIconTooltip: '#UT#The user has the right to use the language resources in InstantTranslate and TermPortal that are assigned to the same clients as those this user is assigned to.',
+        allCustomers: '#UT#All clients'
     },
     
     // Multitenancy

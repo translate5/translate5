@@ -40,9 +40,9 @@ Ext.define('Editor.view.ReferenceFilesInfoMessage', {
     //    type: 'fit'
     //},
     strings:{
-        windowTitle:'#UT#Referenz-Dateien',
-        windowInfoMessage:'#UT#Referenzdateien vorhanden',
-        buttonText:'#UT#Liste öffnen'
+        windowTitle:'#UT#Reference files',
+        windowInfoMessage:'#UT#Reference files available',
+        buttonText:'#UT#Open list'
     },
     initComponent:function(instanceConfig){
         var me = this;

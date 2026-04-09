@@ -35,15 +35,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     id:'importWizardUploadGridViewController',
 
     errorMessages:{
-        extension:'#UT#Die Datei ({0}) mit der Erweiterung ({1}) wird nicht unterstützt.',
-        pivotNotBilingual:'#UT#Die Pivot-Datei ist nicht zweisprachig.',
-        sourceNotValid:'#UT#Ungültige Ausgangssprache ({0}).',
-        targetNotValid:'#UT#Ungültige Zielsprache ({0}).',
-        sourceNotSame:'#UT#Die Ausgangssprache der Datei ({0}) stimmt nicht mit der aktuell ausgewählten Ausgangssprache überein.',
-        pivotSourceNotSame:'#UT#Die Quellsprache in der Pivot-Datei ({0}) ist nicht dieselbe wie die aktuelle Quellsprache des Projekts ({1}).',
-        additionalRelaisNotSameTarget:'#UT#Die Pivot-Datei ({0}) hat eine andere Zielsprache ({1}) als erwartet ({2}).',
-        pivotNameNotSameAsWorkfile:'#UT#Keine Arbeitsdatei mit gleichem Dateinamen gefunden.',
-        zipAsWorkfileAllowedMessage:'#UT#Zip-Upload ist nur als Arbeitsdatei möglich'
+        extension:'#UT#The file-type ({0}) with the extension ({1}) is not supported.',
+        pivotNotBilingual:'#UT#The pivot file is not bilingual.',
+        sourceNotValid:'#UT#Source language ({0}) is not valid.',
+        targetNotValid:'#UT#Target language ({0}) is not valid.',
+        sourceNotSame:'#UT#The source language ({0}) of the file does not match the currently selected source language.',
+        pivotSourceNotSame:'#UT#The source language in the pivot file ({0}) is not the same as the current source language of the project ({1}).',
+        additionalRelaisNotSameTarget:'#UT#The pivot file ({0}) has a different target language ({1}) than expected ({2}).',
+        pivotNameNotSameAsWorkfile:'#UT#No work file with same filename found.',
+        zipAsWorkfileAllowedMessage:'#UT#ZIP upload is only possible for work files'
     },
 
     listeners:{

@@ -269,7 +269,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
      */
     private function transformException(Throwable $e): ZfExtended_ErrorCodeException|Throwable
     {
-        $invalidValueProvidedMessage = Localization::trans('Ungültiger Wert bereitgestellt');
+        $invalidValueProvidedMessage = Localization::trans('Invalid value provided');
 
         return match ($e::class) {
             InvalidTypeProvidedException::class => UnprocessableEntity::createResponse(
@@ -300,7 +300,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                 'E1682',
                 [
                     'userGuid' => [
-                        Localization::trans('Nur Koordinator kann dem Auftrag der Gruppe Koordinator zugewiesen werden'),
+                        Localization::trans('Only Coordinator can be assigned to Coordinator group job'),
                     ],
                 ],
             ),
@@ -308,7 +308,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                 'E1682',
                 [
                     'userGuid' => [
-                        Localization::trans('Kunde ist nicht mit der Benutzergruppe Koordinator verbunden'),
+                        Localization::trans('The customer is not associated with the Coordinator user group'),
                     ],
                 ],
             ),
@@ -316,7 +316,7 @@ class Editor_UserassocdefaultController extends ZfExtended_RestController
                 'E1682',
                 [
                     'userGuid' => [
-                        Localization::trans('coordinator-dont-belong-to-coordinator-group'),
+                        Localization::trans('Coordinator does not belong to Coordinator group'),
                     ],
                 ],
             ),

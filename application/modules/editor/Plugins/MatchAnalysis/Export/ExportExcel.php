@@ -73,10 +73,10 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
 
         $sheet = $spreadsheet->getSpreadsheet()->getActiveSheet();
 
-        $sheet->setCellValue("A" . $sumRowIndex, $this->translate->_("Price adjustment"));
-        $sheet->setCellValue("A" . ($sumRowIndex + 1), $this->translate->_("Final amount"));
-        $sheet->setCellValue("A" . ($sumRowIndex + 2), $this->translate->_("Quellsprache"));
-        $sheet->setCellValue("A" . ($sumRowIndex + 3), $this->translate->_("Zielsprache"));
+        $sheet->setCellValue("A" . $sumRowIndex, $this->translate->_('Price adjustment'));
+        $sheet->setCellValue("A" . ($sumRowIndex + 1), $this->translate->_('Final amount'));
+        $sheet->setCellValue("A" . ($sumRowIndex + 2), $this->translate->_('Source language'));
+        $sheet->setCellValue("A" . ($sumRowIndex + 3), $this->translate->_('Target language'));
         $sheet->setCellValue("B" . ($sumRowIndex + 2), $task->getSourceLanguage()->getRfc5646());
         $sheet->setCellValue("B" . ($sumRowIndex + 3), $task->getTargetLanguage()->getRfc5646());
 
@@ -112,7 +112,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
             //the order in the newRows array defines the result order in the spreadsheet
             $newRow = [
                 'resourceName' => empty($row['resourceName']) ?
-                    $this->translate->_("Repetitions") : $row['resourceName'],
+                    $this->translate->_('Repetitions') : $row['resourceName'],
                 'unitCountTotal' => $row['unitCountTotal'],
             ];
 
@@ -139,7 +139,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
      */
     protected function setLabels(ExcelExport $spreadsheet): void
     {
-        $spreadsheet->setLabel('resourceName', $this->translate->_("Name"));
+        $spreadsheet->setLabel('resourceName', $this->translate->_('Name'));
 
         $beginners = array_keys($this->fuzzyRanges);
         //remove the nomatch element itself to get the last and smallest begin value
@@ -162,18 +162,18 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
             $spreadsheet->setLabel($begin, $label);
         }
 
-        $spreadsheet->setLabel('unitCountTotal', $this->translate->_("Summe"));
-        $spreadsheet->setLabel('created', $this->translate->_("Erstellungsdatum"));
-        $spreadsheet->setLabel('internalFuzzy', $this->translate->_("Interner Fuzzy aktiv"));
+        $spreadsheet->setLabel('unitCountTotal', $this->translate->_('Sum'));
+        $spreadsheet->setLabel('created', $this->translate->_('Creation date'));
+        $spreadsheet->setLabel('internalFuzzy', $this->translate->_('Internal fuzzy matching active'));
     }
 
     private function getSingleElementRangeLabel(int $match): string
     {
         return match ($match) {
-            104 => $this->translate->_("TermCollection Treffer (104%)"),
-            103 => $this->translate->_("Kontext Treffer (103%)"),
-            102 => $this->translate->_("Wiederholung (102%)"),
-            101 => $this->translate->_("Exact-exact Treffer (101%)"),
+            104 => $this->translate->_('TermCollection match (104%)'),
+            103 => $this->translate->_('Context match (103%)'),
+            102 => $this->translate->_('Repetition (102%)'),
+            101 => $this->translate->_('Exact exact Match (101%)'),
             default => sprintf('%d%%', $match),
         };
     }

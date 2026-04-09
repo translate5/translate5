@@ -34,32 +34,32 @@ Editor.controller.Localizer.addPluginInit('globalesePreTranslation', function() 
     Ext.define("Editor.locale.plugins.GlobalesePreTranslation.view.GlobaleseAuth", {
         override: "Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth",
         strings: {
-            skipPreTranslation:'<?php echo $this->translate->_("Globalese Vorübersetzung überspringen"); ?>',
-            username:'<?php echo $this->translate->_("Globalese Benutzer"); ?>',
-            wizardTitle:'<?php echo $this->translate->_("Globalese Authentifizierung"); ?>',
-            apiKey:'<?php echo $this->translate->_("API Schlüssel"); ?>',
+            skipPreTranslation:'<?php echo $this->translate->_('Skip Globalese pre-translation'); ?>',
+            username:'<?php echo $this->translate->_('Globalese username'); ?>',
+            wizardTitle:'<?php echo $this->translate->_('Globalese authentication'); ?>',
+            apiKey:'<?php echo $this->translate->_('API Key'); ?>',
         }
     });
     
     Ext.define("Editor.locale.plugins.GlobalesePreTranslation.view.GlobaleseSettings", {
         override: "Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings",
         strings: {
-            wizardTitle:'<?php echo $this->translate->_("Globalese Einstellungen"); ?>',
-            nextButtonText:'<?php echo $this->translate->_("Importieren"); ?>',
-            groupComboLabel:'<?php echo $this->translate->_("Globalese Benutzergruppe"); ?>',
-            engineComboLabel:'<?php echo $this->translate->_("Globalese engine"); ?>',
-            emptyComboText:'<?php echo $this->translate->_("Bitte wählen"); ?>',
+            wizardTitle:'<?php echo $this->translate->_('Globalese settings'); ?>',
+            nextButtonText:'<?php echo $this->translate->_('Import'); ?>',
+            groupComboLabel:'<?php echo $this->translate->_('Globalese user group'); ?>',
+            engineComboLabel:'<?php echo $this->translate->_('Globalese engine'); ?>',
+            emptyComboText:'<?php echo $this->translate->_('Please select'); ?>',
         }
     });
     
     Ext.define("Editor.locale.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController", {
         override: "Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController",
         strings: {
-            noEnginesFoundMsg:'<?php echo $this->translate->_("Keine Globalese Übersetzungs-Engine verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung."); ?>',
-            noGroupsFoundMsg:'<?php echo $this->translate->_("Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung."); ?>',
-            authErrorMsg:'<?php echo $this->translate->_("Benutzer oder Passwort sind nicht valide."); ?>',
-            loadingWindowMessage:'<?php echo $this->translate->_("Laden"); ?>',
-            noEnginesForLanguageComboMsg:'<?php echo $this->translate->_("Für die aktuelle Sprachkombination existiert keine Engine in Globalese. Bitte überspringen Sie den Globalese Schritt für diesen Import."); ?>'
+            noEnginesFoundMsg:'<?php echo $this->translate->_('No Globalese translation engine available (for your Globalese username and language pair). Please change the Globalese username or skip pre-translation.'); ?>',
+            noGroupsFoundMsg:'<?php echo $this->translate->_('No Globalese user group available (for your Globalese username and language pair). Please change the Globalese username or skip pre-translation.'); ?>',
+            authErrorMsg:'<?php echo $this->translate->_('Username or password is not valid.'); ?>',
+            loadingWindowMessage:'<?php echo $this->translate->_('Loading'); ?>',
+            noEnginesForLanguageComboMsg:'<?php echo $this->translate->_('There is no Globalese engine for the selected language pair. Please skip the Globalese step in the import process.'); ?>'
         }
     });
 });

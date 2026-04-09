@@ -70,11 +70,11 @@ class editor_Services_Manager
     ): void {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $msg =
-            $translate->_('Das Segment konnte nicht ins TM gespeichert werden')
+            $translate->_('The segment could not be saved to the TM')
             . '. '
-            . $translate->_('Bitte kontaktieren Sie Ihren Administrator')
+            . $translate->_('Please contact your administrator')
             . '!<br />'
-            . $translate->_('Gemeldete Fehler')
+            . $translate->_('Reported errors')
             . ':';
         if (empty($errors)) {
             $data = [

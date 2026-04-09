@@ -102,7 +102,7 @@ class editor_FileController extends ZfExtended_RestController
 
         if (empty($fileId)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1426', [
-                'fileId' => Localization::trans('missing field fileId'),
+                'fileId' => Localization::trans('Missing field “fileId”'),
             ]);
         }
 

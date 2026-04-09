@@ -37,9 +37,9 @@ Ext.define('Editor.view.comments.Grid', {
   alias: 'widget.commentsGrid',
   cls: 'comments-grid',
   store: 'Comments',
-  text_edited: '#UT#bearbeitet',
-  text_edit: '#UT#Bearbeiten',
-  text_delete: '#UT#Löschen',
+  text_edited: '#UT#edited',
+  text_edit: '#UT#Edit',
+  text_delete: '#UT#Delete',
   hideHeaders: true,
   viewConfig: {
       getRowClass: function(record) {

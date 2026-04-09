@@ -46,22 +46,22 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         bconfFilter: null
     },
     strings: {
-        title: '#UT#Editiere Filter Typ {0} von Bconf {1}',
-        help: '#UT#OKAPI Hilfe',
-        helpTooltip: '#UT#Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet',
-        save: '#UT#Speichern',
-        cancel: '#UT#Abbrechen',
-        reset: '#UT#Änderungen zurücksetzen',
-        invalidTitle: '#UT#Bearbeitung fehlerhaft',
-        invalidField: "#UT#Feld '{0}' vom Typ '{1}' ist nicht valide",
-        float: '#UT#Gleitkommazahl',
-        boolean : '#UT#Boolscher Wert',
-        integer : '#UT#Ganzzahl',
-        validationFailed: '#UT#Ihre Änderungen sind nicht valide',
-        changesInvalid: '#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden',
-        successfullySaved: '#UT#Der Filter wurde erfolgreich gespeichert',
-        yes: '#UT#Ja',
-        no: '#UT#Nein'
+        title: '#UT#Edit filter type {0} of BCONF{1}',
+        help: '#UT#OKAPI help',
+        helpTooltip: '#UT#The OKAPI framework is used on the server side for file conversions.',
+        save: '#UT#Save',
+        cancel: '#UT#Cancel',
+        reset: '#UT#Reset changes',
+        invalidTitle: '#UT#Incorrect processing',
+        invalidField: '#UT#Field “{0}” of type “{1}” is not valid',
+        float: '#UT#Floating-point number',
+        boolean : '#UT#Boolean',
+        integer : '#UT#Integer',
+        validationFailed: '#UT#Your changes are not valid',
+        changesInvalid: '#UT#The filter could not be saved, as your changes are not valid',
+        successfullySaved: '#UT#The filter has been saved successfully',
+        yes: '#UT#Yes',
+        no: '#UT#No'
     },
     initConfig: function(instanceConfig){
         var config = {

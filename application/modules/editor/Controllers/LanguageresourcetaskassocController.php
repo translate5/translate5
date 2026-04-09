@@ -144,8 +144,8 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         if ($task->isUsed($this->entity->getTaskGuid())) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
                 Localization::trans(
-                    'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment ' .
-                    'nicht von der Aufgabe entfernt werden!'
+                    'The Task is in use, the language resource can ' .
+                    'not be removed from the task at the meoment!'
                 ),
             ]);
         }
@@ -195,7 +195,7 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             throw ZfExtended_Models_Entity_Conflict::createResponse(
                 'E1050',
                 [
-                    'languageResourceId' => Localization::trans('Die gewünschte Sprachressource gibt es nicht!'),
+                    'languageResourceId' => Localization::trans('The chosen language resource does not exist.'),
                 ],
                 [
                     'languageresourceId' => $this->data->languageResourceId,

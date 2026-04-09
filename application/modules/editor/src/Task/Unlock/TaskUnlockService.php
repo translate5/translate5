@@ -99,7 +99,7 @@ final class TaskUnlockService
         ]);
 
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1284', [
-            Localization::trans('Projekte können nicht bearbeitet werden.'),
+            Localization::trans('Projects cannot be edited.'),
         ]);
     }
 

@@ -45,8 +45,8 @@ Ext.define('Editor.view.segments.column.IsWatched', {
   width: 90,
   dataIndex: 'isWatched',
   hidden: true,
-  text: '#UT#Lesezeichen',
-  text_tip: '#UT#Mit Lesezeichen versehen',
+  text: '#UT#Bookmarks',
+  text_tip: '#UT#bookmarked',
   showInMetaTooltip: true,
 
   initComponent: function() {

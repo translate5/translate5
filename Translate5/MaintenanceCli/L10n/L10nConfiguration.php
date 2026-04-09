@@ -47,6 +47,11 @@ class L10nConfiguration
     public const DATA_DIR = 'l10n';
 
     /**
+     * The file where the exchanged key of an exchange are stored
+     */
+    public const EXCHANGE_MAP_PATH = 'locales/exchanged-strings.php';
+
+    /**
      * The existing localizations and the connected code-dirs
      * HINT: Plugin-dirs will be evaluated programmatically
      */

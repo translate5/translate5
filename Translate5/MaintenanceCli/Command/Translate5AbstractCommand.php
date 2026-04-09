@@ -43,18 +43,12 @@ use Zend_Registry;
 
 abstract class Translate5AbstractCommand extends Command
 {
-    protected InputInterface $input;
-
-    protected OutputInterface $output;
-
-    protected SymfonyStyle $io;
-
-    protected Application $translate5;
-
     /**
-     * if true output should be machine-readable!
+     * Use for commands failing to write code-files (usually belonging to root) ...
      */
-    protected bool $isPorcelain = false;
+    protected const string CODEFILE_WRITE_ERROR =
+        'You may have insufficient rights to write into the code directories; ' . "\n" .
+        'Try to run the command as root to solve this problem.';
 
     public static function create(): static
     {
@@ -107,6 +101,19 @@ abstract class Translate5AbstractCommand extends Command
 
         return $cli->run($input) === 0;
     }
+
+    protected InputInterface $input;
+
+    protected OutputInterface $output;
+
+    protected SymfonyStyle $io;
+
+    protected Application $translate5;
+
+    /**
+     * if true output should be machine-readable!
+     */
+    protected bool $isPorcelain = false;
 
     public function __construct($name = null)
     {

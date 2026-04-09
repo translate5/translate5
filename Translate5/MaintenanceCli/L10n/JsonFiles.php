@@ -36,13 +36,14 @@ class JsonFiles
     ) {
     }
 
-    public function findFiles(string $language, bool $asAbsolutePath = false): array
+    public function findFiles(string $language, bool $asAbsolutePath = true): array
     {
         $cwd = getcwd();
         chdir($this->rootPath);
 
         $find = sprintf(
-            'find -iname "*%s.json" -not -path "./vendor/*" -not -path "./data/*" -path "*/locales/*"',
+            'find ./ -iname "*%s.json" -not -path "./vendor/*" -not -path "./data/*" -not -path "./testdata/*"' .
+            ' -path "*/locales/*"',
             $language
         );
         $files = shell_exec($find);
@@ -57,6 +58,13 @@ class JsonFiles
         if ($asAbsolutePath) {
             foreach ($files as &$file) {
                 $file = $this->rootPath . '/' . ltrim($file, './');
+            }
+        }
+
+        // change /PrivatPlugins - this expects symlinks to be set up properly
+        foreach ($files as &$file) {
+            if (str_contains($file, '/PrivatePlugins/')) {
+                $file = str_replace('/PrivatePlugins/', '/Plugins/', $file);
             }
         }
 

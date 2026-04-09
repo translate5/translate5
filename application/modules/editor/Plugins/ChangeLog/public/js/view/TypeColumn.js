@@ -43,7 +43,7 @@ Ext.define('Editor.plugins.ChangeLog.view.TypeColumn', {
   dataIndex: 'type',
   filter: null,
   strings: {
-      type:'#UT#Typ'
+      type:'#UT#Type'
   },
   types: {
       bugfix:'#UT#Bugfix',

@@ -45,20 +45,20 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
     closable:false,
     
     strings:{
-      comboFieldLabel:'#UT#Suchen nach',//Search for
-      searchInField:'#UT#Suchen in',
-      matchCaseLabel:'#UT#Groß/Kleinschreibung beachten',//Match case
-      towardsTop:'#UT#Nach oben suchen',//Search towards the top
-      useForSearch:'#UT#Bei der Suche verwenden',//Use for search
-      normalSearch:'#UT#Normal (Standard)',//Normal (default)
-      wildcardsSearch:'#UT#Wildcards (* und ?)',
-      regularExpressionSearch:'#UT#Regulärer Ausdruck',
-      saveCurrentOpen:'#UT#Segment beim Schließen speichern',
-      saveCurrentDraft:'#UT#Segment beim Schließen als Entwurf speichern',
-      invalidRegularExpression:'#UT#Ungültiger Regulärer Ausdruck',
-      unsupportedRegularExpression:'#UT#Dieser reguläre Ausdruck wird nicht unterstützt',
-      segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:',
-      searchInLockedSegments:'#UT#Suche in gesperrten Segmenten'
+      comboFieldLabel:'#UT#Search for',//Search for
+      searchInField:'#UT#Search in',
+      matchCaseLabel:'#UT#Match case',//Match case
+      towardsTop:'#UT#Search towards the top',//Search towards the top
+      useForSearch:'#UT#Use for search',//Use for search
+      normalSearch:'#UT#Normal (default)',//Normal (default)
+      wildcardsSearch:'#UT#Wildcards (* and ?)',
+      regularExpressionSearch:'#UT#Regular expression',
+      saveCurrentOpen:'#UT#Save segment on close',
+      saveCurrentDraft:'#UT#Save segment on close as draft',
+      invalidRegularExpression:'#UT#Invalid regular expression',
+      unsupportedRegularExpression:'#UT#This regular expression is not supported',
+      segmentMatchInfoMessage:'#UT#Segments with search hits:',
+      searchInLockedSegments:'#UT#Search in locked segments'
     },
     
     padding:'10 10 10 10',

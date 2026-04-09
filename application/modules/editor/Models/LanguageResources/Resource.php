@@ -333,7 +333,7 @@ class editor_Models_LanguageResources_Resource
     ): array {
         return [
             'status' => LanguageResourceStatus::NOTCHECKED,
-            'statusInfo' => $translate->_('Wählen Sie die Ressource aus um weitere Infos zu bekommen.'),
+            'statusInfo' => $translate->_('Choose the resource to get more information.'),
         ];
     }
 

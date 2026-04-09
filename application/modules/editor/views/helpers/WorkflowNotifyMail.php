@@ -33,14 +33,14 @@ END LICENSE AND COPYRIGHT
  */
 class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
 {
-    #[\MittagQI\ZfExtended\Localization\LocalizableArrayProp]
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsgArray]
     private array $columnHeads = [
-        'surName' => 'Nachname',
-        'firstName' => 'Vorname',
-        'email' => 'E-Mail Adresse',
-        'role' => 'Rolle',
+        'surName' => 'Surname',
+        'firstName' => 'Forename',
+        'email' => 'E-mail address',
+        'role' => 'Role',
         'state' => 'Status',
-        'deadlineDate' => 'Deadline Datum',
+        'deadlineDate' => 'Deadline date',
     ];
 
     public function workflowNotifyMail()
@@ -160,7 +160,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract
             } catch (Exception $e) {
                 $params['relaisLanguageTranslated'] = 'unknown';
             }
-            $params['relaisLanguageFragment'] = $t->_('<b>Relaissprache:</b> {relaisLanguageTranslated}<br />');
+            $params['relaisLanguageFragment'] = $t->_('<b>Pivot language:</b> {relaisLanguageTranslated}<br />');
         } else {
             $params['relaisLanguageFragment'] = '';
         }

@@ -153,32 +153,32 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     confirmStrings: {
         "editorFinishTask": {
-            title: "#UT#Aufgabe abschließen?",
-            msg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?"
+            title: '#UT#Finish task?',
+            msg: '#UT#Do you really want to complete the task?'
         },
         "editorUnfinishTask": {
-            title: "#UT#Aufgabe wieder öffnen?",
-            msg: "#UT#Wollen Sie die Aufgabe wirklich wieder öffnen?"
+            title: '#UT#Reopen task?',
+            msg: '#UT#Do you really want to reopen the task?'
         },
         "editorFinishAllTask": {
-            title: "#UT#Aufgabe für alle Nutzer abschließen?",
-            msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?"
+            title: '#UT#Finish task for all users?',
+            msg: '#UT#Do you really want to complete the task for all users?'
         },
         "editorUnfinishAllTask": {
-            title: "#UT#Aufgabe für alle Nutzer wieder öffnen?",
-            msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?"
+            title: '#UT#Reopen task for all users?',
+            msg: '#UT#Do you really want to reopen the task for all users?'
         },
         "editorEndTask": {
-            title: "#UT#Aufgabe endgültig beenden?",
-            msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?"
+            title: '#UT#Permanently end job?',
+            msg: '#UT#Do you really want to finally end the job for all users?'
         },
         "editorReopenTask": {
-            title: "#UT#Beendete Aufgabe wieder öffnen?",
-            msg: "#UT#Wollen Sie die beendete Aufgabe wirklich wieder öffnen?"
+            title: '#UT#Reopen finished task?',
+            msg: '#UT#Do you really want to reopen the finished job?'
         },
         "editorDeleteTask": {
-            title: '#UT#Aufgabe "{0}" komplett löschen?',
-            msg: '#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?'
+            title: '#UT#Delete “{0}” task completely?',
+            msg: '#UT#Do you really want to permanently delete the task?'
         },
         "editorImportTask": {
             title: 'Bestätigen Sie den Aufgabenimport',
@@ -186,39 +186,39 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         }
     },
     strings: {
-        taskImported: '#UT#Aufgabe "{0}" bereit.',
-        taskError: '#UT#Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!',
-        taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
-        taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
-        taskReopen: '#UT#Aufgabe wird wieder eröffnet...',
-        taskEnding: '#UT#Aufgabe wird beendet...',
-        taskDestroy: '#UT#Aufgabe "{0}" wird gelöscht...',
-        taskDeleted: '#UT#Aufgabe "{0}" gelöscht',
-        taskNotDestroyed: '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
-        loadingWindowMessage: "#UT#Dateien werden hochgeladen",
-        loading: '#UT#Laden',
-        importTaskMessage: "#UT#Hochladen beendet. Import und Vorbereitung laufen.",
-        deleteTaskDialogMessage: '#UT#Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?',
-        deleteTaskDialogTitle: '#UT#Aufgabe löschen',
-        taskImportButtonText: '#UT#Aufgabe importieren',
-        taskDeleteButtonText: '#UT#Aufgabe löschen',
-        averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit',
-        excelExportUsageLabel: '#UT#Excel-Export Nutzung',
-        workflowStep: '#UT#Workflow Schritt',
-        type: '#UT#Typ',
-        translatorStep: '#UT#Übersetzung',
-        reviewerStep: '#UT#Lektorat',
-        translatorCheckStep: '#UT#Finales Lektorat',
-        sekunden: '#UT#Sekunden',
-        posteditingTimeLabel: '#UT#Ø Nachbearbeitungszeit innerhalb eines Workflowschritts',
+        taskImported: '#UT#Task “{0}” available.',
+        taskError: '#UT#The task could not be imported due to errors!',
+        taskFinishing: '#UT#Finishing task...',
+        taskUnFinishing: '#UT#Finishing task...',
+        taskReopen: '#UT#Reopening task...',
+        taskEnding: '#UT#Ending task...',
+        taskDestroy: '#UT#Deleting “{0}” task...',
+        taskDeleted: '#UT#Task “{0}” deleted',
+        taskNotDestroyed: '#UT#This task is in use and therefore cannot be deleted.',
+        loadingWindowMessage: '#UT#File upload in progress',
+        loading: '#UT#Loading',
+        importTaskMessage: '#UT#File upload completed. Import and job preparation running.',
+        deleteTaskDialogMessage: '#UT#Should the task be deleted or imported with the current settings?',
+        deleteTaskDialogTitle: '#UT#Delete task',
+        taskImportButtonText: '#UT#Import task',
+        taskDeleteButtonText: '#UT#Delete task',
+        averageProcessingTimeLabel: '#UT#Ø Processing time',
+        excelExportUsageLabel: '#UT#Excel export usage',
+        workflowStep: '#UT#Workflow step',
+        type: '#UT#Type',
+        translatorStep: '#UT#Translation',
+        reviewerStep: '#UT#Review',
+        translatorCheckStep: '#UT#Final review',
+        sekunden: '#UT#seconds',
+        posteditingTimeLabel: '#UT#Ø Post-editing time within one workflow step',
         posteditingTimeTotalLabel: '#UT#Ø Post-editing time since import/pre-translation',
-        posteditingTimeStartLabel: '#UT#Ø Nachbearbeitungszeit vor Beginn des Workflows',
-        posteditingTimeEndLabel: '#UT#Ø Nachbearbeitungszeit nach Ende des Workflows',
-        levenshteinDistanceLabel: '#UT#Ø Levenshtein-Abstand innerhalb eines Workflowschritts',
-        levenshteinDistanceStartLabel: '#UT#Ø Levenshtein-Distanz vor Beginn des Workflows',
-        levenshteinDistanceEndLabel: '#UT#Ø Levenshtein-Distanz nach Ende des Workflows',
+        posteditingTimeStartLabel: '#UT#Ø Post-editing time before the beginning of the workflow',
+        posteditingTimeEndLabel: '#UT#Ø Post-editing time after the end of the workflow',
+        levenshteinDistanceLabel: '#UT#Ø Levenshtein distance within one workflow step',
+        levenshteinDistanceStartLabel: '#UT#Ø Levenshtein distance before the start of the workflow',
+        levenshteinDistanceEndLabel: '#UT#Ø Levenshtein distance after the end of the workflow',
         levenshteinDistanceOriginalLabel: '#UT#Ø Levenshtein distance from import/pre-translation',
-        noFinishDueDraftSegments: '#UT#Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.'
+        noFinishDueDraftSegments: '#UT#The task still contains segments in draft status. Open the task and change the status.'
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',

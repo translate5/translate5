@@ -80,22 +80,45 @@ class L10nReimportCommand extends Translate5AbstractCommand
         $this->writeTitle('Translate5 L10n maintenance - reimporting localizations');
         $doCreate = $input->getOption('create');
 
-        $reimport = new L10nReimporter();
-        $reimport->process($doCreate);
-        $reimportedFiles = $reimport->getReimportedPathes();
+        try {
+            $reimport = new L10nReimporter();
+            $reimport->process($doCreate);
+            $reimportedFiles = $reimport->getReimportedPathes();
+        } catch (\MittagQI\ZfExtended\FileWriteException $e) {
+            $this->io->error($e->getMessage() . "\n" . self::CODEFILE_WRITE_ERROR);
+
+            return self::FAILURE;
+        } catch (\Throwable $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         if ($reimport->hasErrors()) {
             $this->io->error($reimport->getErrors());
         }
 
-        if (count($reimportedFiles) > 0) {
-            $this->io->success('Reimported ' . count($reimportedFiles) . ' localization-files');
+        $numZxliff = count($reimportedFiles['zxliff']);
+        $numJson = count($reimportedFiles['json']);
 
-            $rows = [];
-            foreach ($reimportedFiles as $file) {
-                $rows[] = [$file];
+        if (($numZxliff + $numJson) > 0) {
+            $this->io->success('Reimported ' . ($numZxliff + $numJson) . ' localization-files');
+            if ($numZxliff > 0) {
+                $this->io->newLine(1);
+                $rows = [];
+                foreach ($reimportedFiles['zxliff'] as $file) {
+                    $rows[] = [$file];
+                }
+                $this->io->table(['Reimported ' . $numZxliff . ' ZXLIFF files:'], $rows);
             }
-            $this->io->table(['Overview of reimported files'], $rows);
+            if ($numZxliff > 0) {
+                $this->io->newLine(1);
+                $rows = [];
+                foreach ($reimportedFiles['json'] as $file) {
+                    $rows[] = [$file];
+                }
+                $this->io->table(['Reimported ' . $numJson . ' JSON files:'], $rows);
+            }
 
             return self::SUCCESS;
         }

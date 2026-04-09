@@ -42,7 +42,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     ],
     dock: 'top',
     strings:{
-    	filterHolderLabel:'#UT#Gesetzte Filter'
+    	filterHolderLabel:'#UT#Active filters'
     },
     hidden:true,
     bind:{

@@ -62,7 +62,7 @@ Ext.define('Editor.view.ViewPortEditor', {
 
     //Item Strings:
     items_north_title: 'Header',
-    items_west_title: '#UT#QS &amp; Dateien',
+    items_west_title: '#UT#QA &amp; Files',
     initComponent: function() {
     var me = this,
         task = Editor.data.task,

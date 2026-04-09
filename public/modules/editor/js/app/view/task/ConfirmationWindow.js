@@ -38,10 +38,10 @@ Ext.define('Editor.view.task.ConfirmationWindow', {
         align: 'stretch'
     },
     strings: {
-        title: "#UT#Aufgabe bestätigen?",
-        confirmMsg: "#UT#Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.",
-        confirmCompetitive: "#UT#<br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.",
-        confirmBtn: '#UT#bestätigen'
+        title: '#UT#Approve task?',
+        confirmMsg: '#UT#Do you want to confirm the case? <br/> Without confirmation, it cannot be edited.',
+        confirmCompetitive: '#UT#<br/><br/>The task will be removed from all other users and will be your sole responsibility.<br/> and will be your sole responsibility.',
+        confirmBtn: '#UT#approve'
     },
     border: false,
     y: '5%',

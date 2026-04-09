@@ -40,13 +40,13 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.languageResourceMatchGrid',
     strings: {
-        loading: '#UT#wird geladen...',
-        noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
-        serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
-        serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
-        serverErrorMsg502: '#UT#Es gibt Probleme mit dem angefragten Dienst.',
-        serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
-        delInsTagTooltip:'#UT#Unterschied zu Quellsegment'
+        loading: '#UT#loading...',
+        noresults: '#UT#No results found.',
+        serverErrorMsgDefault: '#UT#The language resource did not respond in a reasonable time.',
+        serverErrorMsg500: '#UT#The request produced an error in the queried service.',
+        serverErrorMsg502: '#UT#There are problems with the queried service.',
+        serverErrorMsg408: '#UT#The language resource did not respond in a reasonable time.',
+        delInsTagTooltip:'#UT#Difference to source segment'
     },
     refs:[{
         ref: 'matchgrid',

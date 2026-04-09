@@ -56,10 +56,10 @@ class Task extends Base
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1473', [
             'errorMessages' => [
-                Localization::trans('Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:'),
+                Localization::trans('The to be removed language resource is used in the following tasks:'),
                 Localization::trans(
-                    'Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. ' .
-                    'Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?'
+                    'If removed, this language resource will be unassigned from all of the tasks ' .
+                    'above. Do you want to remove this language resource and remove all assignments?'
                 ),
             ],
         ], extraData: [

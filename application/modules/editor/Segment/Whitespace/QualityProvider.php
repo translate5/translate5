@@ -112,7 +112,7 @@ class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_P
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
     {
-        return $translate->_('Leerraum am Anfang/Ende');
+        return $translate->_('White space at the beginning/end');
     }
 
     public function translateCategory(
@@ -121,18 +121,18 @@ class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_P
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            Check::TAG_SPACE_BEG => $translate->_('Segment beginnt mit einem Tag gefolgt von Leerzeichen'),
-            Check::NBSP_BEG => $translate->_('Geschützes Leerzeichen am Anfang'),
-            Check::TAB_BEG => $translate->_('Tab am Anfang'),
-            Check::SPACE_BEG => $translate->_('Normales Leerzeichen am Anfang'),
-            Check::LNBR_BEG => $translate->_('Umbruch am Anfang'),
-            Check::SPACE_TAG_END => $translate->_('Segment endet mit einem Leerzeichen gefolgt von einem Tag'),
-            Check::NBSP_END => $translate->_('Geschützes Leerzeichen am Ende'),
-            Check::TAB_END => $translate->_('Tab am Ende'),
-            Check::SPACE_END => $translate->_('Normales Leerzeichen am Ende'),
-            Check::LNBR_END => $translate->_('Umbruch am Ende'),
-            Check::SPACE_LNBR => $translate->_('Leerzeichen vor Zeilenumbruch'),
-            Check::LNBR_SPACE => $translate->_('Leerzeichen nach Zeilenumbruch'),
+            Check::TAG_SPACE_BEG => $translate->_('Segment begins with a tag followed by a space'),
+            Check::NBSP_BEG => $translate->_('Non-breaking space at the beginning'),
+            Check::TAB_BEG => $translate->_('Tab at the beginning'),
+            Check::SPACE_BEG => $translate->_('Normal space at the beginning'),
+            Check::LNBR_BEG => $translate->_('Line break at the beginning'),
+            Check::SPACE_TAG_END => $translate->_('Segment ends with a space followed by a tag'),
+            Check::NBSP_END => $translate->_('Non-breaking space at the end'),
+            Check::TAB_END => $translate->_('Tab at the end'),
+            Check::SPACE_END => $translate->_('Normal space at the end'),
+            Check::LNBR_END => $translate->_('Line break at the end'),
+            Check::SPACE_LNBR => $translate->_('Space before line break'),
+            Check::LNBR_SPACE => $translate->_('Space after line break'),
             default => null,
         };
     }

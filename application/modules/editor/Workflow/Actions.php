@@ -157,8 +157,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
                 'noField' => Localization::trans(
-                    'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, ' .
-                    'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.'
+                    'The other users cannot be removed from the task, another ' .
+                    'user may have been quicker and removed you from the task.'
                 ),
             ]);
         }

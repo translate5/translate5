@@ -62,7 +62,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         $taskGuid = $this->getParam('taskGuid');
         if (empty($taskGuid)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1403', [
-                'taskGuid' => Localization::trans('The taskGuid field is empty'),
+                'taskGuid' => Localization::trans('The “taskGuid” field is empty'),
             ]);
         }
         $this->view->rows = $this->entity->loadAllAvailableForTask(

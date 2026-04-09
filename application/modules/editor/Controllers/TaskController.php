@@ -1126,7 +1126,7 @@ class editor_TaskController extends ZfExtended_RestController
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1284', [
-                Localization::trans('Projekte können nicht bearbeitet werden.'),
+                Localization::trans('Projects cannot be edited.'),
             ]);
         }
 
@@ -1159,16 +1159,16 @@ class editor_TaskController extends ZfExtended_RestController
         } catch (JobAssignmentWasDeletedInTheMeantimeException) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1163', [
                 'userState' => Localization::trans(
-                    'Ihre Zuweisung zur Aufgabe wurde entfernt, ' .
-                    'daher können Sie diese nicht mehr zur Bearbeitung öffnen.'
+                    'Your job was removed, therefore you are ' .
+                    'not allowed to access that task anymore.'
                 ),
             ]);
         } catch (UserJobIsNotEditableException $e) {
             if ($this->data->userStatePrevious !== $e->userJob->getState()) {
                 throw ZfExtended_Models_Entity_Conflict::createResponse('E1164', [
                     'userState' => Localization::trans(
-                        'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. ' .
-                        'Das ist in der Zwischenzeit nicht mehr möglich.'
+                        'You have attempted to open the task ' .
+                        'for editing. This is no longer possible.'
                     ),
                 ]);
             }
@@ -1339,8 +1339,8 @@ class editor_TaskController extends ZfExtended_RestController
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
                 Localization::trans(
-                    'Die Aufgabe kann nicht von einem PM beendet werden, ' .
-                    'weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.'
+                    'The task can not be set to ended ' .
+                    'because another user is still editing it.'
                 ),
             ]);
         }
@@ -1365,8 +1365,8 @@ class editor_TaskController extends ZfExtended_RestController
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1159', [
             'usageMode' => [
                 'usersAssigned' => Localization::trans(
-                    'Der Nutzungsmodus der Aufgabe kann verändert werden, ' .
-                    'wenn kein Benutzer der Aufgabe zugewiesen ist.'
+                    'The usage mode of the task can only be ' .
+                    'changed if no user is assigned to the task.'
                 ),
             ],
         ]);
@@ -2019,7 +2019,7 @@ class editor_TaskController extends ZfExtended_RestController
         if ($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             /** @var ZfExtended_Zendoverwrites_Translate $translate */
-            $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
+            $suffix = $translate->_('– with tracked changes.zip');
         } else {
             $suffix = '.zip';
         }
@@ -2473,7 +2473,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1064', [
-            'customerId' => Localization::trans('Der referenzierte Kunde existiert nicht (mehr)'),
+            'customerId' => Localization::trans('The referenced customer no longer exists.'),
         ], [], $e);
     }
 
@@ -2559,7 +2559,7 @@ class editor_TaskController extends ZfExtended_RestController
         if ($userState === editor_Workflow_Default::STATE_FINISH
             && $this->qualityService->taskHasCriticalErrors($this->entity->getTaskGuid())) {
             throw JobNotFinishableException::createResponse('E1750', [
-                'userState' => Localization::trans('Einige Pflichtkriterien der AutoQA weisen noch Fehler auf.'),
+                'userState' => Localization::trans('Some mandatory criteria of the AutoQA still have errors.'),
             ]);
         }
     }
@@ -2574,8 +2574,8 @@ class editor_TaskController extends ZfExtended_RestController
             && $this->segmentRepository->hasDraftsInTask($this->entity->getTaskGuid())) {
             throw JobNotFinishableException::createResponse('E1751', [
                 'userState' => Localization::trans(
-                    'Die Aufgabe enthält noch Segmente im Entwurfsstatus. ' .
-                    'Setzen Sie den Status auf final um und beenden Sie dann die Aufgabe.'
+                    'The task still contains segments in draft status. ' .
+                    'Change the status to final and finish the task then.'
                 ),
             ]);
         }

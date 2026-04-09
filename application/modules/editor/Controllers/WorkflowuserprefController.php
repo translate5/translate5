@@ -113,7 +113,7 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController
         }
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1172', [
-            'userGuid' => Localization::trans('Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.'),
+            'userGuid' => Localization::trans('The referenced user is not associated to the task or even does not exist anymore.'),
         ], [], $e);
     }
 

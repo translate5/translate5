@@ -58,18 +58,18 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
     scrollable: true,
     SERVER_STATUS: null,
     strings: {
-        source: '#UT#Ausgangstext',
-        target: '#UT#Zieltext',
-        match: '#UT#Matchrate',
-        ctrl: '#UT#STRG',
-        sourceEmptyText: '#UT#Suche im Ausgangstext',
-        targetEmptyText: '#UT#Suche im Zieltext',
-        tmresource: '#UT#TM-Ressource',
-        search: '#UT#Alle durchsuchen',
-        singleSearch:'#UT#Suche in {0}',
-        tooltipMsg: '#UT#Diesen Match in das geöffnete Segment übernehmen.',
-        lastEditTooltipMsg: '#UT#letzte Änderung:',
-        createdTooltipMsg: '#UT#erstellt:'
+        source: '#UT#Source text',
+        target: '#UT#Target text',
+        match: '#UT#Match rate',
+        ctrl: '#UT#CTRL',
+        sourceEmptyText: '#UT#Search in the source text',
+        targetEmptyText: '#UT#Search in the target text',
+        tmresource: '#UT#TM resource',
+        search: '#UT#Search in all',
+        singleSearch:'#UT#Search in {0}',
+        tooltipMsg: '#UT#Take over this match into the opened segment.',
+        lastEditTooltipMsg: '#UT#last change:',
+        createdTooltipMsg: '#UT#created:'
 
     },
     viewConfig: {

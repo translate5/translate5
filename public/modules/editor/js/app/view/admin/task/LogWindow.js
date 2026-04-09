@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.task.LogWindow', {
         'Editor.view.admin.log.Window'
     ],
     task: null,
-    title: '#UT#Ereignisse zu Aufgabe "{0}"',
+    title: '#UT#Events of task “{0}”',
     initConfig: function(instanceConfig) {
         var me = this,
             config;

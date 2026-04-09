@@ -45,19 +45,19 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         'Editor.util.HtmlCleanup'
     ],
     strings: {
-        segmentToShort: '#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
-        segmentToLong: '#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
-        segmentTooManyLines: '#UT#Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.',
-        segmentLinesTooLong: '#UT#Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).',
-        segmentLinesTooShort: '#UT#Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).',
+        segmentToShort: '#UT#The segment content is too short! It must contain at least {0} characters.',
+        segmentToLong: '#UT#The segment content is too long! A maximum of {0} characters are allowed.',
+        segmentTooManyLines: '#UT#The segment content contains too many line breaks; a maximum of {0} lines are allowed.',
+        segmentLinesTooLong: '#UT#Not all lines in the segment content match the allowed length ({0}).',
+        segmentLinesTooShort: '#UT#Not all lines in the segment content match the required length ({0}).',
         min: '#UT#min',
         max: '#UT#max',
-        line: '#UT#Zeile',
-        lines: '#UT#Zeilen',
-        current: '#UT#Aktuell',
-        together: '#UT#insgesamt',
-        siblingSegments: '#UT#Seg.: {siblings}',
-        numberOfChars: '#UT#Anzahl Zeichen'
+        line: '#UT#Line',
+        lines: '#UT#lines',
+        current: '#UT#Current',
+        together: '#UT#overall',
+        siblingSegments: '#UT#seg.: {siblings}',
+        numberOfChars: '#UT#Number of characters'
     },
     lengthstatus: {
         segmentLengthValid: 'segmentLengthValid',

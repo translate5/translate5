@@ -63,8 +63,8 @@ use ZfExtended_Factory;
 
 class QualityService
 {
-    #[\MittagQI\ZfExtended\Localization\LocalizableProp]
-    public const ERROR_MASSAGE_PLEASE_SOLVE_ERRORS = 'Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”:<br/>{categories}';
+    #[\MittagQI\ZfExtended\Localization\LocalizableMsg]
+    public const ERROR_MASSAGE_PLEASE_SOLVE_ERRORS = 'Please solve all errors of the following category OR set them to “false positive”:<br/>{categories}';
 
     private editor_Segment_Quality_Manager $manager;
 

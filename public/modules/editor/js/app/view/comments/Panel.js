@@ -50,16 +50,16 @@ Ext.define('Editor.view.comments.Panel', {
         'Editor.view.comments.PanelViewModel'
     ],
 
-    title: '#UT#Kommentare zum aktuellen Segment',
+    title: '#UT#Comments for the current segment',
     itemId: 'commentPanel',
     layout: 'fit',
-    item_saveBtn: '#UT#Speichern',
-    item_closeBtn: '#UT#Schließen',
-    item_commentNew: '#UT#Kommentar neu',
-    item_commentEdit: '#UT#Kommentar bearbeiten',
-    item_addComment: '#UT#Neuer Kommentar',
-    delete_confirm_title: '#UT#Löschen des Kommentars bestätigen',
-    delete_confirm_msg: '#UT#Soll der Kommentar wirklich gelöscht werden?',
+    item_saveBtn: '#UT#Save',
+    item_closeBtn: '#UT#Close',
+    item_commentNew: '#UT#new comment',
+    item_commentEdit: '#UT#edit comment',
+    item_addComment: '#UT#New comment',
+    delete_confirm_title: '#UT#Confirm comment deletion',
+    delete_confirm_msg: '#UT#Do you really want to delete the comment?',
 
     listeners: {
         expand: 'onCommentPanelExpand'
