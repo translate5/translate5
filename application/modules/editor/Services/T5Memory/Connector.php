@@ -338,29 +338,6 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
         return str_starts_with($trimmed, '<?xml') && str_contains($trimmed, '<tmx');
     }
 
-    private function isTmxFile(string $path): bool
-    {
-        $fh = fopen($path, 'rb');
-        if (! $fh) {
-            return false;
-        }
-
-        $head = fread($fh, 65536);
-        fclose($fh);
-
-        if ($head === false || $head === '') {
-            return false;
-        }
-
-        // Strip UTF-8 BOM if present
-        $head = preg_replace('/^\xEF\xBB\xBF/', '', $head);
-
-        // Trim leading whitespace/control-ish
-        $trimmed = ltrim($head);
-
-        return str_starts_with($trimmed, '<?xml') && str_contains($trimmed, '<tmx');
-    }
-
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
         $customerId = current($this->languageResource->getCustomers());
