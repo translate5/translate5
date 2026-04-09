@@ -244,6 +244,19 @@ class UserJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
+    public function taskHasNotFinishedJob(string $taskGuid, string $workflow): bool
+    {
+        $select = $this->db
+            ->select()
+            ->from(UserJobTable::TABLE_NAME, 'count(*)')
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('workflow = ?', $workflow)
+            ->where('state not in (?)', [Workflow::STATE_FINISH, Workflow::STATE_AUTO_FINISH])
+        ;
+
+        return (int) $this->db->fetchOne($select) > 0;
+    }
+
     /**
      * @return iterable<UserJob>
      */
@@ -410,18 +423,6 @@ class UserJobRepository
 
             yield clone $job;
         }
-    }
-
-    public function getWorkflowStepNamesOfJobsInTask(string $taskGuid): array
-    {
-        $s = $this->db
-            ->select()
-            ->distinct()
-            ->from(UserJobTable::TABLE_NAME, 'workflowStepName')
-            ->where('taskGuid = ?', $taskGuid)
-        ;
-
-        return $this->db->query($s)->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function save(UserJob $job): void

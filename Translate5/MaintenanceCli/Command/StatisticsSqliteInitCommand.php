@@ -95,30 +95,25 @@ class StatisticsSqliteInitCommand extends Translate5AbstractCommand
         $db = SQLite::create();
 
         $tableSql = [
-            SegmentHistoryAggregation::TABLE_NAME => 'CREATE TABLE %s (
+            SegmentHistoryAggregation::TABLE_NAME_POSTEDITING => 'CREATE TABLE %s (
 taskGuid TEXT,
-userGuid TEXT,
-workflowName TEXT,
-workflowStepName TEXT,
 segmentId INTEGER,
-editable INTEGER,
+userGuid TEXT,
+workflowStepName TEXT,
 duration INTEGER,
-matchRate INTEGER,
-qualityScore INTEGER,
-langResType TEXT,
-langResId INTEGER,
 PRIMARY KEY (taskGuid,segmentId,workflowStepName,userGuid)
 )',
-            SegmentHistoryAggregation::TABLE_NAME_LEV => 'CREATE TABLE %s (
+            SegmentHistoryAggregation::TABLE_NAME_STATISTICS => 'CREATE TABLE %s (
 taskGuid TEXT,
 userGuid TEXT,
 workflowName TEXT,
 workflowStepName TEXT,
 segmentId INTEGER,
 editable INTEGER,
-lastEdit INTEGER,
+latestEntry INTEGER,
 levenshteinOriginal INTEGER,
 levenshteinPrevious INTEGER,
+segmentlengthPrevious INTEGER,
 matchRate INTEGER,
 qualityScore INTEGER,
 langResType TEXT,
@@ -157,7 +152,7 @@ PRIMARY KEY (taskGuid,segmentId,workflowStepName)
             } elseif (strtolower((string) $config->resources->db->statistics->engine) !== 'sqlite') {
                 $msg = 'default statistics engine is not sqlite';
             } else {
-                $row = $db->oneAssoc('SELECT COUNT(*) AS total FROM ' . SegmentHistoryAggregation::TABLE_NAME_LEV);
+                $row = $db->oneAssoc('SELECT COUNT(*) AS total FROM ' . SegmentHistoryAggregation::TABLE_NAME_STATISTICS);
                 if ($row['total'] > 0) {
                     $msg = 'data already exists';
                 }

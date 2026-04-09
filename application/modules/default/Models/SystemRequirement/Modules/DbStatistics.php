@@ -73,7 +73,7 @@ class Models_SystemRequirement_Modules_DbStatistics extends ZfExtended_Models_Sy
                     $this->result->error[] = "File is not writeable: $dbFile";
                 }
             }
-            foreach ([SegmentHistoryAggregation::TABLE_NAME, SegmentHistoryAggregation::TABLE_NAME_LEV] as $tableName) {
+            foreach ([SegmentHistoryAggregation::TABLE_NAME_POSTEDITING, SegmentHistoryAggregation::TABLE_NAME_STATISTICS] as $tableName) {
                 if (! $db->tableExists($tableName)) {
                     $this->result->error[] = "Error accessing table '$tableName'";
                 }

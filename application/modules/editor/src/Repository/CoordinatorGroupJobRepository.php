@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Db_Task as TaskTable;
 use editor_Models_Db_TaskUserAssoc as UserJobTable;
+use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\CoordinatorGroup\JobCoordinator;
 use MittagQI\Translate5\CoordinatorGroup\Model\Db\CoordinatorGroupTable;
 use MittagQI\Translate5\CoordinatorGroup\Model\Db\CoordinatorGroupUserTable;
@@ -65,11 +66,6 @@ class CoordinatorGroupJobRepository
         return new self(
             Zend_Db_Table::getDefaultAdapter(),
         );
-    }
-
-    public function getEmptyModel(): CoordinatorGroupJob
-    {
-        return ZfExtended_Factory::get(CoordinatorGroupJob::class);
     }
 
     /**
@@ -500,6 +496,9 @@ class CoordinatorGroupJobRepository
         }
     }
 
+    /**
+     * @return iterable<CoordinatorGroupJob>
+     */
     public function getTaskCoordinatorGroupJobs(string $taskGuid): iterable
     {
         $groupJob = new CoordinatorGroupJob();
@@ -525,6 +524,44 @@ class CoordinatorGroupJobRepository
             );
 
             yield clone $groupJob;
+        }
+    }
+
+    /**
+     * @return iterable<UserJob>
+     */
+    public function getTaskCoordinatorGroupDataJobs(string $taskGuid): iterable
+    {
+        $dataJob = new UserJob();
+
+        $coordinatorGroupJobTableName = CoordinatorGroupJobTable::TABLE_NAME;
+        $userJobTableName = UserJobTable::TABLE_NAME;
+        $coordinatorJobType = TypeEnum::Coordinator->value;
+
+        $sql = <<<SQL
+SELECT
+    userJob.*
+FROM
+    $coordinatorGroupJobTableName AS groupJob
+JOIN
+    $userJobTableName AS userJob ON userJob.coordinatorGroupJobId = groupJob.id AND userJob.type = '$coordinatorJobType'
+WHERE
+    groupJob.taskGuid = ?
+SQL;
+
+        foreach ($this->db->fetchAll($sql, [$taskGuid]) as $jobData) {
+            $dataJob->init(
+                new \Zend_Db_Table_Row(
+                    [
+                        'table' => $dataJob->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $dataJob;
         }
     }
 

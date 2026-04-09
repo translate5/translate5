@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Statistics;
 
-use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
-use MittagQI\Translate5\Statistics\Dto\AggregationFilter;
+use MittagQI\Translate5\Statistics\Dto\StatisticFilterDTO;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Logger;
@@ -41,13 +41,13 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
 {
     private MockObject|AbstractStatisticsDB $client;
 
-    private SegmentHistoryAggregationRepository $repository;
+    private SegmentStatisticsRepository $repository;
 
     protected function setUp(): void
     {
         $this->client = $this->createMock(AbstractStatisticsDB::class);
         $logger = $this->createMock(ZfExtended_Logger::class);
-        $this->repository = new SegmentHistoryAggregationRepository($this->client, $logger);
+        $this->repository = new SegmentStatisticsRepository($this->client, $logger);
     }
 
     public function testGetFilteredTaskIdsWithQualityScoreMinAddsCorrectWhereClause(): void
@@ -63,13 +63,16 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
                 return [];
             });
 
-        $this->repository->getFilteredTaskIds(
+        $this->repository->getTaskGuidsMatchingFilter(
             ['{task-guid-1}'],
-            [new AggregationFilter('qualityScoreMin', 30)]
+            StatisticFilterDTO::fromAssocArray([
+                'qualityScoreMin' => 30,
+            ])
         );
 
         $this->assertNotNull($capturedSql);
         $this->assertStringContainsString('AND qualityScore>=30', $capturedSql);
+        $this->assertStringNotContainsString('AND latestEntry=1', $capturedSql);
     }
 
     public function testGetFilteredTaskIdsWithQualityScoreMaxAddsCorrectWhereClause(): void
@@ -85,13 +88,16 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
                 return [];
             });
 
-        $this->repository->getFilteredTaskIds(
+        $this->repository->getTaskGuidsMatchingFilter(
             ['{task-guid-1}'],
-            [new AggregationFilter('qualityScoreMax', 80)]
+            StatisticFilterDTO::fromAssocArray([
+                'qualityScoreMax' => 80,
+            ])
         );
 
         $this->assertNotNull($capturedSql);
         $this->assertStringContainsString('AND qualityScore<=80', $capturedSql);
+        $this->assertStringNotContainsString('AND latestEntry=1', $capturedSql);
     }
 
     public function testGetFilteredTaskIdsWithBothQualityScoreFilters(): void
@@ -107,17 +113,18 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
                 return [];
             });
 
-        $this->repository->getFilteredTaskIds(
+        $this->repository->getTaskGuidsMatchingFilter(
             ['{task-guid-1}'],
-            [
-                new AggregationFilter('qualityScoreMin', 20),
-                new AggregationFilter('qualityScoreMax', 90),
-            ]
+            StatisticFilterDTO::fromAssocArray([
+                'qualityScoreMin' => 20,
+                'qualityScoreMax' => 90,
+            ])
         );
 
         $this->assertNotNull($capturedSql);
         $this->assertStringContainsString('AND qualityScore>=20', $capturedSql);
         $this->assertStringContainsString('AND qualityScore<=90', $capturedSql);
+        $this->assertStringNotContainsString('AND latestEntry=1', $capturedSql);
     }
 
     public function testGetFilteredTaskIdsWithoutQualityScoreFiltersHasNoQualityScoreClause(): void
@@ -133,14 +140,43 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
                 return [];
             });
 
-        $this->repository->getFilteredTaskIds(
+        $this->repository->getTaskGuidsMatchingFilter(
             ['{task-guid-1}'],
-            [new AggregationFilter('matchRateMin', 75)]
+            StatisticFilterDTO::fromAssocArray([
+                'matchRateMin' => 75,
+            ])
         );
 
         $this->assertNotNull($capturedSql);
         $this->assertStringNotContainsString('qualityScore', $capturedSql);
         $this->assertStringContainsString('AND matchRate>=75', $capturedSql);
+        $this->assertStringNotContainsString('AND latestEntry=1', $capturedSql);
+    }
+
+    public function testGetFilteredTaskIdsWithWorkflowStepFilterDoesNotForceLastEdit(): void
+    {
+        $this->client->method('isAlive')->willReturn(true);
+
+        $capturedSql = null;
+        $this->client
+            ->method('select')
+            ->willReturnCallback(function (string $sql) use (&$capturedSql) {
+                $capturedSql = $sql;
+
+                return [];
+            });
+
+        $this->repository->getTaskGuidsMatchingFilter(
+            ['{task-guid-1}'],
+            StatisticFilterDTO::fromAssocArray([
+                'qualityScoreMin' => 50,
+                'workflowStep' => ['translation'],
+            ])
+        );
+
+        $this->assertNotNull($capturedSql);
+        $this->assertStringContainsString('AND qualityScore>=50', $capturedSql);
+        $this->assertStringNotContainsString('AND latestEntry=1', $capturedSql);
     }
 
     public function testGetFilteredTaskIdsReturnsEmptyWhenClientNotAlive(): void
@@ -148,9 +184,11 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
         $this->client->method('isAlive')->willReturn(false);
         $this->client->expects($this->never())->method('select');
 
-        $result = $this->repository->getFilteredTaskIds(
+        $result = $this->repository->getTaskGuidsMatchingFilter(
             ['{task-guid-1}'],
-            [new AggregationFilter('qualityScoreMin', 50)]
+            StatisticFilterDTO::fromAssocArray([
+                'qualityScoreMin' => 50,
+            ])
         );
 
         $this->assertSame([], $result);
@@ -165,32 +203,13 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
                 'taskGuid' => 'abc-123',
             ]]);
 
-        $result = $this->repository->getFilteredTaskIds(
+        $result = $this->repository->getTaskGuidsMatchingFilter(
             ['{abc-123}'],
-            [new AggregationFilter('qualityScoreMin', 50)]
+            StatisticFilterDTO::fromAssocArray([
+                'qualityScoreMin' => 50,
+            ])
         );
 
         $this->assertSame(['{abc-123}'], $result);
-    }
-
-    public function testQualityScoreFiltersAreNotAppliedAsNativeFilters(): void
-    {
-        $this->client->method('isAlive')->willReturn(true);
-
-        $capturedSql = null;
-        $this->client
-            ->method('select')
-            ->willReturnCallback(function (string $sql) use (&$capturedSql) {
-                $capturedSql = $sql;
-
-                return [];
-            });
-
-        // isNative=true should not add qualityScore clause (it would be handled by ORM instead)
-        $nativeFilter = new AggregationFilter('qualityScoreMin', 50, true);
-        $this->repository->getFilteredTaskIds(['{task}'], [$nativeFilter]);
-
-        $this->assertNotNull($capturedSql);
-        $this->assertStringNotContainsString('qualityScore', $capturedSql);
     }
 }

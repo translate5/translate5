@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment;
 
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
+use MittagQI\Translate5\Statistics\Dto\StatisticSegmentDTO;
 use MittagQI\Translate5\Statistics\MariaDB;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Logger;
@@ -54,28 +55,27 @@ class SegmentHistoryAggregationTest extends TestCase
 
     public function testInserts(): void
     {
-        $entry = [
+        $entry = new StatisticSegmentDTO(
             'f31882a2-6ad3-4049-b0b5-090744ae6dd0',
             'f31882a2-6ad3-4049-b0b5-090744ae6dd1',
             'simple',
             'review',
             123,
-            120,
             4,
             5,
             100,
             'import;tm',
             1,
             1,
-        ];
+        );
 
         $this->statDb
-            ->expects(self::exactly(4))
+            ->expects(self::exactly(2))
             ->method('upsert');
 
-        $this->aggregation->upsert(...$entry);
+        $this->aggregation->upsert($entry);
 
-        $this->aggregation->upsertBuffered(...$entry);
+        $this->aggregation->upsertBuffered($entry);
         $this->aggregation->flushUpserts();
 
         // Test flush on no data

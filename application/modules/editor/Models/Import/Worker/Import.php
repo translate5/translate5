@@ -30,7 +30,11 @@ use MittagQI\Translate5\File\Filter\FilterException;
 use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
+use MittagQI\Translate5\Workflow\SetupInitialWorkflow;
+use ZfExtended_Zendoverwrites_Controller_Action_HelperBroker as HelperBroker;
 
 /**
  * Encapsulates the part of the import logic which is intended to be run in a worker
@@ -65,12 +69,28 @@ class editor_Models_Import_Worker_Import
 
     private editor_Models_Import_Configuration $importConfig;
 
+    private AggregateTaskStatistics $segmentStatisticBootstrap;
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     */
+    private readonly editor_Workflow_Manager $workflowManager;
+
+    private readonly SetupInitialWorkflow $setupInitialWorkflow;
+
+    private readonly TaskRepository $taskRepository;
+
     public function __construct()
     {
-        $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
+        $this->_localEncoded = HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $this->events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [__CLASS__]);
+        $this->workflowManager = new editor_Workflow_Manager();
+        $this->setupInitialWorkflow = SetupInitialWorkflow::create();
+        $this->taskRepository = TaskRepository::create();
+        $this->segmentStatisticBootstrap = AggregateTaskStatistics::create();
     }
 
     /**
@@ -78,52 +98,53 @@ class editor_Models_Import_Worker_Import
      */
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig)
     {
-        $this->task = $task;
         $this->importConfig = $importConfig;
 
-        $this->filelist = ZfExtended_Factory::get(editor_Models_Import_FileList::class, [$this->importConfig, $this->task]);
+        $this->filelist = ZfExtended_Factory::get(editor_Models_Import_FileList::class, [$this->importConfig, $task]);
 
-        $this->segmentFieldManager->initFields($this->task->getTaskGuid());
+        $this->segmentFieldManager->initFields($task->getTaskGuid());
 
         //call import Methods:
-        $this->importFiles();
-        $this->syncFileOrderAndRepetitions();
-        $this->importRelaisFiles();
-        $this->task->createMaterializedView();
-        $this->calculateMetrics();
+        $this->importFiles($task);
+        $this->syncFileOrderAndRepetitions($task);
+        $this->segmentStatisticBootstrap->aggregateOnImport($task);
+        $this->importRelaisFiles($task);
+        $task->createMaterializedView();
+        $this->calculateMetrics($task);
         //saving task twice is the simplest way to do this. has meta data is only available after import.
-        $this->task->save();
+        $task->save();
 
         //init default user prefs
-        $workflowManager = ZfExtended_Factory::get(editor_Workflow_Manager::class);
-        $workflowManager->getByTask($this->task)->hookin()->doImport($this->task, $importConfig);
-        $workflowManager->initDefaultUserPrefs($this->task);
+        $workflow = $this->workflowManager->getCached($task->getWorkflow());
+        $this->setupInitialWorkflow->setup($workflow, $task);
+        $workflow->hookin()->doImport($task, $importConfig);
+        $this->workflowManager->initDefaultUserPrefs($task);
     }
 
-    protected function importFiles(): void
+    protected function importFiles(editor_Models_Task $task): void
     {
         $treeDb = ZfExtended_Factory::get(editor_Models_Foldertree::class);
         $treeDb->setPathPrefix($this->importConfig->getWorkfilesDirName());
-        $filelist = $treeDb->getPaths($this->task->getTaskGuid(), 'file');
+        $filelist = $treeDb->getPaths($task->getTaskGuid(), 'file');
 
         $fileFilter = ZfExtended_Factory::get(Manager::class);
-        $fileFilter->addByConfig($this->task->getTaskGuid(), $this->importConfig, $filelist);
-        $fileFilter->initImport($this->task, $this->importConfig);
+        $fileFilter->addByConfig($task->getTaskGuid(), $this->importConfig, $filelist);
+        $fileFilter->initImport($task, $this->importConfig);
 
         $mqmProc = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_MqmParser::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
         $repHash = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_RepetitionHash::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
         $segProc = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_Review::class, [
-            $this->task,
+            $task,
             $this->importConfig,
         ]);
         $parserHelper = ZfExtended_Factory::get(Factory::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
 
@@ -175,43 +196,43 @@ class editor_Models_Import_Worker_Import
         if ($filesProcessedAtAll === 0) {
             //E1166: Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors.
             throw new editor_Models_Import_FileParser_NoParserException('E1166', [
-                'task' => $this->task,
+                'task' => $task,
             ]);
         }
 
         $mqmProc->handleErrors();
 
-        $this->task->setReferenceFiles($this->filelist->hasReferenceFiles() ? 1 : 0);
-        $this->task->setReimportable($isReImportable ? 1 : 0);
+        $task->setReferenceFiles($this->filelist->hasReferenceFiles() ? 1 : 0);
+        $task->setReimportable($isReImportable ? 1 : 0);
     }
 
     /**
      * Calculates and sets the task metrics emptyTargets (bool), wordCount (int) and segmentCount(int)
      * @throws Zend_Db_Select_Exception|ReflectionException
      */
-    protected function calculateMetrics()
+    protected function calculateMetrics(editor_Models_Task $task)
     {
-        $taskGuid = $this->task->getTaskGuid();
+        $taskGuid = $task->getTaskGuid();
 
         $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
         $progress = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
         $meta = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
 
-        $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($taskGuid));
+        $task->setEmptyTargets($segment->hasEmptyTargetsOnly($taskGuid));
 
         //we may set the tasks wordcount only to our calculated values if there was no count given either by API or by import formats
-        if ($this->task->getWordCount() == 0) {
-            $this->task->setWordCount($meta->getWordCountSum($this->task));
+        if ($task->getWordCount() == 0) {
+            $task->setWordCount($meta->getWordCountSum($task));
         }
 
-        $this->task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
-        $progress->refreshProgress($this->task);
+        $task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
+        $progress->refreshProgress($task);
     }
 
     /**
      * Importiert die Relais Dateien
      */
-    protected function importRelaisFiles(): void
+    protected function importRelaisFiles(editor_Models_Task $task): void
     {
         if (! $this->importConfig->hasRelaisLanguage()) {
             return;
@@ -220,29 +241,29 @@ class editor_Models_Import_Worker_Import
         $relayFiles = $this->filelist->processRelaisFiles();
 
         if (empty($relayFiles)) {
-            $this->onPivotFilesNotFound();
+            $this->onPivotFilesNotFound($task);
 
             return;
         }
 
         // when there are files for pivot, we do not need the pivot language resources associations
         // remove all of them for the current project/task
-        $this->removePivotAssoc();
+        $this->removePivotAssoc($task);
 
         $mqmProc = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_MqmParser::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
         $repHash = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_RepetitionHash::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
         $segProc = ZfExtended_Factory::get(editor_Models_Import_SegmentProcessor_Relais::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
         $parserHelper = ZfExtended_Factory::get(Factory::class, [
-            $this->task,
+            $task,
             $this->segmentFieldManager,
         ]);
 
@@ -262,21 +283,21 @@ class editor_Models_Import_Worker_Import
         $mqmProc->handleErrors();
     }
 
-    protected function syncFileOrderAndRepetitions()
+    protected function syncFileOrderAndRepetitions(editor_Models_Task $task)
     {
         $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
         //dont update view here, since it is not existing yet!
-        $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true);
-        $segment->syncRepetitions($this->task->getTaskGuid(), false);
+        $segment->syncFileOrderFromFiles($task->getTaskGuid(), true);
+        $segment->syncRepetitions($task->getTaskGuid(), false);
     }
 
     /***
      * Check and create the pivot row if there are pivot translate assocs.
      */
-    public function onPivotFilesNotFound(): void
+    public function onPivotFilesNotFound(editor_Models_Task $task): void
     {
         $pivotAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
-        $associations = $pivotAssoc->loadTaskAssociated($this->task->getTaskGuid());
+        $associations = $pivotAssoc->loadTaskAssociated($task->getTaskGuid());
 
         // if no reference files where found, check for pivot pre-translation associations.
         if (! empty($associations)) {
@@ -284,15 +305,15 @@ class editor_Models_Import_Worker_Import
             $this->segmentFieldManager->addField($this->segmentFieldManager::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS, false);
 
             // If the auto-queue config is set, queue the pivot worker
-            if ($this->task->getConfig()->runtimeOptions->import->autoStartPivotTranslations) {
+            if ($task->getConfig()->runtimeOptions->import->autoStartPivotTranslations) {
                 $worker = ZfExtended_Factory::get(PivotQueuer::class);
-                $worker->queuePivotWorker($this->task->getTaskGuid());
+                $worker->queuePivotWorker($task->getTaskGuid());
             }
         } else {
             // log the missing relais files if no pivot associations are found
             $this->filelist->getRelaisFolderTree()->logMissingFile();
             // remove the relais lang when no pivot assoc are found
-            $this->task->setRelaisLang(0);
+            $task->setRelaisLang(0);
         }
     }
 
@@ -300,27 +321,29 @@ class editor_Models_Import_Worker_Import
      * Remove all pivot assocs for the current project/task
      * @return void
      */
-    protected function removePivotAssoc(): void
+    protected function removePivotAssoc(editor_Models_Task $task): void
     {
-        if ($this->task->isProject()) {
-            $task = ZfExtended_Factory::get(editor_Models_Task::class);
-            $projectTasks = $task->loadProjectTasks((int) $this->task->getProjectId(), true);
-            $taskGuids = array_column($projectTasks, 'taskGuid');
-        } else {
-            $taskGuids = [$this->task->getTaskGuid()];
+        $logger = Zend_Registry::get('logger')->cloneMe('languageresources.pivotpretranslation');
+        $assoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
+
+        if ($task->isProject()) {
+            $projectTasks = $this->taskRepository->getProjectTaskList((int) $task->getProjectId());
+
+            foreach ($projectTasks as $projectTask) {
+                if ($assoc->deleteAllForTask($projectTask->getTaskGuid())) {
+                    $logger->info('E1011', 'Default user associations removed: Files will be used as pivot source.', [
+                        'task' => $projectTask,
+                    ]);
+                }
+            }
+
+            return;
         }
 
-        $logger = Zend_Registry::get('logger')->cloneMe('languageresources.pivotpretranslation');
-
-        foreach ($taskGuids as $taskGuid) {
-            $assoc = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\TaskPivotAssociation::class);
-            if ($assoc->deleteAllForTask($taskGuid)) {
-                $task = ZfExtended_Factory::get(editor_Models_Task::class);
-                $task->loadByTaskGuid($taskGuid);
-                $logger->info('E1011', 'Default user associations removed: Files will be used as pivot source.', [
-                    'task' => $task,
-                ]);
-            }
+        if ($assoc->deleteAllForTask($task->getTaskGuid())) {
+            $logger->info('E1011', 'Default user associations removed: Files will be used as pivot source.', [
+                'task' => $task,
+            ]);
         }
     }
 }

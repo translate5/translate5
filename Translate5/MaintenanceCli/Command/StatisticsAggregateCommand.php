@@ -29,23 +29,24 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Task_Type;
-use MittagQI\Translate5\Configuration\KeyValueStorage;
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
-use MittagQI\Translate5\Statistics\Helpers\{AggregateTaskHistory, SyncEditable};
+use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\{InputInterface, InputOption};
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Zend_Db_Table;
+use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Models_Entity_NotFoundException;
 
 class StatisticsAggregateCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'statistics:aggregate';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             // the short description shown while running "php bin/console list"
@@ -84,7 +85,11 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
@@ -143,42 +148,25 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
             }
             $created = $this->io->askQuestion($question);
         }
-        $sqlSince = ($created != $createdEarliest) ? ' AND `created`>"' . $created . ' 00:00:00"' : '';
-
-        if (! $taskId) {
-            // get last Ids to save as starting points for periodical syncs of editable by cron
-            $newLastSegmentHistoryId = (int) $db->fetchOne('SELECT MAX(id) FROM LEK_segment_history');
-            $newLastSegmentId = (int) $db->fetchOne('SELECT MAX(id) FROM LEK_segments');
-        }
+        $sqlSince = ($created != $createdEarliest) ? ' AND `modified`>"' . $created . ' 00:00:00"' : '';
 
         $this->io->writeln("Processing tasks..\n");
 
-        $allTasks = $db->fetchPairs(
-            'SELECT taskGuid,workflow FROM LEK_task WHERE ' .
+        //get tasks only, no projects
+        $allTasks = $db->fetchCol(
+            'SELECT taskGuid FROM LEK_task WHERE ' .
             ($taskId ? 'id=' . $taskId : 'taskType IN ("' .
-                implode('","', editor_Task_Type::getInstance()->getTaskTypes()) . '") ORDER BY id')
+                implode('","', editor_Task_Type::getInstance()->getTaskTypes()) . '")' .
+                $sqlSince .
+                ' ORDER BY id')
         );
 
         $progressBar = new ProgressBar($output, count($allTasks));
-        $aggregateTask = new AggregateTaskHistory($sqlSince);
+        $aggregateTask = AggregateTaskStatistics::create();
 
-        foreach ($allTasks as $taskGuid => $workflowName) {
-            if (! $aggregateTask->aggregateData($taskGuid, $workflowName)) {
-                $this->io->writeln("\n");
-                $this->io->warning(
-                    "Failed to add records into statistics table " . SegmentHistoryAggregation::TABLE_NAME
-                );
-
-                return self::FAILURE;
-            }
-
+        foreach ($allTasks as $taskGuid) {
+            $aggregateTask->aggregateHistoricalData($taskGuid);
             $progressBar->advance();
-        }
-
-        if (! $taskId) {
-            $storage = new KeyValueStorage();
-            $storage->set(SyncEditable::paramLastSegmentHistoryId, $newLastSegmentHistoryId);
-            $storage->set(SyncEditable::paramLastSegmentId, $newLastSegmentId);
         }
 
         $progressBar->finish();
@@ -187,8 +175,8 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
         $compact = $this->input->getOption('compact');
         $this->io->writeln('Optimizing' . ($compact ? '/compacting' : '') . ' imported data..');
 
-        $statDB->optimize(SegmentHistoryAggregation::TABLE_NAME, $compact);
-        $statDB->optimize(SegmentHistoryAggregation::TABLE_NAME_LEV, $compact);
+        $statDB->optimize(SegmentHistoryAggregation::TABLE_NAME_POSTEDITING, $compact);
+        $statDB->optimize(SegmentHistoryAggregation::TABLE_NAME_STATISTICS, $compact);
 
         $duration = $this->printDuration($start, time());
         $this->io->success(
@@ -208,15 +196,16 @@ class StatisticsAggregateCommand extends Translate5AbstractCommand
     private function purgeAggregatedData(AbstractStatisticsDB $statDb): int
     {
         $this->io->warning(
-            'The existing segments history data will be deleted. Make sure Statistics Database status is OK in System Check.'
+            'The existing segments history data will be deleted. '
+            . 'Make sure Statistics Database status is OK in System Check.'
         );
         if (! $this->io->confirm('Do you really want to proceed?', false)) {
             return self::SUCCESS;
         }
 
         $this->io->writeln('Deleting data..');
-        $statDb->truncate(SegmentHistoryAggregation::TABLE_NAME);
-        $statDb->truncate(SegmentHistoryAggregation::TABLE_NAME_LEV);
+        $statDb->truncate(SegmentHistoryAggregation::TABLE_NAME_POSTEDITING);
+        $statDb->truncate(SegmentHistoryAggregation::TABLE_NAME_STATISTICS);
         $this->io->success('Processing done');
 
         return self::SUCCESS;

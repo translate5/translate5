@@ -98,9 +98,58 @@ class ClickHouseDB extends AbstractStatisticsDB
         }
     }
 
+    public function upsertIncrementDuration(
+        string $table,
+        string $taskGuid,
+        int $segmentId,
+        string $workflowStepName,
+        string $userGuid,
+        int $duration,
+    ): void {
+        if ($duration === 0) {
+            return;
+        }
+
+        $row = $this->oneAssoc(
+            'SELECT duration FROM ' . $table . ' FINAL ' .
+            'WHERE taskGuid=:taskGuid AND segmentId=:segmentId AND workflowStepName=:workflowStepName AND userGuid=:userGuid ' .
+            'LIMIT 1',
+            [
+                'taskGuid' => $taskGuid,
+                'segmentId' => $segmentId,
+                'userGuid' => $userGuid,
+                'workflowStepName' => $workflowStepName,
+            ]
+        );
+
+        $totalDuration = (int) ($row['duration'] ?? 0) + $duration;
+
+        $this->upsert(
+            $table,
+            [[
+                $taskGuid,
+                $segmentId,
+                $userGuid,
+                $workflowStepName,
+                $totalDuration,
+            ]],
+            ['taskGuid', 'segmentId', 'userGuid', 'workflowStepName', 'duration']
+        );
+    }
+
     public function query(string $sql, array $bind = []): void
     {
         $this->getClient()?->write($sql, $bind);
+    }
+
+    public function insertSelectIgnore(string $table, array $columns, string $selectSql, array $bind = []): void
+    {
+        // ClickHouse does not provide the same unique-key conflict behavior as MariaDB/SQLite.
+        // We keep a best-effort fallback to preserve abstraction compatibility.
+        $this->query(
+            'INSERT INTO ' . $table . ' (' . implode(',', $columns) . ') ' . $selectSql,
+            $bind
+        );
     }
 
     public function optimize(string $table, bool $compact = false): void

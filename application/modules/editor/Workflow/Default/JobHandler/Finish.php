@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Statistics\Helpers\AggregateUnmodifiedSegments;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Workflow\NextStepCalculator;
 
 /**
@@ -49,11 +49,14 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
 
     private readonly NextStepCalculator $nextStepCalculator;
 
+    private readonly TaskRepository $taskRepository;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->nextStepCalculator = NextStepCalculator::create();
+        $this->taskRepository = TaskRepository::create();
     }
 
     public function execute(editor_Workflow_Actions_Config $actionConfig): ?string
@@ -154,32 +157,27 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
     protected function handleAllFinishOfARole()
     {
         $newTua = $this->config->newTua;
+        $workflow = $this->config->workflow;
         $this->config->trigger = self::HANDLE_JOB_ALLFINISHOFAROLE;
-        $taskGuid = $newTua->getTaskGuid();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+
+        $task = $this->taskRepository->getByGuid($newTua->getTaskGuid());
         $oldStep = $task->getWorkflowStepName();
 
         //this remains as default behaviour
-        $nextStep = $this->nextStepCalculator->getNextStep(
-            $this->config->workflow,
-            $task->getTaskGuid(),
-            $newTua->getWorkflowStepName()
-        );
+        $nextStep = $this->nextStepCalculator->getNextStep($workflow, $task->getTaskGuid());
+
         $this->doDebug($this->config->trigger . " Next Step: " . $nextStep . ' to role ' . $newTua->getRole() . ' with step ' . $nextStep . "; Old Step in Task: " . $oldStep);
-        if (! empty($nextStep)) {
-            //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
+
+        if (null !== $nextStep) {
+            // The next step also triggers a callAction → but somehow in such a way that the new value is used!
+            // It’s a bit of a chicken-and-egg situation!
             $this->setNextStep($task, $nextStep);
-            $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
-            $newTua->setStateForStepAndTask($isComp ? $this->config->workflow::STATE_UNCONFIRMED : $this->config->workflow::STATE_OPEN, $nextStep);
+            $isComp = $task->getUsageMode() === $task::USAGE_MODE_COMPETITIVE;
+            $newTua->setStateForStepAndTask($isComp ? $workflow::STATE_UNCONFIRMED : $workflow::STATE_OPEN, $nextStep);
         }
 
         //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
         $this->callActions($this->config, $oldStep, $newTua->getRole(), $newTua->getState());
-
-        // TODO: move into an event binding
-        AggregateUnmodifiedSegments::aggregate($task, $oldStep, $newTua->getUserGuid());
     }
 
     /**
@@ -255,7 +253,6 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
             'oldStep' => $task->getWorkflowStepName(),
             'newStep' => $stepName,
         ];
-        $this->config->workflow->getStepRecalculation()->addNextStepSet($task->getTaskGuid(), $stepName);
         $this->doDebug(__FUNCTION__ . ': workflow next step "{newStep}"; oldstep: "{oldStep}"', $steps, true);
         $task->updateWorkflowStep($stepName, true);
         //call action directly without separate handler method

@@ -42,7 +42,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
     },
 
     workflowFieldChange: function (fld, workflowIds) {
-        var allSteps = [];
+        let allSteps = [];
 
         Ext.Object.each(Editor.data.app.workflows, function (key, workflow) {
             Ext.Object.each(workflow.steps, function (stepId, stepText) {
@@ -51,7 +51,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
                 }
                 if (!["no workflow", "pmCheck", "workflowEnded"].includes(stepId)) {
                     allSteps.push({
-                        id: stepId,
+                        id: workflow.id + '#' + stepId,
+                        workflowStep: stepId,
                         text: stepText,
                         group: workflow.label
                     });
@@ -59,7 +60,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
             });
         });
 
-        var store = new Ext.data.Store();
+        let store = new Ext.data.Store();
         store.loadData(allSteps, false);
         this.getView().down('#workflowStep').setStore(store);
     },

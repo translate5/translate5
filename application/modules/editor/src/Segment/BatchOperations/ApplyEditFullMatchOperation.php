@@ -38,6 +38,7 @@ use editor_Models_Segment_MatchRateType;
 use editor_Models_Segment_Meta as SegmentMeta;
 use editor_Models_Task as Task;
 use editor_Models_TaskProgress as TaskProgress;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
 use Zend_Db_Statement_Exception;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint as IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey as IntegrityDuplicateKey;
@@ -45,13 +46,14 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey as IntegrityDuplic
 /**
  * Applies the edit full match flag to the task segments
  */
-class ApplyEditFullMatchOperation
+readonly class ApplyEditFullMatchOperation
 {
     public function __construct(
-        private readonly AutoStates $autoState,
-        private readonly InternalTag $internalTag,
-        private readonly SegmentMeta $segmentMeta,
-        private readonly TaskProgress $taskProgress,
+        private AutoStates $autoState,
+        private InternalTag $internalTag,
+        private SegmentMeta $segmentMeta,
+        private TaskProgress $taskProgress,
+        private UpdateSegmentService $updateSegmentStatisticsService,
     ) {
     }
 
@@ -84,6 +86,7 @@ class ApplyEditFullMatchOperation
                 $segment->setEditable($autoStateId != $this->autoState::LOCKED);
                 $history->save();
                 $segment->save();
+                $this->updateSegmentStatisticsService->updateEditable($task, $segment);
             }
         }
 

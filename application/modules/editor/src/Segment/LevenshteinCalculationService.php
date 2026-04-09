@@ -47,7 +47,7 @@ use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
  *  so that levenshtein recognizes them as single change.
  * All multibyte characters are also replaced as single bytes till grapheme_levenshtein can be used.
  */
-final readonly class SegmentLevenshtein
+final readonly class LevenshteinCalculationService
 {
     public function __construct(
         private editor_Models_Segment_TrackChangeTag $trackChangeTag,
@@ -70,13 +70,10 @@ final readonly class SegmentLevenshtein
     /**
      * calculates the levenshtein distance for segment content
      * @throws InvalidInputForLevenshtein
+     * @return array{distance: int, segmentlengthPrevious: int}
      */
-    public function calcDistance(string $s1, string $s2): int
+    public function calcDistance(string $s1, string $s2): array
     {
-        if ($s1 === $s2) {
-            return 0;
-        }
-
         $charMap = [];
         $usedPuaChars = $this->collectPrivateUseAreaChars($s1 . $s2);
         $puaCursor = 0xE000;
@@ -94,7 +91,18 @@ final readonly class SegmentLevenshtein
             ]);
         }
 
-        return $this->levenshteinDistance($s1, $s2);
+        $segmentLengthPrevious = $this->stringLength($s1);
+        if ($s1 === $s2) {
+            return [
+                'distance' => 0,
+                'segmentlengthPrevious' => $segmentLengthPrevious,
+            ];
+        }
+
+        return [
+            'distance' => $this->levenshteinDistance($s1, $s2),
+            'segmentlengthPrevious' => $segmentLengthPrevious,
+        ];
     }
 
     private function levenshteinDistance(string $s1, string $s2): int
@@ -184,6 +192,18 @@ final readonly class SegmentLevenshtein
         $s2 = $this->utf8ToExtendedAscii($s2, $map);
 
         return levenshtein($s1, $s2);
+    }
+
+    private function stringLength(string $text): int
+    {
+        if (function_exists('grapheme_strlen')) {
+            return max(0, (int) grapheme_strlen($text));
+        }
+        if (function_exists('mb_strlen')) {
+            return mb_strlen($text, 'UTF-8');
+        }
+
+        return strlen($text);
     }
 
     private function utf8ToExtendedAscii(string $str, array &$map): string

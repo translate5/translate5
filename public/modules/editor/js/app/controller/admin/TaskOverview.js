@@ -211,13 +211,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         translatorCheckStep: '#UT#Finales Lektorat',
         sekunden: '#UT#Sekunden',
         posteditingTimeLabel: '#UT#Ø Nachbearbeitungszeit innerhalb eines Workflowschritts',
-        posteditingTimeTotalLabel: '#UT#Ø Nachbearbeitungszeit ab Beginn des Workflows',
+        posteditingTimeTotalLabel: '#UT#Ø Post-editing time since import/pre-translation',
         posteditingTimeStartLabel: '#UT#Ø Nachbearbeitungszeit vor Beginn des Workflows',
         posteditingTimeEndLabel: '#UT#Ø Nachbearbeitungszeit nach Ende des Workflows',
         levenshteinDistanceLabel: '#UT#Ø Levenshtein-Abstand innerhalb eines Workflowschritts',
         levenshteinDistanceStartLabel: '#UT#Ø Levenshtein-Distanz vor Beginn des Workflows',
         levenshteinDistanceEndLabel: '#UT#Ø Levenshtein-Distanz nach Ende des Workflows',
-        levenshteinDistanceOriginalLabel: '#UT#Ø Levenshtein-Abstand ab Beginn des Workflows',
+        levenshteinDistanceOriginalLabel: '#UT#Ø Levenshtein distance from import/pre-translation',
         noFinishDueDraftSegments: '#UT#Die Aufgabe enthält noch Segmente im Entwurfsstatus. Öffnen Sie die Aufgabe und setzen Sie den Status um.'
     },
     listeners: {

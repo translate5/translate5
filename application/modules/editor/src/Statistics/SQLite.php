@@ -143,12 +143,46 @@ class SQLite extends AbstractStatisticsDB
         }
     }
 
+    public function upsertIncrementDuration(
+        string $table,
+        string $taskGuid,
+        int $segmentId,
+        string $workflowStepName,
+        string $userGuid,
+        int $duration,
+    ): void {
+        if ($duration === 0) {
+            return;
+        }
+
+        $this->query(
+            'INSERT INTO ' . $table .
+            ' (taskGuid,segmentId,userGuid,workflowStepName,duration) VALUES ' .
+            '(:taskGuid,:segmentId,:userGuid,:workflowStepName,:duration) ' .
+            'ON CONFLICT(taskGuid,segmentId,workflowStepName,userGuid) DO UPDATE ' .
+            'SET duration = duration + excluded.duration',
+            [
+                'taskGuid' => $taskGuid,
+                'segmentId' => $segmentId,
+                'userGuid' => $userGuid,
+                'workflowStepName' => $workflowStepName,
+                'duration' => $duration,
+            ]
+        );
+    }
+
     public function query(string $sql, array $bind = []): void
     {
         $result = $this->execute($sql, $bind);
         if ($result === false) {
             $this->logLastError();
         }
+    }
+
+    public function insertSelectIgnore(string $table, array $columns, string $selectSql, array $bind = []): void
+    {
+        $sql = 'INSERT OR IGNORE INTO ' . $table . ' (' . implode(',', $columns) . ') ' . $selectSql;
+        $this->query($sql, $bind);
     }
 
     public function optimize(string $table, bool $compact = false): void

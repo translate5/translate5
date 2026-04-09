@@ -105,6 +105,8 @@ class KpiTest extends ImportTestAbstract
      */
     private const workflowStepName = 'reviewing';
 
+    private const canonicalWorkflowStepName = 'default#reviewing';
+
     protected static function setupImport(Config $config): void
     {
         // If any task exists already, filtering will be wrong!
@@ -190,7 +192,11 @@ class KpiTest extends ImportTestAbstract
     {
         // Does the number of found tasks match the number of tasks we created?
         $filteredTasks = static::getFilteredTasks();
-        $this->assertEquals(count(static::$tasksForKPI), count($filteredTasks));
+        $this->assertEquals(
+            count(static::$tasksForKPI),
+            count($filteredTasks),
+            'Filtered task count mismatch for KPI task base filter.'
+        );
 
         $result = static::api()->postJson('editor/task/kpi', [
             'filter' => static::renderTaskGridFilter(),
@@ -201,30 +207,54 @@ class KpiTest extends ImportTestAbstract
         $result->{self::KPI_REVIEWER} = self::stripDaysText($result->{self::KPI_REVIEWER});
 
         //test only for reviewer (for all other roles will be the same)
-        $this->assertEquals($result->{self::KPI_REVIEWER}, $statistics[self::KPI_REVIEWER]);
-        $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
+        $this->assertEquals(
+            $result->{self::KPI_REVIEWER},
+            $statistics[self::KPI_REVIEWER],
+            'Reviewer average processing time KPI mismatch for unfiltered KPI request.'
+        );
+        $this->assertEquals(
+            $result->excelExportUsage,
+            $statistics['excelExportUsage'],
+            'Excel export usage KPI mismatch for unfiltered KPI request.'
+        );
 
         $result = static::api()->postJson('editor/task/kpi', [
             'filter' => self::renderTaskGridFilter('{"operator":"in","value":["reviewer"],"property":"workflowUserRole"}'),
         ], null, false);
         $result->{self::KPI_REVIEWER} = self::stripDaysText($result->{self::KPI_REVIEWER});
         // the same result when filtered by reviewer role/stepType
-        $this->assertEquals($statistics[self::KPI_REVIEWER], $result->{self::KPI_REVIEWER});
+        $this->assertEquals(
+            $statistics[self::KPI_REVIEWER],
+            $result->{self::KPI_REVIEWER},
+            'Reviewer average processing time should stay identical when filtered by reviewer workflowUserRole.'
+        );
 
         $result = static::api()->postJson('editor/task/kpi', [
             'filter' => self::renderTaskGridFilter('{"operator":"in","value":["translator"],"property":"workflowUserRole"}'),
         ], null, false);
         $result->{self::KPI_REVIEWER} = self::stripDaysText($result->{self::KPI_REVIEWER});
         // '-' result when filtered out by another role/stepType (e.g. translator)
-        $this->assertEquals('-', $result->{self::KPI_REVIEWER});
+        $this->assertEquals(
+            '-',
+            $result->{self::KPI_REVIEWER},
+            'Reviewer average processing time should be "-" when filtering by translator workflowUserRole.'
+        );
 
         $result = static::api()->postJson('editor/task/kpi', [
-            'filter' => self::renderTaskGridFilter('{"operator":"in","value":["' . self::workflowStepName . '"],"property":"workflowStep"}'),
+            'filter' => self::renderTaskGridFilter('{"operator":"in","value":["' . self::canonicalWorkflowStepName . '"],"property":"workflowStep"}'),
         ], null, false);
-        $result->{self::workflowStepName} = self::stripDaysText($result->{self::workflowStepName});
+        $result->{self::canonicalWorkflowStepName} = self::stripDaysText($result->{self::canonicalWorkflowStepName});
         // the same result when filtering by reviewing step
-        $this->assertEquals($statistics[self::KPI_REVIEWER], $result->{self::workflowStepName});
-        $this->assertEquals(self::workflowStepName, $result->byWorkflowSteps);
+        $this->assertEquals(
+            $statistics[self::KPI_REVIEWER],
+            $result->{self::canonicalWorkflowStepName},
+            'Reviewer average processing time should match when filtered by canonical reviewing workflowStep.'
+        );
+        $this->assertEquals(
+            self::canonicalWorkflowStepName,
+            $result->byWorkflowSteps,
+            'KPI response should report the selected canonical workflow step in byWorkflowSteps.'
+        );
     }
 
     private static function stripDaysText(string $s): string

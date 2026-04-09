@@ -36,6 +36,7 @@ use MittagQI\Translate5\JobAssignment\Workflow\CompetitiveJobsRemover;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
 use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
@@ -387,8 +388,10 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 
     /**
      * If no parameter edit100PercentMatch is given, defaults to true
-     * @throws ReflectionException
-     * @throws editor_Task_Operation_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_Segment_Exception
      */
     public function changeEdit100PercentMatch(): void
@@ -400,6 +403,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
             new editor_Models_Segment_InternalTag(),
             new editor_Models_Segment_Meta(),
             new editor_Models_TaskProgress(),
+            UpdateSegmentService::create(),
         );
         $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
             $this->config->task,

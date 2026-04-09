@@ -34,6 +34,7 @@ use editor_Models_Db_Customer;
 use editor_Models_Db_TaskUserAssoc;
 use editor_Models_Filter_TaskSpecific;
 use editor_Models_Task as Task;
+use Zend_Db_Table_Exception;
 use ZfExtended_Models_Filter_Join as Join;
 
 class TaskQueryFilterAndSort
@@ -47,6 +48,8 @@ class TaskQueryFilterAndSort
             'workflowState' => [
                 'list' => new Join(editor_Models_Db_TaskUserAssoc::TABLE_NAME, 'state', 'taskGuid', 'taskGuid'),
             ],
+            //workflow step from advanced filters to filter tasks by jobs in that step!
+            // Not to be confused with the one from the grid to filter tasks by its current step
             'workflowStep' => [
                 'list' => new Join(
                     editor_Models_Db_TaskUserAssoc::TABLE_NAME,
@@ -121,6 +124,9 @@ class TaskQueryFilterAndSort
         return $sortColMap;
     }
 
+    /**
+     * @throws Zend_Db_Table_Exception
+     */
     public function getTaskFilter(string $jsonFilter, ?Task $task = null): editor_Models_Filter_TaskSpecific
     {
         $task = $task ?: new Task();

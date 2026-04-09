@@ -54,7 +54,23 @@ abstract class AbstractStatisticsDB
 
     abstract public function upsert(string $table, array $values, array $columns): void;
 
+    abstract public function upsertIncrementDuration(
+        string $table,
+        string $taskGuid,
+        int $segmentId,
+        string $workflowStepName,
+        string $userGuid,
+        int $duration,
+    ): void;
+
     abstract public function query(string $sql, array $bind = []): void;
+
+    /**
+     * Inserts rows selected by a query and ignores unique-key duplicates in a DB-specific way.
+     *
+     * @param list<string> $columns
+     */
+    abstract public function insertSelectIgnore(string $table, array $columns, string $selectSql, array $bind = []): void;
 
     /**
      * Recommended to run after performing large updates (inserts and/or deletes)

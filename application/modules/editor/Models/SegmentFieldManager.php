@@ -101,7 +101,7 @@ class editor_Models_SegmentFieldManager
     public static function getForTaskGuid($taskGuid)
     {
         if (empty(self::$instances[$taskGuid])) {
-            $sfm = ZfExtended_Factory::get(__CLASS__);
+            $sfm = ZfExtended_Factory::get(self::class);
             $sfm->initFields($taskGuid);
             self::$instances[$taskGuid] = $sfm;
         }

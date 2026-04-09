@@ -36,8 +36,6 @@ use MittagQI\Translate5\CrossSynchronization\Events\EventListener as CrossSyncEv
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
-use MittagQI\Translate5\Statistics\Helpers\SyncEditable;
-use MittagQI\Translate5\Statistics\Helpers\UnmodifiedSegmentsEventHandler;
 use MittagQI\Translate5\T5Memory\T5MemoryLanguageResourceSpecificDataSnapshot;
 use MittagQI\Translate5\Task\Deadline\TaskDeadlineEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
@@ -93,7 +91,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach(editor_SessionController::class, 'afterDeleteAction', $cleanUp);
         $eventManager->attach(ZfExtended_Session::class, 'afterSessionCleanForUser', $cleanUp);
         $eventManager->attach(ZfExtended_Debug::class, 'applicationState', [$this, 'handleApplicationState']);
-        $eventManager->attach(CronEventTrigger::class, CronEventTrigger::PERIODICAL, [SyncEditable::class, 'sync']);
 
         // Binding the quality Worker queuing to the "afterDirectoryParsing" event of the filetree worker.
         // some qualities have workers that depend on the imported files (e.g. TBX import).
@@ -155,9 +152,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 
         \Zend_Registry::set('statistics', \MittagQI\Translate5\Statistics\Factory::createDb());
         // $db = \Zend_Registry::get('statistics'); // keep to find in IDE
-
-        $unmodifiedSegmentsEventHandler = new UnmodifiedSegmentsEventHandler($eventManager);
-        $unmodifiedSegmentsEventHandler->register();
 
         \MittagQI\Translate5\LanguageResource\TaskTm\EventListener::create($eventManager)->atachAll();
 

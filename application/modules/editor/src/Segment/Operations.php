@@ -29,56 +29,64 @@
 namespace MittagQI\Translate5\Segment;
 
 use editor_ModelInstances;
-use editor_Models_Segment;
+use editor_Models_Segment as Segment;
 use editor_Models_Segment_AutoStates;
 use editor_Models_Segment_Exception;
 use editor_Models_SegmentUserAssoc;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
+use ReflectionException;
 use Zend_Db_Statement_Exception;
+use Zend_Exception;
 use ZfExtended_Authentication;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_ValidateException;
 
 /**
  * Controller Helper for segment controller (batch) operations, like bookmarking, lock and unlock segments
  */
-class Operations
+readonly class Operations
 {
-    private string $taskGuid;
-
-    private editor_Models_Segment $initialSegment;
+    public function __construct(
+        private UpdateSegmentService $updateSegmentStatisticsService,
+    ) {
+    }
 
     /**
-     * @param editor_Models_Segment $initialSegment the initial segment instance from the controller with the prepared filters
+     * @throws Zend_Exception
      */
-    public function __construct(string $taskGuid, editor_Models_Segment $initialSegment)
+    public static function create(): self
     {
-        $this->taskGuid = $taskGuid;
-        $this->initialSegment = $initialSegment;
+        return new self(UpdateSegmentService::create());
     }
 
     /**
      * sets the segment lock, checks if possible, sets history and so on accordingly
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_Segment_Exception
      */
-    public function toggleLockOperation(bool $lock)
+    public function toggleLockOperation(string $taskGuid, Segment $segment, bool $lock): void
     {
-        $this->_toggleLockOperation($this->initialSegment, $lock);
+        $this->internalToggleLockOperation($taskGuid, $segment, $lock);
     }
 
     /**
      * @throws editor_Models_Segment_Exception
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function _toggleLockOperation(editor_Models_Segment $segment, bool $lock)
+    protected function internalToggleLockOperation(string $taskGuid, Segment $segment, bool $lock): void
     {
         $history = $segment->getNewHistoryEntity();
-        $task = editor_ModelInstances::taskByGuid($segment->getTaskGuid());
+        $task = editor_ModelInstances::taskByGuid($taskGuid);
 
         /* @var editor_Models_Segment_AutoStates $autoState */
-        $autoState = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        $autoState = ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class);
 
         //if a segment is locked and lockLocked is set, the editable flag may not be changed
-        $isBlocked = $autoState->isBlocked($segment->getAutoStateId());
+        $isBlocked = $autoState->isBlocked((int) $segment->getAutoStateId());
         $isLockLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
         $isAlreadyOnValue = $lock === ! $segment->getEditable();
         // same if the value is already as expected
@@ -88,7 +96,8 @@ class Operations
         $segment->setEditable(! $lock);
 
         if ($lock) {
-            //since we check for the BLOCKED state above, we can savely set the new autoStateId to LOCKED here (BLOCKED is immutable!)
+            //since we check for the BLOCKED state above, we can savely set the
+            // new autoStateId to LOCKED here (BLOCKED is immutable!)
             $autoStateId = $autoState::LOCKED;
         } else {
             $autoStateId = $autoState->recalculateUnLockedState($segment);
@@ -98,16 +107,20 @@ class Operations
 
         $history->save();
         $segment->save();
+
+        $this->updateSegmentStatisticsService->updateEditable($task, $segment);
     }
 
     /**
      * Toggles segment lock on the filtered segment operator
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function toggleLockBatch(bool $lock)
+    public function toggleLockBatch(string $taskGuid, Segment $segment, bool $lock): void
     {
-        $this->iterateOverFilteredList(function (editor_Models_Segment $segment) use ($lock) {
+        $this->iterateOverFilteredList($taskGuid, $segment, function (Segment $segment) use ($lock, $taskGuid) {
             try {
-                $this->_toggleLockOperation($segment, $lock);
+                $this->internalToggleLockOperation($taskGuid, $segment, $lock);
             } catch (editor_Models_Segment_Exception) {
                 // we just ignore that exception on batch processing
             }
@@ -118,13 +131,13 @@ class Operations
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_ValidateException
+     * @throws ReflectionException
      */
-    public function toggleBookmarkBatch(bool $bookmark)
+    public function toggleBookmarkBatch(string $taskGuid, Segment $segment, bool $bookmark): void
     {
-        /* @var editor_Models_SegmentUserAssoc $assoc */
-        $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
+        $assoc = ZfExtended_Factory::get(editor_Models_SegmentUserAssoc::class);
 
-        $this->iterateOverFilteredList(callback: function (editor_Models_Segment $segment) use ($assoc, $bookmark) {
+        $this->iterateOverFilteredList($taskGuid, $segment, function (Segment $segment) use ($assoc, $bookmark) {
             $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
             if ($bookmark) {
                 $assoc->createAndSave($segment->getTaskGuid(), (int) $segment->getId(), $userGuid);
@@ -136,16 +149,17 @@ class Operations
 
     /**
      * calls the callback per each segment in the filtered iterator (applying the filters from outside)
+     * @throws ReflectionException
      */
-    protected function iterateOverFilteredList(callable $callback)
+    protected function iterateOverFilteredList(string $taskGuid, Segment $segment, callable $callback): void
     {
         /* @var FilteredIterator $segments */
-        $segments = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\FilteredIterator', [
-            $this->taskGuid, // implies the validTaskAccess check by loading only such segments
-            $this->initialSegment,
+        $segments = ZfExtended_Factory::get(FilteredIterator::class, [
+            $taskGuid, // implies the validTaskAccess check by loading only such segments
+            $segment,
         ]);
-        foreach ($segments as $segment) {
-            $callback($segment);
+        foreach ($segments as $oneSegment) {
+            $callback($oneSegment);
         }
     }
 }

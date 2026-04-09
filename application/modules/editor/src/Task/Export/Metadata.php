@@ -113,9 +113,9 @@ class Metadata
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_PREVIOUS] =
             $this->translate->_('Ø Levenshtein-Abstand innerhalb eines Workflowschritts');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_TOTAL] =
-            $this->translate->_('Ø Nachbearbeitungszeit ab Beginn des Workflows');
+            $this->translate->_('Ø Post-editing time since import/pre-translation');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_ORIGINAL] =
-            $this->translate->_('Ø Levenshtein-Abstand ab Beginn des Workflows');
+            $this->translate->_('Ø Levenshtein distance from import/pre-translation');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_LEVENSHTEIN_END] =
             $this->translate->_('Ø Levenshtein-Distanz nach Ende des Workflows');
         $this->kpiTypeLocales[editor_Models_KPI::KPI_DURATION_END] =

@@ -28,8 +28,8 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -249,7 +249,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
 
         $aggregate = SegmentHistoryAggregation::create();
-        $aggregateRepository = SegmentHistoryAggregationRepository::create();
+        $aggregateRepository = SegmentStatisticsRepository::create();
 
         $orphanedTaskIds = $aggregateRepository->getOrphanedTaskIds(array_column($allTasks, 'taskGuid'));
 

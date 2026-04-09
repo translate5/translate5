@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment;
 
-use editor_Models_Segment_MatchRateType;
-use editor_Workflow_Default;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
+use MittagQI\Translate5\Statistics\Dto\StatisticSegmentDTO;
 use Throwable;
+use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Logger;
 
@@ -42,10 +42,32 @@ use ZfExtended_Logger;
  */
 class SegmentHistoryAggregation
 {
-    public const TABLE_NAME = 'LEK_segment_history_aggregation';
+    private const string INITIAL_WORKFLOW_STEP = '_initial';
 
-    public const TABLE_NAME_LEV = 'LEK_segment_history_aggregation_lev';
+    public const string TABLE_NAME_POSTEDITING = 'LEK_statistics_postediting_aggregation';
 
+    public const string TABLE_NAME_STATISTICS = 'LEK_statistics_segment_aggregation';
+
+    private const array CLONE_SYNTHETIC_STEP_COLUMNS = [
+        'taskGuid',
+        'userGuid',
+        'workflowName',
+        'workflowStepName',
+        'segmentId',
+        'levenshteinOriginal',
+        'levenshteinPrevious',
+        'matchRate',
+        'langResType',
+        'langResId',
+        'editable',
+        'latestEntry',
+        'qualityScore',
+        'segmentlengthPrevious',
+    ];
+
+    /**
+     * @var StatisticSegmentDTO[]
+     */
     private array $buffer = [];
 
     public function __construct(
@@ -54,6 +76,9 @@ class SegmentHistoryAggregation
     ) {
     }
 
+    /**
+     * @throws Zend_Exception
+     */
     public static function create(): self
     {
         return new self(
@@ -62,40 +87,10 @@ class SegmentHistoryAggregation
         );
     }
 
-    public function upsertBuffered(
-        string $taskGuid,
-        string $userGuid,
-        string $wfName,
-        string $wfStepName,
-        int $segmentId,
-        int $duration,
-        int $levenshteinOriginal,
-        int $levenshteinPrevious,
-        int $matchRate,
-        string $matchRateType,
-        int $langResId,
-        int $isEditable,
-        ?int $qualityScore = null,
-    ): void {
+    public function upsertBuffered(StatisticSegmentDTO $statisticSegmentDTO): void
+    {
         // trim brackets
-        $taskGuid = trim($taskGuid, '{}');
-        $userGuid = trim($userGuid, '{}');
-
-        $this->buffer[] = [
-            $taskGuid,
-            $userGuid,
-            $wfName,
-            $wfStepName,
-            $segmentId,
-            $duration,
-            $levenshteinOriginal,
-            $levenshteinPrevious,
-            $matchRate,
-            editor_Models_Segment_MatchRateType::getLangResourceType($matchRateType),
-            $langResId,
-            $isEditable,
-            $qualityScore,
-        ];
+        $this->buffer[] = $statisticSegmentDTO;
     }
 
     public function flushUpserts(): bool
@@ -107,88 +102,13 @@ class SegmentHistoryAggregation
         try {
             $buffer = [];
             foreach ($this->buffer as $row) {
-                if ($row[5] === 0) { // duration is 0
-                    continue;
-                }
-                array_splice($row, 6, 2);
-                $buffer[] = $row;
+                $buffer[] = $row->toStatisticArray();
             }
 
             $this->client->upsert(
-                self::TABLE_NAME,
+                self::TABLE_NAME_STATISTICS,
                 $buffer,
-                [
-                    'taskGuid',
-                    'userGuid',
-                    'workflowName',
-                    'workflowStepName',
-                    'segmentId',
-                    'duration',
-                    //'levenshteinOriginal',
-                    //'levenshteinPrevious',
-                    'matchRate',
-                    'langResType',
-                    'langResId',
-                    'editable',
-                    'qualityScore',
-                ]
-            );
-
-            $notInWorkflow = [
-                editor_Workflow_Default::STEP_NO_WORKFLOW => 1,
-                editor_Workflow_Default::STEP_WORKFLOW_ENDED => 1,
-            ];
-            $buffer = $segmentIds = $lastEdit = [];
-            $lastEditIdx = count($this->buffer[0]) - 1;
-            foreach ($this->buffer as $idx => $row) {
-                $segmentId = (int) $row[4];
-                $stepWithinWorkflow = ! isset($notInWorkflow[$row[3]]);
-                if ($stepWithinWorkflow) {
-                    if (isset($lastEdit[$segmentId])) {
-                        // set lastEdit=0
-                        $prevIdx = $lastEdit[$segmentId];
-                        $buffer[$prevIdx][$lastEditIdx] = 0;
-                    }
-                    $lastEdit[$segmentId] = $idx;
-                    $segmentIds[] = $segmentId;
-                }
-                array_splice($row, 5, 1);
-                $row[] = $stepWithinWorkflow ? 1 : 0; // add lastEdit=1 if within workflow
-                $buffer[] = $row;
-            }
-
-            if (! empty($segmentIds)) {
-                // reset prev. lastEdit flags
-                // we update segments per one task in batch import, so this is perfect for now
-                $this->client->query(
-                    'UPDATE ' . self::TABLE_NAME_LEV . ' SET lastEdit=0 WHERE taskGuid=:taskGuid' .
-                    ' AND segmentId IN (:segmentIds)',
-                    [
-                        'taskGuid' => $this->buffer[0][0],
-                        'segmentIds' => $segmentIds,
-                    ]
-                );
-            }
-
-            $this->client->upsert(
-                self::TABLE_NAME_LEV,
-                $buffer,
-                [
-                    'taskGuid',
-                    'userGuid',
-                    'workflowName',
-                    'workflowStepName',
-                    'segmentId',
-                    //'duration',
-                    'levenshteinOriginal',
-                    'levenshteinPrevious',
-                    'matchRate',
-                    'langResType',
-                    'langResId',
-                    'editable',
-                    'qualityScore',
-                    'lastEdit',
-                ]
+                array_keys(reset($buffer))
             );
         } catch (Throwable $e) {
             $this->buffer = [];
@@ -202,36 +122,9 @@ class SegmentHistoryAggregation
         return true;
     }
 
-    public function upsert(
-        string $taskGuid,
-        string $userGuid,
-        string $wfName,
-        string $wfStepName,
-        int $segmentId,
-        int $duration,
-        int $levenshteinOriginal,
-        int $levenshteinPrevious,
-        int $matchRate,
-        string $matchRateType,
-        int $langResId,
-        int $isEditable,
-        ?int $qualityScore = null,
-    ): bool {
-        $this->upsertBuffered(
-            $taskGuid,
-            $userGuid,
-            $wfName,
-            $wfStepName,
-            $segmentId,
-            $duration,
-            $levenshteinOriginal,
-            $levenshteinPrevious,
-            $matchRate,
-            $matchRateType,
-            $langResId,
-            $isEditable,
-            $qualityScore
-        );
+    public function upsert(StatisticSegmentDTO $statisticSegmentDTO): bool
+    {
+        $this->upsertBuffered($statisticSegmentDTO);
 
         return $this->flushUpserts();
     }
@@ -239,44 +132,38 @@ class SegmentHistoryAggregation
     /**
      * Update single segment tqe value. This can happen when single segment TQE evaluation is triggered.
      */
-    public function updateQualityScore(string $taskGuid, int $segmentId, ?int $qualityScore): void
-    {
+    public function updateQualityScore(
+        string $taskGuid,
+        int $segmentId,
+        string $editedInStep,
+        ?int $qualityScore,
+    ): void {
         $bind = [
             'taskGuid' => trim($taskGuid, '{}'),
+            'segmentId' => $segmentId,
+            'editedInStep' => $editedInStep,
+            'editedInStepPriority' => $editedInStep,
+            'initialStep' => self::INITIAL_WORKFLOW_STEP,
         ];
-        $value = $qualityScore === null ? 'NULL' : (int) $qualityScore;
+        $value = $qualityScore === null ? 'NULL' : $qualityScore;
 
         try {
-            $this->client->query(
-                'UPDATE ' . self::TABLE_NAME . ' SET qualityScore=' . $value .
-                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
+            $toUpdate = $this->client->oneAssoc(
+                'SELECT workflowStepName FROM ' . self::TABLE_NAME_STATISTICS .
+                ' WHERE taskGuid = :taskGuid AND segmentId = :segmentId
+                AND workflowStepName IN (:editedInStep, :initialStep)
+                ORDER BY CASE WHEN workflowStepName = :editedInStepPriority THEN 0 ELSE 1 END LIMIT 1',
                 $bind
             );
-            $this->client->query(
-                'UPDATE ' . self::TABLE_NAME_LEV . ' SET qualityScore=' . $value .
-                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
-                $bind
-            );
-        } catch (Throwable $e) {
-            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
-        }
-    }
 
-    public function updateEditable(string $taskGuid, int $segmentId, int $editable): void
-    {
-        $bind = [
-            'taskGuid' => trim($taskGuid, '{}'),
-        ];
+            if (empty($toUpdate)) {
+                return;
+            }
 
-        try {
+            $bind['workflowStepName'] = (string) $toUpdate['workflowStepName'];
             $this->client->query(
-                'UPDATE ' . self::TABLE_NAME . ' SET editable=' . $editable .
-                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
-                $bind
-            );
-            $this->client->query(
-                'UPDATE ' . self::TABLE_NAME_LEV . ' SET editable=' . $editable .
-                ' WHERE taskGuid = :taskGuid AND segmentId=' . $segmentId,
+                'UPDATE ' . self::TABLE_NAME_STATISTICS . ' SET qualityScore=' . $value .
+                ' WHERE taskGuid = :taskGuid AND segmentId = :segmentId AND workflowStepName = :workflowStepName',
                 $bind
             );
         } catch (Throwable $e) {
@@ -292,11 +179,11 @@ class SegmentHistoryAggregation
 
         try {
             $this->client->query(
-                'DELETE FROM ' . self::TABLE_NAME . ' WHERE taskGuid = :taskGuid',
+                'DELETE FROM ' . self::TABLE_NAME_POSTEDITING . ' WHERE taskGuid = :taskGuid',
                 $bind
             );
             $this->client->query(
-                'DELETE FROM ' . self::TABLE_NAME_LEV . ' WHERE taskGuid = :taskGuid',
+                'DELETE FROM ' . self::TABLE_NAME_STATISTICS . ' WHERE taskGuid = :taskGuid',
                 $bind
             );
         } catch (Throwable $e) {
@@ -309,5 +196,256 @@ class SegmentHistoryAggregation
         $this->logger->error('E1633', 'Statistics DB error: {msg}', [
             'msg' => $errMsg,
         ]);
+    }
+
+    /**
+     * @param array<int, array{
+     *   taskGuid: string,
+     *   segmentId: int,
+     *   userGuid: string,
+     *   wfStepName: string,
+     *   duration: int
+     * }> $data
+     */
+    public function flushPosteditingTimes(array $data): void
+    {
+        if (empty($data)) {
+            return;
+        }
+
+        try {
+            $this->flushPosteditingData($data);
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    public function increaseOrInsertPosteditingDuration(
+        string $taskGuid,
+        int $segmentId,
+        string $workflowStepName,
+        string $userGuid,
+        int $duration,
+    ): void {
+        if ($duration === 0 || $this->client === null) {
+            return;
+        }
+
+        try {
+            $this->client->upsertIncrementDuration(
+                self::TABLE_NAME_POSTEDITING,
+                trim($taskGuid, '{}'),
+                $segmentId,
+                $workflowStepName,
+                trim($userGuid, '{}'),
+                $duration
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    public function updateOrInsertEditable(StatisticSegmentDTO $statisticSegmentDTO): void
+    {
+        if ($this->client === null) {
+            return;
+        }
+
+        $bind = [
+            'taskGuid' => $statisticSegmentDTO->taskGuid,
+            'segmentId' => $statisticSegmentDTO->segmentId,
+            'workflowStepName' => $statisticSegmentDTO->wfStepName,
+        ];
+
+        try {
+            //reset all and make the changed one the latest below
+            $this->resetLastEdit($statisticSegmentDTO->taskGuid, $statisticSegmentDTO->segmentId);
+
+            $existing = $this->client->oneAssoc(
+                'SELECT segmentId FROM ' . self::TABLE_NAME_STATISTICS .
+                ' WHERE taskGuid = :taskGuid AND segmentId = :segmentId
+                AND workflowStepName = :workflowStepName LIMIT 1',
+                $bind
+            );
+
+            if (! empty($existing)) {
+                $this->client->query(
+                    'UPDATE ' . self::TABLE_NAME_STATISTICS .
+                    ' SET editable = :editable, latestEntry = 1' .
+                    ' WHERE taskGuid = :taskGuid AND segmentId = :segmentId AND workflowStepName = :workflowStepName',
+                    array_merge($bind, [
+                        'editable' => $statisticSegmentDTO->isEditable,
+                    ])
+                );
+
+                return;
+            }
+
+            $row = $statisticSegmentDTO->toStatisticArray();
+            $row['latestEntry'] = 1;
+            $this->client->upsert(
+                self::TABLE_NAME_STATISTICS,
+                [array_values($row)],
+                array_keys($row)
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    public function resetLastEdit(string $taskGuid, ?int $segmentId = null): void
+    {
+        if ($this->client === null) {
+            return;
+        }
+
+        try {
+            $bind = [
+                'taskGuid' => trim($taskGuid, '{}'),
+            ];
+            $sql = 'UPDATE ' . self::TABLE_NAME_STATISTICS . ' SET latestEntry = 0 WHERE taskGuid = :taskGuid';
+            if ($segmentId !== null) {
+                $sql .= ' AND segmentId = :segmentId';
+                $bind['segmentId'] = $segmentId;
+            }
+            $this->client->query($sql, $bind);
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    private function getCloneSelectSql(): string
+    {
+        //see self::CLONE_SYNTHETIC_STEP_COLUMNS for column order!
+        return 'SELECT
+                    src.taskGuid,
+                    src.userGuid,
+                    :workflowName,
+                    :workflowStepName,
+                    src.segmentId,
+                    src.levenshteinOriginal,
+                    0, -- levenshteinPrevious
+                    src.matchRate,
+                    src.langResType,
+                    src.langResId,
+                    src.editable,
+                    0, -- latestEntry
+                    src.qualityScore,
+                    src.segmentlengthPrevious
+                FROM ' . self::TABLE_NAME_STATISTICS . ' src
+                WHERE src.taskGuid = :taskGuid';
+    }
+
+    public function cloneSyntheticEntriesOnAggregation(
+        string $taskGuid,
+        string $workflowName,
+        string $workflowStepName,
+        string $previousWorkflowStepName,
+    ): void {
+        if ($this->client === null) {
+            return;
+        }
+
+        $bind = [
+            'taskGuid' => trim($taskGuid, '{}'),
+            'workflowName' => $workflowName,
+            'workflowStepName' => $workflowStepName,
+            'previousStep' => $previousWorkflowStepName,
+        ];
+
+        try {
+            // clone previous step rows and ignore duplicate unique-key conflicts for rows created by history entries
+            // latest entries are always the ones which exist already out of segment data and history
+            $this->client->insertSelectIgnore(
+                self::TABLE_NAME_STATISTICS,
+                self::CLONE_SYNTHETIC_STEP_COLUMNS,
+                $this->getCloneSelectSql() . ' AND src.workflowStepName = :previousStep',
+                $bind
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    public function cloneSyntheticEntriesForWorkflowStep(
+        string $taskGuid,
+        string $workflowName,
+        string $workflowStepName,
+    ): void {
+        if ($this->client === null) {
+            return;
+        }
+
+        $bind = [
+            'taskGuid' => trim($taskGuid, '{}'),
+            'workflowName' => $workflowName,
+            'workflowStepName' => $workflowStepName,
+            'initialStep' => self::INITIAL_WORKFLOW_STEP,
+        ];
+
+        try {
+            // Two-phase clone strategy for new workflow step reached:
+            // 1) clone latestEntry=1 rows first
+            // 2) clone _initial fallback rows and ignore duplicate unique-key conflicts
+            $this->client->insertSelectIgnore(
+                self::TABLE_NAME_STATISTICS,
+                self::CLONE_SYNTHETIC_STEP_COLUMNS,
+                $this->getCloneSelectSql() . ' AND src.latestEntry = 1',
+                $bind
+            );
+
+            $this->client->insertSelectIgnore(
+                self::TABLE_NAME_STATISTICS,
+                self::CLONE_SYNTHETIC_STEP_COLUMNS,
+                $this->getCloneSelectSql() . ' AND src.workflowStepName = :initialStep AND src.latestEntry = 0',
+                $bind
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    /**
+     * @param array<int, array{
+     *   taskGuid: string,
+     *   segmentId: int,
+     *   userGuid: string,
+     *   wfStepName: string,
+     *   duration: int
+     * }> $toProcess
+     */
+    private function flushPosteditingData(array $toProcess): void
+    {
+        $buffer = [];
+
+        foreach ($toProcess as $row) {
+            //for postediting time we can skip entries with no time/duration
+            if ((int) $row['duration'] === 0) {
+                continue;
+            }
+            $buffer[] = [
+                trim($row['taskGuid'], '{}'),
+                (int) $row['segmentId'],
+                trim($row['userGuid'], '{}'),
+                $row['wfStepName'],
+                (int) $row['duration'],
+            ];
+        }
+
+        if (empty($buffer)) {
+            return;
+        }
+
+        $this->client->upsert(
+            self::TABLE_NAME_POSTEDITING,
+            $buffer,
+            [
+                'taskGuid',
+                'segmentId',
+                'userGuid',
+                'workflowStepName',
+                'duration',
+            ]
+        );
     }
 }

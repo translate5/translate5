@@ -61,7 +61,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getMatchRateType()
  * @method string|null getStateId()
  * @method void setStateId(int|null $id)
- * @method int getAutoStateId()
+ * @method string getAutoStateId()
  * @method void setAutoStateId(int $id)
  * @method string getFileOrder()
  * @method void setFileOrder(int $order)
@@ -834,8 +834,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $fields[] = 'targetMd5';
         $fields[] = 'target';
         //TRANSLATE-3535
-        $fields[] = 'levenshteinOriginal';
-        $fields[] = 'levenshteinPrevious';
         $fields[] = 'editedInStep';
         $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
 

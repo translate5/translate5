@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Workflow\StepRecalculation;
+
 /**
  * Handler methods for task hookins
  */
@@ -48,6 +50,15 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
     public const HANDLE_JOB_DELETE = 'handleUserAssociationDeleted';
 
     public const HANDLE_JOB_EDITED = 'handleUserAssociationEdited';
+
+    private readonly StepRecalculation $stepRecalculation;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->stepRecalculation = StepRecalculation::create();
+    }
 
     /**
      * @see editor_Workflow_Default_AbstractHandler::execute()
@@ -104,7 +115,10 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         //finally set the trigger to edited and call the job changed handler
         $actionConfig->trigger = self::HANDLE_JOB_EDITED;
         $this->handleUserAssociationChanged();
-        $actionConfig->workflow->getStepRecalculation()->recalculateWorkflowStep($actionConfig->newTua->getTaskGuid());
+        $this->stepRecalculation->recalculateWorkflowStep(
+            $actionConfig->workflow,
+            $actionConfig->newTua->getTaskGuid()
+        );
 
         return $actionConfig->trigger;
     }

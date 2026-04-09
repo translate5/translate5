@@ -53,7 +53,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
-use editor_Models_SegmentField;
 use editor_Models_SegmentHistoryData;
 
 class SegmentHistoryDataRepository
@@ -112,16 +111,5 @@ class SegmentHistoryDataRepository
         $row = $this->db->fetchRow($s);
 
         return $row !== null ? $row->toArray() : [];
-    }
-
-    public function getDurationSumByHistoryIds(array $ids, string $name = editor_Models_SegmentField::TYPE_TARGET): int
-    {
-        if (empty($ids)) {
-            return 0;
-        }
-        $s = $this->db->select()->where('segmentHistoryId IN (' . implode(',', array_map('intval', $ids)) . ') AND name = ?', $name);
-        $s = $s->from($s->getTable(), ['SUM(duration) AS total']);
-
-        return (int) $this->db->fetchRow($s)->toArray()['total'];
     }
 }

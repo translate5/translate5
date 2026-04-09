@@ -112,7 +112,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
         $analysisId = $analysisAssoc->save();
 
-        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId]);
+        $this->analysis = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Analysis::class, [
+            $this->task,
+            (int) $analysisId,
+        ]);
 
         $this->analysis->setPretranslate($params['pretranslate']);
         $this->analysis->setInternalFuzzy($params['internalFuzzy']);

@@ -74,6 +74,7 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
     /**
      * @throws InvalidInputForLevenshtein
      * @throws \Zend_Exception
+     * @throws \Throwable
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -119,20 +120,22 @@ class StatisticsLevenshteinCommand extends Translate5AbstractCommand
             }
             $created = $this->io->askQuestion($question);
         }
-        $sqlSince = ($created != $createdEarliest) ? ' AND `created`>"' . $created . ' 00:00:00"' : '';
+        $sqlSince = ($created != $createdEarliest) ? ' AND `modified`>"' . $created . ' 00:00:00"' : '';
 
         $this->io->writeln("Processing tasks..\n");
 
-        $allTasks = $this->db->fetchPairs(
-            'SELECT taskGuid,workflow FROM LEK_task WHERE ' .
+        $allTasks = $this->db->fetchCol(
+            'SELECT taskGuid FROM LEK_task WHERE ' .
             ($taskId ? 'id=' . $taskId : 'taskType IN ("' .
-                implode('","', editor_Task_Type::getInstance()->getTaskTypes()) . '") ORDER BY id')
+                implode('","', editor_Task_Type::getInstance()->getTaskTypes()) . '")' .
+                $sqlSince .
+                ' ORDER BY id')
         );
         $progressBar = new ProgressBar($output, count($allTasks));
-        $levenshteinCalc = LevenshteinCalcTaskHistory::create($sqlSince);
+        $levenshteinCalc = LevenshteinCalcTaskHistory::create();
 
-        foreach ($allTasks as $taskGuid => $workflowName) {
-            $levenshteinCalc->calculate($taskGuid, $workflowName);
+        foreach ($allTasks as $taskGuid) {
+            $levenshteinCalc->calculate($taskGuid);
             $progressBar->advance();
         }
 

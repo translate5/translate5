@@ -60,19 +60,6 @@ class editor_Models_Workflow_Step extends ZfExtended_Models_Entity_Abstract
         return $this->db->fetchAll($s)->toArray();
     }
 
-    public function loadFirstByFilter(string $workflowName, array $filter): array
-    {
-        $s = $this->db->select()
-            ->where('workflowName = ?', $workflowName);
-
-        foreach ($filter as $field => $value) {
-            $s = $s->where($field . ' = ?', $value);
-        }
-        $v = $this->db->fetchAll($s->limit(1))->toArray();
-
-        return $v[0] ?? [];
-    }
-
     public function getAllLabels(): array
     {
         $s = $this->db->select()->from($this->db, ['name', 'label']);

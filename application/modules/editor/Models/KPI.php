@@ -26,36 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
+use MittagQI\Translate5\Statistics\Dto\StatisticFilterDTO;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
 
 /**
  * KPI (Key Point Indicators) are handled in this class.
  */
 class editor_Models_KPI
 {
-    public const KPI_REVIEWER = 'averageProcessingTimeReviewer';
+    public const string KPI_REVIEWER = 'averageProcessingTimeReviewer';
 
-    public const KPI_TRANSLATOR = 'averageProcessingTimeTranslator';
+    public const string KPI_TRANSLATOR = 'averageProcessingTimeTranslator';
 
-    public const KPI_TRANSLATOR_CHECK = 'averageProcessingTimeSecondTranslator';
+    public const string KPI_TRANSLATOR_CHECK = 'averageProcessingTimeSecondTranslator';
 
-    public const KPI_DURATION = 'posteditingTime';
+    public const string KPI_DURATION = 'posteditingTime';
 
-    public const KPI_DURATION_TOTAL = 'posteditingTimeTotal';
+    public const string KPI_DURATION_TOTAL = 'posteditingTimeTotal';
 
-    public const KPI_DURATION_START = 'posteditingTimeStart';
+    public const string KPI_DURATION_START = 'posteditingTimeStart';
 
-    public const KPI_DURATION_END = 'posteditingTimeEnd';
+    public const string KPI_DURATION_END = 'posteditingTimeEnd';
 
-    public const KPI_LEVENSHTEIN_PREVIOUS = 'levenshteinPrevious';
+    public const string KPI_LEVENSHTEIN_PREVIOUS = 'levenshteinPrevious';
 
-    public const KPI_LEVENSHTEIN_ORIGINAL = 'levenshteinOriginal';
+    public const string KPI_LEVENSHTEIN_ORIGINAL = 'levenshteinOriginal';
 
-    public const KPI_LEVENSHTEIN_START = 'levenshteinStart';
+    public const string KPI_LEVENSHTEIN_START = 'levenshteinStart';
 
-    public const KPI_LEVENSHTEIN_END = 'levenshteinEnd';
+    public const string KPI_AFFECTED_SEGMENTS = 'affectedSegments';
 
-    public const ROLE_TO_KPI_KEY = [
+    public const string KPI_LEVENSHTEIN_END = 'levenshteinEnd';
+
+    public const array ROLE_TO_KPI_KEY = [
         editor_Workflow_Default::ROLE_TRANSLATOR => self::KPI_TRANSLATOR,
         editor_Workflow_Default::ROLE_REVIEWER => self::KPI_REVIEWER,
         editor_Workflow_Default::ROLE_TRANSLATORCHECK => self::KPI_TRANSLATOR_CHECK,
@@ -63,17 +66,13 @@ class editor_Models_KPI
 
     /**
      * Tasks the KPI are to be calculated for.
-     * @var array
      */
-    protected $tasks = [];
+    protected array $tasks = [];
 
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    protected $translate;
+    protected ZfExtended_Zendoverwrites_Translate $translate;
 
     public function __construct(
-        private readonly SegmentHistoryAggregationRepository $aggregation
+        private readonly SegmentStatisticsRepository $aggregation
     ) {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
@@ -95,7 +94,7 @@ class editor_Models_KPI
     /**
      * Set the tasks the KPI are to be calculated for.
      */
-    public function setTasks(array $rows)
+    public function setTasks(array $rows): void
     {
         $this->tasks = $rows;
     }
@@ -111,20 +110,21 @@ class editor_Models_KPI
 
     /**
      * Get the KPI-statistics.
+     * @throws ReflectionException
      */
-    public function getStatistics(array $filters, array $aggregationFilters): array
+    public function getStatistics(?StatisticFilterDTO $statisticFilter): array
     {
-        $statistics = $this->getAverageProcessingTime($filters);
+        $statistics = $this->getAverageProcessingTime($statisticFilter);
         $statistics['excelExportUsage'] = $this->getExcelExportUsage();
 
-        return array_merge($statistics, $this->getAggregateStats($aggregationFilters));
+        return array_merge($statistics, $this->getAggregateStats($statisticFilter));
     }
 
     /**
      * Calculate and return the average processing time for the tasks by role.
      * return array of strings or '-' if statistics can't be calculated
      */
-    protected function getAverageProcessingTime(array $filters): array
+    protected function getAverageProcessingTime(?StatisticFilterDTO $statisticFilter): array
     {
         $results = [];
         foreach (self::ROLE_TO_KPI_KEY as $label) {
@@ -136,19 +136,20 @@ class editor_Models_KPI
         $taskGuids = array_column($this->tasks, 'taskGuid');
 
         $workflowSteps = [];
+        $workflowStepsGrouped = [];
         $workflowStepTypes = array_keys(self::ROLE_TO_KPI_KEY);
-        foreach ($filters as $filter) {
-            if ($filter->property === 'workflowStep') {
-                $workflowSteps = $filter->value;
-            } elseif ($filter->property === 'workflowUserRole') {
-                $workflowStepTypes = $filter->value;
-            }
+        if (! empty($statisticFilter->workflowStep)) {
+            $workflowSteps = $statisticFilter->workflowStep;
+            $workflowStepsGrouped = $statisticFilter->getGroupWorkflowStepsByWorkflow();
+        }
+        if (! empty($statisticFilter->workflowUserRole)) {
+            $workflowStepTypes = $statisticFilter->workflowUserRole;
         }
 
         //load all task assocs for the filtered tasks
         //only reviewer,translator and translatorCheck roles are loaded
         $tua = new editor_Models_TaskUserAssoc();
-        $timeResult = $tua->loadKpiData($taskGuids, $workflowStepTypes, $workflowSteps);
+        $timeResult = $tua->loadKpiData($taskGuids, $workflowStepTypes, $workflowStepsGrouped);
         $time = [];
         foreach ($timeResult as $row) {
             $time[$row['timeBy']] = $row['time'];
@@ -180,9 +181,11 @@ class editor_Models_KPI
         }
 
         foreach ($timeToResultKey as $timeBy => $key) {
+            if (! array_key_exists($timeBy, $time)) {
+                continue;
+            }
             $results[$key] = (isset($time[$timeBy]) ? round(
-                $time[$timeBy],
-                0
+                $time[$timeBy]
             ) : 0) . ' ' . $this->translate->_('Tage');
         }
 
@@ -193,6 +196,7 @@ class editor_Models_KPI
      * Calculate and return the Excel-export-usage of the tasks
      * (= percent of the tasks exported at least once).
      * @return string Percentage (0-100%) or '-' if statistics can't be calculated
+     * @throws ReflectionException
      */
     protected function getExcelExportUsage(): string
     {
@@ -218,7 +222,8 @@ class editor_Models_KPI
             return '-';
         }
 
-        $percentage = ($nrExported / count($allTaskGuids)) * 100; // after $this->hasStatistics(), count($allTaskGuids) will always be > 0
+        // after $this->hasStatistics(), count($allTaskGuids) will always be > 0
+        $percentage = ($nrExported / count($allTaskGuids)) * 100;
 
         return round($percentage, 2) . '%';
     }
@@ -227,7 +232,7 @@ class editor_Models_KPI
      * Calculate and return avg duration and Levenshtein distance for the tasks
      * returns hash of strings '2.5' or '-' if statistics can't be calculated
      */
-    protected function getAggregateStats(array $aggregationFilters): array
+    protected function getAggregateStats(?StatisticFilterDTO $statisticFilter): array
     {
         $results = [];
         foreach (self::getAggregateMetrics() as $key) {
@@ -244,7 +249,7 @@ class editor_Models_KPI
             array_column(array_filter($this->tasks, function ($task) use ($taskTypes) {
                 return isset($taskTypes[$task['taskType']]);
             }), 'taskGuid'),
-            $aggregationFilters
+            $statisticFilter
         );
 
         if (empty($stats)) {
@@ -253,14 +258,22 @@ class editor_Models_KPI
             return $results;
         }
 
-        $results[self::KPI_LEVENSHTEIN_START] = $stats['levenshteinStartAvg'] ?: 0; // to show 0.00000 change within no_workflow
-        $results[self::KPI_DURATION_START] = $stats['durationStartAvg'] ?: '-';
-        $results[self::KPI_DURATION] = $stats['durationAvg'] ?: '-';
-        $results[self::KPI_LEVENSHTEIN_PREVIOUS] = $stats['levenshteinPreviousAvg'] ?: '-';
-        $results[self::KPI_DURATION_TOTAL] = $stats['durationTotal'] ?: '-';
-        $results[self::KPI_LEVENSHTEIN_ORIGINAL] = $stats['levenshteinOriginalAvg'] ?: '-';
-        $results[self::KPI_LEVENSHTEIN_END] = $stats['levenshteinEndAvg'] ?: '-';
-        $results[self::KPI_DURATION_END] = $stats['durationEndAvg'] ?: '-';
+        $roundDuration = static fn (?float $value): string|float => $value === null ? '-' : round($value / 1000, 2);
+        $roundLevenshtein = static fn (?float $value): string|float => $value === null
+            ? '-'
+            : round($value, SegmentStatisticsRepository::LEVENSHTEIN_PRECISION);
+
+        $results[self::KPI_AFFECTED_SEGMENTS] = $roundLevenshtein($stats['affectedSegments']);
+        $results[self::KPI_LEVENSHTEIN_START] = $roundLevenshtein($stats['levenshteinDistanceNoWorkflow'] ?? 0.0);
+        $results[self::KPI_DURATION_START] = $roundDuration($stats['posteditingTimeNoWorkflow'] ?? null);
+        $results[self::KPI_DURATION] = $roundDuration($stats['posteditingTimeInWorkflowStep']);
+        $results[self::KPI_LEVENSHTEIN_PREVIOUS] = $roundLevenshtein(
+            $stats['levenshteinDistanceInWorkflowStep']
+        );
+        $results[self::KPI_DURATION_TOTAL] = $roundDuration($stats['posteditingTimeInAllWorkflowSteps']);
+        $results[self::KPI_LEVENSHTEIN_ORIGINAL] = $roundLevenshtein($stats['levenshteinDistanceOriginal'] ?? null);
+        $results[self::KPI_LEVENSHTEIN_END] = $roundLevenshtein($stats['levenshteinDistanceWorkflowEnded'] ?? null);
+        $results[self::KPI_DURATION_END] = $roundDuration($stats['posteditingTimeWorkflowEnded'] ?? null);
 
         return $results;
     }

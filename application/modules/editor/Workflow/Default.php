@@ -620,11 +620,6 @@ class editor_Workflow_Default
         return self::STATE_EDIT;
     }
 
-    public function getStepRecalculation(): editor_Workflow_Default_StepRecalculation
-    {
-        return new editor_Workflow_Default_StepRecalculation($this);
-    }
-
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)

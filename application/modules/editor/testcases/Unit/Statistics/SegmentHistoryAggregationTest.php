@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Test\Unit\Statistics;
 
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
+use MittagQI\Translate5\Statistics\Dto\StatisticSegmentDTO;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ZfExtended_Logger;
@@ -51,43 +52,40 @@ class SegmentHistoryAggregationTest extends TestCase
         $this->aggregation = new SegmentHistoryAggregation($this->client, $this->logger);
     }
 
-    /**
-     * After array_splice($row, 6, 2) removes levenshtein columns, qualityScore must land at position [10]
-     * in the buffer row passed to upsert() for TABLE_NAME.
-     */
     public function testFlushUpsertsQualityScorePositionInMainTable(): void
     {
         $qualityScore = 75;
 
-        $this->aggregation->upsertBuffered(
+        $this->aggregation->upsertBuffered(new StatisticSegmentDTO(
             '{task-guid}',
             '{user-guid}',
             'default',
             'translation',
             42,
-            100,
             5,
             3,
             80,
             '',
             0,
             1,
-            $qualityScore
-        );
+            $qualityScore,
+            1,
+        ));
 
-        $capturedMainTableColumns = null;
-        $capturedMainTableRows = null;
+        $capturedStatisticsColumns = null;
+        $capturedStatisticsRows = null;
 
         $this->client
+            ->expects($this->once())
             ->method('upsert')
             ->willReturnCallback(
                 function (string $table, array $rows, array $columns) use (
-                    &$capturedMainTableColumns,
-                    &$capturedMainTableRows,
+                    &$capturedStatisticsColumns,
+                    &$capturedStatisticsRows,
                 ) {
-                    if ($table === SegmentHistoryAggregation::TABLE_NAME) {
-                        $capturedMainTableColumns = $columns;
-                        $capturedMainTableRows = $rows;
+                    if ($table === SegmentHistoryAggregation::TABLE_NAME_STATISTICS) {
+                        $capturedStatisticsColumns = $columns;
+                        $capturedStatisticsRows = $rows;
                     }
                 }
             );
@@ -96,53 +94,45 @@ class SegmentHistoryAggregationTest extends TestCase
 
         $this->aggregation->flushUpserts();
 
-        $this->assertNotNull($capturedMainTableRows);
-        $this->assertNotNull($capturedMainTableColumns);
-
-        // qualityScore must be the last column
-        $this->assertSame('qualityScore', end($capturedMainTableColumns));
-
+        $this->assertNotNull($capturedStatisticsRows);
+        $this->assertNotNull($capturedStatisticsColumns);
         // qualityScore position in the data row must match the columns array
-        $qualityScoreIdx = array_search('qualityScore', $capturedMainTableColumns, true);
-        $this->assertSame($qualityScore, $capturedMainTableRows[0][$qualityScoreIdx]);
+        $this->assertSame($qualityScore, $capturedStatisticsRows[0]['qualityScore']);
+        $this->assertSame(1, $capturedStatisticsRows[0]['latestEntry']);
     }
 
-    /**
-     * After array_splice($row, 5, 1) removes duration and lastEdit is appended,
-     * qualityScore must land at position [11] (second-to-last) in the buffer row
-     * passed to upsert() for TABLE_NAME_LEV, with lastEdit at [12].
-     */
     public function testFlushUpsertsQualityScorePositionInLevTable(): void
     {
         $qualityScore = 42;
 
-        $this->aggregation->upsertBuffered(
+        $this->aggregation->upsertBuffered(new StatisticSegmentDTO(
             '{task-guid}',
             '{user-guid}',
             'default',
             'translation',
             99,
-            200,
             8,
             4,
             90,
             '',
             0,
             1,
-            $qualityScore
-        );
+            $qualityScore,
+            1,
+        ));
 
         $capturedLevColumns = null;
         $capturedLevRows = null;
 
         $this->client
+            ->expects($this->once())
             ->method('upsert')
             ->willReturnCallback(
                 function (string $table, array $rows, array $columns) use (
                     &$capturedLevColumns,
                     &$capturedLevRows,
                 ) {
-                    if ($table === SegmentHistoryAggregation::TABLE_NAME_LEV) {
+                    if ($table === SegmentHistoryAggregation::TABLE_NAME_STATISTICS) {
                         $capturedLevColumns = $columns;
                         $capturedLevRows = $rows;
                     }
@@ -156,45 +146,42 @@ class SegmentHistoryAggregationTest extends TestCase
         $this->assertNotNull($capturedLevRows);
         $this->assertNotNull($capturedLevColumns);
 
-        // lastEdit must be the very last column
-        $this->assertSame('lastEdit', end($capturedLevColumns));
-
-        // qualityScore must be second-to-last (before lastEdit)
+        // qualityScore column must be present and mapped correctly
         $qualityScoreIdx = array_search('qualityScore', $capturedLevColumns, true);
-        $lastEditIdx = array_search('lastEdit', $capturedLevColumns, true);
-        $this->assertSame($lastEditIdx - 1, $qualityScoreIdx);
+        $this->assertNotFalse($qualityScoreIdx);
 
         // values must match
-        $this->assertSame($qualityScore, $capturedLevRows[0][$qualityScoreIdx]);
-        $this->assertSame(1, $capturedLevRows[0][$lastEditIdx]); // lastEdit=1 for workflow step
+        $this->assertSame($qualityScore, $capturedLevRows[0]['qualityScore']);
+        $this->assertSame(1, $capturedLevRows[0]['latestEntry']);
     }
 
     public function testFlushUpsertsNullQualityScoreIsPreserved(): void
     {
-        $this->aggregation->upsertBuffered(
+        $this->aggregation->upsertBuffered(new StatisticSegmentDTO(
             '{task-guid}',
             '{user-guid}',
             'default',
             'translation',
             1,
-            50,
             0,
             0,
             100,
             '',
             0,
             1,
-            null
-        );
+            null,
+            1
+        ));
 
-        $capturedMainTableRows = null;
+        $capturedStatisticsRows = null;
 
         $this->client
+            ->expects($this->once())
             ->method('upsert')
             ->willReturnCallback(
-                function (string $table, array $rows, array $columns) use (&$capturedMainTableRows) {
-                    if ($table === SegmentHistoryAggregation::TABLE_NAME) {
-                        $capturedMainTableRows = $rows;
+                function (string $table, array $rows, array $columns) use (&$capturedStatisticsRows) {
+                    if ($table === SegmentHistoryAggregation::TABLE_NAME_STATISTICS) {
+                        $capturedStatisticsRows = $rows;
                     }
                 }
             );
@@ -203,43 +190,40 @@ class SegmentHistoryAggregationTest extends TestCase
 
         $this->aggregation->flushUpserts();
 
-        $this->assertNotNull($capturedMainTableRows);
-        $qualityScoreIdx = 10; // position after splice
-        $this->assertNull($capturedMainTableRows[0][$qualityScoreIdx]);
+        $this->assertNotNull($capturedStatisticsRows);
+        $this->assertNull($capturedStatisticsRows[0]['qualityScore']);
+        $this->assertSame(1, $capturedStatisticsRows[0]['latestEntry']);
     }
 
-    /**
-     * Rows with duration=0 are skipped for TABLE_NAME but still written to TABLE_NAME_LEV.
-     */
-    public function testFlushUpsertsSkipsDurationZeroForMainTable(): void
+    public function testFlushUpsertsWritesOnlyStatisticsTable(): void
     {
-        $this->aggregation->upsertBuffered(
+        $this->aggregation->upsertBuffered(new StatisticSegmentDTO(
             '{task-guid}',
             '{user-guid}',
             'default',
             'translation',
             7,
-            0,  // duration = 0
             2,
             1,
             70,
             '',
             0,
             1,
-            55
-        );
+            55,
+            1
+        ));
 
-        $mainTableCallCount = 0;
-        $levTableCallCount = 0;
+        $posteditingTableCallCount = 0;
+        $statisticsTableCallCount = 0;
 
         $this->client
             ->method('upsert')
             ->willReturnCallback(
-                function (string $table) use (&$mainTableCallCount, &$levTableCallCount) {
-                    if ($table === SegmentHistoryAggregation::TABLE_NAME) {
-                        $mainTableCallCount++;
-                    } elseif ($table === SegmentHistoryAggregation::TABLE_NAME_LEV) {
-                        $levTableCallCount++;
+                function (string $table) use (&$posteditingTableCallCount, &$statisticsTableCallCount) {
+                    if ($table === SegmentHistoryAggregation::TABLE_NAME_POSTEDITING) {
+                        $posteditingTableCallCount++;
+                    } elseif ($table === SegmentHistoryAggregation::TABLE_NAME_STATISTICS) {
+                        $statisticsTableCallCount++;
                     }
                 }
             );
@@ -248,74 +232,227 @@ class SegmentHistoryAggregationTest extends TestCase
 
         $result = $this->aggregation->flushUpserts();
 
-        // duration=0 means TABLE_NAME buffer is empty → upsert still called (with empty rows)
-        // but TABLE_NAME_LEV is always written
         $this->assertTrue($result);
-        $this->assertSame(1, $levTableCallCount);
+        $this->assertSame(0, $posteditingTableCallCount);
+        $this->assertSame(1, $statisticsTableCallCount);
     }
 
-    public function testUpdateQualityScoreUpdatesWithCorrectSqlForBothTables(): void
+    public function testUpdateQualityScorePrefersEditedInStep(): void
     {
         $taskGuid = '{abc-123}';
         $segmentId = 42;
         $qualityScore = 88;
+        $capturedBind = [];
 
-        $capturedQueries = [];
+        $this->client
+            ->expects($this->once())
+            ->method('oneAssoc')
+            ->willReturn([
+                'workflowStepName' => 'review',
+            ]);
 
+        $this->client
+            ->expects($this->once())
+            ->method('query')
+            ->willReturnCallback(function (string $sql, array $bind) use (&$capturedBind, $qualityScore) {
+                $capturedBind = $bind;
+                $this->assertStringContainsString(SegmentHistoryAggregation::TABLE_NAME_STATISTICS, $sql);
+                $this->assertStringContainsString('qualityScore=' . $qualityScore, $sql);
+                $this->assertStringContainsString('workflowStepName = :workflowStepName', $sql);
+            });
+
+        $this->aggregation->updateQualityScore($taskGuid, $segmentId, 'review', $qualityScore);
+
+        $this->assertSame('abc-123', $capturedBind['taskGuid']);
+        $this->assertSame($segmentId, $capturedBind['segmentId']);
+        $this->assertSame('review', $capturedBind['workflowStepName']);
+    }
+
+    public function testUpdateQualityScoreFallsBackToInitialStep(): void
+    {
+        $capturedBind = [];
+
+        $this->client
+            ->expects($this->once())
+            ->method('oneAssoc')
+            ->willReturn([
+                'workflowStepName' => '_initial',
+            ]);
+
+        $this->client
+            ->expects($this->once())
+            ->method('query')
+            ->willReturnCallback(function (string $sql, array $bind) use (&$capturedBind) {
+                $capturedBind = $bind;
+                $this->assertStringContainsString('qualityScore=NULL', $sql);
+            });
+
+        $this->aggregation->updateQualityScore('{task}', 1, 'translation', null);
+
+        $this->assertSame('_initial', $capturedBind['workflowStepName']);
+    }
+
+    public function testUpdateQualityScoreSkipsWhenNoMatchingStepExists(): void
+    {
+        $this->client
+            ->expects($this->once())
+            ->method('oneAssoc')
+            ->willReturn([]);
+
+        $this->client
+            ->expects($this->never())
+            ->method('query');
+
+        $this->aggregation->updateQualityScore('{abc-def}', 1, 'review', 50);
+    }
+
+    public function testIncreaseOrInsertPosteditingDurationDelegatesToClient(): void
+    {
+        $this->client
+            ->expects($this->once())
+            ->method('upsertIncrementDuration')
+            ->with(
+                SegmentHistoryAggregation::TABLE_NAME_POSTEDITING,
+                'task-guid',
+                11,
+                'review',
+                'user-guid',
+                1250
+            );
+
+        $this->aggregation->increaseOrInsertPosteditingDuration('{task-guid}', 11, 'review', '{user-guid}', 1250);
+    }
+
+    public function testIncreaseOrInsertPosteditingDurationSkipsZero(): void
+    {
+        $this->client
+            ->expects($this->never())
+            ->method('upsertIncrementDuration');
+
+        $this->aggregation->increaseOrInsertPosteditingDuration('{task-guid}', 11, 'review', '{user-guid}', 0);
+    }
+
+    public function testUpdateOrInsertEditableUpdatesExistingRow(): void
+    {
+        $entry = new StatisticSegmentDTO(
+            '{task-guid}',
+            '{actor-guid}',
+            'default',
+            'review',
+            11,
+            2,
+            1,
+            100,
+            'pretranslated;tm',
+            3,
+            0,
+            80
+        );
+
+        $this->client
+            ->expects($this->once())
+            ->method('oneAssoc')
+            ->willReturn([
+                'segmentId' => 11,
+            ]);
+
+        $queryCount = 0;
         $this->client
             ->expects($this->exactly(2))
             ->method('query')
-            ->willReturnCallback(function (string $sql) use (&$capturedQueries) {
-                $capturedQueries[] = $sql;
+            ->willReturnCallback(function (string $sql, array $bind) use (&$queryCount): void {
+                $queryCount++;
+                if ($queryCount === 1) {
+                    $this->assertStringContainsString('SET latestEntry = 0', $sql);
+                    $this->assertSame('task-guid', $bind['taskGuid']);
+                    $this->assertSame(11, $bind['segmentId']);
+
+                    return;
+                }
+
+                $this->assertStringContainsString('SET editable = :editable, latestEntry = 1', $sql);
+                $this->assertSame('task-guid', $bind['taskGuid']);
+                $this->assertSame(11, $bind['segmentId']);
+                $this->assertSame('review', $bind['workflowStepName']);
+                $this->assertSame(0, $bind['editable']);
             });
-
-        $this->aggregation->updateQualityScore($taskGuid, $segmentId, $qualityScore);
-
-        $this->assertCount(2, $capturedQueries);
-
-        $mainTableSql = $capturedQueries[0];
-        $levTableSql = $capturedQueries[1];
-
-        $this->assertStringContainsString(SegmentHistoryAggregation::TABLE_NAME, $mainTableSql);
-        $this->assertStringContainsString('qualityScore=' . $qualityScore, $mainTableSql);
-        $this->assertStringContainsString('segmentId=' . $segmentId, $mainTableSql);
-
-        $this->assertStringContainsString(SegmentHistoryAggregation::TABLE_NAME_LEV, $levTableSql);
-        $this->assertStringContainsString('qualityScore=' . $qualityScore, $levTableSql);
-        $this->assertStringContainsString('segmentId=' . $segmentId, $levTableSql);
-    }
-
-    public function testUpdateQualityScoreWithNullWritesSqlNull(): void
-    {
-        $capturedQueries = [];
 
         $this->client
-            ->method('query')
-            ->willReturnCallback(function (string $sql) use (&$capturedQueries) {
-                $capturedQueries[] = $sql;
-            });
+            ->expects($this->never())
+            ->method('upsert');
 
-        $this->aggregation->updateQualityScore('{task}', 1, null);
-
-        foreach ($capturedQueries as $sql) {
-            $this->assertStringContainsString('qualityScore=NULL', $sql);
-        }
+        $this->aggregation->updateOrInsertEditable($entry);
     }
 
-    public function testUpdateQualityScoreStripsGuidBraces(): void
+    public function testUpdateOrInsertEditableInsertsMissingRow(): void
     {
-        $capturedBinds = [];
+        $entry = new StatisticSegmentDTO(
+            '{task-guid}',
+            '{actor-guid}',
+            'default',
+            'review',
+            12,
+            3,
+            2,
+            99,
+            'pretranslated;tm',
+            4,
+            1,
+            77
+        );
 
         $this->client
+            ->expects($this->once())
+            ->method('oneAssoc')
+            ->willReturn([]);
+
+        $queryCount = 0;
+        $this->client
+            ->expects($this->once())
             ->method('query')
-            ->willReturnCallback(function (string $sql, array $bind) use (&$capturedBinds) {
-                $capturedBinds[] = $bind;
+            ->willReturnCallback(function (string $sql, array $bind) use (&$queryCount): void {
+                $queryCount++;
+                $this->assertSame(1, $queryCount);
+                $this->assertStringContainsString('SET latestEntry = 0', $sql);
+                $this->assertSame('task-guid', $bind['taskGuid']);
+                $this->assertSame(12, $bind['segmentId']);
             });
 
-        $this->aggregation->updateQualityScore('{abc-def}', 1, 50);
+        $this->client
+            ->expects($this->once())
+            ->method('upsert')
+            ->with(
+                SegmentHistoryAggregation::TABLE_NAME_STATISTICS,
+                $this->callback(function (array $rows): bool {
+                    return isset($rows[0])
+                        && $rows[0][0] === 'task-guid'
+                        && $rows[0][1] === 'actor-guid'
+                        && $rows[0][3] === 'review'
+                        && $rows[0][4] === 12
+                        && $rows[0][9] === 4
+                        && $rows[0][10] === 1
+                        && $rows[0][11] === 1
+                        && $rows[0][12] === 77
+                        && $rows[0][13] === 0;
+                }),
+                [
+                    'taskGuid',
+                    'userGuid',
+                    'workflowName',
+                    'workflowStepName',
+                    'segmentId',
+                    'levenshteinOriginal',
+                    'levenshteinPrevious',
+                    'matchRate',
+                    'langResType',
+                    'langResId',
+                    'editable',
+                    'latestEntry',
+                    'qualityScore',
+                    'segmentlengthPrevious',
+                ]
+            );
 
-        foreach ($capturedBinds as $bind) {
-            $this->assertSame('abc-def', $bind['taskGuid']);
-        }
+        $this->aggregation->updateOrInsertEditable($entry);
     }
 }

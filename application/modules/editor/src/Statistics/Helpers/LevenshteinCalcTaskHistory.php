@@ -30,248 +30,217 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Statistics\Helpers;
 
+use editor_Models_Segment_AutoStates as SegmentAutoStates;
 use editor_Models_SegmentField;
-use editor_Models_Workflow_Step;
 use editor_Workflow_Default;
-use MittagQI\Translate5\Repository\{SegmentHistoryDataRepository, SegmentHistoryRepository};
 use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
-use MittagQI\Translate5\Segment\SegmentLevenshtein;
+use MittagQI\Translate5\Segment\LevenshteinCalculationService;
+use MittagQI\Translate5\Statistics\Dto\LevenshteinHistoryDTO;
+use MittagQI\Translate5\Statistics\SegmentLevenshteinRepository;
+use Throwable;
 use Zend_Db_Adapter_Abstract;
 use Zend_Db_Table;
+use Zend_Exception;
+use Zend_Registry;
 
 readonly class LevenshteinCalcTaskHistory
 {
     protected function __construct(
-        private LoggedJobsData $jobsLogged,
-        private SegmentHistoryRepository $history,
-        private SegmentHistoryDataRepository $historyData,
-        private editor_Models_Workflow_Step $stepModel,
-        private SegmentLevenshtein $levenshtein,
+        private LevenshteinCalculationService $levenshtein,
+        private SegmentLevenshteinRepository $segmentLevenshteinRepository,
         private ?Zend_Db_Adapter_Abstract $db,
-        private string $sqlSince = '',
     ) {
     }
 
-    public static function create(string $sqlSince = ''): self
+    public static function create(): self
     {
         return new self(
-            new LoggedJobsData($sqlSince, false),
-            SegmentHistoryRepository::create(),
-            new SegmentHistoryDataRepository(),
-            new editor_Models_Workflow_Step(),
-            SegmentLevenshtein::create(),
+            LevenshteinCalculationService::create(),
+            SegmentLevenshteinRepository::create(),
             Zend_Db_Table::getDefaultAdapter(),
-            $sqlSince,
         );
     }
 
     /**
      * @throws InvalidInputForLevenshtein
+     * @throws Throwable
      */
-    public function calculate(string $taskGuid, string $workflowName): void
+    public function calculate(string $taskGuid): void
     {
-        $results = $this->db->fetchAll(
-            'SELECT id,workflowStep,userGuid,segmentId,workflowStepNr,levenshteinOriginal,levenshteinPrevious' .
-            ',UNIX_TIMESTAMP(timestamp) AS timestamp FROM LEK_segment_history WHERE taskGuid="' . $taskGuid . '"' .
-            ($this->sqlSince ?: '') .
-            ' ORDER BY id'
+        $this->segmentLevenshteinRepository->removeByTaskGuid($taskGuid);
+
+        $segments = $this->db->fetchAll(
+            'SELECT
+                s.id,
+                s.autoStateId,
+                s.editedInStep,
+                sd.original,
+                sd.edited
+            FROM LEK_segments s
+            INNER JOIN LEK_segment_data sd
+                ON sd.segmentId = s.id
+                AND sd.name = :targetField
+            WHERE s.taskGuid = :taskGuid
+            ORDER BY s.id ASC',
+            [
+                'targetField' => editor_Models_SegmentField::TYPE_TARGET,
+                'taskGuid' => $taskGuid,
+            ]
         );
 
-        if (empty($results)) {
-            return;
-        }
-
-        $segmentLastEditorId = $this->db->fetchPairs(
-            'SELECT id,userGuid FROM LEK_segments WHERE taskGuid="' . $taskGuid . '"'
-        );
-        $this->jobsLogged->initDataFor($taskGuid);
-
-        $resultsDeduplicated = [];
-
-        foreach ($results as $v) {
-            // false can be returned here
-            $v['segmentCurrentValue'] = (string) $this->db->fetchOne(
-                'SELECT edited FROM LEK_segment_history_data WHERE segmentHistoryId=' . $v['id'],
-            );
-
-            if ($v['workflowStep'] === null || $v['workflowStep'] === editor_Workflow_Default::STEP_PM_CHECK) {
-                $v['workflowStep'] = $this->jobsLogged->lookupWorkflowStep((int) $v['timestamp']);
-                // '' for 'no_workflow'
+        $insertBuffer = [];
+        foreach ($segments as $segment) {
+            $orderdContent = $this->loadSegmentContent($segment);
+            $this->calculateLevenshteinForSegment($orderdContent);
+            $insertBuffer = array_merge($insertBuffer, $orderdContent);
+            if (count($insertBuffer) > 100) {
+                $this->flushInsertBuffer($taskGuid, $insertBuffer);
+                $insertBuffer = [];
             }
-
-            $key = '';
-            foreach (
-                [
-                    'userGuid',
-                    'workflowStep',
-                    'segmentId',
-                ] as $column
-            ) {
-                $key .= $v[$column] . '|';
-            }
-            $resultsDeduplicated[$key] = $v;
         }
+        $this->flushInsertBuffer($taskGuid, $insertBuffer);
+    }
 
-        $segmentIdsLastEditConsidered = $segmentIdsLastEditPending = [];
-        foreach ($resultsDeduplicated as $v) {
-            $v['segmentId'] = (int) $v['segmentId'];
-            $isLatestEdit = false;
-            if (isset($segmentIdsLastEditConsidered[$v['segmentId']])) {
-                continue;
-            } elseif ($segmentLastEditorId[$v['segmentId']] === $v['userGuid']) {
-                $v1 = $this->db->fetchRow(
-                    'SELECT workflowStep,levenshteinOriginal,levenshteinPrevious' .
-                    ',UNIX_TIMESTAMP(timestamp) AS timestamp FROM LEK_segments WHERE id=' . $v['segmentId']
+    /**
+     * @param LevenshteinHistoryDTO[] $insertBuffer
+     */
+    private function flushInsertBuffer(string $taskGuid, array $insertBuffer): void
+    {
+        if (! empty($insertBuffer)) {
+            $this->segmentLevenshteinRepository->insertBatch($taskGuid, $insertBuffer);
+        }
+    }
+
+    /**
+     * @param LevenshteinHistoryDTO[] $orderdContent
+     * @throws Zend_Exception
+     */
+    private function calculateLevenshteinForSegment(array $orderdContent): void
+    {
+        $previousStep = '';
+        $previousStepEdited = '';
+        //since original is changing only in pretranslation that should be consistent
+        // through later steps and can be used for calculation without search the first changed one
+        $previousStepOriginal = '';
+        $firstEntry = true;
+        foreach ($orderdContent as $levenshteinHistoryDTO) {
+            //on review tasks we get targetOriginal by import - so calculation against
+            // initial empty string in $previousStepOriginal makes no sense
+            $setFirstToZero = $firstEntry && strlen($levenshteinHistoryDTO->targetOriginal);
+
+            //pre-translation re-sets the targetOriginal - therefore all levenshtein values are 0 here
+            $isPreTranslation = $levenshteinHistoryDTO->autoStateId === SegmentAutoStates::PRETRANSLATED;
+
+            if ($setFirstToZero || $isPreTranslation) {
+                $levenshteinHistoryDTO->levenshteinOriginal = 0;
+                $levenshteinHistoryDTO->levenshteinPrevious = 0;
+                $initLength = $this->levenshtein->calcDistance(
+                    $levenshteinHistoryDTO->targetOriginal,
+                    $levenshteinHistoryDTO->targetOriginal,
                 );
-                if ($v1['workflowStep'] === editor_Workflow_Default::STEP_PM_CHECK) {
-                    $v1['workflowStep'] = $this->jobsLogged->lookupWorkflowStep((int) $v1['timestamp']);
-                    if (empty($v1['workflowStep']) && ! empty($v['workflowStep'])) {
-                        error_log('Cannot determine workflowStep for pmCheck of segmentId ' . $v['segmentId']);
-
-                        continue;
-                    }
-                }
-                if ($v1['workflowStep'] === $v['workflowStep']) {
-                    // we override this entry with the latest values
-                    $isLatestEdit = true;
-                    $v = array_replace($v, $v1);
-                    $v2 = $this->db->fetchRow(
-                        'SELECT edited FROM LEK_segment_data WHERE segmentId=' . $v['segmentId'] . ' AND name="' . editor_Models_SegmentField::TYPE_TARGET . '"'
-                    );
-                    if (! empty($v2)) {
-                        $v['segmentCurrentValue'] = $v2['edited'];
-                    }
-                    $segmentIdsLastEditConsidered[$v['segmentId']] = 1;
-                    if (isset($segmentIdsLastEditPending[$v['segmentId']])) {
-                        unset($segmentIdsLastEditPending[$v['segmentId']]);
-                    }
-                } else {
-                    $segmentIdsLastEditPending[$v['segmentId']] = 1;
-                }
+                $levenshteinHistoryDTO->segmentlengthPrevious = $initLength['segmentlengthPrevious'];
             } else {
-                $segmentIdsLastEditPending[$v['segmentId']] = 1;
+                //while no real previousStep was set, current original contains the proper value to compare against
+                if ($previousStep === '') {
+                    $previousStepEdited = $previousStepOriginal = $levenshteinHistoryDTO->targetOriginal;
+                }
+                $this->calculateLevenshteinInDto($levenshteinHistoryDTO, $previousStepOriginal, $previousStepEdited);
             }
 
-            $this->updateLevenshteinDistances(
-                $v['segmentId'],
-                $v['segmentCurrentValue'],
-                (int) $v['workflowStepNr'],
-                $workflowName,
-                $taskGuid,
-                $isLatestEdit ? 0 : (int) $v['id']
-            );
-        }
-
-        // segments w/o history entries with userId from LEK_segments
-        foreach (array_keys($segmentIdsLastEditPending) as $segmentId) {
-            if (isset($segmentIdsLastEditConsidered[$segmentId])) {
-                continue;
+            if ($levenshteinHistoryDTO->editedInStep !== $previousStep) {
+                $previousStep = $levenshteinHistoryDTO->editedInStep;
+                $previousStepEdited = $levenshteinHistoryDTO->targetEdited;
+                $previousStepOriginal = $levenshteinHistoryDTO->targetOriginal;
             }
-
-            $v = $this->db->fetchRow(
-                'SELECT workflowStepNr,UNIX_TIMESTAMP(timestamp) AS timestamp FROM LEK_segments WHERE id=' . $segmentId
-            );
-            if (empty($v)) {
-                continue;
-            }
-
-            $segmentCurrentValue = $this->db->fetchOne(
-                'SELECT edited FROM LEK_segment_data WHERE segmentId=' . $segmentId . ' AND name="' . editor_Models_SegmentField::TYPE_TARGET . '"'
-            );
-
-            $this->updateLevenshteinDistances(
-                $segmentId,
-                $segmentCurrentValue,
-                (int) $v['workflowStepNr'],
-                $workflowName,
-                $taskGuid
-            );
+            $firstEntry = false;
         }
     }
 
     /**
-     * @throws InvalidInputForLevenshtein
+     * Returns the segment changes from oldest to newest.
+     * Works on preloaded assoc-array segment data (no segment model instance needed).
+     *
+     * @param array{
+     *     id:int|string,
+     *     autoStateId:int|string|null,
+     *     editedInStep:string|null,
+     *     original:string|null,
+     *     edited:string|null
+     * } $segment
+     * @return LevenshteinHistoryDTO[]
      */
-    private function updateLevenshteinDistances(
-        int $segmentId,
-        string $segmentCurrentValue,
-        int $workflowStepNr,
-        string $workflowName,
-        string $taskGuid,
-        int $segmentHistoryId = 0,
-    ): void {
-        $segmentOriginalValue = $this->db->fetchOne(
-            'SELECT original FROM LEK_segment_data WHERE segmentId=' . $segmentId
-            . ' AND name="' . editor_Models_SegmentField::TYPE_TARGET . '"'
-        );
-        if ($segmentOriginalValue === '') {
-            // load the last entry of the "translation" step (1st step of the workflow of "translation" type/role)
-            $translatorStep = $this->stepModel->loadFirstByFilter($workflowName, [
-                'position' => 1,
-                'role' => editor_Workflow_Default::ROLE_TRANSLATOR,
-            ]);
-            if (empty($translatorStep)) {
-                // error_log('No translation step for "'.$workflowName.'" workflow');
-                return;
-            }
+    private function loadSegmentContent(array $segment): array
+    {
+        $segmentId = (int) $segment['id'];
+        $orderdContent = [
+            0 => new LevenshteinHistoryDTO(
+                $segmentId,
+                null,
+                (int) ($segment['autoStateId'] ?? SegmentAutoStates::NOT_TRANSLATED),
+                (string) ($segment['editedInStep'] ?? editor_Workflow_Default::STEP_NO_WORKFLOW),
+                (string) ($segment['original'] ?? ''),
+                (string) ($segment['edited'] ?? ''),
+            ),
+        ];
 
-            $segmentOriginalValue = $this->getLastHistoryEdited($segmentId, [
-                'workflowStep = ?' => $translatorStep['name'],
-            ]);
-            if ($segmentOriginalValue === null) {
-                // error_log('No history entry for segment #' . $segmentId.' within "'.$translatorStep['name'].'" step ['.$v['workflowStep'].']');
-                return;
-            }
-        }
-
-        // get last value from prev. workflow step if available
-        $filter = [];
-        if ($workflowStepNr === 1) {
-            $filter = LoggedJobsData::getBeforeWorkflowStartFilter($taskGuid);
-        }
-        if (empty($filter)) {
-            $filter = [
-                'workflowStepNr < ?' => $workflowStepNr,
-            ];
-        }
-        $segmentPrevStepValue = $this->getLastHistoryEdited($segmentId, $filter);
-
-        if ($segmentPrevStepValue === null) {
-            $segmentPrevStepValue = $segmentOriginalValue;
-        }
-
-        $levenshteinOriginal = $this->levenshtein->calcDistance(
-            $segmentOriginalValue,
-            $segmentCurrentValue
-        );
-        $levenshteinPrevious = $this->levenshtein->calcDistance(
-            $segmentPrevStepValue,
-            $segmentCurrentValue
+        $historyRows = $this->db->fetchAll(
+            'SELECT
+                h.id AS segmentHistoryId,
+                h.autoStateId,
+                h.editedInStep,
+                hd.original,
+                hd.edited
+            FROM LEK_segment_history h
+            INNER JOIN LEK_segment_history_data hd
+                ON hd.segmentHistoryId = h.id
+                AND hd.name = :targetField
+            WHERE h.segmentId = :segmentId
+            ORDER BY h.id DESC',
+            [
+                'targetField' => editor_Models_SegmentField::TYPE_TARGET,
+                'segmentId' => $segmentId,
+            ]
         );
 
-        if ($segmentHistoryId) {
-            $sql = 'UPDATE LEK_segment_history SET levenshteinOriginal=' . $levenshteinOriginal .
-                ',levenshteinPrevious=' . $levenshteinPrevious . ' WHERE id=' . $segmentHistoryId;
-        } else {
-            // avoid timestamp update
-            $sql = 'UPDATE LEK_segments SET timestamp=timestamp,levenshteinOriginal=' . $levenshteinOriginal .
-                ',levenshteinPrevious=' . $levenshteinPrevious . ' WHERE id=' . $segmentId;
+        foreach ($historyRows as $historyRow) {
+            $orderdContent[(int) $historyRow['segmentHistoryId']] = new LevenshteinHistoryDTO(
+                $segmentId,
+                (int) $historyRow['segmentHistoryId'],
+                (int) ($historyRow['autoStateId'] ?? SegmentAutoStates::NOT_TRANSLATED),
+                (string) ($historyRow['editedInStep'] ?? editor_Workflow_Default::STEP_NO_WORKFLOW),
+                (string) ($historyRow['original'] ?? ''),
+                (string) ($historyRow['edited'] ?? ''),
+            );
         }
-        $this->db->query($sql);
+
+        return array_reverse($orderdContent);
     }
 
-    private function getLastHistoryEdited(int $segmentId, array $filter): ?string
-    {
-        $lastInHistory = $this->history->loadLatestForSegment(
-            $segmentId,
-            $filter
-        );
-
-        if (empty($lastInHistory)) {
-            return null;
+    /**
+     * @throws Zend_Exception
+     */
+    private function calculateLevenshteinInDto(
+        LevenshteinHistoryDTO $levenshteinHistoryDTO,
+        string $previousStepOriginal,
+        string $previousStepEdited
+    ): void {
+        try {
+            $levenshteinOriginal = $this->levenshtein->calcDistance(
+                $previousStepOriginal,
+                $levenshteinHistoryDTO->targetEdited
+            );
+            $levenshteinPrevious = $this->levenshtein->calcDistance(
+                $previousStepEdited,
+                $levenshteinHistoryDTO->targetEdited
+            );
+            $levenshteinHistoryDTO->levenshteinOriginal = $levenshteinOriginal['distance'];
+            $levenshteinHistoryDTO->levenshteinPrevious = $levenshteinPrevious['distance'];
+            $levenshteinHistoryDTO->segmentlengthPrevious = $levenshteinPrevious['segmentlengthPrevious'];
+        } catch (InvalidInputForLevenshtein $e) {
+            Zend_Registry::get('logger')->exception($e);
+            $levenshteinHistoryDTO->levenshteinOriginal = 0;
+            $levenshteinHistoryDTO->levenshteinPrevious = 0;
+            $levenshteinHistoryDTO->segmentlengthPrevious = 0;
         }
-        $historyDataEntry = $this->historyData->loadByHistoryId((int) $lastInHistory['id'], ['edited']);
-
-        return ! empty($historyDataEntry) ? $historyDataEntry['edited'] : null;
     }
 }

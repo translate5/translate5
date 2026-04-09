@@ -128,12 +128,14 @@ class editor_Workflow_Default_Hooks
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);
         $this->events->addIdentifiers(get_class($workflow));
 
+        $stepRecalculation = \MittagQI\Translate5\Workflow\StepRecalculation::create();
+
         // TODO: Extract event handling from here
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach(
             EventDispatcher::class,
             UserJobCreatedEvent::class,
-            function (Zend_EventManager_Event $zendEvent) {
+            function (Zend_EventManager_Event $zendEvent) use ($stepRecalculation) {
                 /** @var UserJobCreatedEvent $event */
                 $event = $zendEvent->getParam('event');
                 //if entity could not be saved no ID was given, so check for it
@@ -143,7 +145,7 @@ class editor_Workflow_Default_Hooks
                     $jobHandler = ZfExtended_Factory::get(editor_Workflow_Default_JobHandler::class);
                     $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_ADD));
 
-                    $this->workflow->getStepRecalculation()->recalculateWorkflowStep($event->userJob->getTaskGuid());
+                    $stepRecalculation->recalculateWorkflowStep($this->workflow, $event->userJob->getTaskGuid());
                 }
             }
         );
@@ -151,7 +153,7 @@ class editor_Workflow_Default_Hooks
         $events->attach(
             EventDispatcher::class,
             UserJobDeletedEvent::class,
-            function (Zend_EventManager_Event $zendEvent) {
+            function (Zend_EventManager_Event $zendEvent) use ($stepRecalculation) {
                 /** @var UserJobDeletedEvent $event */
                 $event = $zendEvent->getParam('event');
                 $this->newTaskUserAssoc = $event->userJob;
@@ -159,7 +161,7 @@ class editor_Workflow_Default_Hooks
                 $jobHandler = ZfExtended_Factory::get(editor_Workflow_Default_JobHandler::class);
                 $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_DELETE));
 
-                $this->workflow->getStepRecalculation()->recalculateWorkflowStep($event->userJob->getTaskGuid());
+                $stepRecalculation->recalculateWorkflowStep($this->workflow, $event->userJob->getTaskGuid());
             }
         );
 
@@ -216,7 +218,11 @@ class editor_Workflow_Default_Hooks
     protected function handleBeforeImport()
     {
         $this->doDebug(self::HANDLE_IMPORT_BEFORE);
-        $this->workflow->getStepRecalculation()->initWorkflowStep($this->newTask, $this->workflow::STEP_NO_WORKFLOW);
+
+        $this->workflow->getLogger($this->newTask)->info('E1013', 'workflow init step to "{step}"', [
+            'step' => $this->workflow::STEP_NO_WORKFLOW,
+        ]);
+        $this->newTask->updateWorkflowStep($this->workflow::STEP_NO_WORKFLOW, false);
         $this->newTask->load((int) $this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
         $this->callActions(self::HANDLE_IMPORT_BEFORE, $this->workflow::STEP_NO_WORKFLOW);
     }
@@ -302,7 +308,6 @@ class editor_Workflow_Default_Hooks
         $this->newTask = $importedTask;
         $this->importConfig = $importConfig;
         $this->doDebug(self::HANDLE_IMPORT);
-        $this->workflow->getStepRecalculation()->setupInitialWorkflow($this->newTask);
         $this->callActions(self::HANDLE_IMPORT);
     }
 

@@ -31,58 +31,123 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Workflow;
 
 use editor_Workflow_Default;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
 class NextStepCalculator
 {
     public function __construct(
+        private readonly TaskRepository $taskRepository,
         private readonly UserJobRepository $userJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
     ) {
     }
 
     public static function create(): self
     {
         return new self(
+            TaskRepository::create(),
             UserJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
         );
     }
 
     /**
      * Returns next step in stepChain, or STEP_WORKFLOW_ENDED if for nextStep no users are associated
      */
-    public function getNextStep(editor_Workflow_Default $workflow, string $taskGuid, string $step): ?string
+    public function getNextStep(editor_Workflow_Default $workflow, string $taskGuid): ?string
     {
-        //get used roles in task:
-        $associatedSteps = $this->userJobRepository->getWorkflowStepNamesOfJobsInTask($taskGuid);
+        $matchingSteps = $this->getMatchingSteps($workflow, $taskGuid);
 
-        if (empty($associatedSteps)) {
-            return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
-        }
+        $task = $this->taskRepository->getByGuid($taskGuid);
 
-        $stepChain = array_values($workflow->getStepChain());
-        $stepCount = count($stepChain);
-
-        $position = array_search($step, $stepChain);
-
-        // if the current step is not found in the chain or
-        // if there are no jobs the workflow should be ended then
-        // (normally we never reach here since to change the workflow at least one job is needed)
-        if ($position === false) {
-            return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
-        }
-
-        //we want the position of the next step, not the current one:
-        $position++;
-
-        //loop over all steps after the current one
-        for (; $position < $stepCount; $position++) {
-            if (in_array($stepChain[$position], $associatedSteps)) {
-                //the first one with associated users is returned
-                return $stepChain[$position];
+        if (empty($matchingSteps)) {
+            if ($this->userJobRepository->taskHasNotFinishedJob($taskGuid, $workflow->getName())) {
+                // if there is no workflow, then we can not change the step, but also do not want to end the workflow
+                return null;
             }
+
+            return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
         }
 
-        //if no next step is found, it is ended by definition
-        return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
+        // if the current step is one of the possible steps for the tua configuration
+        // then everything is OK
+        if (in_array($task->getWorkflowStepName(), $matchingSteps, true)) {
+            return null;
+        }
+
+        return reset($matchingSteps);
+    }
+
+    private function getMatchingSteps(editor_Workflow_Default $workflow, string $taskGuid): array
+    {
+        $jobsCount = 0;
+        $pmOverrideCount = 0;
+        $matchingSteps = [];
+        $jobsData = [];
+
+        foreach ($this->coordinatorGroupJobRepository->getTaskCoordinatorGroupDataJobs($taskGuid) as $dataJob) {
+            $jobsCount++;
+
+            $jobsData[] = [
+                'state' => $dataJob->getState(),
+                'workflowStepName' => $dataJob->getWorkflowStepName(),
+            ];
+        }
+
+        foreach ($this->userJobRepository->getTaskJobs($taskGuid) as $userJob) {
+            $jobsCount++;
+
+            if ($userJob->getIsPmOverride()) {
+                $pmOverrideCount++;
+            }
+
+            $jobsData[] = [
+                'state' => $userJob->getState(),
+                'workflowStepName' => $userJob->getWorkflowStepName(),
+            ];
+        }
+
+        if (0 === $jobsCount || $jobsCount === $pmOverrideCount) {
+            return [
+                editor_Workflow_Default::STEP_NO_WORKFLOW,
+            ];
+        }
+
+        foreach ($workflow->getValidStates() as $step => $roleStates) {
+            if (! $this->areJobsSubset($roleStates, $step, $jobsData)) {
+                continue;
+            }
+
+            $matchingSteps[] = $step;
+        }
+
+        return $matchingSteps;
+    }
+
+    /**
+     * Checks if the given Jobs are a subset of the list be compared
+     */
+    protected function areJobsSubset(array $toCompare, string $currentStep, array $jobs): bool
+    {
+        $hasStepToCurrentTaskStep = false;
+        foreach ($jobs as $job) {
+            if (empty($toCompare[$job['workflowStepName']])) {
+                // if a job's step does not exist in the compare list, we just ignore that job
+                continue;
+            }
+
+            if (! in_array($job['state'], $toCompare[$job['workflowStepName']], true)) {
+                // if the jobs step exist, but its state is not configured, then the configuration is invalid for that step
+                return false;
+            }
+
+            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $job['workflowStepName']);
+        }
+
+        //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
+        // in other words we can not reset the task to reviewing, if we do not have a reviewer
+        return $hasStepToCurrentTaskStep;
     }
 }

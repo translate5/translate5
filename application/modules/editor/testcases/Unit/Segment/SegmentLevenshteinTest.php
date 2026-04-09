@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment;
 
 use MittagQI\Translate5\Segment\Exception\InvalidInputForLevenshtein;
-use MittagQI\Translate5\Segment\SegmentLevenshtein;
+use MittagQI\Translate5\Segment\LevenshteinCalculationService;
 use PHPUnit\Framework\TestCase;
 
 class SegmentLevenshteinTest extends TestCase
@@ -96,7 +96,31 @@ TAG;
             $this->markTestSkipped('Requires grapheme_levenshtein (PHP 8.5+).');
         }
 
-        self::assertEquals($expected, SegmentLevenshtein::create()->calcDistance($s1, $s2));
+        $result = LevenshteinCalculationService::create()->calcDistance($s1, $s2);
+        self::assertArrayHasKey('segmentlengthPrevious', $result);
+        self::assertIsInt($result['segmentlengthPrevious']);
+        self::assertGreaterThanOrEqual(0, $result['segmentlengthPrevious']);
+        self::assertEquals($expected, $result['distance']);
+    }
+
+    public function provideSegmentLength(): array
+    {
+        return [
+            'ascii' => ['abc', 'xyz', 3],
+            'utf8-mb' => ['äöü', 'aou', 3],
+            'empty' => ['', 'x', 0],
+        ];
+    }
+
+    /**
+     * @dataProvider provideSegmentLength
+     * @throws InvalidInputForLevenshtein
+     */
+    public function testSegmentLength(string $s1, string $s2, int $expectedLength): void
+    {
+        $result = LevenshteinCalculationService::create()->calcDistance($s1, $s2);
+
+        self::assertSame($expectedLength, $result['segmentlengthPrevious']);
     }
 
     /**

@@ -126,23 +126,4 @@ class SegmentHistoryRepository
 
         return $result ?: [];
     }
-
-    public function getHistoryIdsForSegment(int $segmentId, string $userGuid, array $filter = []): array
-    {
-        $s = $this->db->select()
-            ->from(editor_Models_Db_SegmentsHistory::TABLE_NAME, ['id'])
-            ->where('segmentId = ?', $segmentId)
-            ->where('userGuid = ?', $userGuid);
-
-        foreach ($filter as $field => $value) {
-            if ($value !== null) {
-                $s = $s->where($field, $value);
-            } else {
-                $field = str_replace('= ?', 'IS NULL', $field);
-                $s = $s->where($field);
-            }
-        }
-
-        return $this->db->fetchCol($s);
-    }
 }

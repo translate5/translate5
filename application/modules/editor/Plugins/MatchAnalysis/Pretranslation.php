@@ -121,12 +121,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
      */
     protected $events = false;
 
-    /***
-     * Analysis id
-     *
-     * @var mixed
-     */
-    protected $analysisId;
+    protected int $analysisId;
 
     /***
      * Is the current analysis and pretranslation running with batch query enabled

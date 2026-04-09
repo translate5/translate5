@@ -34,7 +34,7 @@ use MittagQI\Translate5\LanguageResource\Operation\UpdateSegmentOperation;
 use MittagQI\Translate5\Repository\SegmentHistoryDataRepository;
 use MittagQI\Translate5\Segment\EntityHandlingMode;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
-use MittagQI\Translate5\Segment\UpdateSegmentStatistics;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
@@ -72,7 +72,7 @@ class editor_Models_Segment_Updater
 
     protected ContentProtector $contentProtector;
 
-    private UpdateSegmentStatistics $updateStatistics;
+    private UpdateSegmentService $updateStatistics;
 
     private ConnectorForTaskProvider $connectorProvider;
 
@@ -85,7 +85,7 @@ class editor_Models_Segment_Updater
         $this->events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [get_class($this)]);
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
-        $this->updateStatistics = UpdateSegmentStatistics::create();
+        $this->updateStatistics = UpdateSegmentService::create();
         $this->connectorProvider = ConnectorForTaskProvider::create();
     }
 
@@ -201,8 +201,6 @@ class editor_Models_Segment_Updater
         $this->updateStatistics->updateFor(
             $this->segment,
             $this->task->getWorkflow(),
-            (int) $this->task->getWorkflowStep(),
-            true
         );
 
         $this->setTimestampOnSegmentUpdate();

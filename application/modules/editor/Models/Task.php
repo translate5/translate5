@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_AutoStates as AutoStates;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
+use MittagQI\Translate5\Workflow\UpdateTaskWorkflowStepService;
 use MittagQI\ZfExtended\Localization;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
@@ -715,23 +716,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     /**
      * update the workflowStep of a specific task
      * @param bool $increaseStep optional, by default true, increases then the workflow step nr
+     * @throws ReflectionException
+     * @throws Zend_Db_Adapter_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function updateWorkflowStep(string $stepName, $increaseStep = true)
+    public function updateWorkflowStep(string $stepName, bool $increaseStep = true): void
     {
-        $data = [
-            'workflowStepName' => $stepName,
-        ];
-        if ($increaseStep) {
-            $data['workflowStep'] = new Zend_Db_Expr('`workflowStep` + 1');
-            //step nr is not updated in task entity! For correct value we have to reload the task and load the value form DB.
-        }
-        $this->__call('setWorkflowStepName', [$stepName]);
-        $this->db->update($data, [
-            'taskGuid = ?' => $this->getTaskGuid(),
-        ]);
-        ZfExtended_Factory
-            ::get(editor_Models_TaskProgress::class)
-                ->updateSegmentFinishCount($this);
+        UpdateTaskWorkflowStepService::create()->updateWorkflowStep(
+            $this,
+            $stepName,
+            $increaseStep,
+        );
     }
 
     /**

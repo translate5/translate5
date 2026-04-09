@@ -567,21 +567,45 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * Load the Key Point Indicators data for the given taskGuids and roles/steps
      * If 'workflowSteps' filter is specified, it has priority over 'roles'
      */
-    public function loadKpiData(array $taskGuids, array $roles = [], array $workflowSteps = []): array
-    {
+    public function loadKpiData(
+        array $taskGuids,
+        array $roles = [],
+        array $stepsByWorkflow = [],
+    ): array {
         if (empty($taskGuids)) {
             return [];
         }
 
-        $col = ! empty($workflowSteps) ? 'workflowStepName' : 'role';
+        $timeByColumn = ! empty($stepsByWorkflow)
+            ? new Zend_Db_Expr('CONCAT(workflow, "#", workflowStepName)')
+            : 'role';
         $s = $this->db->select()
-            ->from($this->db, [$col . ' AS timeBy', new Zend_Db_Expr('SUM(DATEDIFF(finishedDate, assignmentDate))/COUNT(*) AS time')])
+            ->from($this->db, [
+                'timeBy' => $timeByColumn,
+                'time' => new Zend_Db_Expr('SUM(DATEDIFF(finishedDate, assignmentDate))/COUNT(*)'),
+            ])
             ->where('taskGuid IN(?)', $taskGuids)
             ->where('assignmentDate IS NOT NULL')
             ->where('finishedDate IS NOT NULL');
 
-        if ($col === 'workflowStepName') {
-            $s = $s->where('workflowStepName IN (?)', $workflowSteps);
+        if (! empty($stepsByWorkflow)) {
+            $whereParts = [];
+            $dbAdapter = $this->db->getAdapter();
+            foreach ($stepsByWorkflow as $workflow => $steps) {
+                if (empty($steps)) {
+                    continue;
+                }
+                $quotedSteps = array_map(
+                    static fn ($step): string => $dbAdapter->quote((string) $step),
+                    $steps
+                );
+                $whereParts[] = '(workflow = ' . $dbAdapter->quote($workflow) .
+                    ' AND workflowStepName IN (' . implode(',', $quotedSteps) . '))';
+            }
+            if (empty($whereParts)) {
+                return [];
+            }
+            $s = $s->where('(' . implode(' OR ', $whereParts) . ')');
         } else {
             //if the roles are not set, use the default roles for kpi
             if (empty($roles)) {
@@ -589,7 +613,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
             }
             $s = $s->where('role IN (?)', $roles);
         }
-        $s = $s->group($col);
+        if (! empty($stepsByWorkflow)) {
+            $s = $s->group(['workflow', 'workflowStepName']);
+        } else {
+            $s = $s->group($timeByColumn);
+        }
 
         return $this->db->fetchAll($s)->toArray();
     }

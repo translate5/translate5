@@ -110,8 +110,17 @@
             <file>editorAPI/ClientPmTest.php</file>
         </testsuite>
         <testsuite name="statistics">
+            <file>Unit/Segment/SegmentHistoryAggregationTest.php</file>
+            <file>Unit/Segment/SegmentLevenshteinTest.php</file>
             <file>Unit/Statistics/SegmentHistoryAggregationTest.php</file>
             <file>Unit/Statistics/SegmentHistoryAggregationRepositoryTest.php</file>
+            <file>Unit/Statistics/StatisticsWorkflowStepBackfillCommandTest.php</file>
+            <file>Unit/Statistics/StatisticsDbUpsertIncrementDurationTest.php</file>
+            <file>Unit/Statistics/UpdateSegmentServiceTest.php</file>
+            <file>editorAPI/AggregateTaskHistorySeedTest.php</file>
+            <file>editorAPI/KpiTest.php</file>
+            <file>editorAPI/StatisticsAggregateTest.php</file>
+            <file>../Plugins/MatchAnalysis/tests/Functional/MatchAnalysisTest.php</file>
         </testsuite>
         <testsuite name="unit">
             <directory>Unit</directory>

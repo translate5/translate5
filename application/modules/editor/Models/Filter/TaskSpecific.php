@@ -26,71 +26,131 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Statistics\Dto\StatisticFilterDTO;
+use MittagQI\ZfExtended\Models\Filter\FilterJoinDTO;
+
 /**
  * Set the task specific filter when special filter is active
  */
 class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6
 {
     /**
+     * Used in the advanced filter window, values for them are filtered
+     * for performance reasons in columnar based segment_statistics DB
+     */
+    private const array ADVANCED_FILTERS = [
+        'matchRateMin',
+        'matchRateMax',
+        'langResource',
+        'langResourceType',
+        'qualityScoreMin',
+        'qualityScoreMax',
+    ];
+
+    private ?StatisticFilterDTO $advancedFilter = null;
+
+    public function __construct(ZfExtended_Models_Entity_Abstract $entity = null, $filter = null)
+    {
+        parent::__construct($entity, $filter);
+        $advancedFilter = [];
+        foreach ($this->filter as $idx => $oneFilter) {
+            if (StatisticFilterDTO::isSupported($oneFilter->field)) {
+                $advancedFilter[$oneFilter->field] = $oneFilter->value;
+            }
+            //advanced filters are currently only processed via statistics
+            if (in_array($oneFilter->field, self::ADVANCED_FILTERS)) {
+                unset($this->filter[$idx]);
+            }
+        }
+        if (! empty($advancedFilter)) {
+            $this->advancedFilter = StatisticFilterDTO::fromAssocArray($advancedFilter);
+        }
+    }
+
+    public function getStatisticFilter(): ?StatisticFilterDTO
+    {
+        return $this->advancedFilter;
+    }
+
+    /**
      * sets several field mappings (field name in frontend differs from that in backend)
      * should be called after setDefaultFilter
      * @param array|null $sortColMap
      * @param array|null $filterTypeMap
+     * @throws Zend_Db_Table_Exception
      */
-    public function setMappings($sortColMap = null, $filterTypeMap = null)
+    public function setMappings($sortColMap = null, $filterTypeMap = null): void
     {
+        //HERE wenn step gefiltert, dann splitten in zwei Filter. Workflow und WfStep. Wobei Workflow mit dem gegeben
+        // Worekflwo gemerged werden muss!
+
         parent::setMappings($sortColMap, $filterTypeMap);
 
+        $this->addLockedToStateFilter();
+        $this->addAuthUserToUserStateFilter();
+        $this->processWorkflowStepFilter();
+    }
+
+    /**
+     * @throws Zend_Db_Table_Exception
+     */
+    private function addLockedToStateFilter(): void
+    {
         //if the task state filter is set, set the filter table
         $taskState = null;
-        if ($this->hasFilter('state', $taskState)) {
-            $db = $this->entity->db;
-            $taskTable = $db->info($db::NAME);
-            $taskStateValues = $taskState->value;
+        if (! $this->hasFilter('state', $taskState)) {
+            return;
+        }
+        $db = $this->entity->db;
+        $taskTable = $db->info($db::NAME);
+        $taskStateValues = $taskState->value;
 
-            //set the task table
-            $taskState->table = $taskTable;
+        //set the task table
+        $taskState->table = $taskTable;
 
-            //is state locked active
-            $locked = ! empty($taskStateValues) && in_array('locked', $taskStateValues);
+        //is state locked active
+        $locked = ! empty($taskStateValues) && in_array('locked', $taskStateValues);
 
-            //if locked filter state is active, add the or filter
-            if ($locked) {
-                //remove the user task state filter
-                $this->deleteFilter('state');
+        //if locked filter state is active, add the "or" filter
+        if (! $locked) {
+            return;
+        }
+        //remove the user task state filter
+        $this->deleteFilter('state');
 
-                $orFilter = new stdClass();
-                $orFilter->type = 'orExpression';
-                $orFilter->field = '';
-                $orFilter->value = [];
+        $orFilter = new stdClass();
+        $orFilter->type = 'orExpression';
+        $orFilter->field = '';
+        $orFilter->value = [];
 
-                //add the locked filter
-                $filter = new stdClass();
-                $filter->field = 'locked';
-                $filter->type = 'notIsNull';
-                $filter->value = '';
-                $filter->table = $taskTable;
-                $orFilter->value[] = $filter;
+        //add the locked filter
+        $filter = new stdClass();
+        $filter->field = 'locked';
+        $filter->type = 'notIsNull';
+        $filter->value = '';
+        $filter->table = $taskTable;
+        $orFilter->value[] = $filter;
 
-                //remove state locked from the state values
-                if (($key = array_search('locked', $taskStateValues)) !== false) {
-                    unset($taskStateValues[$key]);
-                }
-
-                if (! empty($taskStateValues)) {
-                    //add all other state filter values
-                    $filter = new stdClass();
-                    $filter->field = 'state';
-                    $filter->type = 'list';
-                    $filter->value = $taskStateValues;
-                    $filter->table = $taskTable;
-                    $orFilter->value[] = $filter;
-                }
-
-                $this->addFilter($orFilter);
-            }
+        //remove state locked from the state values
+        if (($key = array_search('locked', $taskStateValues)) !== false) {
+            unset($taskStateValues[$key]);
         }
 
+        if (! empty($taskStateValues)) {
+            //add all other state filter values
+            $filter = new stdClass();
+            $filter->field = 'state';
+            $filter->type = 'list';
+            $filter->value = $taskStateValues;
+            $filter->table = $taskTable;
+            $orFilter->value[] = $filter;
+        }
+
+        $this->addFilter($orFilter);
+    }
+
+    private function addAuthUserToUserStateFilter(): void
+    {
         //check if one of the set filters is userState filter
         $userStateFilter = null;
         if (! $this->hasFilter('userState', $userStateFilter)) {
@@ -104,5 +164,56 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6
         $filter->value = ZfExtended_Authentication::getInstance()->getUserGuid();
         $filter->table = $userStateFilter->type->getTable();
         $this->addFilter($filter);
+    }
+
+    private function processWorkflowStepFilter(): void
+    {
+        if (! $this->hasFilter('workflowStep')) {
+            return;
+        }
+        $this->deleteFilter('workflowStep');
+
+        // the advanced filter instance are filled with the steps already
+        $stepsByWorkflow = $this->advancedFilter->getGroupWorkflowStepsByWorkflow();
+
+        $orFilter = new stdClass();
+        $orFilter->type = 'orExpression';
+        $orFilter->field = '';
+        $orFilter->value = [];
+
+        foreach ($stepsByWorkflow as $workflow => $steps) {
+            $orFilter->value[] = $this->createStepAndWorkflowFilter($workflow, $steps);
+        }
+
+        $this->addFilter($orFilter);
+        $this->addJoinedTable(new FilterJoinDTO(
+            editor_Models_Db_TaskUserAssoc::TABLE_NAME,
+            'taskGuid',
+            'taskGuid'
+        ));
+    }
+
+    private function createStepAndWorkflowFilter(string $workflow, array $steps): stdClass
+    {
+        //add the locked filter
+        $stepFilter = new stdClass();
+        $stepFilter->field = 'workflowStepName';
+        $stepFilter->type = 'list';
+        $stepFilter->value = $steps;
+        $stepFilter->table = editor_Models_Db_TaskUserAssoc::TABLE_NAME;
+
+        $workflowFilter = new stdClass();
+        $workflowFilter->field = 'workflow';
+        $workflowFilter->table = editor_Models_Db_TaskUserAssoc::TABLE_NAME;
+        $workflowFilter->value = $workflow;
+        $workflowFilter->comparison = 'eq';
+        $workflowFilter->type = 'numeric';
+
+        $andFilter = new stdClass();
+        $andFilter->type = 'andExpression';
+        $andFilter->field = '';
+        $andFilter->value = [$stepFilter, $workflowFilter];
+
+        return $andFilter;
     }
 }

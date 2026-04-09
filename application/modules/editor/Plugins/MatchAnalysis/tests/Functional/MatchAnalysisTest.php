@@ -26,6 +26,9 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
+use MittagQI\Translate5\Test\Api\AnalysisTrait;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\ImportTestAbstract;
 
@@ -37,7 +40,7 @@ use MittagQI\Translate5\Test\ImportTestAbstract;
  */
 class MatchAnalysisTest extends ImportTestAbstract
 {
-    use \MittagQI\Translate5\Test\Api\AnalysisTrait;
+    use AnalysisTrait;
 
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
@@ -49,8 +52,13 @@ class MatchAnalysisTest extends ImportTestAbstract
      * Configs which are changed for test tests and needs to be revoked after the test is done
      * @var array
      */
-    protected static $changedConfigs = [];
+    protected static array $changedConfigs = [];
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_Exception
+     */
     protected static function setupImport(Config $config): void
     {
         $sourceLangRfc = 'en';
@@ -81,19 +89,25 @@ class MatchAnalysisTest extends ImportTestAbstract
             ->setProperty('edit100PercentMatch', true);
     }
 
-    /***
-     * @return void
+    /**
+     * @throws Zend_Http_Client_Exception
      */
     public function testExportXmlResultsWord(): void
     {
         $this->exportXmlResults(false);
     }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
     public function testWordBasedResults(): void
     {
         $this->validateGroupedResults(false);
     }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
     public function testCharacterBasedResults(): void
     {
         $this->validateGroupedResults(true);
@@ -101,6 +115,7 @@ class MatchAnalysisTest extends ImportTestAbstract
 
     /***
      * Validate all analysis results.
+     * @throws Zend_Http_Client_Exception
      */
     public function testValidateAllResults(): void
     {
@@ -112,7 +127,10 @@ class MatchAnalysisTest extends ImportTestAbstract
         ], $jsonFileName);
         $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based not-grouped matchanalysis.');
 
-        static::api()->isCapturing() && file_put_contents(static::api()->getFile($jsonFileName, null, false), json_encode($this->filterUngroupedAnalysis($analysis), JSON_PRETTY_PRINT));
+        static::api()->isCapturing() && file_put_contents(
+            static::api()->getFile($jsonFileName, null, false),
+            json_encode($this->filterUngroupedAnalysis($analysis), JSON_PRETTY_PRINT)
+        );
 
         $expectedAnalysis = static::api()->getFileContent($jsonFileName);
 
@@ -123,8 +141,97 @@ class MatchAnalysisTest extends ImportTestAbstract
         );
     }
 
+    /**
+     * @throws Zend_Exception
+     */
+    public function testPretranslationStatisticsAreSynced(): void
+    {
+        $config = Zend_Registry::get('config');
+        if (! $config->resources->db->statistics?->enabled) {
+            self::markTestSkipped('Runs only with resources.db.statistics.enabled = 1');
+        }
+
+        $taskGuid = static::api()->getTask()->taskGuid;
+        $repository = SegmentStatisticsRepository::create();
+
+        $levenshteinRows = $repository->getLevenshteinRowsByTaskGuid($taskGuid);
+        self::assertNotEmpty($levenshteinRows, 'Expected statistics rows for pretranslated task');
+
+        $statsBySegmentId = [];
+        foreach ($levenshteinRows as $row) {
+            if ((int) ($row['latestEntry'] ?? 0) !== 1) {
+                continue;
+            }
+            $statsBySegmentId[(int) $row['segmentId']] = $row;
+        }
+
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $segments = $db->fetchAll(
+            'SELECT id, matchRate, matchRateType, editedInStep, editable FROM LEK_segments WHERE taskGuid = :taskGuid',
+            [
+                'taskGuid' => $taskGuid,
+            ]
+        );
+        self::assertNotEmpty($segments, 'Expected task segments for comparison with statistics rows');
+
+        $hasPretranslationMatchData = false;
+        foreach ($segments as $segment) {
+            $segmentId = (int) $segment['id'];
+            self::assertArrayHasKey(
+                $segmentId,
+                $statsBySegmentId,
+                'Missing latest statistics row for segment ' . $segmentId
+            );
+
+            $statsRow = $statsBySegmentId[$segmentId];
+            $expectedStep = empty($segment['editedInStep'])
+                ? AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP
+                : (string) $segment['editedInStep'];
+            $expectedLangResType = editor_Models_Segment_MatchRateType::getLangResourceType(
+                (string) $segment['matchRateType']
+            );
+
+            self::assertSame(
+                (int) $segment['matchRate'],
+                (int) $statsRow['matchRate'],
+                'Statistics matchRate mismatch for segment ' . $segmentId
+            );
+            self::assertSame(
+                $expectedLangResType,
+                (string) $statsRow['langResType'],
+                'Statistics langResType mismatch for segment ' . $segmentId
+            );
+            self::assertSame(
+                $expectedStep,
+                (string) $statsRow['workflowStepName'],
+                'Statistics workflowStepName mismatch for segment ' . $segmentId
+            );
+            self::assertSame(
+                (int) $segment['editable'],
+                (int) $statsRow['editable'],
+                'Statistics editable mismatch for segment ' . $segmentId
+            );
+
+            if ((int) $statsRow['matchRate'] > 0 && trim((string) $statsRow['langResType']) !== '') {
+                $hasPretranslationMatchData = true;
+            }
+        }
+        self::assertTrue(
+            $hasPretranslationMatchData,
+            'Expected at least one synced pretranslation row with matchRate and langResType'
+        );
+
+        $posteditingRows = $repository->getPosteditingTimeAggregationByTaskGuid($taskGuid);
+        self::assertSame(
+            [],
+            $posteditingRows,
+            'Pretranslation should not create postediting duration rows'
+        );
+    }
+
     /***
      * Validate the grouped analysis results.
+     * @throws Zend_Http_Client_Exception
      */
     private function validateGroupedResults(bool $characterBased): void
     {
@@ -136,7 +243,10 @@ class MatchAnalysisTest extends ImportTestAbstract
             'taskGuid' => static::api()->getTask()->taskGuid,
             'unitType' => $unitType,
         ], $jsonFileName);
-        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based task-specific matchanalysis.');
+        $this->assertNotEmpty(
+            $analysis,
+            'No results found for the ' . $unitType . '-based task-specific matchanalysis.'
+        );
         //check for differences between the expected and the actual content
         $expectedAnalysis = static::api()->getFileContent($jsonFileName);
 
@@ -149,6 +259,7 @@ class MatchAnalysisTest extends ImportTestAbstract
 
     /***
      * Test the xml analysis summary
+     * @throws Zend_Http_Client_Exception
      */
     private function exportXmlResults(bool $characterBased): void
     {
@@ -173,13 +284,19 @@ class MatchAnalysisTest extends ImportTestAbstract
             $actual
         );
 
-        static::api()->isCapturing() && file_put_contents(static::api()->getFile('exportResults-' . $unitType . '.xml', null, false), $actual);
+        static::api()->isCapturing() && file_put_contents(
+            static::api()->getFile('exportResults-' . $unitType . '.xml', null, false),
+            $actual
+        );
         $expected = static::api()->getFileContent('exportResults-' . $unitType . '.xml');
 
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
     }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
     public static function afterTests(): void
     {
         foreach (self::$changedConfigs as $c) {

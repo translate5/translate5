@@ -96,10 +96,43 @@ class MariaDB extends AbstractStatisticsDB
         }
     }
 
+    public function upsertIncrementDuration(
+        string $table,
+        string $taskGuid,
+        int $segmentId,
+        string $workflowStepName,
+        string $userGuid,
+        int $duration,
+    ): void {
+        if ($duration === 0) {
+            return;
+        }
+
+        $this->query(
+            'INSERT INTO ' . $table .
+            ' (taskGuid,segmentId,userGuid,workflowStepName,duration) VALUES ' .
+            '(:taskGuid,:segmentId,:userGuid,:workflowStepName,:duration) ' .
+            'ON DUPLICATE KEY UPDATE duration = duration + VALUES(duration)',
+            [
+                'taskGuid' => $taskGuid,
+                'segmentId' => $segmentId,
+                'userGuid' => $userGuid,
+                'workflowStepName' => $workflowStepName,
+                'duration' => $duration,
+            ]
+        );
+    }
+
     public function query(string $sql, array $bind = []): void
     {
         $sql = $this->adjustBindings($sql, $bind);
         $this->getClient()->query($sql, $bind);
+    }
+
+    public function insertSelectIgnore(string $table, array $columns, string $selectSql, array $bind = []): void
+    {
+        $sql = 'INSERT IGNORE INTO ' . $table . ' (' . implode(',', $columns) . ') ' . $selectSql;
+        $this->query($sql, $bind);
     }
 
     public function optimize(string $table, bool $compact = false): void

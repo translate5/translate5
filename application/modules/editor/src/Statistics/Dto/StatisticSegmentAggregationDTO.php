@@ -30,17 +30,47 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Statistics\Dto;
 
-class AggregationFilter
+/**
+ * manipulatable DTO for data collection
+ */
+class StatisticSegmentAggregationDTO
 {
     public function __construct(
-        public string $property,
-        public string|int|array $value,
-        public bool $isNative = false,
+        public string $userGuid,
+        public string $editedInStep,
+        public string $workflowStep,
+        public int $id,
+        public int $autoStateId,
+        public int $levenshteinOriginal = 0,
+        public int $levenshteinPrevious = 0,
+        public ?int $matchRate = null,
+        public ?string $matchRateType = null,
+        public int $isEditable = 0,
+        public ?int $qualityScore = null,
+        public int $latestEntry = 0,
+        public int $segmentlengthPrevious = 0,
     ) {
     }
 
-    public static function fromNativeFilter(\stdClass $filter): self
+    /**
+     * @param array{
+     *   userGuid: string,
+     *   editedInStep: string,
+     *   workflowStep: string,
+     *   id: int,
+     *   autoStateId: int,
+     *   levenshteinOriginal?: int,
+     *   levenshteinPrevious?: int,
+     *   matchRate?: int|null,
+     *   matchRateType?: string|null,
+     *   isEditable?: int,
+     *   qualityScore?: int|null,
+     *   latestEntry?: int,
+     *   segmentlengthPrevious?: int
+     * } $assocFilterList
+     */
+    public static function fromAssocArray(array $assocFilterList): self
     {
-        return new self($filter->property, $filter->value, true);
+        return new self(...$assocFilterList);
     }
 }

@@ -56,6 +56,7 @@ use MittagQI\Translate5\Segment\ReferenceFieldService;
 use MittagQI\Translate5\Segment\Repetition\DTO\ReplaceDto;
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionProcessingFailedEvent;
 use MittagQI\Translate5\Segment\Repetition\Event\RepetitionReplacementRequestedEvent;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use stdClass;
 use Throwable;
@@ -78,6 +79,7 @@ class RepetitionService
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly UserJobRepository $jobRepository,
         private readonly ReferenceFieldService $referenceFieldService,
+        private readonly UpdateSegmentService $updateSegmentStatistics,
     ) {
     }
 
@@ -96,6 +98,7 @@ class RepetitionService
             EventDispatcher::create(),
             UserJobRepository::create(),
             ReferenceFieldService::create(),
+            UpdateSegmentService::create(),
         );
     }
 
@@ -304,7 +307,7 @@ class RepetitionService
             }
             $repetition->setMatchRateType($master->getMatchRateType());
 
-            $repetition->setAutoStateId($master->getAutoStateId());
+            $repetition->setAutoStateId((int) $master->getAutoStateId());
             $repetition->meta()->setRepetitionUsed(true);
             $repetition->meta()->save();
             $repetition->setAutoStateId($this->autoStates->calculateAlikeState($repetition, $userJob));
@@ -339,6 +342,12 @@ class RepetitionService
             $this->updateTargetHashAndOriginal($repetition, $hasher);
 
             $history->save();
+
+            $this->updateSegmentStatistics->updateFor(
+                $repetition,
+                $task->getWorkflow(),
+            );
+
             $repetition->setTimestamp(NOW_ISO); //see TRANSLATE-922
             $repetition->save();
             $repetition->updateIsTargetRepeated($repetition->getTargetMd5(), $oldHash);

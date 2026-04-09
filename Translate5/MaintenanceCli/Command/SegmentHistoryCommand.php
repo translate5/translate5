@@ -34,9 +34,11 @@ use editor_Models_Segment_UtilityBroker;
 use editor_Models_SegmentField;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
-use MittagQI\Translate5\Repository\{SegmentHistoryAggregationRepository,
-    SegmentHistoryDataRepository,
+use MittagQI\Translate5\Repository\{SegmentHistoryDataRepository,
     SegmentHistoryRepository};
+use MittagQI\Translate5\Statistics\Dto\SegmentLevenshteinDTO;
+use MittagQI\Translate5\Statistics\SegmentLevenshteinRepository;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
 use ReflectionException;
 use stdClass;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -132,6 +134,17 @@ The single versions are showing only the values different to the current one! Th
 
         $ids = array_column($historyDataEntries, 'segmentHistoryId');
         $historyDataEntries = array_combine($ids, $historyDataEntries);
+        $segmentLevenshteinRows = SegmentLevenshteinRepository::create()->getBySegmentId((int) $segment->getId());
+        $historyLevenshtein = [];
+        $currentLevenshtein = null;
+        foreach ($segmentLevenshteinRows as $row) {
+            if ($row->historyId === 0) {
+                $currentLevenshtein = $row;
+
+                continue;
+            }
+            $historyLevenshtein[$row->historyId] = $row;
+        }
 
         $this->io->section("General segment information");
         $this->io->text([
@@ -140,12 +153,16 @@ The single versions are showing only the values different to the current one! Th
             '<info>Task ID / GUID:</info> <options=bold>' . $task->getId() . ' / ' . $segment->getTaskGuid() . '</>',
         ]);
         foreach ($historyEntries as $entry) {
-            $this->showSegment((object) $entry, $segment);
+            $this->showSegment(
+                (object) $entry,
+                $segment,
+                $historyLevenshtein[(int) $entry['id']] ?? null
+            );
             if (! empty($historyDataEntries[$entry['id']])) {
                 $this->showSegmentContent($historyDataEntries[$entry['id']]);
             }
         }
-        $this->showLatestSegment($segment);
+        $this->showLatestSegment($segment, $currentLevenshtein);
         $data = $segment->getEditableFieldData();
         foreach ($data as $field => $content) {
             $this->showSegmentContent([
@@ -170,26 +187,22 @@ The single versions are showing only the values different to the current one! Th
         return $this->autoStateMap[$autoState] ?? 'unknown';
     }
 
-    protected function showSegment(stdClass $segmentVersion, editor_Models_Segment $segment): void
-    {
+    protected function showSegment(
+        stdClass $segmentVersion,
+        editor_Models_Segment $segment,
+        ?SegmentLevenshteinDTO $levenshteinData = null
+    ): void {
         $this->io->section('Version ' . $this->versionCounter++ . ':');
         $result = [
             '     <info>history ID:</info> <options=bold>' . $segmentVersion->id . '</>',
             '        <info>created:</info> <options=bold>' . $segmentVersion->created . '</>',
         ];
-        if ($segmentVersion->userGuid != $segment->getUserGuid()) {
-            $result[] = '           <info>user:</info> ' . $segmentVersion->userName
-                . ' (' . $segmentVersion->userGuid . ')';
-        }
-        if ($segmentVersion->autoStateId != $segment->getAutoStateId()) {
-            $result[] = '  <info>process state:</info> ' . $this->getAutoState($segmentVersion->autoStateId);
-        }
-        if ($segmentVersion->editable != $segment->getEditable()) {
-            $result[] = '       <info>editable:</info> ' . $segmentVersion->editable;
-        }
-        if ($segmentVersion->pretrans != $segment->getPretrans()) {
-            $result[] = '       <info>pretrans:</info> ' . $segmentVersion->pretrans;
-        }
+        $result[] = '           <info>user:</info> ' . $segmentVersion->userName
+            . ' (' . $segmentVersion->userGuid . ')';
+        $result[] = '  <info>process state:</info> ' . $this->getAutoState($segmentVersion->autoStateId);
+        $result[] = '       <info>editable:</info> ' . $segmentVersion->editable;
+        $result[] = '       <info>pretrans:</info> ' . $segmentVersion->pretrans;
+        $result[] = '   <info>editedInStep:</info> ' . $segmentVersion->editedInStep;
         if ($segmentVersion->workflowStepNr != $segment->getWorkflowStepNr()
             || $segmentVersion->workflowStep != $segment->getWorkflowStep()) {
             if (empty($segmentVersion->workflowStepNr) && empty($segmentVersion->workflowStep)) {
@@ -205,11 +218,10 @@ The single versions are showing only the values different to the current one! Th
         if (mb_stripos($segment->getMatchRateType(), $segmentVersion->matchRateType) !== 0) {
             $result[] = ' <info>matchRate type:</info> ' . $segmentVersion->matchRateType;
         }
-        if (! empty($segmentVersion->stateId) && $segmentVersion->stateId != $segment->getStateId()) {
-            $result[] = '       <info>state id:</info> ' . $segmentVersion->stateId;
-        }
-        $result[] = '<info>Levensht (Orig):</info> ' . $segmentVersion->levenshteinOriginal;
-        $result[] = '<info>Levensht (Prev):</info> ' . $segmentVersion->levenshteinPrevious;
+        $result[] = '       <info>state id:</info> ' . $segmentVersion->stateId;
+        $result[] = '<info>Levensht (Orig):</info> ' . ($levenshteinData?->levenshteinOriginal ?? 0);
+        $result[] = '<info>Levensht (Prev):</info> ' . ($levenshteinData?->levenshteinPrevious ?? 0);
+        $result[] = '<info>  Length (Prev):</info> ' . ($levenshteinData?->segmentlengthPrevious ?? 0);
         $this->io->text($result);
     }
 
@@ -230,8 +242,10 @@ The single versions are showing only the values different to the current one! Th
         $this->io->text($label . $content);
     }
 
-    protected function showLatestSegment(editor_Models_Segment $segment): void
-    {
+    protected function showLatestSegment(
+        editor_Models_Segment $segment,
+        ?SegmentLevenshteinDTO $levenshteinData = null
+    ): void {
         $this->io->section('Used/latest version:');
         $result = [
             '  <info>last modified:</info> <options=bold>' . $segment->getTimestamp() . '</>',
@@ -239,7 +253,10 @@ The single versions are showing only the values different to the current one! Th
             . ' (' . $segment->getUserGuid() . ')</>',
             '       <info>editable:</info> <options=bold>' . $segment->getEditable() . '</>',
             '       <info>pretrans:</info> <options=bold>' . $segment->getPretrans() . '</>',
-            '  <info>process state:</info> <options=bold>' . $this->getAutoState($segment->getAutoStateId()) . '</>',
+            '   <info>editedInStep:</info> <options=bold>' . $segment->getEditedInStep() . '</>',
+            '  <info>process state:</info> <options=bold>' . $this->getAutoState(
+                (int) $segment->getAutoStateId()
+            ) . '</>',
         ];
         if (empty($segment->getWorkflowStep()) && empty($segment->getWorkflowStepNr())) {
             $result[] = '       <info>workflow:</info> <options=bold>-na-</>';
@@ -249,8 +266,9 @@ The single versions are showing only the values different to the current one! Th
         }
         $result[] = '      <info>matchRate:</info> <options=bold>' . $segment->getMatchRate() . '</>';
         $result[] = '  <info>matchRateType:</info> <options=bold>' . $segment->getMatchRateType() . '</>';
-        $result[] = '<info>Levensht (Orig):</info> ' . $segment->getLevenshteinOriginal();
-        $result[] = '<info>Levensht (Prev):</info> ' . $segment->getLevenshteinPrevious();
+        $result[] = '<info>Levensht (Orig):</info> ' . ($levenshteinData?->levenshteinOriginal ?? 0);
+        $result[] = '<info>Levensht (Prev):</info> ' . ($levenshteinData?->levenshteinPrevious ?? 0);
+        $result[] = '<info>  Length (Prev):</info> ' . ($levenshteinData?->segmentlengthPrevious ?? 0);
         if (! empty($segment->getStateId())) {
             $result[] = '        <info>stateId:</info> <options=bold>' . $segment->getStateId() . '</>';
         }
@@ -260,7 +278,6 @@ The single versions are showing only the values different to the current one! Th
 
     /**
      * returns the taskGuid to given option --task, null if option was not given
-     * @throws ReflectionException
      */
     protected function findTaskGuid(editor_Models_Task $task): ?string
     {
@@ -310,21 +327,19 @@ The single versions are showing only the values different to the current one! Th
 
     private function showSegmentStatistics(editor_Models_Segment $segment): void
     {
-        $historyAggregationData = SegmentHistoryAggregationRepository::create();
-        $aggregatedData = $historyAggregationData->getAggregationRowsBySegmentId((int) $segment->getId());
+        $historyAggregationData = SegmentStatisticsRepository::create();
+        $durationData = $historyAggregationData->getPosteditingTimeAggregationBySegmentId((int) $segment->getId());
         $levenstheinData = $historyAggregationData->getLevenshteinRowsBySegmentId((int) $segment->getId());
 
-        $this->io->section('Segment history aggregation data');
+        $this->io->section('Segment history postediting time data');
 
         $table = $this->io->createTable();
-        $table->setHeaders(['Workflow', 'Editable', 'Duration (ms)', 'MatchRate', 'Lang Res ID']);
-        foreach ($aggregatedData as $row) {
+        $table->setHeaders(['Workflow', 'UserGuid', 'Duration (ms)']);
+        foreach ($durationData as $row) {
             $table->addRow([
-                $row['workflowName'] . '::' . $row['workflowStepName'],
-                $row['editable'],
+                $row['workflowStepName'],
+                $row['userGuid'],
                 $row['duration'],
-                $row['matchRate'],
-                $row['langResId'] . ' (' . $row['langResType'] . ')',
             ]);
         }
 
@@ -333,15 +348,23 @@ The single versions are showing only the values different to the current one! Th
         $this->io->section('Segment history aggregation levenshtein data');
         $table = $this->io->createTable();
         $table->setHeaders([
-            'Workflow', 'Editable', 'Is last edit', 'Levensth. Orig', 'Levensth. Prev', 'MatchRate', 'Lang Res ID',
+            'Workflow',
+            'UserGuid',
+            'Editable',
+            'Levensth. Orig',
+            'Levensth. Prev',
+            'Length. Prev',
+            'MatchRate',
+            'Lang Res ID',
         ]);
         foreach ($levenstheinData as $row) {
             $table->addRow([
                 $row['workflowName'] . '::' . $row['workflowStepName'],
+                $row['userGuid'],
                 $row['editable'],
-                $row['lastEdit'],
                 $row['levenshteinOriginal'],
                 $row['levenshteinPrevious'],
+                $row['segmentlengthPrevious'],
                 $row['matchRate'],
                 $row['langResId'] . ' (' . $row['langResType'] . ')',
             ]);

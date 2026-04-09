@@ -575,8 +575,10 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws ZfExtended_NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws editor_Models_Segment_Exception
+     * @throws Zend_Exception
+     * @throws ReflectionException
      */
-    public function lockOperation(bool $lock = true)
+    public function lockOperation(bool $lock = true): void
     {
         $acl = $lock ? Rights::LOCK_SEGMENT_OPERATION : Rights::UNLOCK_SEGMENT_OPERATION;
 
@@ -589,12 +591,6 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->checkAccess(Rights::ID, $acl, __CLASS__ . '::' . ($lock ? __FUNCTION__ : 'unlockOperation'));
         $this->getAction();
 
-        /* @var Operations $operations */
-        $operations = ZfExtended_Factory::get(Operations::class, [
-            $task->getTaskGuid(),
-            $this->entity,
-        ]);
-
         // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
         // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is updated,
         // so that it would be possible to do the same AFTER segment is updated, calculate the difference and insert/delete
@@ -602,7 +598,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
 
         // Toggle lock
-        $operations->toggleLockOperation($lock);
+        Operations::create()->toggleLockOperation($task->getTaskGuid(), $this->entity, $lock);
 
         // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
         editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::ALIKE);
@@ -615,19 +611,24 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws editor_Models_Segment_Exception
      */
-    public function unlockOperation()
+    public function unlockOperation(): void
     {
         $this->lockOperation(false);
     }
 
     /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    public function unlockBatch()
+    public function unlockBatch(): void
     {
         $this->lockBatch(false);
     }
@@ -635,8 +636,10 @@ class Editor_SegmentController extends ZfExtended_RestController
     /**
      * @throws ZfExtended_NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws Zend_Exception
+     * @throws ReflectionException
      */
-    public function lockBatch(bool $lock = true)
+    public function lockBatch(bool $lock = true): void
     {
         $acl = $lock ? Rights::LOCK_SEGMENT_BATCH : Rights::UNLOCK_SEGMENT_BATCH;
 
@@ -646,12 +649,6 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->checkAccess(Rights::ID, $acl, __CLASS__ . '::' . ($lock ? __FUNCTION__ : 'unlockBatch'));
         $this->applyQualityFilter();
 
-        /* @var Operations $operations */
-        $operations = ZfExtended_Factory::get(Operations::class, [
-            $task->getTaskGuid(),
-            $this->entity,
-        ]);
-
         // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
         // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is updated,
         // so that it would be possible to do the same AFTER segment is updated, calculate the difference and insert/delete
@@ -659,7 +656,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
 
         // Batch-lock/unlock
-        $operations->toggleLockBatch($lock);
+        Operations::create()->toggleLockBatch($task->getTaskGuid(), $this->entity, $lock);
 
         // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
         editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::ALIKE);
@@ -668,27 +665,36 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->appendTaskProgress();
     }
 
-    public function unbookmarkBatch()
+    /**
+     * @throws Zend_Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ReflectionException
+     * @throws ZfExtended_ValidateException
+     * @throws ZfExtended_NoAccessException
+     */
+    public function unbookmarkBatch(): void
     {
         $this->bookmarkBatch(false);
     }
 
     /**
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_NoAccessException
+     * @throws ZfExtended_ValidateException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    public function bookmarkBatch(bool $bookmark = true)
+    public function bookmarkBatch(bool $bookmark = true): void
     {
         $acl = $bookmark ? 'bookmarkBatch' : 'unbookmarkBatch';
         $this->checkAccess('editor_segmentuserassoc', $acl, __CLASS__ . '::' . $acl);
         $this->applyQualityFilter();
 
-        /* @var Operations $operations */
-        $operations = ZfExtended_Factory::get(Operations::class, [
-            $this->getCurrentTask()->getTaskGuid(),
-            $this->entity,
-        ]);
-        $operations->toggleBookmarkBatch($bookmark);
+        Operations::create()->toggleBookmarkBatch($this->getCurrentTask()->getTaskGuid(), $this->entity, $bookmark);
     }
 
     /**

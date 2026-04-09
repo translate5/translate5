@@ -32,8 +32,8 @@ namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_KPI;
 use editor_Models_Task;
-use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
-use MittagQI\Translate5\Statistics\Dto\AggregationFilter;
+use MittagQI\Translate5\Statistics\Dto\StatisticFilterDTO;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -65,6 +65,11 @@ class StatisticsInspectCommand extends TaskCommand
         );
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws \ReflectionException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
@@ -80,15 +85,15 @@ class StatisticsInspectCommand extends TaskCommand
             return self::FAILURE;
         }
 
-        $historyAggregationRepository = SegmentHistoryAggregationRepository::create();
-        $aggregationRows = [];
+        $historyAggregationRepository = SegmentStatisticsRepository::create();
+        $durationRows = [];
         $levenshteinRows = [];
 
         $taskData = [];
         foreach ($tasks as $task) {
-            $aggregationRows = array_merge(
-                $aggregationRows,
-                $historyAggregationRepository->getAggregationRowsByTaskGuid($task->getTaskGuid())
+            $durationRows = array_merge(
+                $durationRows,
+                $historyAggregationRepository->getPosteditingTimeAggregationByTaskGuid($task->getTaskGuid())
             );
             $levenshteinRows = array_merge(
                 $levenshteinRows,
@@ -97,17 +102,16 @@ class StatisticsInspectCommand extends TaskCommand
             $taskData[] = (array) $task->getDataObject();
         }
 
-        $this->renderAggregatedData($aggregationRows, $tasks);
+        $this->renderPosteditingTimeData($durationRows, $tasks);
         $this->renderLevenshteinData($levenshteinRows, $tasks);
 
         $workflowFilterValues = $this->normalizeWorkflowFilters($input->getOption('workflow'));
 
         $kpi = new editor_Models_KPI($historyAggregationRepository);
         $kpi->setTasks($taskData);
-        $kpiStatistics = $kpi->getStatistics(
-            $this->buildWorkflowFilters($workflowFilterValues),
-            $this->buildWorkflowAggregationFilters($workflowFilterValues)
-        );
+        $kpiStatistics = $kpi->getStatistics(StatisticFilterDTO::fromAssocArray([
+            'workflowStep' => $workflowFilterValues,
+        ]));
 
         $this->io->section('KPI statistics summary');
 
@@ -150,12 +154,12 @@ class StatisticsInspectCommand extends TaskCommand
         return $tasks;
     }
 
-    private function renderAggregatedData(array $aggregationRows, array $tasks): void
+    private function renderPosteditingTimeData(array $aggregationRows, array $tasks): void
     {
-        $this->io->section('Segment history aggregation data');
+        $this->io->section('Segment history postediting time data');
 
         $table = $this->io->createTable();
-        $table->setHeaders(['Task', 'Seg ID', 'Workflow', 'Editable', 'Duration (ms)', 'MatchRate', 'Lang Res ID']);
+        $table->setHeaders(['Task', 'Seg ID', 'WorkflowStep', 'Duration (ms)']);
 
         $durationSum = 0;
         foreach ($aggregationRows as $row) {
@@ -163,11 +167,8 @@ class StatisticsInspectCommand extends TaskCommand
             $table->addRow([
                 $tasks['{' . $row['taskGuid'] . '}']->getId() . ' (' . $row['taskGuid'] . ')',
                 $row['segmentId'],
-                $row['workflowName'] . '::' . $row['workflowStepName'],
-                $row['editable'],
+                $row['workflowStepName'],
                 $row['duration'],
-                $row['matchRate'],
-                $row['langResId'] . ' (' . $row['langResType'] . ')',
             ]);
         }
 
@@ -175,10 +176,7 @@ class StatisticsInspectCommand extends TaskCommand
             'Duration SUM',
             '',
             '',
-            '',
             $durationSum,
-            '',
-            '',
         ]);
 
         $table->render();
@@ -192,10 +190,12 @@ class StatisticsInspectCommand extends TaskCommand
             'Task',
             'Seg ID',
             'Workflow',
+            'User',
             'Editable',
-            'Is last edit',
+            'Latest',
             'Levensth. Orig',
             'Levensth. Prev',
+            'Length Prev',
             'MatchRate',
             'Lang Res ID',
         ]);
@@ -204,10 +204,12 @@ class StatisticsInspectCommand extends TaskCommand
                 $tasks['{' . $row['taskGuid'] . '}']->getId() . ' (' . $row['taskGuid'] . ')',
                 $row['segmentId'],
                 $row['workflowName'] . '::' . $row['workflowStepName'],
+                $row['userGuid'],
                 $row['editable'],
-                $row['lastEdit'],
+                $row['latestEntry'],
                 $row['levenshteinOriginal'],
                 $row['levenshteinPrevious'],
+                $row['segmentlengthPrevious'] ?? 0,
                 $row['matchRate'],
                 $row['langResId'] . ' (' . $row['langResType'] . ')',
             ]);
@@ -237,32 +239,5 @@ class StatisticsInspectCommand extends TaskCommand
         $values = array_filter($values, static fn (string $value): bool => $value !== '');
 
         return array_values(array_unique($values));
-    }
-
-    private function buildWorkflowFilters(array $workflowSteps): array
-    {
-        if (empty($workflowSteps)) {
-            return [];
-        }
-
-        $filter = new \stdClass();
-        $filter->property = 'workflowStep';
-        $filter->value = $workflowSteps;
-
-        return [$filter];
-    }
-
-    /**
-     * @return AggregationFilter[]
-     */
-    private function buildWorkflowAggregationFilters(array $workflowSteps): array
-    {
-        if (empty($workflowSteps)) {
-            return [];
-        }
-
-        return [
-            new AggregationFilter('workflowStepName', $workflowSteps, true),
-        ];
     }
 }

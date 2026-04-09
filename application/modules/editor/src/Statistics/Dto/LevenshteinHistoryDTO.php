@@ -28,41 +28,20 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Configuration;
+namespace MittagQI\Translate5\Statistics\Dto;
 
-use Zend_Db_Adapter_Abstract;
-use Zend_Db_Table;
-
-class KeyValueStorage
+class LevenshteinHistoryDTO
 {
-    private Zend_Db_Adapter_Abstract $db;
-
-    private const TABLE = 'LEK_key_value_data';
-
-    public function __construct(Zend_Db_Adapter_Abstract $db = null)
-    {
-        $this->db = $db !== null ? $db : Zend_Db_Table::getDefaultAdapter();
-    }
-
-    public function get(string $key, string $default = ''): string
-    {
-        $value = $this->db->fetchOne('SELECT value FROM ' . self::TABLE . ' WHERE id = ?', $key);
-        if ($value === false) {
-            $value = $default;
-            $this->set($key, $value);
-        }
-
-        return $value;
-    }
-
-    public function set(string $key, string|int $value): void
-    {
-        $this->db->query(
-            'INSERT INTO ' . self::TABLE . ' SET id = :id, value = :value ON DUPLICATE KEY UPDATE value = :value',
-            [
-                "id" => $key,
-                "value" => $value,
-            ]
-        );
+    public function __construct(
+        public readonly int $segmentId,
+        public readonly ?int $historyId, //null for plain segment
+        public readonly int $autoStateId,
+        public readonly string $editedInStep,
+        public readonly string $targetOriginal,
+        public readonly string $targetEdited,
+        public int $levenshteinOriginal = 0,
+        public int $levenshteinPrevious = 0,
+        public int $segmentlengthPrevious = 0,
+    ) {
     }
 }

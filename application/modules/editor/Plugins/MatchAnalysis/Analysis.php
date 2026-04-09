@@ -35,6 +35,7 @@ use MittagQI\Translate5\LanguageResource\ConnectorForTaskProvider;
 use MittagQI\Translate5\LanguageResource\Status;
 use MittagQI\Translate5\Penalties\DataProvider\TaskPenaltyDataProvider;
 use MittagQI\Translate5\Segment\Repetition\RepetitionUpdater;
+use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
 use ZfExtended_Factory as Factory;
 
 /**
@@ -47,12 +48,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 {
     public const MAX_ERROR_PER_CONNECTOR = 2;
 
-    /***
-     * Analysis id
-     *
-     * @var mixed
-     */
-    protected $analysisId;
+    protected int $analysisId;
 
     /***
      * Flag if pretranslations is active
@@ -105,10 +101,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     private ConnectorForTaskProvider $connectorProvider;
 
+    private AggregateTaskStatistics $aggregateTaskStatistics;
+
     /**
-     * @param integer $analysisId
+     * @throws Zend_Exception
+     * @throws ReflectionException
      */
-    public function __construct(editor_Models_Task $task, $analysisId)
+    public function __construct(editor_Models_Task $task, int $analysisId)
     {
         $this->task = $task;
         $this->analysisId = $analysisId;
@@ -117,6 +116,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->repetitionUpdater = RepetitionUpdater::create();
         $this->connectorProvider = ConnectorForTaskProvider::create();
         $this->taskPenaltyDataProvider = TaskPenaltyDataProvider::create();
+        $this->aggregateTaskStatistics = AggregateTaskStatistics::create();
 
         parent::__construct($analysisId);
     }
@@ -244,9 +244,30 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $segment->syncRepetitions($this->task->getTaskGuid());
         }
 
+        if ($this->pretranslate) {
+            $this->syncStatisticsAfterPretranslation();
+        }
+
         $this->clean();
 
         return true;
+    }
+
+    /**
+     * Refresh statistics once after pretranslation to sync matchRate/matchRateType changes.
+     */
+    protected function syncStatisticsAfterPretranslation(): void
+    {
+        try {
+            $this->aggregateTaskStatistics->aggregateHistoricalData($this->task->getTaskGuid());
+        } catch (Throwable $e) {
+            $this->log->exception($e, [
+                'domain' => $this->log->getDomain(),
+                'extra' => [
+                    'task' => $this->task,
+                ],
+            ]);
+        }
     }
 
     /**

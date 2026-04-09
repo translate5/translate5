@@ -35,13 +35,13 @@ use MittagQI\Translate5\LanguageResource\Operation\AssociateTaskOperation;
 use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Repository\LanguageResourceTaskAssocRepository;
-use MittagQI\Translate5\Repository\SegmentHistoryAggregationRepository;
 use MittagQI\Translate5\Repository\SegmentRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
 use MittagQI\Translate5\Segment\QualityService;
-use MittagQI\Translate5\Statistics\Dto\AggregationFilter;
+use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\JobAssignmentWasDeletedInTheMeantimeException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\Exception\UserJobIsNotEditableException;
 use MittagQI\Translate5\Task\ActionAssert\Permission\TaskActionPermissionAssert;
@@ -73,8 +73,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Exception;
 class editor_TaskController extends ZfExtended_RestController
 {
     use TaskContextTrait;
-
-    private const EXTRA_FILTERS = ['matchRateMin', 'matchRateMax', 'langResource', 'langResourceType', 'qualityScoreMin', 'qualityScoreMax'];
 
     protected $entityClass = 'editor_Models_Task';
 
@@ -150,11 +148,6 @@ class editor_TaskController extends ZfExtended_RestController
     private TaskViewDataProvider $taskViewDataProvider;
 
     private TaskActionPermissionAssert $taskActionPermissionAssert;
-
-    /**
-     * @var AggregationFilter[]
-     */
-    private array $extraFilters = [];
 
     private SegmentRepository $segmentRepository;
 
@@ -291,18 +284,23 @@ class editor_TaskController extends ZfExtended_RestController
     {
         //set default sort
         $this->addDefaultSort();
-        $this->removeExtraFiltersFromRequest();
         $rows = $this->taskViewDataProvider->getTaskList(
             $this->authenticatedUser,
-            $this->adjustFilter($this->entity->getFilter()),
+            $this->getAppliedAdvancedFilters(),
             (int) $this->getParam('start', 0),
             (int) $this->getParam('limit', 0),
             false
         );
 
-        $kpi = new editor_Models_KPI(SegmentHistoryAggregationRepository::create());
+        $kpi = new editor_Models_KPI(SegmentStatisticsRepository::create());
         $kpi->setTasks($rows['rows']);
-        $kpiStatistics = $kpi->getStatistics(json_decode($this->getParam('filter')), $this->getAggregationFilters());
+
+        $filter = $this->entity->getFilter();
+        if (! $filter instanceof editor_Models_Filter_TaskSpecific) {
+            throw new \Exception('$filter is ' . $filter::class . ' instead of editor_Models_Filter_TaskSpecific');
+        }
+
+        $kpiStatistics = $kpi->getStatistics($filter->getStatisticFilter());
 
         // For Front-End:
         foreach (array_keys($kpiStatistics) as $key) {
@@ -333,7 +331,6 @@ class editor_TaskController extends ZfExtended_RestController
     {
         //set default sort
         $this->addDefaultSort();
-        $this->removeExtraFiltersFromRequest();
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
         $this->view->rows = $this->entity->loadUserList($this->authenticatedUser->getUserGuid());
@@ -404,11 +401,9 @@ class editor_TaskController extends ZfExtended_RestController
     {
         $limit = (int) $this->getParam('limit', 0);
 
-        $this->removeExtraFiltersFromRequest();
-
         $taskDataList = $this->taskViewDataProvider->getTaskList(
             $this->authenticatedUser,
-            $this->adjustFilter($this->entity->getFilter()),
+            $this->getAppliedAdvancedFilters(),
             (int) $this->getParam('start', 0),
             $limit,
         );
@@ -1270,6 +1265,7 @@ class editor_TaskController extends ZfExtended_RestController
                 ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class),
                 ZfExtended_Factory::get(editor_Models_Segment_Meta::class),
                 ZfExtended_Factory::get(editor_Models_TaskProgress::class),
+                UpdateSegmentService::create(),
             );
             $applyFullMatchChange->updateSegmentsEdit100PercentMatch(
                 $this->entity,
@@ -2506,55 +2502,30 @@ class editor_TaskController extends ZfExtended_RestController
         return $this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false);
     }
 
-    private function removeExtraFiltersFromRequest(): void
+    private function getAppliedAdvancedFilters(): ?ZfExtended_Models_Filter
     {
-        $f = $this->entity->getFilter();
-        $this->extraFilters = [];
-        foreach ($f->getFilters() as $filter) {
-            if (in_array($filter->field, self::EXTRA_FILTERS)) {
-                $this->extraFilters[] = new AggregationFilter($filter->field, $filter->value);
-                $f->deleteFilter($filter->field);
-            }
-        }
-    }
+        $filter = $this->entity->getFilter();
 
-    private function getAggregationFilters(): array
-    {
-        /**
-         * @var AggregationFilter[] $filters
-         */
-        $filters = $this->extraFilters;
-        $nativeFilters = $this->getParam('filter');
-        if (! empty($nativeFilters)) {
-            $nativeFilters = json_decode($nativeFilters);
-            if (is_array($nativeFilters)) {
-                foreach ($nativeFilters as $filter) {
-                    $filters[] = AggregationFilter::fromNativeFilter($filter);
-                }
-            }
+        if (! $filter instanceof editor_Models_Filter_TaskSpecific) {
+            return $filter;
         }
 
-        return $filters;
-    }
-
-    private function adjustFilter(?ZfExtended_Models_Filter $filter): ?ZfExtended_Models_Filter
-    {
-        if (empty($this->extraFilters)) {
+        $statisticFilter = $filter->getStatisticFilter();
+        if ($statisticFilter === null) {
             return $filter;
         }
 
         // get all matching tasks before filtering out non-relevant ones
-        $taskDataList = $this->taskViewDataProvider->getTaskList($this->authenticatedUser, $filter, buildTaskView: false);
+        $taskDataList = $this->taskViewDataProvider->getTaskList(
+            $this->authenticatedUser,
+            $filter,
+            buildTaskView: false
+        );
 
         if (! empty($taskDataList['rows'])) { // tasks re-filtering may be needed
             $taskGuids = array_column($taskDataList['rows'], 'taskGuid');
-            $aggregate = SegmentHistoryAggregationRepository::create();
-            $taskGuidsFiltered = $aggregate->getFilteredTaskIds($taskGuids, $this->extraFilters);
-            if ($filter === null) {
-                $filter = ZfExtended_Factory::get(ZfExtended_Models_Filter_ExtJs::class, [
-                    $this->entity,
-                ]);
-            }
+            $aggregate = SegmentStatisticsRepository::create();
+            $taskGuidsFiltered = $aggregate->getTaskGuidsMatchingFilter($taskGuids, $statisticFilter);
             if (empty($taskGuidsFiltered)) {
                 // make filter return nothing, maybe there is a better way ?
                 $filter->addFilter(

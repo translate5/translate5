@@ -12,6 +12,7 @@ use editor_Models_SegmentHistory as SegmentHistory;
 use editor_Models_Task as Task;
 use editor_Models_TaskProgress as TaskProgress;
 use MittagQI\Translate5\Segment\BatchOperations\ApplyEditFullMatchOperation;
+use MittagQI\Translate5\Statistics\UpdateSegmentService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -35,12 +36,15 @@ class ApplyEditFullMatchOperationTest extends TestCase
             ->onlyMethods(['updateSegmentEditableCount'])
             ->getMock();
 
+        $segmentStatisticsUpdater = $this->createMock(UpdateSegmentService::class);
+
         // Create an instance of the class under test
         $operation = new ApplyEditFullMatchOperation(
             $autoStates,
             new InternalTag(),
             $this->createMock(SegmentMeta::class),
             $taskProgress,
+            $segmentStatisticsUpdater,
         );
 
         $taskProgress
@@ -286,9 +290,9 @@ class ApplyEditFullMatchOperationTest extends TestCase
     }
 
     /**
-     * @return (SegmentIterator&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @return (SegmentIterator&MockObject)|MockObject
      */
-    private function getSingleSegmentIterator($segment): SegmentIterator|\PHPUnit\Framework\MockObject\MockObject
+    private function getSingleSegmentIterator($segment): SegmentIterator|MockObject
     {
         // Create a mock for SegmentIterator and configure it as an iterator
         $segmentsMock = $this->getMockBuilder(SegmentIterator::class)
