@@ -136,8 +136,9 @@ class OkapiVersionConfigUpdater
                     preg_match($neededServerPattern, $serverUrl) === 1
                 ) {
                     $version = OkapiService::fetchServerVersion($serverUrl);
-                    // make szúre the version is of the correct minor
-                    if (version_compare($version, $this->major . '.' . ($this->minor - 1)) >= 0 &&
+                    // make sure the version is of the correct minor
+                    if ($version !== null &&
+                        version_compare($version, $this->major . '.' . ($this->minor - 1)) >= 0 &&
                         version_compare($version, $this->major . '.' . ($this->minor + 1)) < 0
                     ) {
                         $nearestServer = $serverName;
