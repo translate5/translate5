@@ -37,7 +37,7 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
 {
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
-    protected static $segmentTagClass = 'editor_Segment_Internal_Tag';
+    protected static $segmentTagClass = editor_Segment_Internal_Tag::class;
 
     private ReferenceFieldService $referenceFieldService;
 
@@ -47,9 +47,9 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
         parent::__construct();
     }
 
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return ($qualityConfig->enableInternalTagCheck == 1);
+        return ['runtimeOptions.autoQA.enableInternalTagCheck'];
     }
 
     public function processSegment(
@@ -58,7 +58,7 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
         editor_Segment_Tags $tags,
         string $processingMode
     ): editor_Segment_Tags {
-        if (! $qualityConfig->enableInternalTagCheck) {
+        if (! $this->isEnabled($qualityConfig)) {
             return $tags;
         }
 
@@ -117,7 +117,7 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider
 
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
     {
-        return ($qualityConfig->enableInternalTagCheck == 1);
+        return $this->isEnabled($qualityConfig, $taskConfig);
     }
 
     public function isExportedTag(): bool

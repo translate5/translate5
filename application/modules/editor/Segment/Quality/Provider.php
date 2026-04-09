@@ -73,6 +73,11 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     }
 
     /**
+     * Retrieves the overall config(s) to enable/disable the quality
+     */
+    abstract public function getTypeEnabledConfigs(): array;
+
+    /**
      * Retrieves if the provider has an own worker for the given processing type
      */
     public function hasOperationWorker(string $processingMode, Zend_Config $qualityConfig): bool
@@ -184,7 +189,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      */
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
     {
-        return true;
+        return $this->isEnabled($qualityConfig, $taskConfig);
     }
 
     public function mustBeZeroErrors(string $type, ?string $category, Zend_Config $taskConfig): bool
@@ -325,5 +330,44 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         }
 
         return null;
+    }
+
+    /* *************** Helper API *************** */
+
+    /**
+     * Evaluates the enablement of qualities based on the quality-config -
+     * which is expected to be the "runtimeOptions->autoQA" branch of the task config
+     * If the config is a core config following "runtimeOptions.autoQA.enableXYZ",
+     * only the $qualityConfig must be given, for plugin qualities, the $taskConfig must be given !
+     * @throws ZfExtended_Exception
+     */
+    protected function isEnabled(Zend_Config $qualityConfig, Zend_Config $taskConfig = null): bool
+    {
+        $enabled = false;
+        foreach ($this->getTypeEnabledConfigs() as $config) {
+            if (str_starts_with($config, 'runtimeOptions.autoQA.enable')) {
+                $prop = substr($config, strlen('runtimeOptions.autoQA.'));
+                $enabled = $enabled || ((int) $qualityConfig->$prop === 1);
+            } elseif ($taskConfig === null) {
+                throw new ZfExtended_Exception('Wrong use of editor_Segment_Quality_Provider::isEnabled(): ' .
+                    'the $taskConfig argument is mandatory for non-core qualities');
+            } else {
+                try {
+                    $value = $taskConfig;
+                    foreach (explode('.', $config) as $branch) {
+                        // to avoid warnings ...
+                        if (empty($value)) {
+                            throw new ZfExtended_Exception('Value “' . $value . '” is null in config “' . $config . '”');
+                        }
+                        $value = $value->$branch;
+                    }
+                } catch (Throwable) {
+                    throw new ZfExtended_Exception('Global Config did not contain “' . $config . '”');
+                }
+                $enabled = $enabled || ((int) $value === 1);
+            }
+        }
+
+        return $enabled;
     }
 }

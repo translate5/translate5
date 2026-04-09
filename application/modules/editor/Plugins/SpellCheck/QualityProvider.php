@@ -56,12 +56,9 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
     private ?Service $languagetoolService = null;
 
-    /**
-     * Method to check whether this quality is turned On
-     */
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return $qualityConfig->enableSegmentSpellCheck == 1;
+        return ['runtimeOptions.autoQA.enableSegmentSpellCheck'];
     }
 
     /**
@@ -69,7 +66,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     public function hasOperationWorker(string $processingMode, Zend_Config $qualityConfig): bool
     {
-        return $qualityConfig->enableSegmentSpellCheck == 1;
+        return $this->isEnabled($qualityConfig);
     }
 
     /**
@@ -160,7 +157,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
         // If this check is turned Off in config - return $tags
-        if (! $qualityConfig->enableSegmentSpellCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return $tags;
         }
 

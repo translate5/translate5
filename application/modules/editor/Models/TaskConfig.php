@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /***
 * @method void setId(int $id)
 * @method string getId()
-* @method void setTaskGuid(guid $taskGuid)
+* @method void setTaskGuid(string $taskGuid)
 * @method string getTaskGuid()
 * @method void setName(string $name)
 * @method string getName()
@@ -127,12 +127,9 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function updateInsertConfig(string $taskGuid, string $name, $value): Zend_Db_Statement_Interface
+    public function updateInsertConfig(string $taskGuid, string $name, mixed $value): Zend_Db_Statement_Interface
     {
-        if (is_array($value)) {
-            $value = implode('","', $value);
-            $value = '["' . $value . '"]';
-        }
+        $value = $this->prepareInsertValue($value);
         $sql = "INSERT INTO LEK_task_config(taskGuid,name,value) " .
             " VALUES (?,?,?) " .
             " ON DUPLICATE KEY UPDATE value = ? ";
@@ -142,6 +139,50 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
         } catch (Zend_Db_Statement_Exception $e) {
             $this->handleIntegrityConstraintException($e);
         }
+    }
+
+    /**
+     * Updates the given task-configs, will only update those, that are different to the current value
+     * Be aware, this API updates only configs of level 8 (task-configs) !
+     * @throws ZfExtended_Exception
+     */
+    public function updateInsertConfigs(string $taskGuid, array $configData): int
+    {
+        $configs = array_keys($configData);
+        if (empty($configs) || ! str_starts_with($configs[0], 'runtimeOptions.')) {
+            throw new ZfExtended_Exception('Wrong parameter format for $configData');
+        }
+        $adapter = $this->db->getAdapter();
+        $updates = 0;
+        $select = $this->db->select(true)
+            ->where('`taskGuid` = ?', $taskGuid)
+            ->where('`name` IN (?)', $configs);
+        $existing = $adapter->fetchAssoc($select);
+        $adapter->beginTransaction();
+        foreach ($existing as $row) {
+            $newValue = $this->prepareInsertValue($configData[$row['name']]);
+            if ($newValue !== $row['value']) {
+                $adapter->query(
+                    'UPDATE `LEK_task_config` SET `value` = ? WHERE `taskGuid` = ? AND `name` = ?',
+                    [$newValue, $taskGuid, $row['name']]
+                );
+                $updates++;
+            }
+        }
+        $adapter->commit();
+
+        return $updates;
+    }
+
+    private function prepareInsertValue(mixed $value): string
+    {
+        if (is_array($value)) {
+            $value = implode('","', $value);
+
+            return '["' . $value . '"]';
+        }
+
+        return strval($value);
     }
 
     /***

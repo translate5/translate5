@@ -42,29 +42,42 @@ class editor_Models_Import_TaskConfig
     ) {
     }
 
-    /***
+    /**
      * Load the config template for the task if it is provided in the import package
      * @throws Exception
      */
     public function loadAndProcessConfigTemplate(
         editor_Models_Task $task,
-        editor_Models_Import_Configuration $importConfig
+        editor_Models_Import_Configuration $importConfig,
+        array $baseTaskConfigs = []
     ): void {
         $template = $importConfig->importFolder . '/' . self::CONFIG_TEMPLATE;
-        if (! file_exists($template)) {
-            return;
-        }
+        $taskConfigs = [];
         $logData = [
-            'fileName' => self::CONFIG_TEMPLATE,
             'task' => $task,
         ];
-        $config = $this->parseIniFile($template, $logData);
+        // configs from template
+        if (file_exists($template)) {
+            $logData['fileName'] = self::CONFIG_TEMPLATE;
+            $taskConfigs = $this->parseIniFile($template, $logData);
+        }
+        // configs from argument
+        if (count($baseTaskConfigs) > 0) {
+            $logData['baseTaskConfigs'] = implode(', ', array_keys($baseTaskConfigs));
+            $taskConfigs = array_merge($taskConfigs, $baseTaskConfigs);
+        }
+        if (count($taskConfigs) === 0) {
+            return;
+        }
+        // the ini file will not be able to overwrite the base configs
         $log = Zend_Registry::get('logger');
         $dbConfig = new editor_Models_Config();
 
-        foreach ($config as $name => $value) {
+        foreach ($taskConfigs as $name => $value) {
             try {
                 if (str_starts_with($name, 'runtimeOptions.')) {
+                    // we also check the configs from argument here
+                    // that will ensure, configs are not inadvertently misused
                     $this->checkConfigLevel($dbConfig, $name, $logData);
 
                     $this->taskConfig->updateInsertConfig($task->getTaskGuid(), $name, $value);

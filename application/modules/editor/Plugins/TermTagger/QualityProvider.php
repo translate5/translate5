@@ -89,9 +89,9 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
     protected static $segmentTagClass = 'editor_Plugins_TermTagger_Tag';
 
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return ($taskConfig->runtimeOptions->termTagger->enableAutoQA == 1);
+        return ['runtimeOptions.termTagger.enableAutoQA'];
     }
 
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool

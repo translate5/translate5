@@ -35,14 +35,14 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider
 
     protected static $segmentTagClass = 'editor_Segment_Mqm_Tag';
 
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return ($qualityConfig->enableMqmTags == 1);
+        return ['runtimeOptions.autoQA.enableMqmTags'];
     }
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
-        if ($qualityConfig->enableMqmTags == 1) {
+        if ($this->isEnabled($qualityConfig)) {
             foreach ($tags->getTagsByType(static::$type) as $mqmTag) {
                 /* @var $mqmTag editor_Segment_Mqm_Tag */
                 // this will also update the ext-js sequence-id in the tag with the database-id of the bound quality in case of an extJs generated ID

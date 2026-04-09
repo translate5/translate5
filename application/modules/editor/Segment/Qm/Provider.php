@@ -48,14 +48,14 @@ class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider
         return editor_Segment_Tag::TYPE_QM . '_' . strval($categoryIndex);
     }
 
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return ($qualityConfig->enableQm == 1);
+        return ['runtimeOptions.autoQA.enableQm'];
     }
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
-        if ($processingMode == editor_Segment_Processing::ALIKE && $qualityConfig->enableQm == 1) {
+        if ($processingMode == editor_Segment_Processing::ALIKE && $this->isEnabled($qualityConfig)) {
             // the only task we ever have to do is cloning the qm qualities in the alike copying process
             $tags->cloneAlikeQualitiesByType(self::$type);
         }

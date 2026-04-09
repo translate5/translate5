@@ -52,12 +52,9 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      */
     protected static $hasCategories = true;
 
-    /**
-     * Method to check whether this quality is turned On
-     */
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return $qualityConfig->enableSegmentNumbersCheck == 1;
+        return ['runtimeOptions.autoQA.enableSegmentNumbersCheck'];
     }
 
     /**
@@ -70,7 +67,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
         // If this check is turned Off in config - return $tags
-        if (! $qualityConfig->enableSegmentNumbersCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return $tags;
         }
 

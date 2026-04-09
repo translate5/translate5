@@ -47,18 +47,24 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
      */
     protected static $type = 'matchrate';
 
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return ($qualityConfig->enableUneditedFuzzyMatchCheck == 1 || $qualityConfig->enableEdited100MatchCheck == 1);
+        return ['runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck', 'runtimeOptions.autoQA.enableEdited100MatchCheck'];
     }
 
-    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
-    {
-        if (! $qualityConfig->enableUneditedFuzzyMatchCheck && (! $qualityConfig->enableEdited100MatchCheck || $processingMode == editor_Segment_Processing::IMPORT)) {
+    public function processSegment(
+        editor_Models_Task $task,
+        Zend_Config $qualityConfig,
+        editor_Segment_Tags $tags,
+        string $processingMode
+    ): editor_Segment_Tags {
+        if (! $qualityConfig->enableUneditedFuzzyMatchCheck &&
+            (! $qualityConfig->enableEdited100MatchCheck || $processingMode === editor_Segment_Processing::IMPORT)
+        ) {
             return $tags;
         }
 
-        if ($processingMode == editor_Segment_Processing::ALIKE) {
+        if ($processingMode === editor_Segment_Processing::ALIKE) {
             // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
         } else {
@@ -66,7 +72,11 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
             $segment = $tags->getSegment();
 
             // no need to check for edited 100% matches on import
-            if ($processingMode != editor_Segment_Processing::IMPORT && $qualityConfig->enableEdited100MatchCheck && $segment->getMatchRate() >= 100 && $segment->isFromTM()) {
+            if ($processingMode != editor_Segment_Processing::IMPORT &&
+                $qualityConfig->enableEdited100MatchCheck &&
+                $segment->getMatchRate() >= 100 &&
+                $segment->isFromTM()
+            ) {
                 $editedTargetFields = $tags->getEditedTargetFields();
                 if (count($editedTargetFields) > 0) {
                     foreach ($editedTargetFields as $targetField) {
@@ -74,8 +84,12 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
                     }
                 }
             }
-            // Fuzzy Match check must be done on import (where it can be assumed that all targets are set with the match) and for taken over TMs otherwise
-            if ($qualityConfig->enableUneditedFuzzyMatchCheck && $segment->getMatchRate() < 100 && $segment->isInteractive() === false) {
+            // Fuzzy Match check must be done on import (where it can be assumed that all targets are set
+            // with the match) and for taken over TMs otherwise
+            if ($qualityConfig->enableUneditedFuzzyMatchCheck &&
+                $segment->getMatchRate() < 100 &&
+                $segment->isInteractive() === false
+            ) {
                 if ($segment->isPretranslated()) {
                     if ($segment->isPretranslatedTM()) {
                         $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
@@ -126,6 +140,6 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider
 
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
     {
-        return ($qualityConfig->enableUneditedFuzzyMatchCheck == 1 && $qualityConfig->enableEdited100MatchCheck == 1);
+        return $qualityConfig->enableUneditedFuzzyMatchCheck && $qualityConfig->enableEdited100MatchCheck;
     }
 }

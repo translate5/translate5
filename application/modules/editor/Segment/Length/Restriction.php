@@ -72,9 +72,9 @@ class editor_Segment_Length_Restriction
      */
     public $maxNumLines = 0;
 
-    public function __construct(Zend_Config $qualityConfig, Zend_Config $taskConfig)
+    public function __construct(Zend_Config $qualityConfig)
     {
-        if ($qualityConfig->enableSegmentLengthCheck == 1) {
+        if ($qualityConfig->enableSegmentLengthCheck) {
             $this->active = true;
             $this->maxLengthMinPercent = is_int($qualityConfig->segmentPixelLengthTooShortPercent) ? $qualityConfig->segmentPixelLengthTooShortPercent : 0;
             $this->maxLengthMinPixel = is_int($qualityConfig->segmentPixelLengthTooShortPixel) ? $qualityConfig->segmentPixelLengthTooShortPixel : 0;

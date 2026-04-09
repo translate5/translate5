@@ -53,15 +53,23 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
     public static function getRestriction(Zend_Config $qualityConfig, Zend_Config $taskConfig)
     {
         if (static::$restriction === null) {
-            static::$restriction = new editor_Segment_Length_Restriction($qualityConfig, $taskConfig);
+            static::$restriction = new editor_Segment_Length_Restriction($qualityConfig);
         }
 
         return static::$restriction;
     }
 
+    public function getTypeEnabledConfigs(): array
+    {
+        return ['runtimeOptions.autoQA.enableSegmentLengthCheck'];
+    }
+
+    /**
+     * Non-standard implementation for this quality !
+     */
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
     {
-        return ($qualityConfig->enableSegmentLengthCheck == 1 && static::getRestriction($qualityConfig, $taskConfig)->active);
+        return ($this->isEnabled($qualityConfig) && static::getRestriction($qualityConfig, $taskConfig)->active);
     }
 
     /**
@@ -69,7 +77,7 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
      */
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
-        if (! $qualityConfig->enableSegmentLengthCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return $tags;
         }
         $restriction = static::getRestriction($qualityConfig, $task->getConfig());

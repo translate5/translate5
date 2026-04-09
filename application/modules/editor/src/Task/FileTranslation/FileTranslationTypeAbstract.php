@@ -65,7 +65,7 @@ abstract class FileTranslationTypeAbstract extends editor_Task_Type_Abstract
 
     protected bool $terminologyDisabled = false;
 
-    protected bool $autoStartAutoQA = false;
+    protected bool $autoStartAutoQA = true;
 
     protected bool $exportUsage = false;
 

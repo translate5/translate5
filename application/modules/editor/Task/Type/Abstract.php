@@ -85,7 +85,7 @@ abstract class editor_Task_Type_Abstract
     }
 
     /**
-     * Returns true if usage of AutoQA is enabled for that type
+     * Retrieves if usage of AutoQA is enabled for that type
      */
     public function isAutoStartAutoQA(): bool
     {

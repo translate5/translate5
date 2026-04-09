@@ -216,14 +216,11 @@ final class editor_Segment_Quality_Manager
 
     /**
      * Adds the neccessary import workers
-     * This is called after the "afterDirectoryParsing" of the FileFileTree Worker
+     * This is called after the "afterDirectoryParsing" of the FileTree Worker
      */
-    public function queueImport(editor_Models_Task $task, int $workerParentId = 0, bool $skipCheck = false): void
+    public function queueImport(editor_Models_Task $task, int $workerParentId = 0): void
     {
-        if (
-            ! $skipCheck
-            && $this->isProcessingSkipped(editor_Segment_Processing::IMPORT, $task, true)
-        ) {
+        if ($this->isProcessingSkipped(editor_Segment_Processing::IMPORT, $task, true)) {
             return;
         }
 
@@ -231,7 +228,6 @@ final class editor_Segment_Quality_Manager
         $workerParams = [
             'processingMode' => editor_Segment_Processing::IMPORT,
             'operationType' => editor_Task_Operation::IMPORT,
-            'skipCheck' => $skipCheck,
         ];
         $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
 
@@ -296,9 +292,9 @@ final class editor_Segment_Quality_Manager
      * @throws editor_Models_ConfigException
      * @throws Zend_Exception
      */
-    public function prepareOperation(string $processingMode, editor_Models_Task $task, bool $skipCheck): void
+    public function prepareOperation(string $processingMode, editor_Models_Task $task): void
     {
-        if (! $skipCheck && $this->isProcessingSkipped($processingMode, $task)) {
+        if ($this->isProcessingSkipped($processingMode, $task)) {
             return;
         }
 
@@ -329,9 +325,9 @@ final class editor_Segment_Quality_Manager
      * @throws Zend_Db_Table_Exception
      * @throws editor_Models_ConfigException
      */
-    public function finishOperation(string $processingMode, editor_Models_Task $task, bool $skipCheck = false): void
+    public function finishOperation(string $processingMode, editor_Models_Task $task): void
     {
-        if (! $skipCheck && $this->isProcessingSkipped($processingMode, $task)) {
+        if ($this->isProcessingSkipped($processingMode, $task)) {
             return;
         }
 
@@ -751,6 +747,30 @@ final class editor_Segment_Quality_Manager
         return $this->exportTypes;
     }
 
+    /**
+     * This API can be used to gather an array of all enabling configs for qualities for the current core & plugins
+     * These configs point either to "1" if one wish to enable or "0" otherwise
+     * The $flippedtypes can be used to flip the given quality-types
+     * That makes it easy to gather smth like "disable all qualities but XYZ" or "enable all qualities but XYZ" ...
+     */
+    public function getEnablingDisablingConfigs(bool $enabled, array $flippedTypes = []): array
+    {
+        $default = $enabled ? 1 : 0;
+        $flipped = $enabled ? 0 : 1;
+        $configs = [];
+        foreach ($this->registry as $type => $provider) {
+            foreach ($provider->getTypeEnabledConfigs() as $configKey) {
+                if (in_array($type, $flippedTypes)) {
+                    $configs[$configKey] = $flipped;
+                } else {
+                    $configs[$configKey] = $default;
+                }
+            }
+        }
+
+        return $configs;
+    }
+
     public function getTranslate(): ZfExtended_Zendoverwrites_Translate
     {
         if ($this->translate == null) {
@@ -824,11 +844,15 @@ final class editor_Segment_Quality_Manager
         if (! self::ACTIVE) {
             return true;
         }
-        if ($processingMode === editor_Segment_Processing::IMPORT
-            && (! $task->getTaskType()->isAutoStartAutoQA()
-                || ! $task->getConfig()->runtimeOptions->autoQA->autoStartOnImport)) {
+        if ($processingMode === editor_Segment_Processing::IMPORT &&
+            (! $task->getTaskType()->isAutoStartAutoQA() ||
+                ! $task->getConfig()->runtimeOptions->autoQA->autoStartOnImport)
+        ) {
             if ($logSkipping) {
-                $task->logger('editor.task')->info('E1432', 'AutoQA-step of the import process - is deactivated');
+                $task->logger('editor.task')->info(
+                    'E1432',
+                    'AutoQA-step of the import process - is deactivated'
+                );
             }
 
             return true;

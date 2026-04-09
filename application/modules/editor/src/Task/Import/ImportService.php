@@ -183,14 +183,24 @@ class ImportService
 
     /**
      * Handles the import for non project data.
-     * This will evaluate what kind of data provider should be used, and it will process the uploaded files
-     * @throws Exception
+     * This will evaluate what kind of data provider should be used, and it will process the uploaded files     *
+     * @param array $baseTaskConfigs Array of config-values (name => value) to create the task with
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function importSingleTask(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         int $targetLanguage,
         ZfExtended_Models_User $user,
+        array $baseTaskConfigs = []
     ): array {
         // was set as array in setDataInEntity
         $task->setTargetLang($targetLanguage);
@@ -198,7 +208,7 @@ class ImportService
         $task->save();
 
         // handling project tasks is also done in prepareConfigsDefaultsCheckUploadsQueueWorkers
-        $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $user);
+        $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $user, $baseTaskConfigs);
 
         // for internal tasks the usage log requires different handling, so log only non-internal tasks
         if (! $task->getTaskType()->isInternalTask()) {
@@ -210,7 +220,9 @@ class ImportService
     }
 
     /**
+     * @param array $baseTaskConfigs Array of config-values (name => value) to create the project-task with
      * @return object[]
+     *
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
@@ -223,6 +235,7 @@ class ImportService
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         array $targetLanguages,
         ZfExtended_Models_User $user,
+        array $baseTaskConfigs = []
     ): array {
         $entityId = $project->save();
         $project->initTaskDataDirectory();
@@ -266,7 +279,7 @@ class ImportService
 
             try {
                 $task->save();
-                $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $user);
+                $this->prepareConfigsDefaultsCheckUploadsQueueWorkers($task, $dataProvider, $user, $baseTaskConfigs);
                 //update the task usage log for this project-task
                 $this->usageLogger->log($task);
             } catch (Throwable $e) {
@@ -324,12 +337,22 @@ class ImportService
     }
 
     /**
-     * @throws Exception
+     * @param array $baseTaskConfigs Array of config-values (name => value) to create the task with
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function prepareConfigsDefaultsCheckUploadsQueueWorkers(
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         ZfExtended_Models_User $user,
+        array $baseTaskConfigs = [],
     ): void {
         try {
             $importConfig = $this->prepareImportConfig($task, $dataProvider, $user);
@@ -345,7 +368,7 @@ class ImportService
         }
 
         $taskConfig = new editor_Models_Import_TaskConfig(new editor_Models_TaskConfig());
-        $taskConfig->loadAndProcessConfigTemplate($task, $importConfig);
+        $taskConfig->loadAndProcessConfigTemplate($task, $importConfig, $baseTaskConfigs);
 
         // add task defaults (user associations and language resources)
         $this->defaults->setTaskDefaults($task, $this->importWizardUsed);

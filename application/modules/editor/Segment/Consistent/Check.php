@@ -73,7 +73,7 @@ class editor_Segment_Consistent_Check
 
     /**
      * Retrieves the evaluated states
-     * @return string[]
+     * @return array<string, array<string,string>>
      */
     public function getStates()
     {

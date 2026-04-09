@@ -54,6 +54,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\FileTranslation;
 
 use DateTime;
+use editor_Models_Customer_CustomerConfig;
 use editor_Models_Import_DataProvider_Factory;
 use editor_Models_LanguageResources_CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource;
@@ -61,6 +62,8 @@ use editor_Models_Languages;
 use editor_Models_Task;
 use editor_Models_TaskUsageLog;
 use editor_Plugins_MatchAnalysis_Init;
+use editor_Segment_Quality_Manager;
+use editor_Segment_Tag;
 use editor_Task_Type;
 use Exception;
 use MittagQI\Translate5\Customer\Exception\InexistentCustomerException;
@@ -119,6 +122,7 @@ class FileTranslation
             Zend_Registry::get('PluginManager')->get('MatchAnalysis'),
             Zend_EventManager_StaticEventManager::getInstance(),
             LanguageResourceTaskAssocRepository::create(),
+            new editor_Models_Customer_CustomerConfig(),
         );
     }
 
@@ -131,7 +135,8 @@ class FileTranslation
         private readonly ZfExtended_Authentication $authentication,
         private readonly editor_Plugins_MatchAnalysis_Init $matchanalysisPlugin,
         private readonly Zend_EventManager_StaticEventManager $eventManager,
-        private readonly LanguageResourceTaskAssocRepository $assocRepository
+        private readonly LanguageResourceTaskAssocRepository $assocRepository,
+        private readonly editor_Models_Customer_CustomerConfig $customerConfig
     ) {
     }
 
@@ -211,25 +216,41 @@ class FileTranslation
                 $this->insertTaskUsageLog($task, $assignedLanguageResourceIds);
             }
         );
+
         if ($isSingle) {
             $this->importService->importSingleTask(
                 $task,
                 $dataprovider->createFromPath($importFile->getPathname()),
                 (int) reset($targetLang),
-                $this->authentication->getUser()
+                $this->authentication->getUser(),
+                $this->createConfigOverwrites($customerId)
             );
         } else {
             $this->importService->importProject(
                 $task,
                 $dataprovider->createFromPath($importFile->getPathname()),
                 $targetLang,
-                $this->authentication->getUser()
+                $this->authentication->getUser(),
+                $this->createConfigOverwrites($customerId)
             );
         }
 
         $this->importService->startWorkers($task);
 
         return $task;
+    }
+
+    private function createConfigOverwrites(int $customerId): array
+    {
+        $customerConfig = $this->customerConfig->getCustomerConfig($customerId);
+        // maybe a full AutoQA is wanted for InstantTranslate anyway ...
+        if ($customerConfig->runtimeOptions->plugins->InstantTranslate->runQaAndTerminologyOnImport) {
+            return [];
+        }
+
+        // normal case is having a AutoQA with only the tag-check active
+        return editor_Segment_Quality_Manager::instance()
+            ->getEnablingDisablingConfigs(false, [editor_Segment_Tag::TYPE_INTERNAL]);
     }
 
     /**

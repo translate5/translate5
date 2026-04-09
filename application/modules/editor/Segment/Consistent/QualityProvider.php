@@ -52,12 +52,9 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      */
     private static $was = [];
 
-    /**
-     * Method to check whether this quality is turned On
-     */
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return $qualityConfig->enableSegmentConsistentCheck == 1;
+        return ['runtimeOptions.autoQA.enableSegmentConsistentCheck'];
     }
 
     /**
@@ -69,7 +66,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
         // If this check is turned Off in config - return $tags
-        if (! $qualityConfig->enableSegmentConsistentCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return $tags;
         }
 
@@ -93,7 +90,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     public function postProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode)
     {
         // If this check is turned Off in config - return $tags
-        if (! $qualityConfig->enableSegmentConsistentCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return;
         }
 
@@ -115,7 +112,8 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             $wasCategoryA = static::$was[$segmentNrInTask] ?? [];
 
             // If there are qualities that should be added to the segment
-            if ($insCategoryA = array_diff($nowCategoryA, $wasCategoryA)) {
+            $insCategoryA = array_diff($nowCategoryA, $wasCategoryA);
+            if (! empty($insCategoryA)) {
                 $bySegmentNrA[$segmentNrInTask]['ins'] = $insCategoryA;
             }
         }
@@ -126,7 +124,8 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             $nowCategoryA = $check->getStates()[$segmentNrInTask] ?? [];
 
             // If there are qualities that should be removed from the segment
-            if ($delCategoryA = array_diff($wasCategoryA, $nowCategoryA)) {
+            $delCategoryA = array_diff($wasCategoryA, $nowCategoryA);
+            if (! empty($delCategoryA)) {
                 $bySegmentNrA[$segmentNrInTask]['del'] = $delCategoryA;
             }
         }
@@ -134,9 +133,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         // If not empty
         if ($bySegmentNrA) {
             // Get SegmentQuality model shortcut
-            $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var editor_Models_Db_SegmentQuality $qualityM */
-
+            $qualityM = new editor_Models_Db_SegmentQuality();
             // Get [segmentNrInTask => id] pairs
             $segmentIdA = Zend_Db_Table_Abstract::getDefaultAdapter()->query('
                 SELECT `segmentNrInTask`, `id` 
@@ -147,7 +144,9 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
             // Drop qualities if need
             foreach ($bySegmentNrA as $segmentNr => $categoriesByAction) {
                 // If there is smth to be inserted - do insert
-                foreach ($categoriesByAction['ins'] ?? [] as $insCategoryI) {
+                // @phpstan-ignore-next-line
+                $insCategories = array_key_exists('ins', $categoriesByAction) ? $categoriesByAction['ins'] : [];
+                foreach ($insCategories as $insCategoryI) {
                     $qualityR = $qualityM->createRow([], Zend_Db_Table_Abstract::DEFAULT_DB);
                     $qualityR->segmentId = $segmentIdA[$segmentNr];
                     $qualityR->taskGuid = $task->getTaskGuid();
@@ -177,7 +176,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode)
     {
         // If this check is turned Off in config - return $tags
-        if (! $qualityConfig->enableSegmentConsistentCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return;
         }
 

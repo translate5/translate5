@@ -52,12 +52,9 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
      */
     protected static $hasCategories = false;
 
-    /**
-     * Method to check whether this quality is turned On
-     */
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    public function getTypeEnabledConfigs(): array
     {
-        return $qualityConfig->enableSegmentEmptyCheck == 1;
+        return ['runtimeOptions.autoQA.enableSegmentEmptyCheck'];
     }
 
     /**
@@ -69,7 +66,7 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
         // If this check is turned Off in config - return $tags
-        if (! $qualityConfig->enableSegmentEmptyCheck == 1) {
+        if (! $this->isEnabled($qualityConfig)) {
             return $tags;
         }
 
