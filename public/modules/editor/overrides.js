@@ -2269,3 +2269,49 @@ Ext.override(Ext.data.request.Form, {
         return form;
     }
 });
+
+/**
+ * https://jira.translate5.net/browse/TRANSLATE-5373
+ * Sometimes the value is me.pickerField.getValue() is non-falsy, but is not a Date
+ * so it does not have getHours() method. This can be a string value, but it was not
+ * possible to reproduce
+ */
+Ext.override(Ext.ux.DateTimePicker, {
+    updateSliders: function() {
+        var me = this,
+            // currentDate = (me.pickerField && me.pickerField.getValue()) || new Date();   // -
+            pickerValue = me.pickerField && me.pickerField.getValue(),                      // +
+            currentDate = Ext.isDate(pickerValue) ? pickerValue : new Date();    // +
+
+        if (me.timePicker.rendered) {
+            me.hourSlider.setValue(currentDate.getHours());
+            me.minuteSlider.setValue(currentDate.getMinutes());
+        }
+    },
+    changeTimeValue: function(slider) {
+        var me = this,
+            label = me.timePicker.down('label'),
+            minutePrefix = me.minuteSlider.getValue() < 10 ? '0' : '',
+            hourDisplay = me.hourSlider.getValue(),
+            pickerValue, hourPrefix, timeSufix, auxValue;
+
+        if (me.timeFormat == 'h') {
+            timeSufix = me.hourSlider.getValue() < 12 ? ' AM' : ' PM';
+            hourDisplay = me.hourSlider.getValue() < 13 ? hourDisplay : hourDisplay - 12;
+            hourDisplay = hourDisplay || '12';
+        }
+
+        hourPrefix = hourDisplay < 10 ? '0' : '';
+
+        label.setText(hourPrefix + hourDisplay + ':' + minutePrefix + me.minuteSlider.getValue() + (timeSufix || ''));
+
+        if (me.pickerField && (pickerValue = me.pickerField.getValue())) {
+            if (!Ext.isDate(pickerValue)) {                                                // +
+                pickerValue = new Date();                                                  // +
+            }                                                                              // +
+            auxValue = new Date(pickerValue[slider == me.hourSlider ? 'setHours' : 'setMinutes'](slider.getValue()));
+            me.pickerField.setValue(auxValue);
+            me.pickerField.fireEvent('select', me.pickerField, auxValue);
+        }
+    },
+});
