@@ -1,32 +1,33 @@
+import calculateNodeLength from "./calculate-node-length.js";
+
 'use strict';
 
 /**
  * @param {HTMLElement} root
  * @param {HTMLElement} target
  *
- * @returns {number}
+ * @returns {{start: number, end: number}}
  */
 export default function calculateNodeOffsets(root, target) {
     if (!target) {
-        return null;
+        return { start: 0, end: 0 };
     }
 
     let currentOffset = 0;
     let result = null;
-    let _this = this;
 
     function traverse(nodeList) {
         for (const node of nodeList) {
             if (result) {
-                return;
+                break;
             }
 
-            if (node === target || node.outerHTML === target.outerHTML) {
+            if (node === target) {
                 const start = currentOffset;
-                const length = RichTextEditor.calculateNodeLength(node);
-                result = { start, end: start + length };
+                const length = calculateNodeLength(node);
+                result = { start: start, end: start + length };
 
-                return;
+                break;
             }
 
             if (node.nodeType === Node.TEXT_NODE) {
@@ -48,5 +49,5 @@ export default function calculateNodeOffsets(root, target) {
 
     traverse(root.childNodes);
 
-    return result;
+    return result || { start: 0, end: 0 };
 }

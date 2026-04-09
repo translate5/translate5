@@ -754,6 +754,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Modifiers_preserve_original_text_if_no_modifications_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../Modifiers/preserve-original-text-if-no-modifications.js */ "./Modifiers/preserve-original-text-if-no-modifications.js");
 /* harmony import */ var _Modifiers_add_line_breaks_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../Modifiers/add-line-breaks.js */ "./Modifiers/add-line-breaks.js");
 /* harmony import */ var _DataCleanup_copy_preprocessor_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../DataCleanup/copy-preprocessor.js */ "./DataCleanup/copy-preprocessor.js");
+/* harmony import */ var _Tools_escape_html_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../Tools/escape-html.js */ "./Tools/escape-html.js");
+
 
 
 
@@ -1936,7 +1938,7 @@ class EditorWrapper {
         let content = '';
         for (const node of operation.nodes) {
             const dom = this.#createModelNode(node).toDom();
-            content += dom.data ?? dom.outerHTML;
+            content += dom.data ? (0,_Tools_escape_html_js__WEBPACK_IMPORTED_MODULE_15__["default"])(dom.data) : dom.outerHTML;
         }
 
         // Use Unicode for non-breaking space for further processing
@@ -4010,33 +4012,41 @@ class Templating {
     constructor(idPrefix) {
         this.idPrefix = idPrefix;
 
-        // TODO remove dependency on EXTJS
-        this.intImgTpl = new Ext.Template([
+        this.intImgTpl = this.createTemplate(
             '<img id="' + this.idPrefix + '{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" data-tag-number="{nr}"/>'
-        ]);
-        this.intImgTplQid = new Ext.Template([
+        );
+        this.intImgTplQid = this.createTemplate(
             '<img id="' + this.idPrefix + '{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" data-t5qid="{qualityId}" />'
-        ]);
-        this.intSpansTpl = new Ext.Template([
-            '<span title="{title}" class="short">{shortTag}</span>',
+        );
+        this.intSpansTpl = this.createTemplate(
+            '<span title="{title}" class="short">{shortTag}</span>' +
             '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
-        ]);
-        this.intNumberSpansTpl = new Ext.Template([
-            '<span title="{title}" class="short">{shortTag}</span>',
+        );
+        this.intNumberSpansTpl = this.createTemplate(
+            '<span title="{title}" class="short">{shortTag}</span>' +
             '<span data-originalid="{id}" data-length="{length}" data-source="{source}" data-target="{target}" class="full"></span>'
-        ]);
-        this.termSpanTpl = new Ext.Template([
+        );
+        this.termSpanTpl = this.createTemplate(
             '<span class="{className}" title="{title}"></span>'
-        ]);
-        this.termSpanTplQid = new Ext.Template([
+        );
+        this.termSpanTplQid = this.createTemplate(
             '<span class="{className}" title="{title}" data-t5qid="{qualityId}"></span>'
-        ]);
-        this.intImgTpl.compile();
-        this.intImgTplQid.compile();
-        this.intSpansTpl.compile();
-        this.intNumberSpansTpl.compile();
-        this.termSpanTpl.compile();
-        this.termSpanTplQid.compile();
+        );
+    }
+
+    /**
+     * Create a template object with apply method
+     * @param {string} template - Template string with {placeholder} syntax
+     * @returns {Object} Template object with apply method
+     */
+    createTemplate(template) {
+        return {
+            apply: (data) => {
+                return template.replace(/{(\w+)}/g, (match, key) => {
+                    return data[key] !== undefined ? data[key] : '';
+                });
+            }
+        };
     }
 }
 
@@ -4105,35 +4115,37 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ calculateNodeOffsets)
 /* harmony export */ });
+/* harmony import */ var _calculate_node_length_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calculate-node-length.js */ "./Tools/calculate-node-length.js");
 
+
+'use strict';
 
 /**
  * @param {HTMLElement} root
  * @param {HTMLElement} target
  *
- * @returns {number}
+ * @returns {{start: number, end: number}}
  */
 function calculateNodeOffsets(root, target) {
     if (!target) {
-        return null;
+        return { start: 0, end: 0 };
     }
 
     let currentOffset = 0;
     let result = null;
-    let _this = this;
 
     function traverse(nodeList) {
         for (const node of nodeList) {
             if (result) {
-                return;
+                break;
             }
 
-            if (node === target || node.outerHTML === target.outerHTML) {
+            if (node === target) {
                 const start = currentOffset;
-                const length = RichTextEditor.calculateNodeLength(node);
-                result = { start, end: start + length };
+                const length = (0,_calculate_node_length_js__WEBPACK_IMPORTED_MODULE_0__["default"])(node);
+                result = { start: start, end: start + length };
 
-                return;
+                break;
             }
 
             if (node.nodeType === Node.TEXT_NODE) {
@@ -4155,7 +4167,7 @@ function calculateNodeOffsets(root, target) {
 
     traverse(root.childNodes);
 
-    return result;
+    return result || { start: 0, end: 0 };
 }
 
 /***/ }),

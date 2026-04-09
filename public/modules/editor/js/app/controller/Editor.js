@@ -1765,7 +1765,8 @@ Ext.define('Editor.controller.Editor', {
 
         // preset text and html with the found ranges
         // for insert as html (must not include element-ids that already exist in Ext.cache!)
-        copy.selDataText = copy.selDataHtml = htmlString.replace(/id="ext-element-[0-9]+"/, '');
+        copy.selDataText = copy.selDataHtml = htmlString.replaceAll(/id="ext-element-[0-9]+"/g, '');
+        copy.selDataText = copy.selDataHtml;
 
         // for insert as text only
         //the toString is working if copying img tags

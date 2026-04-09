@@ -13,6 +13,7 @@ import removeTagOnCorrespondingDeletion from "../Modifiers/remove-tag-on-corresp
 import preserveOriginalTextIfNoModifications from "../Modifiers/preserve-original-text-if-no-modifications.js";
 import addLineBreaks from "../Modifiers/add-line-breaks.js";
 import copyPreprocessor from "../DataCleanup/copy-preprocessor.js";
+import escapeHtml from "../Tools/escape-html.js";
 // import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 export default class EditorWrapper {
@@ -1180,7 +1181,7 @@ export default class EditorWrapper {
         let content = '';
         for (const node of operation.nodes) {
             const dom = this.#createModelNode(node).toDom();
-            content += dom.data ?? dom.outerHTML;
+            content += dom.data ? escapeHtml(dom.data) : dom.outerHTML;
         }
 
         // Use Unicode for non-breaking space for further processing

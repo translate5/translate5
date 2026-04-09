@@ -18,7 +18,9 @@ export default {
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/$1',
         '^@plugins/(.*)$': '<rootDir>/../../Plugins/$1',
-        '^@private-plugins/(.*)$': '<rootDir>/../../PrivatePlugins/$1'
+        '^@private-plugins/(.*)$': '<rootDir>/../../PrivatePlugins/$1',
+        // Map js-htmlencode to handle CommonJS module in ESM context
+        '^js-htmlencode$': '<rootDir>/__mocks__/js-htmlencode.js'
     },
 
     // Collect coverage from both core and plugins

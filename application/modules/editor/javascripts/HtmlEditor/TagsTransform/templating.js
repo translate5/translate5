@@ -5,32 +5,40 @@ export default class Templating {
     constructor(idPrefix) {
         this.idPrefix = idPrefix;
 
-        // TODO remove dependency on EXTJS
-        this.intImgTpl = new Ext.Template([
+        this.intImgTpl = this.createTemplate(
             '<img id="' + this.idPrefix + '{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" data-tag-number="{nr}"/>'
-        ]);
-        this.intImgTplQid = new Ext.Template([
+        );
+        this.intImgTplQid = this.createTemplate(
             '<img id="' + this.idPrefix + '{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" data-t5qid="{qualityId}" />'
-        ]);
-        this.intSpansTpl = new Ext.Template([
-            '<span title="{title}" class="short">{shortTag}</span>',
+        );
+        this.intSpansTpl = this.createTemplate(
+            '<span title="{title}" class="short">{shortTag}</span>' +
             '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
-        ]);
-        this.intNumberSpansTpl = new Ext.Template([
-            '<span title="{title}" class="short">{shortTag}</span>',
+        );
+        this.intNumberSpansTpl = this.createTemplate(
+            '<span title="{title}" class="short">{shortTag}</span>' +
             '<span data-originalid="{id}" data-length="{length}" data-source="{source}" data-target="{target}" class="full"></span>'
-        ]);
-        this.termSpanTpl = new Ext.Template([
+        );
+        this.termSpanTpl = this.createTemplate(
             '<span class="{className}" title="{title}"></span>'
-        ]);
-        this.termSpanTplQid = new Ext.Template([
+        );
+        this.termSpanTplQid = this.createTemplate(
             '<span class="{className}" title="{title}" data-t5qid="{qualityId}"></span>'
-        ]);
-        this.intImgTpl.compile();
-        this.intImgTplQid.compile();
-        this.intSpansTpl.compile();
-        this.intNumberSpansTpl.compile();
-        this.termSpanTpl.compile();
-        this.termSpanTplQid.compile();
+        );
+    }
+
+    /**
+     * Create a template object with apply method
+     * @param {string} template - Template string with {placeholder} syntax
+     * @returns {Object} Template object with apply method
+     */
+    createTemplate(template) {
+        return {
+            apply: (data) => {
+                return template.replace(/{(\w+)}/g, (match, key) => {
+                    return data[key] !== undefined ? data[key] : '';
+                });
+            }
+        };
     }
 }
