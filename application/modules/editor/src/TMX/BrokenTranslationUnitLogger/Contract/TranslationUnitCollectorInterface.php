@@ -34,7 +34,7 @@ interface TranslationUnitCollectorInterface
 {
     public static function logCode(): string;
 
-    public function collectTU(string $tu): void;
+    public function collectTU(string $tu, array $extra): void;
 
     public function writeLog(\ZfExtended_Logger $logger, array $extra = []): void;
 }

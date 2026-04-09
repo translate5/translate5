@@ -219,23 +219,5 @@ TU,
             'This is a segment with CP tag <t5:n id="2" r="aaa" n="2023-09-15"/> and <t5:n id="1001" r="utf-char" n="0b"/>',
             true,
         ];
-
-        yield 'segment with CP tag number and CP tag invalid XML escaped char' => [
-            'This is a segment with CP tag <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and \\u0003',
-            'This is a segment with CP tag <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="2023-09-15"/> and <t5:n id="1001" r="utf-char" n="03"/>',
-            true,
-        ];
-
-        yield 'segment with CP tag number and CP tag invalid XML char' => [
-            "This is a segment with CP tag <number type=\"date\" name=\"default Y-m-d\" source=\"2023-09-15\" iso=\"2023-09-15\" target=\"15/09/23\"/> and \x00",
-            'This is a segment with CP tag <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="2023-09-15"/> and <t5:n id="1001" r="utf-char" n="00"/>',
-            true,
-        ];
-
-        yield 'segment with CP tag number and CP tag invalid XML control char' => [
-            'This is a segment with CP tag <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and &#x0B;',
-            'This is a segment with CP tag <t5:n id="2" r="ZGVmYXVsdCBZLW0tZA==" n="2023-09-15"/> and <t5:n id="1001" r="utf-char" n="0b"/>',
-            true,
-        ];
     }
 }

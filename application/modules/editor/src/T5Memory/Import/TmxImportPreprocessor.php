@@ -31,10 +31,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory\Import;
 
 use editor_Models_Languages as Language;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
 use MittagQI\Translate5\T5Memory\Contract\TmxImportProcessor;
-use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\Exception\UnableToCreateFileForTmxPreprocessingException;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\AddFakeContextProcessor;
@@ -43,6 +43,7 @@ use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\ContentProtectionP
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\FixCreationTimeProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveCompromisedSegmentsProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemoveDifferentLanguageNodesProcessor;
+use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\RemovePropsFromSegLevelProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TransformTuProcessor;
 use MittagQI\Translate5\T5Memory\Import\TmxImportPreprocessor\TranslationUnitResegmentProcessor;
 use MittagQI\Translate5\T5Memory\TMX\TmxSymbolsFixer;
@@ -74,6 +75,7 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
             [
                 RemoveDifferentLanguageNodesProcessor::create(),
                 RemoveCompromisedSegmentsProcessor::create(),
+                RemovePropsFromSegLevelProcessor::create(),
                 TransformTuProcessor::create(),
                 TranslationUnitResegmentProcessor::create(),
                 ContentProtectionProcessor::create(),

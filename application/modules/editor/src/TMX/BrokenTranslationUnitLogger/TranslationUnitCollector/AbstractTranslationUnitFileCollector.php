@@ -43,7 +43,7 @@ abstract class AbstractTranslationUnitFileCollector implements TranslationUnitCo
 
     abstract public static function logCode(): string;
 
-    public function collectTU(string $tu): void
+    public function collectTU(string $tu, array $extra): void
     {
         $this->tuWasCollected = true;
 

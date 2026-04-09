@@ -7,6 +7,7 @@ namespace MittagQI\Translate5\Test\Integration\T5Memory;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Resource;
 use GuzzleHttp\Psr7\Stream;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Export\TmxChunkFixer;
@@ -54,6 +55,7 @@ class ExportServiceTest extends TestCase
             ConcatTmx::create(),
             TmxIterator::create(),
             TmxChunkFixer::create(),
+            DirectoryPath::create(),
         );
     }
 

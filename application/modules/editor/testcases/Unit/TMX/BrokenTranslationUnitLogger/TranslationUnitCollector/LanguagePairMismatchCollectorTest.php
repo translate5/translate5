@@ -65,7 +65,7 @@ class LanguagePairMismatchCollectorTest extends TestCase
     {
         $tu = '<tu><tuv xml:lang="en-US"><seg>Test</seg></tuv><tuv xml:lang="de-DE"><seg>Test</seg></tuv></tu>';
 
-        $this->collector->collectTU($tu);
+        $this->collector->collectTU($tu, []);
 
         $filename = $this->testDir . '/E1771.tmx';
         $this->assertFileExists($filename);
@@ -78,9 +78,9 @@ class LanguagePairMismatchCollectorTest extends TestCase
         $tu2 = '<tu><tuv xml:lang="de-DE"><seg>Test2</seg></tuv><tuv xml:lang="en-us"><seg>Test2</seg></tuv></tu>';
         $tu3 = '<tu><tuv xml:lang="fr-FR"><seg>Test3</seg></tuv><tuv xml:lang="es-ES"><seg>Test3</seg></tuv></tu>';
 
-        $this->collector->collectTU($tu1);
-        $this->collector->collectTU($tu2);
-        $this->collector->collectTU($tu3);
+        $this->collector->collectTU($tu1, []);
+        $this->collector->collectTU($tu2, []);
+        $this->collector->collectTU($tu3, []);
 
         $logger = $this->createMock(ZfExtended_Logger::class);
         $logger->expects($this->once())
@@ -106,8 +106,8 @@ class LanguagePairMismatchCollectorTest extends TestCase
         $tu1 = '<tu><tuv xml:lang="en-US"><seg>Test</seg></tuv><tuv xml:lang="de-DE"><seg>Test</seg></tuv></tu>';
         $tu2 = '<tu><tuv xml:lang="de-DE"><seg>Test2</seg></tuv><tuv xml:lang="en-US"><seg>Test2</seg></tuv></tu>';
 
-        $this->collector->collectTU($tu1);
-        $this->collector->collectTU($tu2);
+        $this->collector->collectTU($tu1, []);
+        $this->collector->collectTU($tu2, []);
 
         $logger = $this->createMock(ZfExtended_Logger::class);
         $logger->expects($this->once())
@@ -137,7 +137,7 @@ class LanguagePairMismatchCollectorTest extends TestCase
     public function testWriteLogIncludesFilePath(): void
     {
         $tu = '<tu><tuv xml:lang="en-US"><seg>Test</seg></tuv><tuv xml:lang="de-DE"><seg>Test</seg></tuv></tu>';
-        $this->collector->collectTU($tu);
+        $this->collector->collectTU($tu, []);
 
         $logger = $this->createMock(ZfExtended_Logger::class);
         $logger->expects($this->once())
@@ -159,7 +159,7 @@ class LanguagePairMismatchCollectorTest extends TestCase
     public function testWriteLogMergesExtraData(): void
     {
         $tu = '<tu><tuv xml:lang="en-US"><seg>Test</seg></tuv><tuv xml:lang="de-DE"><seg>Test</seg></tuv></tu>';
-        $this->collector->collectTU($tu);
+        $this->collector->collectTU($tu, []);
 
         $logger = $this->createMock(ZfExtended_Logger::class);
         $logger->expects($this->once())
@@ -190,8 +190,8 @@ class LanguagePairMismatchCollectorTest extends TestCase
         $tu1 = '<tu><tuv xml:lang="en-US"><seg>First</seg></tuv><tuv xml:lang="de-DE"><seg>Erste</seg></tuv></tu>';
         $tu2 = '<tu><tuv xml:lang="en-US"><seg>Second</seg></tuv><tuv xml:lang="de-DE"><seg>Zweite</seg></tuv></tu>';
 
-        $this->collector->collectTU($tu1);
-        $this->collector->collectTU($tu2);
+        $this->collector->collectTU($tu1, []);
+        $this->collector->collectTU($tu2, []);
 
         $filename = $this->testDir . '/E1771.tmx';
         $content = file_get_contents($filename);

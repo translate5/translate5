@@ -27,8 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Segment_UtilityBroker as UtilityBroker;
-use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
@@ -138,9 +138,12 @@ class editor_Services_Connector implements ExportAdapterInterface
 
     private ?QueryDurationLogger $queryDurationLogger = null;
 
+    private readonly DirectoryPath $directoryPath;
+
     public function __construct()
     {
-        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
+        $this->contentProtector = ContentProtector::create();
+        $this->directoryPath = DirectoryPath::create();
     }
 
     /**
@@ -497,8 +500,8 @@ class editor_Services_Connector implements ExportAdapterInterface
             return $this->adapter->export($mime);
         }
 
-        $filename = APPLICATION_PATH
-            . '/../data/TMExport/'
+        $filename = $this->directoryPath->tmExportDir()
+            . '/'
             . sprintf(
                 '%s_%s.%s',
                 $this->languageResource->getId(),

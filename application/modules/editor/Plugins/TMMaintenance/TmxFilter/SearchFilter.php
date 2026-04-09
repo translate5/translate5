@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TMMaintenance\TmxFilter;
 
-use MittagQI\Translate5\T5Memory\DirectoryPath;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\SearchMode;
 use MittagQI\Translate5\T5Memory\Exception\TmxFilterException;

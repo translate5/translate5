@@ -32,13 +32,13 @@ namespace MittagQI\Translate5\Test\Functional\ContentProtection\T5memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\T5Memory\Api\Contract\TmxImportPreprocessorInterface;
 use MittagQI\Translate5\T5Memory\Api\SegmentLengthValidator;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\ContentProtection\QueryStringGuesser;
 use MittagQI\Translate5\T5Memory\CreateMemoryService;
-use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\EmptyMemoryCheck;

@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Reorganize;
+namespace MittagQI\Translate5\Integration;
 
 use MittagQI\Translate5\Maintenance\CleanUpFolders;
-use MittagQI\Translate5\T5Memory\DirectoryPath;
+use MittagQI\Translate5\T5Memory\Reorganize\ManualReorganizeService;
 
 class CleanUpCronJob
 {

@@ -31,8 +31,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Integration\T5Memory;
 
 use editor_Models_Languages as Language;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\T5Memory\DirectoryPath;
 use MittagQI\Translate5\T5Memory\DTO\ImportOptions;
 use MittagQI\Translate5\T5Memory\DTO\TmxFilterOptions;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;

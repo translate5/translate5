@@ -189,7 +189,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach(
             CronEventTrigger::class,
             CronEventTrigger::DAILY,
-            fn () => \MittagQI\Translate5\T5Memory\Reorganize\CleanUpCronJob::create()->cleanUp()
+            fn () => \MittagQI\Translate5\Integration\CleanUpCronJob::create()->cleanUp()
         );
     }
 

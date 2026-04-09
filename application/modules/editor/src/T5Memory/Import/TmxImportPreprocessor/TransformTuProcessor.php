@@ -64,7 +64,7 @@ class TransformTuProcessor extends Processor
 
     public function order(): int
     {
-        return 100;
+        return 120;
     }
 
     protected function processTu(

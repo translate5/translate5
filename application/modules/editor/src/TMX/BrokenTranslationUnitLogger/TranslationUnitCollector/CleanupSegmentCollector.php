@@ -32,9 +32,11 @@ namespace MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\TranslationUnitCol
 
 use ZfExtended_Logger;
 
-class LanguagePairMismatchCollector extends AbstractTranslationUnitFileCollector
+class CleanupSegmentCollector extends AbstractTranslationUnitFileCollector
 {
-    private array $skippedPerLanguagePair = [];
+    public const string ENTITIES_KEY = 'cleaned_entities';
+
+    private array $cleanedEntities = [];
 
     public static function create(string $artefactsDir): self
     {
@@ -45,20 +47,11 @@ class LanguagePairMismatchCollector extends AbstractTranslationUnitFileCollector
     {
         $this->tuWasCollected = true;
 
-        preg_match_all('/<tuv[^>]+?xml:lang="([^"]+)"/U', $tu, $matches);
-
-        [$lang1, $lang2] = $matches[1];
-        $lang1 = strtolower($lang1 ?: 'none');
-        $lang2 = strtolower($lang2 ?: 'none');
-
-        $pair = "$lang1 - $lang2";
-        $pairReverse = "$lang2 - $lang1";
-
-        match (true) {
-            isset($this->skippedPerLanguagePair[$pair]) => $this->skippedPerLanguagePair[$pair]++,
-            isset($this->skippedPerLanguagePair[$pairReverse]) => $this->skippedPerLanguagePair[$pairReverse]++,
-            default => $this->skippedPerLanguagePair[$pair] = 1,
-        };
+        if (isset($extra[self::ENTITIES_KEY])) {
+            foreach ($extra[self::ENTITIES_KEY] as $entity) {
+                $this->cleanedEntities[$entity] = true;
+            }
+        }
 
         file_put_contents(
             $this->getFilename(),
@@ -77,19 +70,19 @@ class LanguagePairMismatchCollector extends AbstractTranslationUnitFileCollector
             $extra,
             [
                 'file' => $this->getFilename(),
-                'skipped_per_language_pair' => $this->skippedPerLanguagePair,
+                self::ENTITIES_KEY => implode(PHP_EOL, array_keys($this->cleanedEntities)),
             ],
         );
 
         $logger->warn(
             self::logCode(),
-            "Translation units were skipped as doesn't match language pair of Language resource",
+            'Some translation units were cleaned. Affected entities are: {cleaned_entities}',
             $extra,
         );
     }
 
     public static function logCode(): string
     {
-        return 'E1771';
+        return 'E1780';
     }
 }

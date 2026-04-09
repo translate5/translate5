@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\T5Memory;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseInterface;

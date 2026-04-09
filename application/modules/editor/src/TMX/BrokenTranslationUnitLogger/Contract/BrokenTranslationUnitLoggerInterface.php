@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\TMX\BrokenTranslationUnitLogger\Contract;
 
 interface BrokenTranslationUnitLoggerInterface
 {
-    public function collectProblematicTU(string $code, string $tu): void;
+    public function collectProblematicTU(string $code, string $tu, array $extra = []): void;
 
     public function writeCollectedTUsLog(): void;
 }

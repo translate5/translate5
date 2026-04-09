@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory;
+namespace MittagQI\Translate5\Integration;
 
 class DirectoryPath
 {

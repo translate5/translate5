@@ -39,7 +39,7 @@ class NullBrokenTranslationUnitLogger implements BrokenTranslationUnitLoggerInte
         return new self();
     }
 
-    public function collectProblematicTU(string $code, string $tu): void
+    public function collectProblematicTU(string $code, string $tu, array $extra = []): void
     {
     }
 

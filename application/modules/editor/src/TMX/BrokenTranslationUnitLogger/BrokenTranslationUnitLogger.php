@@ -58,16 +58,17 @@ class BrokenTranslationUnitLogger implements BrokenTranslationUnitLoggerInterfac
                 TranslationUnitCollector\UnexpectedStructureCollector::create($artefactDir),
                 TranslationUnitCollector\CompromisedTuCollector::create($artefactDir),
                 TranslationUnitCollector\LanguagePairMismatchCollector::create($artefactDir),
+                TranslationUnitCollector\CleanupSegmentCollector::create($artefactDir),
                 TranslationUnitCollector\NotMappedFieldsCollector::create($artefactDir),
             ]
         );
     }
 
-    public function collectProblematicTU(string $code, string $tu): void
+    public function collectProblematicTU(string $code, string $tu, array $extra = []): void
     {
         foreach ($this->collectors as $collector) {
             if ($collector::logCode() === $code) {
-                $collector->collectTU($tu);
+                $collector->collectTU($tu, $extra);
             }
         }
     }

@@ -34,6 +34,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector_Exception as ConnectorException;
 use GuzzleHttp\Exception\RequestException;
 use LogicException;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
 use MittagQI\Translate5\T5Memory\Api\T5MemoryApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
@@ -62,6 +63,7 @@ class ExportService
         private readonly ConcatTmx $concatTmx,
         private readonly TmxIterator $tmxIterator,
         private readonly TmxChunkFixer $tmxChunkFixer,
+        private readonly DirectoryPath $directoryPath,
     ) {
     }
 
@@ -78,6 +80,7 @@ class ExportService
             ConcatTmx::create(),
             TmxIterator::create(),
             TmxChunkFixer::create(),
+            DirectoryPath::create(),
         );
     }
 
@@ -370,12 +373,7 @@ class ExportService
             return null;
         }
 
-        $exportDir = APPLICATION_DATA . '/TMExport/';
-        $tmpDir = $exportDir . $languageResource->getId() . '_' . uniqid() . '/';
-
-        if (! mkdir($tmpDir, recursive: true) && ! is_dir($tmpDir)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $tmpDir));
-        }
+        $tmpDir = $this->getExportDir($languageResource, true);
 
         $zipFilename = $this->composeFilename($languageResource, TmFileExtension::ZIP);
 
@@ -485,17 +483,13 @@ class ExportService
         LanguageResource $languageResource,
         bool $multipleParts,
     ): string {
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
-
-        if (! is_dir($exportDir) && ! mkdir($exportDir, recursive: true)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $exportDir));
-        }
+        $exportDir = $this->directoryPath->tmExportDir();
 
         if (! $multipleParts) {
             return $exportDir;
         }
 
-        $exportDir .= $languageResource->getId() . '/';
+        $exportDir .= $languageResource->getId() . '_' . bin2hex(random_bytes(4)) . '/';
 
         if (! is_dir($exportDir) && ! mkdir($exportDir, recursive: true)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $exportDir));

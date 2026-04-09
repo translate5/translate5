@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\TMX;
 
-use MittagQI\Translate5\T5Memory\DirectoryPath;
+use MittagQI\Translate5\Integration\DirectoryPath;
 
 class TmxSymbolsFixer
 {

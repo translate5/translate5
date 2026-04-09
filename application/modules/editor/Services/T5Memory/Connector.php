@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\Integration\ActionLockService;
+use MittagQI\Translate5\Integration\DirectoryPath;
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\TmFileExtension;
@@ -136,6 +137,7 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
             ConcatTmx::create(),
             TmxIterator::create(),
             TmxChunkFixer::create(),
+            DirectoryPath::create(),
         );
 
         $this->reorganizeService = ReorganizeService::create();
