@@ -86,6 +86,10 @@ Ext.define('Editor.controller.Editor', {
         {
             ref: 'synonymSearch',
             selector: '#synonymSearch'
+        },
+        {
+            ref: 'viewport',
+            selector: 'viewport'
         }
     ],
     registeredTooltips: [],
@@ -337,9 +341,10 @@ Ext.define('Editor.controller.Editor', {
             }
         });
 
-        me.generalKeyMap = new Ext.util.KeyMap(
-            Ext.getDoc(),
-            me.getKeyMapConfig(
+        me.generalKeyMap = new Ext.util.KeyMap({
+            target: Ext.getDoc(),
+            processEvent: event => me.getViewport().isMasked() ? false : event,
+            binding: me.getKeyMapConfig(
                 'application',
                 {
                     'alt-c': [
@@ -353,7 +358,7 @@ Ext.define('Editor.controller.Editor', {
                     ]
                 }
             )
-        );
+        });
 
         //inits the editor directly after loading the application
         plug.editor = plug.initEditor();
@@ -476,7 +481,7 @@ Ext.define('Editor.controller.Editor', {
     },
 
     onAfterStartEdit: function (editor) {
-
+        var me = this;
         if (this.editorKeyMap) {
             this.editorKeyMap.destroy();
         }
@@ -487,6 +492,7 @@ Ext.define('Editor.controller.Editor', {
 
         this.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: editor.getEditorBody(),
+            processEvent: event => me.getViewport().isMasked() ? false : event,
             binding: this.getKeyMapConfig('editor', {
                 // insert editor-specific key events
                 'ctrl-comma': [188, {
@@ -523,7 +529,7 @@ Ext.define('Editor.controller.Editor', {
 
         this.editorKeyMap_rowEditor = new Editor.view.segments.EditorKeyMap({
             target: editor.editingPlugin.editor.el,
-            processEvent: event => event.getTarget('.ck-editor__editable') ? false : event,
+            processEvent: event => event.getTarget('.ck-editor__editable') || me.getViewport().isMasked() ? false : event,
             binding: this.getKeyMapConfig('editor', {})
         });
     },

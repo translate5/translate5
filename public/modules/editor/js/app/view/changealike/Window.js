@@ -211,7 +211,7 @@ Ext.define('Editor.view.changealike.Window', {
       else {
           targetEdit = format('target',targetEdit);
       }
-      
+      this.segmentRecord = segmentRecord;
       this.down('#infoText').update({
           edited: targetEdit,
           addition: '',
