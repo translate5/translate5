@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\Operation\WithAuthentication;
@@ -57,8 +58,8 @@ use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssertInterface;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
-use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
 use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentOperationInterface;
+use MittagQI\Translate5\Segment\Operation\Contract\UserNotificationInterface;
 use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\Segment\Operation\UpdateSegmentLogger;
@@ -89,7 +90,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         ContextDto $contextDto,
         User $actor,
         UpdateSegmentLogger $updateLogger,
-        ?UpdateSegmentHandlerInterface $resultHandler = null
+        ?UserNotificationInterface $userNotification = null
     ): void {
         $this->permissionAssert->assertGranted(
             SegmentAction::Update,
@@ -97,6 +98,6 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
             new PermissionAssertContext($actor),
         );
 
-        $this->updateSegmentOperation->update($segment, $updateDto, $contextDto, $actor, $updateLogger, $resultHandler);
+        $this->updateSegmentOperation->update($segment, $updateDto, $contextDto, $actor, $updateLogger, $userNotification);
     }
 }

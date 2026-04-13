@@ -32,7 +32,7 @@ use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
-use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
+use MittagQI\Translate5\Segment\Operation\Contract\UserNotificationInterface;
 use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\Factory\UpdateSegmentDtoFactory;
 use MittagQI\Translate5\Segment\Operation\UpdateFlow;
@@ -1005,21 +1005,17 @@ class Editor_SegmentController extends ZfExtended_RestController
         }
     }
 
-    private function getNewResultHandler(): UpdateSegmentHandlerInterface
+    private function getNewResultHandler(): UserNotificationInterface
     {
-        return new class($this->restMessages) implements UpdateSegmentHandlerInterface {
+        return new class($this->restMessages) implements UserNotificationInterface {
             public function __construct(
                 private readonly ZfExtended_Models_Messages $restMessages
             ) {
             }
 
-            public function handleResults(bool $contentWasSanitized): void
+            public function addWarning(string $message): void
             {
-                if ($contentWasSanitized) {
-                    $this->restMessages->addWarning(
-                        'Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!'
-                    );
-                }
+                $this->restMessages->addWarning($message);
             }
         };
     }

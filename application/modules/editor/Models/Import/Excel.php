@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Segment\Exception\NotEditableException;
-use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
+use MittagQI\Translate5\Segment\Operation\Contract\UserNotificationInterface;
 use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\DurationsDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
@@ -85,6 +85,8 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
 
     private ReferenceFieldService $referenceFieldService;
 
+    private readonly ZfExtended_Zendoverwrites_Translate $translate;
+
     /**
      * reimport $filename xls into $task.
      * the fiel $filename is located inside the /data/importedTasks/<taskGuid>/excelReimport/ folder
@@ -94,8 +96,11 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_Excel_ExImportException
      */
-    public function __construct(editor_Models_Task $task, $filename, $currentUserGuid)
-    {
+    public function __construct(
+        editor_Models_Task $task,
+        $filename,
+        $currentUserGuid
+    ) {
         parent::__construct();
         $this->task = $task;
 
@@ -127,12 +132,14 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         $this->writeableWorkflowAssert = WriteableWorkflowAssert::create();
 
         $this->referenceFieldService = ReferenceFieldService::create();
+
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 
     public function reimport(
         ZfExtended_Zendoverwrites_Translate $translate,
         ZfExtended_Models_Messages $restMessages,
-        ZfExtended_Models_User $user
+        ZfExtended_Models_User $user,
     ): void {
         $this->segmentErrors = [];
         // contains the TUA which is used to alter the segments
@@ -285,17 +292,23 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
      */
     protected function saveSegment(editor_Models_Segment $t5Segment, string $newContent)
     {
-        $resultHandler = new class() implements UpdateSegmentHandlerInterface {
-            protected bool $wasSanitized = false;
+        $addSegmentErrorCallback = function (string $message) use ($t5Segment) {
+            $this->addSegmentError(
+                (int) $t5Segment->getSegmentNrInTask(),
+                $message
+            );
+        };
 
-            public function handleResults(bool $contentWasSanitized): void
-            {
-                $this->wasSanitized = $contentWasSanitized;
+        $userNotification = new class($addSegmentErrorCallback) implements UserNotificationInterface {
+            public function __construct(
+                private readonly Closure $addSegmentErrorCallback,
+            ) {
             }
 
-            public function wasSanitized(): bool
+            public function addWarning(string $message): void
             {
-                return $this->wasSanitized;
+                $call = $this->addSegmentErrorCallback;
+                $call($message);
             }
         };
 
@@ -315,16 +328,8 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
             ),
             $this->context,
             $this->user,
-            resultHandler: $resultHandler,
+            userNotification: $userNotification,
         );
-
-        if ($resultHandler->wasSanitized()) {
-            $this->addSegmentError(
-                (int) $t5Segment->getSegmentNrInTask(),
-                'Some non representable characters were removed from the segment'
-                . ' (multiple white-spaces, tabs, line-breaks etc.)!'
-            );
-        }
     }
 
     /**
@@ -333,7 +338,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
     protected function checkTagStructure(
         string $newSegment,
         string $orgSegmentAsExcel,
-        excelExImportSegmentContainer $segment
+        excelExImportSegmentContainer $segment,
     ) {
         // check structure of the new segment (from excel)
         if (! $this->tagStructureChecker->check($newSegment)) {
@@ -487,7 +492,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         //we abuse the segment container for transporting the error messages
         $error = new excelExImportSegmentContainer();
         $error->nr = $segmentNr;
-        $error->comment = $hint;
+        $error->comment = $this->translate->_($hint);
         $this->segmentErrors[] = $error;
     }
 }

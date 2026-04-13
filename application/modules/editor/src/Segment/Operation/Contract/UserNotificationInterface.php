@@ -48,13 +48,12 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\Operation\Contract;
 
-interface UpdateSegmentHandlerInterface
+interface UserNotificationInterface
 {
-    public function handleResults(
-        bool $contentWasSanitized
-    ): void;
+    public function addWarning(string $message): void;
 }

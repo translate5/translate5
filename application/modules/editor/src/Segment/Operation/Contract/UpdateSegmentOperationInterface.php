@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\Operation\Contract;
@@ -66,6 +67,6 @@ interface UpdateSegmentOperationInterface
         ContextDto $contextDto,
         User $actor,
         UpdateSegmentLogger $updateLogger,
-        ?UpdateSegmentHandlerInterface $resultHandler = null
+        ?UserNotificationInterface $userNotification = null
     ): void;
 }

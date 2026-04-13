@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\Operation;
@@ -61,8 +62,8 @@ use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Segment\ActionAssert\Feasibility\SegmentActionFeasibilityAssert;
 use MittagQI\Translate5\Segment\Event\SegmentUpdatedEvent;
-use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentHandlerInterface;
 use MittagQI\Translate5\Segment\Operation\Contract\UpdateSegmentOperationInterface;
+use MittagQI\Translate5\Segment\Operation\Contract\UserNotificationInterface;
 use MittagQI\Translate5\Segment\Operation\DTO\ContextDto;
 use MittagQI\Translate5\Segment\Operation\DTO\UpdateSegmentDto;
 use MittagQI\Translate5\User\Model\User;
@@ -71,8 +72,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class UpdateSegmentOperation implements UpdateSegmentOperationInterface
 {
-    private bool $contentWasSanitized = false;
-
     public function __construct(
         private readonly WriteableWorkflowAssert $writeableWorkflowAssert,
         private readonly ActionFeasibilityAssertInterface $feasibilityAssert,
@@ -99,7 +98,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
         ContextDto $contextDto,
         User $actor,
         ?UpdateSegmentLogger $updateLogger = null,
-        ?UpdateSegmentHandlerInterface $resultHandler = null
+        ?UserNotificationInterface $userNotification = null
     ): void {
         $this->feasibilityAssert->assertAllowed(Action::Update, $segment);
 
@@ -134,7 +133,7 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
             $segment->setMatchRateType($updateDto->matchRateType);
         }
 
-        $textData = $this->sanitizeEditedContent($updater, $updateDto->textData);
+        $textData = $this->sanitizeEditedContent($updater, $updateDto->textData, $userNotification);
 
         foreach ($textData as $field => $text) {
             // call via magic setter as this is the only way to set modified fields in model
@@ -153,8 +152,6 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
 
         $updater->update($segment, $history);
 
-        $resultHandler?->handleResults($this->contentWasSanitized);
-
         $this->taskProgress->refreshProgress($task, $actor->getUserGuid(), fireEvent: true);
 
         $this->eventDispatcher->dispatch(new SegmentUpdatedEvent($segment));
@@ -167,13 +164,16 @@ class UpdateSegmentOperation implements UpdateSegmentOperationInterface
      */
     protected function sanitizeEditedContent(
         editor_Models_Segment_Updater $updater,
-        array $textData
+        array $textData,
+        ?UserNotificationInterface $userNotification
     ): array {
-        $this->contentWasSanitized = false;
         $result = [];
 
         foreach ($textData as $field => $text) {
-            $this->contentWasSanitized = $updater->sanitizeEditedContent($text, $field) || $this->contentWasSanitized;
+            if ($updater->sanitizeEditedContent($text, $field)) {
+                $userNotification?->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
+            }
+
             $result[$field] = $text;
         }
 

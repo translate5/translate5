@@ -339,7 +339,7 @@ class editor_Models_Segment_Updater
      */
     public function sanitizeEditedContent(string &$content, string $field): bool
     {
-        $isEditingTargetInFront = ($field === 'targetEdit');
+        $isEditingInFront = in_array($field, ['targetEdit', 'sourceEdit'], true);
 
         // some browsers create nbsp instead of normal whitespace, also if content is copied from other sources
         // there may be some non-breaking spaces/narrow non-breaking space etc spaces in the content
@@ -360,15 +360,15 @@ class editor_Models_Segment_Updater
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
         $content = editor_Models_Segment_Utility::foreachSegmentTextNode(
             $content,
-            function ($text) use ($isEditingTargetInFront) {
+            function ($text) use ($isEditingInFront) {
                 return strip_tags(
                     $this->contentProtector->protect(
                         $text,
-                        ! $isEditingTargetInFront,
+                        ! $isEditingInFront,
                         $this->task->getSourceLang(),
                         $this->task->getTargetLang(),
                         EntityHandlingMode::Restore,
-                        $isEditingTargetInFront ? NumberProtector::alias() : '',
+                        $isEditingInFront ? NumberProtector::alias() : '',
                     )
                 );
             }
