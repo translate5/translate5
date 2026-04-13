@@ -108,7 +108,7 @@ class TmxIterator
 
             if ($reader->nodeType === XMLReader::ELEMENT && $reader->name === 'header') {
                 yield '<tmx version="1.4">' . PHP_EOL;
-                yield $reader->readOuterXML() . PHP_EOL;
+                yield preg_replace('/gitCommit=".+"/U', '', $reader->readOuterXML()) . PHP_EOL;
                 yield '<body>' . PHP_EOL;
             }
         }
