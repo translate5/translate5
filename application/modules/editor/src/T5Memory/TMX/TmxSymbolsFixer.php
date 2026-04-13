@@ -53,6 +53,16 @@ class TmxSymbolsFixer
         $dirPath = $this->directoryPath->tmxImportProcessingDir();
         $outputFilename = tempnam($dirPath, 'tmxfix_');
 
+        $encoding = $this->detectXmlEncoding($filePath);
+
+        if ($encoding === null) {
+            throw new \RuntimeException("Cannot reliably detect source encoding");
+        }
+
+        if ($encoding !== 'UTF-8') {
+            $this->convertToUtf8($filePath);
+        }
+
         // Process file in chunks to optimize memory usage
         $inputHandle = fopen($filePath, 'rb');
         $outputHandle = fopen($outputFilename, 'wb');
@@ -62,8 +72,23 @@ class TmxSymbolsFixer
         }
 
         $insideTuv = false;
+        $firstLine = true;
 
         while ($line = fgets($inputHandle)) {
+            if ($firstLine) {
+                preg_replace_callback(
+                    '/<\?xml[^>]+encoding=["\']([^"\']+)["\']/i',
+                    fn ($matches) => str_replace(
+                        $matches[1],
+                        'UTF-8',
+                        $matches[0],
+                    ),
+                    $line
+                );
+
+                $firstLine = false;
+            }
+
             $oneLineTuv = strrpos($line, '<tuv') && strrpos($line, '</tuv>');
             $insideTuv = $oneLineTuv || strrpos($line, '<tuv') || $insideTuv;
 
@@ -123,5 +148,79 @@ class TmxSymbolsFixer
         if (file_exists($outputFilename)) {
             throw new \RuntimeException("Failed to rename temporary file to original file path.");
         }
+    }
+
+    private function detectXmlEncoding(string $filePath): ?string
+    {
+        $fh = fopen($filePath, 'rb');
+        if (! $fh) {
+            throw new \RuntimeException("Cannot open file: $filePath");
+        }
+
+        $prefix = fread($fh, 4096);
+        fclose($fh);
+
+        if ($prefix === false) {
+            throw new \RuntimeException("Cannot read file: $filePath");
+        }
+
+        // BOM checks
+        if (strncmp($prefix, "\xEF\xBB\xBF", 3) === 0) {
+            return 'UTF-8';
+        }
+        if (strncmp($prefix, "\xFF\xFE\x00\x00", 4) === 0) {
+            return 'UTF-32LE';
+        }
+        if (strncmp($prefix, "\x00\x00\xFE\xFF", 4) === 0) {
+            return 'UTF-32BE';
+        }
+        if (strncmp($prefix, "\xFF\xFE", 2) === 0) {
+            return 'UTF-16LE';
+        }
+        if (strncmp($prefix, "\xFE\xFF", 2) === 0) {
+            return 'UTF-16BE';
+        }
+
+        // No BOM, no xml encoding declaration:
+        // verify whether first chunk looks like valid UTF-8
+        if (mb_check_encoding($prefix, 'UTF-8')) {
+            return 'UTF-8';
+        }
+
+        // XML declaration in plain ASCII-compatible encodings
+        if (preg_match('/<\?xml[^>]+encoding=["\']([^"\']+)["\']/i', $prefix, $m)) {
+            return strtoupper($m[1]);
+        }
+
+        return null;
+    }
+
+    private function convertToUtf8(string $inputFile): void
+    {
+        $encoding = $this->detectXmlEncoding($inputFile);
+
+        $dirPath = APPLICATION_PATH . '/../data/TmxImportPreprocessing/';
+        $outputFile = tempnam($dirPath, 'tmxfix_');
+
+        if ($encoding === null) {
+            throw new \RuntimeException("Cannot reliably detect source encoding");
+        }
+
+        $cmd = sprintf(
+            'iconv -f %s -t UTF-8 %s > %s 2>&1',
+            escapeshellarg($encoding),
+            escapeshellarg($inputFile),
+            escapeshellarg($outputFile)
+        );
+
+        exec($cmd, $output, $exitCode);
+
+        if ($exitCode !== 0) {
+            throw new \RuntimeException(
+                "iconv failed for encoding {$encoding}: " . implode("\n", $output)
+            );
+        }
+
+        rename($outputFile, $inputFile);
     }
 }

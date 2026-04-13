@@ -800,7 +800,7 @@ Ext.define('Editor.controller.Segments', {
         me.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
 
         //invoking change alike handling:
-        if (me.fireEvent('saveComplete')) {
+        if (me.fireEvent('saveComplete', record)) {
             me.saveChainEnd(record); //NEXT step in save chain
         }
     },

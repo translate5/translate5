@@ -33,6 +33,7 @@ use editor_Models_KPI;
 use editor_Models_Workflow_Step;
 use editor_Workflow_Exception;
 use Exception;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Task\Excel\Metadata as ExcelMetadata;
 use MittagQI\Translate5\Task\Excel\MetadataException;
 use MittagQI\ZfExtended\Controller\Response\Header;
@@ -231,6 +232,24 @@ class Metadata
                 }
             }
         };
+
+        //convert the language filter value (the initial value is the language id)
+        $languageRepository = LanguageRepository::create();
+        $convertLanguage = function ($filter) use ($languageRepository) {
+            if (empty($filter->value)) {
+                return;
+            }
+
+            $values = is_array($filter->value) ? $filter->value : [$filter->value];
+            foreach ($values as &$single) {
+                try {
+                    $language = $languageRepository->get((int) $single);
+                    $single = $language->getLangName() . ' (' . $language->getRfc5646() . ')';
+                } catch (Exception) {
+                }
+            }
+            $filter->value = is_array($filter->value) ? $values : $values[0];
+        };
         $filter = ZfExtended_Factory::get(ZfExtended_Models_Filter_ExtJs6::class);
         $operatorTranslated = $filter->getTranslatedOperators();
         $workflowStepTypes = null;
@@ -242,6 +261,8 @@ class Metadata
 
             if ($filter->property == 'userName') {
                 $convertUserName($filter);
+            } elseif (in_array($filter->property, ['sourceLang', 'targetLang', 'relaisLang'])) {
+                $convertLanguage($filter);
             } elseif ($filter->property == 'workflowUserRole') {
                 $workflowStepTypes = $filter->value;
             } elseif ($isDate($filter->value)) {

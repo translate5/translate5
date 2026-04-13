@@ -192,6 +192,7 @@ class RetryClient implements ClientInterface, PoolAsyncClientInterface
 
         return str_contains($e->getMessage(), 'cURL error 6') // Could not resolve host
             || str_contains($e->getMessage(), 'cURL error 7') // Failed to connect to host
+            || str_contains($e->getMessage(), 'cURL error 18') // Transfer closed with outstanding read data remaining
             || str_contains($e->getMessage(), 'cURL error 56') // Recv failure
         ;
     }

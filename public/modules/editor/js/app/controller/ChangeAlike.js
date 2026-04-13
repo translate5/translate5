@@ -75,12 +75,11 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikesFailure: '#UT#The repetitions could not be saved',
     alikesScheduled: '#UT#{0} repetitions scheduled for processing'
   },
-  alikesToProcess: null,
+  alikesToProcess: {},
   fetchedAlikes: null,
   saveIsRunning: false,
   window: null,
   alikeSegmentsUrl: '',
-  actualRecord: null,
   actualColumnToEdit: null,
   timeTracking: null,
   isDisabled: false,
@@ -101,12 +100,12 @@ Ext.define('Editor.controller.ChangeAlike', {
   listen: {
       component: {
           '#changealikeWindow #saveBtn' : {
-              click: 'handleSaveChangeAlike'
+              click: 'handleSaveChangeAlikeClick'
           },
           '#changealikeWindow' : {
               show: 'focusButton',
               onEscape: 'handleCancelChangeAlike',
-              onCtrlS: 'handleSaveChangeAlike'
+              onCtrlS: 'handleSaveChangeAlikeCtrlS'
           },
           '#changealikeWindow #cancelBtn' : {
               click: 'handleCancelChangeAlike'
@@ -239,7 +238,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   handleAlikesRead: function(operation, id) {
       var me = this;
-      
+
       if(me.isDisabled || ! operation.wasSuccessful()){
           operation.handleReadAfterSave && operation.handleReadAfterSave();
           return;
@@ -261,7 +260,6 @@ Ext.define('Editor.controller.ChangeAlike', {
 
 	  var me = this;
 	  me.callbackToSaveChain = finalCallback;
-	  me.actualRecord = record;
       me.actualColumnToEdit = columnToEdit;
 	  me.saveIsRunning = true;
 
@@ -283,7 +281,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           return;
       }
       if(me.isAutoProcessing()) {
-          me.handleSaveChangeAlike();
+          me.handleSaveChangeAlike(record);
           return;
       }
       //manualProcessing:
@@ -308,15 +306,37 @@ Ext.define('Editor.controller.ChangeAlike', {
   getSourceEditing: function() {
       return Editor.data.task.get('enableSourceEditing');
   },
+
+  /**
+   * Prevent duplicated handler call on double-click
+   *
+   * @param btn
+   */
+  handleSaveChangeAlikeClick: function(btn){
+
+      // Disable the button to prevent double-click
+      btn.setDisabled(true);
+
+      // Call real handler
+      this.handleSaveChangeAlike(btn.up('#changealikeWindow').segmentRecord);
+
+      // Re-enable the button after a short delay
+      Ext.defer(() => btn.setDisabled(false), 500);
+  },
+
+  handleSaveChangeAlikeCtrlS: function (changealikeWindow) {
+      this.handleSaveChangeAlike(changealikeWindow.segmentRecord);
+  },
+
   /**
    * Starts saving the repetitions. Triggered automatically or manually, depending on the setting.
    */
-  handleSaveChangeAlike: function() {
+  handleSaveChangeAlike: function(rec) {
     var me = this,
-        rec = me.actualRecord,
         meta = rec.get('metaCache'),
         newLength = null,
-    
+        recId = rec.getId(),
+
     //Daten des aktuelle bearbeiteten Segments, die angezeigten AlikeSegmente im Segment Store werden mit diesen überschrieben 
     //Hier wird auch das Alike Segment vorübergehend auf nicht editierbar gesetzt, bis das OK vom Server kommt
     data = {
@@ -325,8 +345,8 @@ Ext.define('Editor.controller.ChangeAlike', {
       autoStateId: 999
     };
     //get the length of the changed master segment
-    if(meta && meta.siblingData && meta.siblingData[rec.get('id')]) {
-        newLength = Ext.clone(meta.siblingData[rec.get('id')].length);
+    if(meta && meta.siblingData && meta.siblingData[recId]) {
+        newLength = Ext.clone(meta.siblingData[recId].length);
     }
     if(me.getSourceEditing()) {
         data.sourceEdit = rec.data.sourceEdit;
@@ -340,12 +360,12 @@ Ext.define('Editor.controller.ChangeAlike', {
     if(rec.wasOriginalTargetUpdated) {
         data.target = rec.get('target');
     }
-    me.alikesToProcess = me.getAlikesToProcess();
+    me.alikesToProcess[recId] = me.getAlikesToProcess();
     me.calculateUsedTime();
-    
+
     //just fill the alike segments with the changes. The commit of the them will be triggered  
     // in alikesSaveSuccessHandler when the Alike Segments are saved on the server
-    Ext.Array.each(me.alikesToProcess, function(alikeId){
+    Ext.Array.each(me.alikesToProcess[recId], function(alikeId){
         me.updateSegment(alikeId, data, newLength);
     });
     
@@ -358,7 +378,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     }
 
     if(!me.saveIsRunning) {
-        me.savePendingAlikes();
+        me.savePendingAlikes(rec);
     }
   },
   /**
@@ -379,10 +399,10 @@ Ext.define('Editor.controller.ChangeAlike', {
    * Handler is called after saving a segment successfully to the server in save chain (called by Ajax callback)
    * @return {Boolean}
    */
-  onSaveComplete: function(){
+  onSaveComplete: function(record){
       var me = this;
-      if(me.alikesToProcess) { 
-          me.savePendingAlikes();
+      if(me.alikesToProcess[record.getId()]) {
+          me.savePendingAlikes(record);
       }
       me.saveIsRunning = false;
       //if no alikes are used or available, return to save chain
@@ -397,10 +417,10 @@ Ext.define('Editor.controller.ChangeAlike', {
    * Stößt auf der Server Seite die Verarbeitung Wiederholungen an.  
    * @param {Number[]} alikes Array mit den zu bearbeitenden Segment IDs
    */
-  savePendingAlikes: function() {
+  savePendingAlikes: function(record) {
     var me = this,
-        id = me.actualRecord.getId(),
-        alikes = me.alikesToProcess;
+        id = record.getId(),
+        alikes = me.alikesToProcess[id];
     if(!alikes || alikes.length == 0) {
         me.callbackToSaveChain();
         return;
@@ -411,6 +431,22 @@ Ext.define('Editor.controller.ChangeAlike', {
       "alikes": Ext.JSON.encode(alikes),
       "columnToEdit": me.actualColumnToEdit
     };
+
+    // Log the stack trace of how we ended up here, to investigate double calls for the same segment
+    // Apparently, the doubled calls are:
+    // 1. Segment save
+    //   - Editor.controller.Segments.saveChainSaveCallback()
+    //   - Editor.controller.Segments.fireEvent('saveComplete')
+    //   - Editor.controller.ChangeAlike.listen.controller.'#Segments'.saveComplete: 'onSaveComplete'
+    //   - Editor.controller.ChangeAlike.onSaveComplete()
+    //   - Editor.controller.ChangeAlike.savePendingAlikes()
+    // 2. Save-button click (or Ctrl+S) in Repetitions-window
+    //   - Editor.controller.ChangeAlike.listen.component.'#changealikeWindow #saveBtn'.click: 'handleSaveChangeAlike'
+    //     Editor.controller.ChangeAlike.listen.component.'#changealikeWindow'.onCtrlS: 'handleSaveChangeAlike'
+    //     Editor.controller.ChangeAlike.handleSaveChangeAlike()
+    //     Editor.controller.ChangeAlike.savePendingAlikes()
+    // So the logging is to check whether this assumption is corrert and there are no other scenarios
+    console.log(new Error(`savePendingAlikes for segment ${id} (arg rec id ${record.id}): ${params.alikes}`).stack);
 
     if (Editor.data.plugins.hasOwnProperty('FrontEndMessageBus')) {
         params.async = true;
@@ -498,7 +534,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @param {Object} options
    */
   alikesSaveFailureHandler: function(resp, options) {
-    this.cleanUpAlikeSegments();
+    this.cleanUpAlikeSegments(resp.request.url.split('/').pop());
     Editor.MessageBox.addError(this.messages.alikesFailure);
   },
   /**
@@ -510,10 +546,18 @@ Ext.define('Editor.controller.ChangeAlike', {
     var me = this,
     //id des Ziel Segments
     data = Ext.decode(resp.responseText),
-    alikes = me.alikesToProcess;
+    recId = resp.request.url.split('/').pop(),
+    alikes = me.alikesToProcess[recId];
+
+    // If alikes is null it means the current function was already called
+    // and alikes were cleaned up so nothing left to do here anymore
+    //
+    /*if (alikes === null) {
+        return;
+    }*/
 
     if (Editor.data.plugins.hasOwnProperty('FrontEndMessageBus')) {
-        me.cleanUpAlikeSegments();
+        me.cleanUpAlikeSegments(recId);
 
         const store = me.getStore('Segments');
 
@@ -534,7 +578,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     const alikesSaved = (data.rows.length == 1 ? me.messages.alikeSingular : me.messages.alikePlural);
 
     if(!data.rows || data.rows.length == 0) {
- 	    me.cleanUpAlikeSegments();
+ 	    me.cleanUpAlikeSegments(recId);
     	return;
     }
     //Auslesen und Verarbeiten der IDs der Alike Segmente die auf dem Server erfolgreich gespeichert wurden
@@ -550,7 +594,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     	}
     });
     // finish process by checking of unsaved alikes occured
-    if(me.cleanUpAlikeSegments()){
+    if(me.cleanUpAlikeSegments(recId)){
         Editor.MessageBox.addSuccess(Ext.String.format(alikesSaved, data.rows.length));
     }
 
@@ -564,10 +608,10 @@ Ext.define('Editor.controller.ChangeAlike', {
    * This method should be the last called method in the changealike processing. Its responsible to jump back to the saveChain
    * It returns, if no error saving the alikes occured
    */
-  cleanUpAlikeSegments: function() {
+  cleanUpAlikeSegments: function(recId) {
       var me = this,
-          alikes = me.alikesToProcess;
-      me.alikesToProcess = null;
+          alikes = me.alikesToProcess[recId];
+      delete me.alikesToProcess[recId];
       if(!alikes || alikes.length == 0) {
           me.callbackToSaveChain();
           return true;
@@ -626,7 +670,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     return rec;
   },
   handleCancelChangeAlike: function() {
-      this.fireEvent('cancelManualProcessing', this.actualRecord, this.window, this);
+      this.fireEvent('cancelManualProcessing', this.getAlikeWindow().segmentRecord, this.window, this);
       this.callbackToSaveChain();
       this.window.close();
       return false; //prevent default close action
