@@ -57,21 +57,27 @@ class ContentDefault extends ContentBase
         //the history entry must be created before the original entity is modified
         $history = $this->segment->getNewHistoryEntity();
 
+        $originalSource = $this->getExistingSourceEdit();
+        $originalTarget = $this->getExistingTargetEdit();
+
         //basically a source must exist, if not (in some specific XLF dialects) its null and must be ignored
         $newSource = $this->getDataSource();
+        $newTarget = $this->getDataTarget();
+
+        // we update the source only when source editing is active
         if (! is_null($newSource) &&
-            ! $this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstSourceName()), $newSource)) {
-            $this->updateSource($this->getDataSource());
+            $this->sfm->isEditable('source') &&
+            ! $this->isContentEqual($originalSource, $newSource)
+        ) {
+            $this->updateSourceEdit($newSource, $originalSource);
             $this->updateSegment = true;
         }
 
         if (! $this->isContentEqual(
-            $this->segment->getFieldEdited(
-                $this->sfm->getFirstTargetName()
-            ),
-            $this->getDataTarget()
+            $originalTarget,
+            $newTarget
         )) {
-            $this->updateTarget($this->getDataTarget());
+            $this->updateTargetEdit($newTarget, $originalTarget);
             $this->updateSegment = true;
         }
 
@@ -94,17 +100,38 @@ class ContentDefault extends ContentBase
     }
 
     /**
-     * Updates the segment target with the given content. In case of incorrect tag count, this will stil update
-     * the segment(the autoqa tag check should find this problem)
+     * Updates the segments editable source field and keeps the internal tags in sync
+     * When the tags have faults this may create problems with editing in the frontend
+     * ... but is the responsibility of the import
      */
-    protected function updateTarget(string $target): void
+    protected function updateSourceEdit(string $newSource, string $originalSource): void
     {
-        $this->segmentTagger->updateSegmentContent($this->segment->getSource(), $target, function ($original, $target) {
+        $this->segmentTagger->synchronizeInternalTags($originalSource, $newSource, function ($original, $source) {
+            // the $source will now hold the synchronized internal tags and will be saved to the source-edit field
+            $this->update($source, $this->sfm->getFirstSourceNameEdit());
+        }, true, true);
+    }
+
+    /**
+     * Updates the segments editable target with the given content.
+     * In case of incorrect tag count or missing/superflous tags, this will still update the segment
+     * (the autoqa tag-check should detect & report such problems)
+     */
+    protected function updateTargetEdit(string $newTarget, string $originalTarget): void
+    {
+        // we need to transfer the tags from the existing target to the new target.
+        // In case, the target is empty, we will use the source to be used as base to get the internal tags from
+        if ($originalTarget === '') {
+            $originalTarget = $this->segment->getSource();
+        }
+        $this->segmentTagger->synchronizeInternalTags($originalTarget, $newTarget, function ($original, $target) {
+            // the $target will now hold the synchronized internal tags and will be saved to the target-edit field
             if ($this->isTrackChangesActive()) {
-                $fieldOriginal = $this->segment->getFieldOriginal($this->sfm->getFirstTargetName());
-                $target = $this->diffTargetWithTrackChanges($fieldOriginal, $target);
+                // if trackChanges is active, we need to diff against the edited target (if existing)
+                // otherwise the original target (if segment is unedited)
+                $target = $this->diffTargetWithTrackChanges($this->getExistingTargetEdit(), $target);
             }
-            $this->update($target, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
+            $this->update($target, $this->sfm->getFirstTargetNameEdit());
         }, true, true);
     }
 

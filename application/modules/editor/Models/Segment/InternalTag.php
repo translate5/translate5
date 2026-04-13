@@ -921,8 +921,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
 
     /**
-     * Takes the tags from the first content, and applies them to the second content. After that pass both contents
-     * to the update field callback to set the content to the desired place
+     * Takes the tags from the first content, and applies them to the second content.
+     * This will adjust the tags present in the segmentContent to their counterparts in the originalContent or
+     * - in case of protected content - adjust them
+     * missing/additional tags will not be corrected and may not be saved depending on $callBackOnNotEqualTags
+     * After that pass both contents to the update field callback to set the content to the desired place
      *
      * @param string $originalContent the content from which the tags will be taken
      * @param string $segmentContent the content where the tags will be applied
@@ -931,7 +934,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @param bool $callBackOnNotEqualTags if set to true, the callback will be called also when the
      *                                     $originalContent tags count is not the same as the $segmentContent tag count
      */
-    public function updateSegmentContent(
+    public function synchronizeInternalTags(
         string $originalContent,
         string $segmentContent,
         callable $updateField,

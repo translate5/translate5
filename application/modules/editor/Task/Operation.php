@@ -36,40 +36,44 @@ class editor_Task_Operation
     // these keys presumably also be used to find code related to the operation, so please keep them pretty unique !
 
     /**
-     * @var string
+     * Task Import ... must match editor_Models_Task::STATE_IMPORT
      */
-    public const IMPORT = 'import';
+    public const string IMPORT = 'import';
 
     /**
-     * @var string
+     * MatchAnalysis
      */
-    public const MATCHANALYSIS = 'matchanalysis';
+    public const string MATCHANALYSIS = 'matchanalysis';
 
     /**
-     * @var string
+     * Seperate AutoQA
      */
-    public const AUTOQA = 'autoqa';
+    public const string AUTOQA = 'autoqa';
 
     /**
-     * @var string
+     * Seperate TermTagging, currently available only as CLI-command
      */
-    public const TAGTERMS = 'tagterms';
+    public const string TAGTERMS = 'tagterms';
 
     /**
-     * @var string
+     * Pivot Pretranslation
      */
-    public const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
+    public const string PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
 
     /**
-     * @var string
+     * Visual Exchange
      */
-    public const VISUAL_EXCHANGE = 'visualexchange';
+    public const string VISUAL_EXCHANGE = 'visualexchange';
+
+    /**
+     * Translator Package Reimport ... must match editor_Models_Task::STATE_REIMPORT
+     */
+    public const string PACKAGE_REIMPORT = 'reimport';
 
     /**
      * For contexts where the operation-type might be unknown
-     * @var string
      */
-    public const UNKNOWN = 'unknown';
+    public const string UNKNOWN = 'unknown';
 
     /**
      * Creates a Task-Operation which is the wrapper for any operation performed for tasks albeit the Import
@@ -105,7 +109,14 @@ class editor_Task_Operation
      */
     public static function getAllOperations(): array
     {
-        return [self::AUTOQA, self::MATCHANALYSIS, self::PIVOT_PRE_TRANSLATION, self::TAGTERMS, self::VISUAL_EXCHANGE];
+        return [
+            self::AUTOQA,
+            self::MATCHANALYSIS,
+            self::PIVOT_PRE_TRANSLATION,
+            self::TAGTERMS,
+            self::VISUAL_EXCHANGE,
+            self::PACKAGE_REIMPORT,
+        ];
     }
 
     private string $taskGuid;

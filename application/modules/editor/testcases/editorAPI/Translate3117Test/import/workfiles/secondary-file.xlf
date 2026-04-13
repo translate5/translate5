@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="original-3059.html" source-language="en" target-language="de" datatype="html">
+<body>
+<trans-unit id="tu4" restype="x-paragraph">
+<source xml:lang="en">FOURTH One</source>
+<seg-source><mrk mid="0" mtype="seg">FOURTH One</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">FOURTH Bar</mrk></target>
+</trans-unit>
+<trans-unit id="tu5" restype="x-paragraph">
+<source xml:lang="en">FIFTH Two</source>
+<seg-source><mrk mid="0" mtype="seg">FIFTH Two</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">FIFTH Gjb</mrk></target>
+</trans-unit>
+<trans-unit id="tu6" restype="x-paragraph">
+<source xml:lang="en">SIXTH Three</source>
+<seg-source><mrk mid="0" mtype="seg">SIXTH Three</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">SIXTH Guerr</mrk></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

@@ -74,7 +74,7 @@ class ReimportFile
         $parserCls = $file->getFileParser();
 
         $fileFilter = ZfExtended_Factory::get(Manager::class);
-        $fileFilter->initReImport($this->task, Worker::FILEFILTER_CONTEXT_NEW);
+        $fileFilter->initReImport($this->task, ReimportWorker::FILEFILTER_CONTEXT_NEW);
 
         // get the parser dynamically even of only xliff is supported
         /** @var editor_Models_Import_FileParser $parser */

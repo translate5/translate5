@@ -63,7 +63,7 @@ class RepetitionUpdater
 
         $originalContent = $this->checkAndGetSegmentContent($repetition, $originalContent);
 
-        return $this->tagHelper->updateSegmentContent(
+        return $this->tagHelper->synchronizeInternalTags(
             $originalContent,
             $segmentContent,
             function ($originalContent, $segmentContent) use ($master, $repetition) {
@@ -72,7 +72,7 @@ class RepetitionUpdater
                 // language-resource, we copy the original target as well ...
                 if ($master->isFromLanguageResource()) {
                     $originalContent = $this->checkAndGetSegmentContent($repetition, $originalContent);
-                    $this->tagHelper->updateSegmentContent(
+                    $this->tagHelper->synchronizeInternalTags(
                         $originalContent,
                         $master->getTarget(),
                         function ($originalContent, $segmentContent) use ($repetition) {
@@ -97,7 +97,7 @@ class RepetitionUpdater
 
         $originalContent = $this->checkAndGetSegmentContent($repetition, $repetition->getSource());
 
-        return $this->tagHelper->updateSegmentContent(
+        return $this->tagHelper->synchronizeInternalTags(
             $originalContent,
             $segmentContent,
             function ($originalContent, $segmentContent) use ($editable, $repetition) {

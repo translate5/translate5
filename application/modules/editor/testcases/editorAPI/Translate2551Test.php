@@ -69,7 +69,7 @@ class Translate2551Test extends JsonTestAbstract
         ], null, false, true);
 
         // wait for reimport worker
-        $this->waitForWorker(MittagQI\Translate5\Task\Reimport\Worker::class, $task);
+        $this->waitForTaskOperation($task);
 
         self::api()->setTaskToEdit();
         $segmentsActual = static::api()->getSegmentsWithBasicData();

@@ -605,4 +605,15 @@ abstract class ApiTestAbstract extends TestCase
         $taskGuids = ($task === null || empty($task?->taskGuid)) ? [] : [$task->taskGuid];
         DbHelper::waitForWorkers($this, $class, $taskGuids, true, $timeout);
     }
+
+    /**
+     * Waits for a running task-operation optionally identified by the given task
+     * @param int $timeout in seconds for all other states (how long might the worker be scheduled/waiting/running)
+     */
+    final public function waitForTaskOperation(
+        Task|stdClass $task = null,
+        int $timeout = 100,
+    ): void {
+        $this->waitForWorker(\editor_Task_Operation_FinishingWorker::class, $task, $timeout);
+    }
 }

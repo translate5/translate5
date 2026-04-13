@@ -33,39 +33,33 @@ class editor_Segment_Processing
 {
     /**
      * Used to indicate an import process
-     * @var string
      */
-    public const IMPORT = 'import';
+    public const string IMPORT = 'import';
 
     /**
      * Used to indicate an editing process
-     * @var string
      */
-    public const EDIT = 'edit';
+    public const string EDIT = 'edit';
 
     /**
      * #Used to indicate an alike segment copying process
-     * @var string
      */
-    public const ALIKE = 'alike';
+    public const string ALIKE = 'alike';
 
     /**
-     * Used to indicate an retagging process (rebuilding qualities)
-     * @var string
+     * Used to indicate a retagging process (rebuilding qualities)
      */
-    public const RETAG = 'retag';
+    public const string RETAG = 'retag';
 
     /**
      * Used to indicate a match analysis pretranslation/retagging
-     * @var string
      */
-    public const ANALYSIS = 'analysis';
+    public const string ANALYSIS = 'analysis';
 
     /**
      * Special processing mode where ONLY the terms are re-evaluated
-     * @var string
      */
-    public const TAGTERMS = 'tagterms';
+    public const string TAGTERMS = 'tagterms';
 
     /**
      * Evaluates if we have a operational processing mode

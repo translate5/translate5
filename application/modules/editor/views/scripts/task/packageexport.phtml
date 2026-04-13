@@ -111,7 +111,10 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     </div>
     <div class="error hidden"></div>
 
-    <div><h4 style="color: #ff004b"><?php echo $translate->_('Warning: Please do NOT use segment merge or splitting in another translation tool with the downloaded package. translate5 does not support segment merge/split and such segments will be ignored on re-import.'); ?></h4></div>
+    <div>
+        <h4 style="color: #ff004b"><?php echo $translate->_('Hint: A re-import will remove any manual QA inside segments.'); ?></h4>
+        <h4 style="color: #ff004b"><?php echo $translate->_('Warning: Please do NOT use segment merge or splitting in another translation tool with the downloaded package. translate5 does not support segment merge/split and such segments will be ignored on re-import.'); ?></h4>
+    </div>
 </div>
 
 <script>

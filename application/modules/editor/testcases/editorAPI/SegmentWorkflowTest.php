@@ -210,7 +210,7 @@ class SegmentWorkflowTest extends ImportTestAbstract
             'Workflow Step is not as expected'
         );
         // waiting for autoQA (triggered implicit by workflow on finish above)
-        $this->waitForWorker(editor_Task_Operation_FinishingWorker::class, $task);
+        $this->waitForTaskOperation($task);
         static::api()->setTaskToOpen();
     }
 

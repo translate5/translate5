@@ -268,7 +268,7 @@ class RepetitionService
                 return;
             }
 
-            // updateSegmentContent does replace the masters tags with the original repetition ones
+            // synchronizeInternalTags does replace the masters tags with the original repetition ones
             // if there was an error in taking over the segment content into the repetition (returning false) the segment must be ignored
 
             $sourceSuccess = true;

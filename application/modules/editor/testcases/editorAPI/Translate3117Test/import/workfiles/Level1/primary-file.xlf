@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="original-3059.html" source-language="en" target-language="de" datatype="html">
+<body>
+<trans-unit id="tu1" restype="x-paragraph">
+<source xml:lang="en">FIRST Test</source>
+<seg-source><mrk mid="0" mtype="seg">FIRST Test</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">FIRST Bar</mrk></target>
+</trans-unit>
+<trans-unit id="tu2" restype="x-paragraph">
+<source xml:lang="en">SECOND Segment 2</source>
+<seg-source><mrk mid="0" mtype="seg">SECOND Segment 2</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">SECOND Translation for segment 2</mrk></target>
+</trans-unit>
+<trans-unit id="tu3" restype="x-paragraph">
+<source xml:lang="en">THIRD Segment Three</source>
+<seg-source><mrk mid="0" mtype="seg">THIRD Segment Three</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">THIRD Translation for Segment Three</mrk></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

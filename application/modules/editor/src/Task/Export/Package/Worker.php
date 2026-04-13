@@ -46,6 +46,8 @@ class Worker extends editor_Models_Export_Worker
 
     private TaskLockService $lock;
 
+    private editor_Models_Task $task;
+
     public function __construct()
     {
         parent::__construct();

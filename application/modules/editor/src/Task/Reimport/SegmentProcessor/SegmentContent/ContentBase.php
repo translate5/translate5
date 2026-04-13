@@ -43,24 +43,15 @@ use ZfExtended_Plugin_Manager;
 
 abstract class ContentBase
 {
-    /***
-     * @var editor_Models_SegmentFieldManager
-     */
     protected editor_Models_SegmentFieldManager $sfm;
 
-    /***
-     * @var editor_Models_Segment_Updater
-     */
     protected editor_Models_Segment_Updater $segmentUpdater;
 
-    /***
-     * @var editor_Models_Segment
-     */
     protected editor_Models_Segment $segment;
 
     protected editor_Models_Segment_InternalTag $segmentTagger;
 
-    /***
+    /**
      * @var editor_Models_Export_DiffTagger_TrackChanges
      */
     protected $diffTagger;
@@ -70,7 +61,7 @@ abstract class ContentBase
         protected array $segmentData,
         protected ZfExtended_Models_User $user
     ) {
-        $this->sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->sfm = ZfExtended_Factory::get(\editor_Models_SegmentFieldManager::class);
         $this->sfm->initFields($this->task->getTaskGuid());
 
         $this->segmentUpdater = new editor_Models_Segment_Updater($this->task, $this->user->getUserGuid());
@@ -85,22 +76,46 @@ abstract class ContentBase
 
     abstract public function saveSegment(editor_Models_Segment $segment, string $segmentSaveTimestamp): void;
 
-    protected function update(string $value, string $fieldName, string $fieldNameEdit): void
+    protected function update(string $value, string $fieldNameEdit): void
     {
-        $this->segment->set($fieldName, $value);
         $this->segment->set($fieldNameEdit, $value);
-        $this->segment->updateToSort($fieldName);
         $this->segment->updateToSort($fieldNameEdit);
     }
 
-    protected function updateSource(string $source): void
+    protected function getExistingSourceEdit(): string
     {
-        $this->update($source, $this->sfm->getFirstSourceName(), $this->sfm->getFirstSourceNameEdit());
+        $source = $this->segment->getFieldEdited($this->sfm->getFirstSourceName());
+        if ($source === '' || $source === null) {
+            $source = $this->segment->getFieldOriginal($this->sfm->getFirstSourceName());
+        }
+
+        return $source ?? '';
     }
 
-    protected function updateTarget(string $target): void
+    protected function getExistingTargetEdit(): string
     {
-        $this->update($target, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
+        $target = $this->segment->getFieldEdited($this->sfm->getFirstTargetName());
+        if ($target === '' || $target === null) {
+            $target = $this->segment->getFieldOriginal($this->sfm->getFirstTargetName());
+        }
+
+        return $target ?? '';
+    }
+
+    /**
+     * Updates an editable source field
+     */
+    protected function updateSourceEdit(string $newSource, string $originalSource): void
+    {
+        $this->update($newSource, $this->sfm->getFirstSourceNameEdit());
+    }
+
+    /**
+     * Updates an editable target field
+     */
+    protected function updateTargetEdit(string $newTarget, string $originalTarget): void
+    {
+        $this->update($newTarget, $this->sfm->getFirstTargetNameEdit());
     }
 
     protected function getDataSource(): ?string

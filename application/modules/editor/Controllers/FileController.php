@@ -36,23 +36,21 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
-use MittagQI\Translate5\Task\Reimport\Worker;
+use MittagQI\Translate5\Task\Reimport\ReimportWorker;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\Translate5\Task\TaskLockService;
 use MittagQI\ZfExtended\Localization;
+use MittagQI\ZfExtended\Worker\Queue;
 
 class editor_FileController extends ZfExtended_RestController
 {
     use TaskContextTrait;
 
-    protected $entityClass = 'editor_Models_File';
+    protected $entityClass = editor_Models_File::class;
 
     /**
      * @var editor_Models_File
      */
     protected $entity;
-
-    private TaskLockService $lock;
 
     /**
      * inits the internal entity Object, handles given limit, filter and sort parameters
@@ -69,7 +67,6 @@ class editor_FileController extends ZfExtended_RestController
 
         /* @var ZfExtended_Logger $log */
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
-        $this->lock = TaskLockService::create();
 
         ZfExtended_UnprocessableEntity::addCodes([
             'E1426' => 'Reimport: Missing required request parameter fileId.',
@@ -131,8 +128,11 @@ class editor_FileController extends ZfExtended_RestController
     {
         $task = $this->getCurrentTask();
 
-        $filesMetaData = $this->getTaskFilesMetaData($task);
+        // check if the current tsak state allows operations
+        $task->checkStateAllowsActions();
 
+        // collect the provided data
+        $filesMetaData = $this->getTaskFilesMetaData($task);
         if ($fileId) {
             $dataProvider = ZfExtended_Factory::get(DataProvider::class, [$task, $filesMetaData, $fileId]);
         } else {
@@ -143,10 +143,15 @@ class editor_FileController extends ZfExtended_RestController
             $dataProvider->checkAndPrepare();
             $errors = $dataProvider->getCollectedErrors();
             if (! empty($errors)) {
-                $this->log->warn('E1461', 'Reimport ZipDataProvider: One or more problems happened on mapping files from ZIP to task files. See details.', [
-                    'task' => $task,
-                    'errors' => $errors,
-                ]);
+                $this->log->warn(
+                    'E1461',
+                    'Reimport ZipDataProvider: One or more problems happened on mapping files ' .
+                    'from ZIP to task files. See details.',
+                    [
+                        'task' => $task,
+                        'errors' => $errors,
+                    ]
+                );
             }
         } catch (\MittagQI\Translate5\Task\Reimport\Exception $e) {
             throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
@@ -155,35 +160,48 @@ class editor_FileController extends ZfExtended_RestController
             ]);
         }
 
-        /** @var Worker $worker */
-        $worker = ZfExtended_Factory::get(Worker::class);
-
-        // init worker and queue it
-        if (! $worker->init($task->getTaskGuid(), [
-            'files' => $dataProvider->getFiles(), // fileId => FileDto mapping
-            'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid(),
-            'segmentTimestamp' => NOW_ISO,
-            'dataProviderClass' => $dataProvider::class,
-        ])) {
-            throw new ZfExtended_Exception('Task ReImport Error on worker init()');
-        }
+        // creates the operation wrapper, that sets the needed task-states
+        $operation = editor_Task_Operation::create(editor_Task_Operation::PACKAGE_REIMPORT, $task);
 
         try {
-            // use blocking for tests env only
-            if (APPLICATION_ENV === ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
-                $worker->setBlocking();
+            // first, create & queue the reimport-import
+            $worker = ZfExtended_Factory::get(ReimportWorker::class);
+            if (! $worker->init($task->getTaskGuid(), [
+                'files' => $dataProvider->getFiles(), // fileId => FileDto mapping
+                'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid(),
+                'segmentTimestamp' => NOW_ISO,
+                'dataProviderClass' => $dataProvider::class,
+            ])) {
+                throw new ZfExtended_Exception('Task ReImport Error on ReimportWorker init()');
             }
-            $worker->queue();
+            $worker->queue($operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
 
+            // queues the AutoQA workers
+            editor_Segment_Quality_Manager::instance()->queueOperation(
+                editor_Segment_Processing::RETAG, // a reimport is a re-tagging in terms of AutoQA
+                editor_Task_Operation::PACKAGE_REIMPORT,
+                $task,
+                $operation->getWorkerId(),
+                ZfExtended_Models_Worker::STATE_PREPARE
+            );
+
+            // queue a TM-update (will not be part of the operation)
             $this->queueUpdateTmWorkers();
 
-            $this->view->success = true;
-        } catch (Throwable $exception) {
-            $this->lock->unlockTask($task);
-            $dataProvider->cleanup();
+            // start the operation
+            $operation->start();
 
-            throw $exception;
+            // finally, trigger the worker-queue
+            $workerQueue = ZfExtended_Factory::get(Queue::class);
+            $workerQueue->trigger();
+        } catch (Throwable $e) {
+            $dataProvider->cleanup();
+            $operation->onQueueingError();
+
+            throw $e;
         }
+
+        $this->view->success = true;
     }
 
     /**
@@ -235,7 +253,7 @@ class editor_FileController extends ZfExtended_RestController
         $paths = $tree->getPaths($task->getTaskGuid(), editor_Models_Foldertree::TYPE_FILE);
 
         $fileFilter = ZfExtended_Factory::get(Manager::class);
-        $fileFilter->initReImport($task, Worker::FILEFILTER_CONTEXT_EXISTING);
+        $fileFilter->initReImport($task, ReimportWorker::FILEFILTER_CONTEXT_EXISTING);
 
         $filesMetaData = [];
         foreach ($paths as $fileId => $filePath) {

@@ -1,0 +1,244 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+namespace MittagQI\Translate5\Test\Unit\Models\Segment\InternalTag;
+
+use PHPUnit\Framework\TestCase;
+
+class SynchronizeInternalTagsTest extends TestCase
+{
+    private const TAGS = [
+        '<bpt1>' => '<div class="open 6270742069643d2231222063747970653d22782d656d706861736973223e266c743b656d70686173697320747970653d2671756f743b6b65792671756f743b2667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;bpt id=&quot;1&quot; ctype=&quot;x-emphasis&quot;&gt;&amp;lt;emphasis type=&amp;quot;key&amp;quot;&amp;gt;&lt;/bpt&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;bpt id=&quot;1&quot; ctype=&quot;x-emphasis&quot;&gt;&amp;lt;emphasis type=&amp;quot;key&amp;quot;&amp;gt;&lt;/bpt&gt;</span></div>',
+        '<bpt2>' => '<div class="open 6270742069643d2234222063747970653d22782d656d706861736973223e266c743b656d70686173697320747970653d2671756f743b6b65792671756f743b2667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;bpt id=&quot;4&quot; ctype=&quot;x-emphasis&quot;&gt;&amp;lt;emphasis type=&amp;quot;key&amp;quot;&amp;gt;&lt;/bpt&gt;">&lt;2&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;bpt id=&quot;4&quot; ctype=&quot;x-emphasis&quot;&gt;&amp;lt;emphasis type=&amp;quot;key&amp;quot;&amp;gt;&lt;/bpt&gt;</span></div>',
+        '<ept1>' => '<div class="close 6570742069643d2231223e266c743b2f656d7068617369732667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;ept id=&quot;1&quot;&gt;&amp;lt;/emphasis&amp;gt;&lt;/ept&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;ept id=&quot;1&quot;&gt;&amp;lt;/emphasis&amp;gt;&lt;/ept&gt;</span></div>',
+        '<ept2>' => '<div class="close 6570742069643d2234223e266c743b2f656d7068617369732667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;ept id=&quot;4&quot;&gt;&amp;lt;/emphasis&amp;gt;&lt;/ept&gt;">&lt;/2&gt;</span><span class="full" data-originalid="4" data-length="-1">&lt;ept id=&quot;1&quot;&gt;&amp;lt;/emphasis&amp;gt;&lt;/ept&gt;</span></div>',
+        '<cp-2-1>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt; CP: default simple">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="2" data-target="2"></span></div>',
+        '<cp-2-2>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222072656765783d22303965494b61364a71346e52304e534950725178526c6337316c346a326c44584d6a596d5262736d4a6b565455304d6a4f6b5a507839724b586a45577046524655374d47524e5845614772716c774941222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt; CP: default simple">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="2" data-target="2"></span></div>',
+        '<cp-EN50170>' => '<div class="single 6e756d62657220747970653d226b6565702d636f6e74656e7422206e616d653d224e6f726d20287374616e6461726429207769746820636f756e74727920636f6465202220736f757263653d22454e203530313730222069736f3d22454e20353031373022207461726765743d22454e203530313730222072656765783d223039665138417a3272334831712f463064613578386654546a443630494b5934316c355447384b4953616b32316a4774316444516a556e52314e61303137414369706a55617472724177413d222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: Norm (standard) with country code " class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="EN 50170" data-target="EN 50170" class="full"></span></div>',
+        '<cp-50>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d223530222069736f3d22353022207461726765743d223530222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt; CP: any number (not part of hyphanted compound)">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="50" data-target="50"></span></div>',
+        '<cp-1500-1>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231353030222069736f3d223135303022207461726765743d2231353030222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt; CP: any number (not part of hyphanted compound)">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="4" data-source="1500" data-target="1500"></span></div>',
+        '<cp-1500-2>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231353030222069736f3d223135303022207461726765743d2231353030222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt; CP: any number (not part of hyphanted compound)">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="4" data-source="1500" data-target="1500"></span></div>',
+        '<cp-1000>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231303030222069736f3d223130303022207461726765743d2231303030222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: any number (not part of hyphanted compound)" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1000" data-target="1000" class="full"></span></div>',
+        '<cp-1200-1>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231323030222069736f3d223132303022207461726765743d2231323030222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt; CP: any number (not part of hyphenated compound)">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="4" data-source="1200" data-target="1200"></span></div>',
+        '<cp-1200-2>' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231323030222069736f3d223132303022207461726765743d2231323030222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt; CP: any number (not part of hyphenated compound)">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="4" data-source="1200" data-target="1200"></span></div>',
+        '<placable-ph1>' => '<div class="single 70682069643d2231222063747970653d22782d726566223e26616d703b6e6273703b3c2f7068 t5placeable internal-tag ownttip"><span class="short" title="&lt;ph id=&quot;1&quot; ctype=&quot;x-ref&quot;&gt;&amp;amp;nbsp;&lt;/ph&gt;">&lt;1/&gt;</span><span class="full" data-originalid="1" data-length="1"> </span></div>',
+        '<placable-ph2>' => '<div class="single 70682069643d2231222063747970653d22782d726566223e26616d703b6e6273703b3c2f7068 t5placeable internal-tag ownttip"><span class="short" title="&lt;ph id=&quot;1&quot; ctype=&quot;x-ref&quot;&gt;&amp;amp;nbsp;&lt;/ph&gt;">&lt;2/&gt;</span><span class="full" data-originalid="1" data-length="1"> </span></div>',
+        '<newline>' => '<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">↵</span></div>',
+        '<hardReturn4>' => '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;4/&gt;: Newline" class="short">&lt;4/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>',
+        '<hardReturn6>' => '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;6/&gt;: Newline" class="short">&lt;6/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>',
+        '<tag2>' => '<div class="single 70682069643d2232223e266c743b74616773322f2667743b3c2f7068 internal-tag ownttip"><span title="&lt;tags2/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="2" data-length="-1" class="full">&lt;tags2/&gt;</span></div>',
+        '<tag3>' => '<div class="single 70682069643d2233223e266c743b74616773332f2667743b3c2f7068 internal-tag ownttip"><span title="&lt;tags3/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="3" data-length="-1" class="full">&lt;tags3/&gt;</span></div>',
+        '<tag4>' => '<div class="single 70682069643d2234223e266c743b74616773342f2667743b3c2f7068 internal-tag ownttip"><span title="&lt;tags4/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="4" data-length="-1" class="full">&lt;tags4/&gt;</span></div>',
+        '<tag5>' => '<div class="single 70682069643d2235223e266c743b74616773352f2667743b3c2f7068 internal-tag ownttip"><span title="&lt;tags5/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="5" data-length="-1" class="full">&lt;tags5/&gt;</span></div>',
+    ];
+
+    /**
+     * @dataProvider casesProvider
+     */
+    public function test(
+        string $originalContent,
+        string $segmentContent,
+        bool $ignoreWhitespace,
+        string $expectedContent,
+        string $expectedSegmentContent,
+        bool $expectedResult,
+    ): void {
+        $originalContent = str_replace(
+            array_keys(self::TAGS),
+            array_values(self::TAGS),
+            $originalContent,
+        );
+        $segmentContent = str_replace(
+            array_keys(self::TAGS),
+            array_values(self::TAGS),
+            $segmentContent,
+        );
+        $expectedContent = str_replace(
+            array_keys(self::TAGS),
+            array_values(self::TAGS),
+            $expectedContent,
+        );
+        $expectedSegmentContent = str_replace(
+            array_keys(self::TAGS),
+            array_values(self::TAGS),
+            $expectedSegmentContent,
+        );
+
+        $tagHandler = new \editor_Models_Segment_InternalTag();
+        $result = $tagHandler->synchronizeInternalTags(
+            $originalContent,
+            $segmentContent,
+            function ($processedOriginal, $processedSegment) use ($expectedContent, $expectedSegmentContent) {
+                self::assertEquals($expectedContent, $processedOriginal);
+                self::assertEquals($expectedSegmentContent, $processedSegment);
+            },
+            $ignoreWhitespace,
+            true,
+        );
+
+        self::assertEquals($expectedResult, $result);
+    }
+
+    public function casesProvider(): iterable
+    {
+        yield 'en -> ja after DeepL from real client task' => [
+            'originalContent' => 'Press the <bpt1>Powder supply system<ept1> button in menu bar <cp-2-2>.',
+            'segmentContent' => 'メニューバー<cp-2-2>の<bpt1>Powder supply system<ept1> ボタンを押します。',
+            'ignoreWhitespace' => false,
+            'expectedContent' => 'Press the <bpt1>Powder supply system<ept1> button in menu bar <cp-2-2>.',
+            'expectedSegmentContent' => 'メニューバー<cp-2-2>の<bpt1>Powder supply system<ept1> ボタンを押します。',
+            'expectedResult' => true,
+        ];
+
+        yield 'de -> en CP tag only' => [
+            'originalContent' => 'Kabelspezifikation nach <cp-EN50170> (Leitungstyp A)',
+            'segmentContent' => 'Cable specification in accordance with <cp-EN50170> (cable type A)',
+            'ignoreWhitespace' => false,
+            'expectedContent' => 'Kabelspezifikation nach <cp-EN50170> (Leitungstyp A)',
+            'expectedSegmentContent' => 'Cable specification in accordance with <cp-EN50170> (cable type A)',
+            'expectedResult' => true,
+        ];
+
+        yield 'swap CP tags' => [
+            'originalContent' => '<cp-50> ... <cp-1500-2>',
+            'segmentContent' => '<cp-50> ... <cp-1000>',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '<cp-50> ... <cp-1500-2>',
+            'expectedSegmentContent' => '<cp-50> ... <cp-1500-2>',
+            'expectedResult' => true,
+        ];
+
+        yield 'cp + placeble' => [
+            'originalContent' => '<cp-1500-2><placable-ph1>kBaud',
+            'segmentContent' => '<cp-1200-2><placable-ph1>m',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '<cp-1500-2><placable-ph1>kBaud',
+            'expectedSegmentContent' => '<cp-1500-2><placable-ph1>m',
+            'expectedResult' => true,
+        ];
+
+        yield 'tag order mixed' => [
+            'originalContent' => 'Press the <bpt1>Powder supply system<ept1> button in menu bar <bpt2>Powder supply system<ept2>.',
+            'segmentContent' => '<bpt2>Powder supply system<ept2>メニューバーの<bpt1>Powder supply system<ept1> ボタンを押します。',
+            'ignoreWhitespace' => false,
+            'expectedContent' => 'Press the <bpt1>Powder supply system<ept1> button in menu bar <bpt2>Powder supply system<ept2>.',
+            'expectedSegmentContent' => '<bpt2>Powder supply system<ept2>メニューバーの<bpt1>Powder supply system<ept1> ボタンを押します。',
+            'expectedResult' => true,
+        ];
+
+        yield 'placeble + cp' => [
+            'originalContent' => '<cp-1500-2><placable-ph1>kBaud',
+            'segmentContent' => '<placable-ph1><cp-1200-2>m',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '<cp-1500-2><placable-ph1>kBaud',
+            'expectedSegmentContent' => '<placable-ph1><cp-1500-2>m',
+            'expectedResult' => true,
+        ];
+
+        yield 'whitespace + cp' => [
+            'originalContent' => '<cp-1500-1><newline>kBaud',
+            'segmentContent' => '<newline><cp-1200-1>m',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '<cp-1500-1><newline>kBaud',
+            'expectedSegmentContent' => '<newline><cp-1500-1>m',
+            'expectedResult' => true,
+        ];
+
+        yield 'cp + placeble in origin and 2 placebles in segment' => [
+            'originalContent' => '<cp-1500-2><placable-ph1>kBaud',
+            'segmentContent' => '<placable-ph2><placable-ph1>m',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '<cp-1500-2><placable-ph1>kBaud',
+            'expectedSegmentContent' => '<placable-ph2><placable-ph1>m',
+            'expectedResult' => false,
+        ];
+
+        yield '3 repeating tags' => [
+            'originalContent' => '01<tag5>02<tag5>03<tag5>04',
+            'segmentContent' => '01<tag2>02<tag3>03<tag4>04',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '01<tag5>02<tag5>03<tag5>04',
+            'expectedSegmentContent' => '01<tag5>02<tag3>03<tag4>04',
+            'expectedResult' => false,
+        ];
+
+        yield 'mixed short tag numbers' => [
+            'originalContent' => '01<tag3>02<tag4>03<tag5>04',
+            'segmentContent' => '01<tag2>02<tag3>03<tag4>04',
+            'ignoreWhitespace' => false,
+            'expectedContent' => '01<tag3>02<tag4>03<tag5>04',
+            'expectedSegmentContent' => '01<tag3>02<tag4>03<tag5>04',
+            'expectedResult' => true,
+        ];
+
+        yield 'whitespace may be placed' => [
+            'originalContent' => '01<tag3>02<tag4>03<tag5>04',
+            'segmentContent' => '01<tag2>02<tag3>03<hardReturn4>04<tag5>05',
+            'ignoreWhitespace' => true,
+            'expectedContent' => '01<tag3>02<tag4>03<tag5>04',
+            'expectedSegmentContent' => '01<tag3>02<tag4>03<hardReturn6>04<tag5>05',
+            'expectedResult' => true,
+        ];
+
+        yield 'real life 1' => [
+            'originalContent' => '<cp-2-1> Schaltausgang SP<cp-2-2>',
+            'segmentContent' => '<cp-2-1>: SP<cp-2-2>',
+            'ignoreWhitespace' => true,
+            'expectedContent' => '<cp-2-1> Schaltausgang SP<cp-2-2>',
+            'expectedSegmentContent' => '<cp-2-1>: SP<cp-2-2>',
+            'expectedResult' => true,
+        ];
+
+        yield 'real life 2' => [
+            'originalContent' => 'Normaldurchfluss qn in Abhängigkeit vom Differenzdruck Δp<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2232222069736f3d223222207461726765743d2232222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt;: Number">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="2" data-target="2"></span></div> – MS4-LF-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt;: Number">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>/<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt;: Number">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div> (Filterfeinheit <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d223430222069736f3d22343022207461726765743d223430222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;5/&gt;: Number">&lt;5/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="40" data-target="40"></span></div> μm)',
+            'segmentContent' => 'Normalni pretok qn v odvisnosti od diferenčnega tlaka Δp<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2232222069736f3d223222207461726765743d2232222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt;: Number">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="2" data-target="2"></span></div> - MS6-LF-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>/<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt;: Number">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div> (finost filtra <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d223430222069736f3d22343022207461726765743d223430222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;5/&gt;: Number">&lt;5/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="40" data-target="40"></span></div> μm)',
+            'ignoreWhitespace' => true,
+            'expectedContent' => 'Normaldurchfluss qn in Abhängigkeit vom Differenzdruck Δp<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2232222069736f3d223222207461726765743d2232222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt;: Number">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="2" data-target="2"></span></div> – MS4-LF-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt;: Number">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>/<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt;: Number">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div> (Filterfeinheit <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d223430222069736f3d22343022207461726765743d223430222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;5/&gt;: Number">&lt;5/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="40" data-target="40"></span></div> μm)',
+            'expectedSegmentContent' => 'Normalni pretok qn v odvisnosti od diferenčnega tlaka Δp<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2232222069736f3d223222207461726765743d2232222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;2/&gt;: Number">&lt;2/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="2" data-target="2"></span></div> - MS6-LF-<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div>/<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2231222069736f3d223122207461726765743d2231222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt;: Number">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="1" data-target="1"></span></div> (finost filtra <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068616e74656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965494e7443316a4e5857314c42586a4e474e547453746374534e4f727a6b384c624465773633484a353265453673706a3441222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt;: Number">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div> μm)',
+            'expectedResult' => false,
+        ];
+
+        yield 'real life 3' => [
+            'originalContent' => 'U<div class="open 6270742069643d2231222063747970653d22782d737562223e266c743b7375622667743b3c2f627074 t5placeable internal-tag ownttip"><span class="short" title="&lt;bpt id=&quot;1&quot; ctype=&quot;x-sub&quot;&gt;&amp;lt;sub&amp;gt;&lt;/bpt&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;sub&gt;</span></div>VAL<div class="close 6570742069643d2231223e266c743b2f7375622667743b3c2f657074 t5placeable internal-tag ownttip"><span class="short" title="&lt;ept id=&quot;1&quot;&gt;&amp;lt;/sub&amp;gt;&lt;/ept&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;/sub&gt;</span></div> = <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d223230222069736f3d22323022207461726765743d223230222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt; CP: any number (not part of hyphenated compound)">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="20" data-target="20"></span></div>,<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt; CP: any number (not part of hyphenated compound)">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div><div class="single 70682069643d2232222063747970653d22782d726566223e26616d703b6e6273703b3c2f7068 t5placeable internal-tag ownttip"><span class="short" title="&lt;ph id=&quot;2&quot; ctype=&quot;x-ref&quot;&gt;&amp;amp;nbsp;&lt;/ph&gt;">&lt;2/&gt;</span><span class="full" data-originalid="2" data-length="1"> </span></div>V',
+            'segmentContent' => 'U<div class="open 6270742069643d2231222063747970653d22782d737562223e266c743b7375622667743b3c2f627074 t5placeable internal-tag ownttip"><span class="short" title="&lt;bpt id=&quot;1&quot; ctype=&quot;x-sub&quot;&gt;&amp;lt;sub&amp;gt;&lt;/bpt&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;sub&gt;</span></div>VAL<div class="close 6570742069643d2231223e266c743b2f7375622667743b3c2f657074 t5placeable internal-tag ownttip"><span class="short" title="&lt;ept id=&quot;1&quot;&gt;&amp;lt;/sub&amp;gt;&lt;/ept&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;/sub&gt;</span></div> = <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d223230222069736f3d22323022207461726765743d223230222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt; CP: any number (not part of hyphenated compound)">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="20" data-target="20"></span></div>.<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt; CP: any number (not part of hyphenated compound)">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div><div class="single 70682069643d2232222063747970653d22782d726566223e26616d703b6e6273703b3c2f7068 t5placeable internal-tag ownttip"><span class="short" title="&lt;ph id=&quot;2&quot; ctype=&quot;x-ref&quot;&gt;&amp;amp;nbsp;&lt;/ph&gt;">&lt;2/&gt;</span><span class="full" data-originalid="2" data-length="1"> </span></div>V',
+            'ignoreWhitespace' => true,
+            'expectedContent' => 'U<div class="open 6270742069643d2231222063747970653d22782d737562223e266c743b7375622667743b3c2f627074 t5placeable internal-tag ownttip"><span class="short" title="&lt;bpt id=&quot;1&quot; ctype=&quot;x-sub&quot;&gt;&amp;lt;sub&amp;gt;&lt;/bpt&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;sub&gt;</span></div>VAL<div class="close 6570742069643d2231223e266c743b2f7375622667743b3c2f657074 t5placeable internal-tag ownttip"><span class="short" title="&lt;ept id=&quot;1&quot;&gt;&amp;lt;/sub&amp;gt;&lt;/ept&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;/sub&gt;</span></div> = <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d223230222069736f3d22323022207461726765743d223230222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt; CP: any number (not part of hyphenated compound)">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="20" data-target="20"></span></div>,<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt; CP: any number (not part of hyphenated compound)">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div><div class="single 70682069643d2232222063747970653d22782d726566223e26616d703b6e6273703b3c2f7068 t5placeable internal-tag ownttip"><span class="short" title="&lt;ph id=&quot;2&quot; ctype=&quot;x-ref&quot;&gt;&amp;amp;nbsp;&lt;/ph&gt;">&lt;2/&gt;</span><span class="full" data-originalid="2" data-length="1"> </span></div>V',
+            'expectedSegmentContent' => 'U<div class="open 6270742069643d2231222063747970653d22782d737562223e266c743b7375622667743b3c2f627074 t5placeable internal-tag ownttip"><span class="short" title="&lt;bpt id=&quot;1&quot; ctype=&quot;x-sub&quot;&gt;&amp;lt;sub&amp;gt;&lt;/bpt&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;sub&gt;</span></div>VAL<div class="close 6570742069643d2231223e266c743b2f7375622667743b3c2f657074 t5placeable internal-tag ownttip"><span class="short" title="&lt;ept id=&quot;1&quot;&gt;&amp;lt;/sub&amp;gt;&lt;/ept&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="0">&lt;/sub&gt;</span></div> = <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d223230222069736f3d22323022207461726765743d223230222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;3/&gt; CP: any number (not part of hyphenated compound)">&lt;3/&gt;</span><span class="full" data-originalid="number" data-length="2" data-source="20" data-target="20"></span></div>.<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d22616e79206e756d62657220286e6f742070617274206f662068797068656e6174656420636f6d706f756e64292220736f757263653d2234222069736f3d223422207461726765743d2234222072656765783d22303965777431474d4e7443316a4e58554146506132706f61396f713630596d365659363655596558484e3532654d2f686c73505444732b4a3164514841413d3d222f number internal-tag ownttip"><span class="short" title="&lt;4/&gt; CP: any number (not part of hyphenated compound)">&lt;4/&gt;</span><span class="full" data-originalid="number" data-length="1" data-source="4" data-target="4"></span></div><div class="single 70682069643d2232222063747970653d22782d726566223e26616d703b6e6273703b3c2f7068 t5placeable internal-tag ownttip"><span class="short" title="&lt;ph id=&quot;2&quot; ctype=&quot;x-ref&quot;&gt;&amp;amp;nbsp;&lt;/ph&gt;">&lt;2/&gt;</span><span class="full" data-originalid="2" data-length="1"> </span></div>V',
+            'expectedResult' => true,
+        ];
+
+        yield 'different CP rules in original and segment' => [
+            'originalContent' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d2231323334222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div> Test',
+            'segmentContent' => '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt; CP: default" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div> Test 2',
+            'ignoreWhitespace' => true,
+            'expectedContent' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d2231323334222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div> Test',
+            'expectedSegmentContent' => '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d2231323334222f number internal-tag ownttip"><span title="&lt;2/&gt; CP: default" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div> Test 2',
+            'expectedResult' => false,
+        ];
+    }
+}

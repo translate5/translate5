@@ -35,7 +35,6 @@ use editor_Models_TaskUserAssoc;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
-use MittagQI\Translate5\Task\TaskLockService;
 use ReflectionException;
 use Throwable;
 use Zend_Acl_Exception;
@@ -46,9 +45,9 @@ use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
 /**
- * Contains the Task Reimport Worker
+ * Contains the Task Reimport ReimportWorker
  */
-class Worker extends editor_Models_Task_AbstractWorker
+class ReimportWorker extends editor_Models_Task_AbstractWorker
 {
     /**
      * context when applying the filters on the filenames of the already imported files in LEK_files
@@ -59,15 +58,6 @@ class Worker extends editor_Models_Task_AbstractWorker
      * context when applying the filters on uploaded re-import files
      */
     public const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
-
-    private TaskLockService $lock;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->lock = TaskLockService::create();
-    }
 
     protected function validateParameters(array $parameters): bool
     {
@@ -90,8 +80,6 @@ class Worker extends editor_Models_Task_AbstractWorker
         $tua = $this->prepareTaskUserAssociation($this->task, $user);
 
         try {
-            $this->lock->lockTask($this->task, $this->task::STATE_REIMPORT);
-
             $reimportFile = ZfExtended_Factory::get(ReimportFile::class, [
                 $this->task,
                 $user,
@@ -112,8 +100,6 @@ class Worker extends editor_Models_Task_AbstractWorker
             if ($tua->getIsPmOverride()) {
                 $tua->delete();
             }
-            $this->lock->unlockTask($this->task);
-
             $this->archiveImportedData($this->task, $params['files']);
             $this->cleanupImportFolder($params['dataProviderClass'], $this->task);
         }
