@@ -36,10 +36,12 @@ use MittagQI\Translate5\Repository\CustomerRepository;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Task\CustomFields\Field;
 use MittagQI\ZfExtended\Models\Entity\ExcelExport;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use ReflectionException;
 use ZfExtended_Authentication;
 use ZfExtended_Factory as Factory;
@@ -53,6 +55,30 @@ use ZfExtended_Zendoverwrites_Translate;
 
 class Metadata
 {
+    /**
+     * Columns that should stay numeric in Excel despite the global StringValueBinder.
+     *
+     * @var array<string, true>
+     */
+    private const array INTEGER_TASK_COLUMNS = [
+        'fileCount' => true,
+        'id' => true,
+        'projectId' => true,
+        'segmentCount' => true,
+        'segmentEditableCount' => true,
+        'segmentFinishCount' => true,
+        'qualityErrorCount' => true,
+        'referenceFiles' => true,
+        'terminologie' => true,
+        'taskassocs' => true,
+        'edit100PercentMatch' => true,
+        'emptyTargets' => true,
+        'lockLocked' => true,
+        'userCount' => true,
+        'wordCount' => true,
+        'wordCountTT' => true,
+    ];
+
     /**
      * general max width for all cols in the Excel.
      * @var int
@@ -276,7 +302,7 @@ class Metadata
                     break;
             }
 
-            $sheet->setCellValue($sheetCol . $this->taskRow, $value);
+            $this->setTaskCellValue($sheet, $sheetCol . $this->taskRow, $colName, $task[$colName], $value);
             $sheetCol++;
         }
         $this->taskRow++;
@@ -351,6 +377,39 @@ class Metadata
         }
 
         return count($allTaskassocs) . ': ' . implode(', ', $values);
+    }
+
+    /**
+     * Excel export uses a global StringValueBinder for formula-injection protection.
+     * Override that only for columns that are known-safe integers.
+     */
+    private function setTaskCellValue(
+        Worksheet $sheet,
+        string $cell,
+        string $columnName,
+        mixed $rawValue,
+        mixed $value,
+    ): void {
+        if ($this->isExplicitIntegerColumnValue($columnName, $rawValue)) {
+            $sheet->setCellValueExplicit($cell, (int) $rawValue, DataType::TYPE_NUMERIC);
+
+            return;
+        }
+
+        $sheet->setCellValue($cell, $value);
+    }
+
+    private function isExplicitIntegerColumnValue(string $columnName, mixed $rawValue): bool
+    {
+        if (! isset(self::INTEGER_TASK_COLUMNS[$columnName])) {
+            return false;
+        }
+
+        if (is_int($rawValue)) {
+            return true;
+        }
+
+        return is_string($rawValue) && preg_match('/^-?\d+$/', $rawValue) === 1;
     }
 
     /**
