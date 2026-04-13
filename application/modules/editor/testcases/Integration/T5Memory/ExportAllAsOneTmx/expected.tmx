@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tmx version="1.4">
-<header creationtoolversion="0.5.74" gitCommit="692b51d5 * updated to v0.5.74 * fixed 211" segtype="sentence" adminlang="en-us" srclang="en" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
+<header creationtoolversion="0.5.74"  segtype="sentence" adminlang="en-us" srclang="en" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext"/>
 <body>
 <tu tuid="1" creationdate="20160622T072410Z">
     <prop type="tmgr:segNum">0</prop>
