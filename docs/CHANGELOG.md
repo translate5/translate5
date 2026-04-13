@@ -13,6 +13,41 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.35.6] - 2026-04-13
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5407](https://jira.translate5.net/browse/TRANSLATE-5407): t5memory - Retry request on "Transfer closed with outstanding read data remaining" error** <br>
+Improve t5memory network handling
+
+**[TRANSLATE-5387](https://jira.translate5.net/browse/TRANSLATE-5387): translate5 AI - TQE: encoded html special character affects score** <br>
+Fix problem where the HTML characters where not handled correctly in TQE evaluation.
+
+**[TRANSLATE-5376](https://jira.translate5.net/browse/TRANSLATE-5376): t5memory - Incorrect handling of utf-16 tmx files** <br>
+Re-enable processing of UTF-16 TMX files
+
+**[TRANSLATE-5373](https://jira.translate5.net/browse/TRANSLATE-5373): Editor general - RootCause: currentDate.getHours is not a function** <br>
+FIXED: error on Deadline-field's datetime picker expand in User assignment form at the 2nd step of project import wizard
+
+**[TRANSLATE-5371](https://jira.translate5.net/browse/TRANSLATE-5371): TermPortal - Improve Typing in Search Filter in TermPortal** <br>
+FIXED: dropdown search with keyword now works for any matches rather than only for matches at the beginning of dropdown choice label
+
+**[TRANSLATE-5312](https://jira.translate5.net/browse/TRANSLATE-5312): InstantTranslate - Instant-Translate: empty translation from resource not processed correctly** <br>
+Fix for a problem where when empty translation was returned and the requested translation is part of the segmented query, the empty result is rendered even if some other resource delivers non empty result.
+
+**[TRANSLATE-5296](https://jira.translate5.net/browse/TRANSLATE-5296): TrackChanges - Checked state not preserved for 'Display tracked changes' menu item** <br>
+FIXED: checked state is now preserved for  'Display tracked changes' menu item, by default TrackChanges are always visible
+
+**[TRANSLATE-5285](https://jira.translate5.net/browse/TRANSLATE-5285): Task Management - Excel-exported task meta data shows language id instead of short-cut** <br>
+Display a properly formatted language filter in the task Excel export.
+
+**[TRANSLATE-5224](https://jira.translate5.net/browse/TRANSLATE-5224): Repetition editor - RootCause: null is not an object (evaluating 'alikes')** <br>
+FIXED: prevented duplicated processing of repetitions
+
+
 ## [7.35.5] - 2026-04-08
 
 ### Important Notes:
