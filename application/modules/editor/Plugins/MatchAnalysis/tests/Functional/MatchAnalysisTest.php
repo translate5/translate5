@@ -185,7 +185,7 @@ class MatchAnalysisTest extends ImportTestAbstract
 
             $statsRow = $statsBySegmentId[$segmentId];
             $expectedStep = empty($segment['editedInStep'])
-                ? AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP
+                ? \editor_Workflow_Default::STEP_NO_WORKFLOW
                 : (string) $segment['editedInStep'];
             $expectedLangResType = editor_Models_Segment_MatchRateType::getLangResourceType(
                 (string) $segment['matchRateType']
