@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Plugins\Okapi;
 use editor_Plugins_Okapi_Init;
 use editor_Utils;
 use JsonException;
+use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigMaintenance;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
 use ReflectionException;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -124,6 +125,16 @@ final class OkapiService extends DockerServiceAbstract
         'runtimeOptions.plugins.Okapi.server' => null,
         'runtimeOptions.plugins.Okapi.serverUsed' => null,
     ];
+
+    /**
+     * Special API to check service-url's for being valid
+     */
+    public function checkOkapiServiceUrl(string $url): bool
+    {
+        $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
+
+        return $this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url);
+    }
 
     /**
      * Differing from the base-implementation we add checking the other configured
@@ -275,7 +286,7 @@ final class OkapiService extends DockerServiceAbstract
                 $newServers = array_merge($newServers, $foundVersions);
             }
 
-            $okapiServerConfig = new ConfigMaintenance();
+            $okapiServerConfig = new ServerConfigMaintenance();
             foreach ($newServers as $name => $url) {
                 //add update the found new servers
                 $okapiServerConfig->addServer($url, $name);

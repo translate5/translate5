@@ -62,5 +62,6 @@ class OkapiException extends ZfExtended_ErrorCodeException
         'E1474' => 'Okapi Plug-In: The Okapi plug-in is disabled so no export into the original import format can be done at the moment',
         'E1686' => 'Okapi Plug-In: The uploaded filter/fprm file is not valid ({details})',
         'E1687' => 'Okapi Plug-In: The uploaded pipeline file is not valid ({details})',
+        'E1781' => 'Okapi Plug-In: Maintaining Okapi versions: {details}',
     ];
 }

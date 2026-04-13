@@ -28,7 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
+use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigMaintenance;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -87,7 +87,7 @@ class OkapiAddCommand extends Translate5AbstractCommand
             $name = basename($url);
         }
 
-        $config = new ConfigMaintenance();
+        $config = new ServerConfigMaintenance();
         if (! $config->isPluginActive()) {
             $this->io->warning('Plugin Okapi is disabled - the config changes are still applied!');
         }

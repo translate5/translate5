@@ -22,7 +22,7 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
+use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigMaintenance;
 use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 
 /**
@@ -49,7 +49,7 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         if (! $rawType) {
             return false;
         }
-        $okapiConfig = ZfExtended_Factory::get(ConfigMaintenance::class);
+        $okapiConfig = ZfExtended_Factory::get(ServerConfigMaintenance::class);
         $newServerList = $okapiConfig->serverListFromJson($newvalue);
         $oldServerList = $okapiConfig->serverListFromJson($config->getValue());
         $serverList = [];

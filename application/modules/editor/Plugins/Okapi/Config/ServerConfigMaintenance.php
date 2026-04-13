@@ -27,12 +27,13 @@
  */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\Okapi;
+namespace MittagQI\Translate5\Plugins\Okapi\Config;
 
 use editor_Models_Config;
 use editor_Models_Customer_CustomerConfig;
 use editor_Models_TaskConfig;
 use editor_Plugins_Okapi_Init;
+use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 use ReflectionException;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
@@ -47,11 +48,18 @@ use ZfExtended_Plugin_Manager;
 /**
  * Interface to maintain the Okapi server configurations
  */
-class ConfigMaintenance
+class ServerConfigMaintenance
 {
     public const CONFIG_SERVER_USED = 'runtimeOptions.plugins.Okapi.serverUsed';
 
     public const CONFIG_SERVER = 'runtimeOptions.plugins.Okapi.server';
+
+    public static function getLatestAvailableVersion(): string
+    {
+        return editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION[
+            count(editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION) - 1
+        ];
+    }
 
     private editor_Models_Config $config;
 
@@ -405,5 +413,28 @@ class ConfigMaintenance
         $pluginmanager = Zend_Registry::get('PluginManager');
 
         return $pluginmanager->isActive('Okapi');
+    }
+
+    /**
+     * Retrieves the latest configured version
+     * Returns null, if there are no or no valid configured versions
+     */
+    public function getLatestConfiguredVersion(): ?string
+    {
+        $latest = -1;
+        $versions = editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION;
+        $map = [];
+        foreach ($versions as $index => $version) {
+            $map[strtolower($version)] = $index;
+        }
+        $this->config->loadByName(self::CONFIG_SERVER);
+        $servers = $this->fromJson($this->config->getValue());
+        foreach ($servers as $serverName => $server) {
+            if (array_key_exists(strtolower($serverName), $map) && $map[strtolower($serverName)] > $latest) {
+                $latest = $map[strtolower($serverName)];
+            }
+        }
+
+        return ($latest > -1) ? $versions[$latest] : null;
     }
 }

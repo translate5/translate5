@@ -95,6 +95,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         return APPLICATION_PATH . '/modules/editor/Plugins/Okapi/data/';
     }
 
+    /**
+     * The versions we support. This will be the pathes of the longhorn wars in the combined containers
+     * The latest Version MUST be the last one !!
+     */
     public const array SUPPORTED_OKAPI_VERSION = [
         'okapi-longhorn-037',
         'okapi-longhorn-139',

@@ -55,6 +55,7 @@ class InstallerPostInstallCommand extends Translate5AbstractCommand
 Files have to end on .update.t5cli or .installation.t5cli and may contain only t5 CLI commands!
 
     .update.t5cli files are called only on updates,
+    .always.update.t5cli wil be executed with every update,
     .installation.t5cli on installations only
 
 this is controlled by the --update option'
@@ -111,8 +112,12 @@ this is controlled by the --update option'
         if ($this->input->getOption('list-executed')) {
             $table = $this->io->createTable();
             $table->setHeaders(['File', 'Timestamp and status']);
-            foreach ($loadedFiles as $id => $file) {
-                $table->addRow([$id, $file]);
+            foreach ($loadedFiles as $id => $entries) {
+                $showId = true;
+                foreach ($entries as $entry) {
+                    $table->addRow([($showId ? $id : ''), $entry]);
+                    $showId = false;
+                }
             }
             $table->render();
 
@@ -129,7 +134,8 @@ this is controlled by the --update option'
                 continue;
             }
 
-            if (array_key_exists($filename, $loadedFiles)) {
+            // exclude files that are already executed and shouldn't always execute
+            if (array_key_exists($filename, $loadedFiles) && ! $this->isTypeToAlwaysProcess($fileInfo)) {
                 continue;
             }
 
@@ -182,19 +188,29 @@ this is controlled by the --update option'
         return str_ends_with($fileName, '.installation.t5cli');
     }
 
+    protected function isTypeToAlwaysProcess(SplFileInfo $file): bool
+    {
+        if ($this->input->getOption('update')) {
+            return str_ends_with(strtolower($file->getFilename()), '.always.update.t5cli');
+        }
+
+        return false;
+    }
+
     private function loadExecutedFiles(string $executedFilesLog): array
     {
         $result = [];
         if (! is_file($executedFilesLog)) {
             return $result;
         }
-        $executedFiles = file($executedFilesLog, FILE_IGNORE_NEW_LINES);
+        $executedFiles = file($executedFilesLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
         foreach ($executedFiles as $file) {
             $line = explode('#', $file);
-            $result[$line[1]] = $line[0];
-            if (array_key_exists(2, $line)) {
-                $result[$line[1]] .= ': ' . $line[2];
+            if (! array_key_exists($line[1], $result)) {
+                $result[$line[1]] = [];
             }
+            $result[$line[1]][] = $line[0] . ': ' . $line[2];
         }
 
         return $result;

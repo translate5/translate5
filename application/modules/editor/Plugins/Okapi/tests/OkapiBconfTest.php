@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigMaintenance;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 use MittagQI\Translate5\Test\Import\Bconf;
@@ -69,9 +70,18 @@ class OkapiBconfTest extends JsonTestAbstract
         $okapiConf = $conf->runtimeOptions->plugins->Okapi;
         $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID, $conf);
 
+        // check service
         self::assertNotEmpty($okapiConf->dataDir, 'runtimeOptions.plugins.Okapi.dataDir not set');
         self::assertNotEmpty($service->getConfiguredServiceUrl(false), 'runtimeOptions.plugins.Okapi.api.url not set');
 
+        // check latest version. For a testing system, this must be the latest available version
+        $serverUsed = $service->getConfigValue(
+            ServerConfigMaintenance::CONFIG_SERVER_USED,
+            \ZfExtended_DbConfig_Type_CoreTypes::TYPE_STRING
+        );
+        self::assertEquals(ServerConfigMaintenance::getLatestAvailableVersion(), $serverUsed);
+
+        // check default bconf
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists(
             $t5defaultImportBconf,

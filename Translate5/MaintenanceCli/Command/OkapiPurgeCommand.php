@@ -28,7 +28,7 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
+use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigMaintenance;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -95,7 +95,7 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
         $sort = $this->input->getOption('sort');
         $onlyOffline = $this->input->getOption('only-offline');
 
-        $config = new ConfigMaintenance();
+        $config = new ServerConfigMaintenance();
         $summary = $config->getSummary();
         $serverList = $onlyOffline ?
             $config->purgeOffline($sort) :

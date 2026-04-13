@@ -29,7 +29,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use LogicException;
-use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
+use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigMaintenance;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -84,7 +84,7 @@ If no name is given, use the last one from the configured server list.');
         $this->writeTitle('Update OKAPI server used by default');
 
         $name = $this->input->getArgument('name');
-        $config = new ConfigMaintenance();
+        $config = new ServerConfigMaintenance();
         $serverNames = array_keys($config->getServerList());
         $usedServer = $config->getServerUsed();
         $doSelect = $this->input->getOption('select');
