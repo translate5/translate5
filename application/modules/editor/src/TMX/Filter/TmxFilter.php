@@ -264,7 +264,7 @@ class TmxFilter
      */
     private function getReader(string $tmxFile): XMLReader
     {
-        $reader = XMLReader::open($tmxFile, flags: LIBXML_NONET);
+        $reader = XMLReader::open($tmxFile, 'UTF-8', flags: LIBXML_NONET);
         if (! $reader) {
             throw new TmxFilterException('Could not open TMX file ' . $tmxFile);
         }
