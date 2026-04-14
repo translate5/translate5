@@ -35,7 +35,7 @@ use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 
-class NextStepCalculator
+class WorkflowStepCalculator
 {
     public function __construct(
         private readonly TaskRepository $taskRepository,
@@ -53,10 +53,44 @@ class NextStepCalculator
         );
     }
 
+    public function getNextStep(editor_Workflow_Default $workflow, string $taskGuid, string $step): ?string
+    {
+        $associatedSteps = $this->userJobRepository->getWorkflowStepNamesOfJobsInTask($taskGuid);
+
+        if (empty($associatedSteps)) {
+            return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
+        }
+
+        $stepChain = array_values($workflow->getStepChain());
+
+        $stepCount = count($stepChain);
+        $position = array_search($step, $stepChain, true);
+
+        // if the current step is not found in the chain or
+        // if there are no jobs the workflow should be ended then
+        // (normally we never reach here since to change the workflow at least one job is needed)
+        if ($position === false) {
+            return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
+        }
+
+        //we want the position of the next step, not the current one:
+        $position++;
+
+        //loop over all steps after the current one
+        for (; $position < $stepCount; $position++) {
+            if (in_array($stepChain[$position], $associatedSteps, true)) {
+                //the first one with associated users is returned
+                return $stepChain[$position];
+            }
+        }
+
+        return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
+    }
+
     /**
      * Returns next step in stepChain, or STEP_WORKFLOW_ENDED if for nextStep no users are associated
      */
-    public function getNextStep(editor_Workflow_Default $workflow, string $taskGuid): ?string
+    public function getValidTaskWorkflowStep(editor_Workflow_Default $workflow, string $taskGuid): string
     {
         $matchingSteps = $this->getMatchingSteps($workflow, $taskGuid);
 
@@ -65,7 +99,7 @@ class NextStepCalculator
         if (empty($matchingSteps)) {
             if ($this->userJobRepository->taskHasNotFinishedJob($taskGuid, $workflow->getName())) {
                 // if there is no workflow, then we can not change the step, but also do not want to end the workflow
-                return null;
+                return $task->getWorkflowStepName();
             }
 
             return editor_Workflow_Default::STEP_WORKFLOW_ENDED;
@@ -74,7 +108,7 @@ class NextStepCalculator
         // if the current step is one of the possible steps for the tua configuration
         // then everything is OK
         if (in_array($task->getWorkflowStepName(), $matchingSteps, true)) {
-            return null;
+            return $task->getWorkflowStepName();
         }
 
         return reset($matchingSteps);
@@ -143,7 +177,7 @@ class NextStepCalculator
                 return false;
             }
 
-            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep == $job['workflowStepName']);
+            $hasStepToCurrentTaskStep = $hasStepToCurrentTaskStep || ($currentStep === $job['workflowStepName']);
         }
 
         //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
