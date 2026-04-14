@@ -320,7 +320,9 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
         }
 
         if ($field->type == editor_Models_SegmentField::TYPE_RELAIS && $this->data['relaisLang'] !== false) {
-            $this->result[] = '<alt-trans dx:origin-shorttext="' . $this->escape($field->label) . '"><target xml:lang="' . $this->escape($this->data['relaisLang']) . '">' . $this->prepareText($segment[$field->name]) . '</target></alt-trans>';
+            $this->result[] = '<alt-trans dx:origin-shorttext="' . $this->escape($field->label)
+                . '"><target xml:lang="' . $this->escape($this->data['relaisLang'])
+                . '">' . $this->prepareText($segment[$field->name], false) . '</target></alt-trans>';
 
             return;
         }
