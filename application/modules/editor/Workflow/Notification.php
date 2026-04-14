@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Workflow\NextStepCalculator;
+use MittagQI\Translate5\Workflow\WorkflowStepCalculator;
 
 /**
  * Encapsulates the Default Notifications triggered by the Workflow
@@ -53,14 +53,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract
     protected $tua;
 
     public function __construct(
-        private readonly NextStepCalculator $nextStepCalculator,
+        private readonly WorkflowStepCalculator $nextStepCalculator,
     ) {
     }
 
     public static function create(): self
     {
         return new self(
-            NextStepCalculator::create(),
+            WorkflowStepCalculator::create(),
         );
     }
 

@@ -382,6 +382,50 @@ class UserJobRepository
         return $this->db->fetchCol($s);
     }
 
+    /**
+     * @return UserJob[]
+     */
+    public function getJobsInTaskWithWorkflow(string $taskGuid, string $workflow, string $workflowStepName): iterable
+    {
+        $job = new UserJob();
+
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('workflow = ?', $workflow)
+            ->where('workflowStepName = ?', $workflowStepName)
+        ;
+
+        $stmt = $this->db->query($s);
+
+        while ($jobData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $job->init(
+                new Zend_Db_Table_Row(
+                    [
+                        'table' => $job->db,
+                        'data' => $jobData,
+                        'stored' => true,
+                        'readOnly' => false,
+                    ]
+                )
+            );
+
+            yield clone $job;
+        }
+    }
+
+    public function getWorkflowStepNamesOfJobsInTask(string $taskGuid): array
+    {
+        $s = $this->db
+            ->select()
+            ->distinct()
+            ->from(UserJobTable::TABLE_NAME, 'workflowStepName')
+            ->where('taskGuid = ?', $taskGuid)
+        ;
+
+        return $this->db->query($s)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     public function getJobsCountWithinWorkflowStep(array $taskGuids, string $workflow, string $workflowStepName): int
     {
         $s = $this->db->select()

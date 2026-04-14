@@ -37,7 +37,7 @@ class StepRecalculation
 {
     public function __construct(
         private readonly TaskRepository $taskRepository,
-        private readonly NextStepCalculator $nextStepCalculator,
+        private readonly WorkflowStepCalculator $nextStepCalculator,
     ) {
     }
 
@@ -45,7 +45,7 @@ class StepRecalculation
     {
         return new self(
             TaskRepository::create(),
-            NextStepCalculator::create(),
+            WorkflowStepCalculator::create(),
         );
     }
 
@@ -56,13 +56,12 @@ class StepRecalculation
      */
     public function recalculateWorkflowStep(editor_Workflow_Default $workflow, string $taskGuid): void
     {
-        $step = $this->nextStepCalculator->getNextStep($workflow, $taskGuid);
+        $task = $this->taskRepository->getByGuid($taskGuid);
+        $step = $this->nextStepCalculator->getValidTaskWorkflowStep($workflow, $taskGuid);
 
-        if (null === $step) {
+        if ($task->getWorkflowStepName() === $step) {
             return;
         }
-
-        $task = $this->taskRepository->getByGuid($taskGuid);
 
         $workflow->getLogger($task)->info('E1013', 'recalculate workflow to step {step} ', [
             'step' => $step,

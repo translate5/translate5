@@ -35,15 +35,15 @@ use editor_Workflow_Default;
 use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
-use MittagQI\Translate5\Workflow\NextStepCalculator;
+use MittagQI\Translate5\Workflow\WorkflowStepCalculator;
 use PHPUnit\Framework\TestCase;
 
-class NextStepCalculatorTest extends TestCase
+class WorkflowStepCalculatorTest extends TestCase
 {
     /**
      * @dataProvider casesProvider
      */
-    public function testGetNextStep(
+    public function testGetValidTaskWorkflowStep(
         string $currentTaskStep,
         ?string $expected,
         bool $taskHasNotFinishedJob,
@@ -141,13 +141,13 @@ class NextStepCalculatorTest extends TestCase
                 ],
             ]);
 
-        $calculator = new NextStepCalculator(
+        $calculator = new WorkflowStepCalculator(
             $taskRepository,
             $userJobRepository,
             $coordinatorGroupJobRepository,
         );
 
-        $result = $calculator->getNextStep($workflow, 'some-task-guid');
+        $result = $calculator->getValidTaskWorkflowStep($workflow, 'some-task-guid');
 
         self::assertSame($expected, $result);
     }
@@ -157,7 +157,7 @@ class NextStepCalculatorTest extends TestCase
         return [
             'no workflow, all waiting' => [
                 'currentTaskStep' => editor_Workflow_Default::STEP_NO_WORKFLOW,
-                'expected' => null,
+                'expected' => editor_Workflow_Default::STEP_NO_WORKFLOW,
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'waiting'),
@@ -173,7 +173,7 @@ class NextStepCalculatorTest extends TestCase
             ],
             'any step, all waiting' => [
                 'currentTaskStep' => 'translation',
-                'expected' => null,
+                'expected' => 'translation',
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'waiting'),
@@ -183,7 +183,7 @@ class NextStepCalculatorTest extends TestCase
             ],
             'translation, translation open, next waiting' => [
                 'currentTaskStep' => 'translation',
-                'expected' => null,
+                'expected' => 'translation',
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'open'),
@@ -193,7 +193,7 @@ class NextStepCalculatorTest extends TestCase
             ],
             'translation, translation finished, next waiting' => [
                 'currentTaskStep' => 'translation',
-                'expected' => null,
+                'expected' => 'translation',
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'finished'),
@@ -223,7 +223,7 @@ class NextStepCalculatorTest extends TestCase
             ],
             'translation, translation open, next finished' => [
                 'currentTaskStep' => 'translation',
-                'expected' => null,
+                'expected' => 'translation',
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'open'),
@@ -233,7 +233,7 @@ class NextStepCalculatorTest extends TestCase
             ],
             'translation, translation open, last finished' => [
                 'currentTaskStep' => 'translation',
-                'expected' => null,
+                'expected' => 'translation',
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'open'),
@@ -243,7 +243,7 @@ class NextStepCalculatorTest extends TestCase
             ],
             'translation, translation finished, reviewing open, last finished' => [
                 'currentTaskStep' => 'translation',
-                'expected' => null,
+                'expected' => 'translation',
                 'taskHasNotFinishedJob' => true,
                 'jobs' => [
                     $this->createUserJob('translation', 'finished'),

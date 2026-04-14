@@ -27,7 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\Workflow\NextStepCalculator;
+use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Workflow\WorkflowStepCalculator;
 
 /**
  * different hooks for the different finish cases, is called by JobHandler::onFinish
@@ -47,16 +48,19 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
 
     public const HANDLE_TASK_SETNEXTSTEP = 'handleSetNextStep';
 
-    private readonly NextStepCalculator $nextStepCalculator;
+    private readonly WorkflowStepCalculator $nextStepCalculator;
 
     private readonly TaskRepository $taskRepository;
+
+    private readonly UserJobRepository $jobRepository;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->nextStepCalculator = NextStepCalculator::create();
+        $this->nextStepCalculator = WorkflowStepCalculator::create();
         $this->taskRepository = TaskRepository::create();
+        $this->jobRepository = UserJobRepository::create();
     }
 
     public function execute(editor_Workflow_Actions_Config $actionConfig): ?string
@@ -163,17 +167,37 @@ class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_
         $task = $this->taskRepository->getByGuid($newTua->getTaskGuid());
         $oldStep = $task->getWorkflowStepName();
 
-        //this remains as default behaviour
-        $nextStep = $this->nextStepCalculator->getNextStep($workflow, $task->getTaskGuid());
+        // get next workflow step for existing jobs
+        $nextStep = $this->nextStepCalculator->getNextStep(
+            $workflow,
+            $task->getTaskGuid(),
+            $newTua->getWorkflowStepName()
+        );
 
         $this->doDebug($this->config->trigger . " Next Step: " . $nextStep . ' to role ' . $newTua->getRole() . ' with step ' . $nextStep . "; Old Step in Task: " . $oldStep);
 
         if (null !== $nextStep) {
-            // The next step also triggers a callAction → but somehow in such a way that the new value is used!
-            // It’s a bit of a chicken-and-egg situation!
-            $this->setNextStep($task, $nextStep);
-            $isComp = $task->getUsageMode() === $task::USAGE_MODE_COMPETITIVE;
-            $newTua->setStateForStepAndTask($isComp ? $workflow::STATE_UNCONFIRMED : $workflow::STATE_OPEN, $nextStep);
+            $jobState = $task->getUsageMode() === $task::USAGE_MODE_COMPETITIVE
+                ? $workflow::STATE_UNCONFIRMED
+                : $workflow::STATE_OPEN;
+            $jobsInStep = $this->jobRepository->getJobsInTaskWithWorkflow(
+                $task->getTaskGuid(),
+                $workflow->getName(),
+                $nextStep
+            );
+
+            foreach ($jobsInStep as $job) {
+                $job->setState($jobState);
+
+                $this->jobRepository->save($job);
+            }
+
+            // step of next job may not be the same as step of task.
+            // Task may be in invalid workflow step (translation is still open but first review is finished, etc.)
+            // we have to recalculate the workflow step of the task to set it to the correct one
+            $validTaskStep = $this->nextStepCalculator->getValidTaskWorkflowStep($workflow, $task->getTaskGuid());
+
+            $this->setNextStep($task, $validTaskStep);
         }
 
         //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger

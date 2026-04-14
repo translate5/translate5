@@ -2581,6 +2581,10 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
                 <source>Hindi (Indien)</source>
                 <target>Hindi (Indien)</target>
             </trans-unit>
+            <trans-unit id="SGludDogQSByZS1pbXBvcnQgd2lsbCByZW1vdmUgYW55IG1hbnVhbCBRQSBpbnNpZGUgc2VnbWVudHMu">
+                <source>Hint: A re-import will remove any manual QA inside segments.</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="SG1vbmc=">
                 <source>Hmong</source>
                 <target>Hmong</target>

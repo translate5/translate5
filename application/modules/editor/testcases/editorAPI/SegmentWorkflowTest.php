@@ -105,7 +105,6 @@ class SegmentWorkflowTest extends ImportTestAbstract
         //add missing translation by translator
         static::api()->saveSegment($segments[6]->id, 'Apache 2.x  auf Unix-Systemen');
         static::api()->setTaskToFinished();
-        static::api()->setTaskToOpen();
 
         // workflow step changed now
         $this->assertEquals('review1stlanguage', static::api()->reloadTask()->workflowStepName);
@@ -211,7 +210,6 @@ class SegmentWorkflowTest extends ImportTestAbstract
         );
         // waiting for autoQA (triggered implicit by workflow on finish above)
         $this->waitForTaskOperation($task);
-        static::api()->setTaskToOpen();
     }
 
     /**
