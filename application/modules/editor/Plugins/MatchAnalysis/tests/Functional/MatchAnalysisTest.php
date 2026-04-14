@@ -26,7 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
+use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\SegmentStatisticsRepository;
 use MittagQI\Translate5\Test\Api\AnalysisTrait;
 use MittagQI\Translate5\Test\Import\Config;
@@ -159,10 +159,7 @@ class MatchAnalysisTest extends ImportTestAbstract
 
         $statsBySegmentId = [];
         foreach ($levenshteinRows as $row) {
-            if ((int) ($row['latestEntry'] ?? 0) !== 1) {
-                continue;
-            }
-            $statsBySegmentId[(int) $row['segmentId']] = $row;
+            $statsBySegmentId[(int) $row['segmentId']][] = $row;
         }
 
         $db = Zend_Db_Table::getDefaultAdapter();
@@ -180,40 +177,45 @@ class MatchAnalysisTest extends ImportTestAbstract
             self::assertArrayHasKey(
                 $segmentId,
                 $statsBySegmentId,
-                'Missing latest statistics row for segment ' . $segmentId
+                'Missing statistics rows for segment ' . $segmentId
             );
 
-            $statsRow = $statsBySegmentId[$segmentId];
             $expectedStep = empty($segment['editedInStep'])
-                ? \editor_Workflow_Default::STEP_NO_WORKFLOW
+                ? SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP
                 : (string) $segment['editedInStep'];
             $expectedLangResType = editor_Models_Segment_MatchRateType::getLangResourceType(
                 (string) $segment['matchRateType']
             );
 
-            self::assertSame(
-                (int) $segment['matchRate'],
-                (int) $statsRow['matchRate'],
-                'Statistics matchRate mismatch for segment ' . $segmentId
-            );
-            self::assertSame(
-                $expectedLangResType,
-                (string) $statsRow['langResType'],
-                'Statistics langResType mismatch for segment ' . $segmentId
-            );
-            self::assertSame(
-                $expectedStep,
-                (string) $statsRow['workflowStepName'],
-                'Statistics workflowStepName mismatch for segment ' . $segmentId
-            );
-            self::assertSame(
-                (int) $segment['editable'],
-                (int) $statsRow['editable'],
-                'Statistics editable mismatch for segment ' . $segmentId
-            );
+            foreach ($statsBySegmentId[$segmentId] as $statsRow) {
+                //we may compare only the latest change against the current segment
+                if ($statsRow['latestEntry'] === 0) {
+                    continue;
+                }
+                self::assertSame(
+                    (int) $segment['matchRate'],
+                    (int) $statsRow['matchRate'],
+                    'Statistics matchRate mismatch for segment ' . $segmentId
+                );
+                self::assertSame(
+                    $expectedLangResType,
+                    (string) $statsRow['langResType'],
+                    'Statistics langResType mismatch for segment ' . $segmentId
+                );
+                self::assertSame(
+                    $expectedStep,
+                    (string) $statsRow['workflowStepName'],
+                    'Statistics workflowStepName mismatch for segment ' . $segmentId
+                );
+                self::assertSame(
+                    (int) $segment['editable'],
+                    (int) $statsRow['editable'],
+                    'Statistics editable mismatch for segment ' . $segmentId
+                );
 
-            if ((int) $statsRow['matchRate'] > 0 && trim((string) $statsRow['langResType']) !== '') {
-                $hasPretranslationMatchData = true;
+                if ((int) $statsRow['matchRate'] > 0 && trim((string) $statsRow['langResType']) !== '') {
+                    $hasPretranslationMatchData = true;
+                }
             }
         }
         self::assertTrue(

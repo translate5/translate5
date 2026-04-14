@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
+
 /**
  * This Worker reopens the task after the import was successful
  */
@@ -49,6 +51,8 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Task_Abstr
         if ($task->getState() != $task::STATE_IMPORT) {
             return false;
         }
+
+        AggregateTaskStatistics::create()->aggregateOnImport($task);
 
         $task->setState($this->getInitialTaskState($task));
         $task->save();

@@ -31,7 +31,6 @@ use MittagQI\Translate5\File\Filter\Manager;
 use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Repository\TaskRepository;
-use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
 use MittagQI\Translate5\Workflow\SetupInitialWorkflow;
 use ZfExtended_Zendoverwrites_Controller_Action_HelperBroker as HelperBroker;
@@ -69,8 +68,6 @@ class editor_Models_Import_Worker_Import
 
     private editor_Models_Import_Configuration $importConfig;
 
-    private AggregateTaskStatistics $segmentStatisticBootstrap;
-
     /**
      * @throws ReflectionException
      * @throws Zend_Exception
@@ -90,7 +87,6 @@ class editor_Models_Import_Worker_Import
         $this->workflowManager = new editor_Workflow_Manager();
         $this->setupInitialWorkflow = SetupInitialWorkflow::create();
         $this->taskRepository = TaskRepository::create();
-        $this->segmentStatisticBootstrap = AggregateTaskStatistics::create();
     }
 
     /**
@@ -107,7 +103,7 @@ class editor_Models_Import_Worker_Import
         //call import Methods:
         $this->importFiles($task);
         $this->syncFileOrderAndRepetitions($task);
-        $this->segmentStatisticBootstrap->aggregateOnImport($task);
+
         $this->importRelaisFiles($task);
         $task->createMaterializedView();
         $this->calculateMetrics($task);

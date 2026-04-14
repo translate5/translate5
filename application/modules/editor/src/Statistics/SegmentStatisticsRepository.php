@@ -33,7 +33,6 @@ namespace MittagQI\Translate5\Statistics;
 use editor_Workflow_Default;
 use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\Dto\StatisticFilterDTO;
-use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
 use Throwable;
 use Zend_Exception;
 use Zend_Registry;
@@ -581,7 +580,7 @@ class SegmentStatisticsRepository
         $bind['wfStepWorkflowEnded'] = editor_Workflow_Default::STEP_WORKFLOW_ENDED;
 
         if ($excludeInitial) {
-            $bind['wfStepInitial'] = AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP;
+            $bind['wfStepInitial'] = SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP;
 
             return ' AND ' . $tableAlias
                 . '.workflowStepName NOT IN (:wfStepNoWorkflow, :wfStepWorkflowEnded, :wfStepInitial)';

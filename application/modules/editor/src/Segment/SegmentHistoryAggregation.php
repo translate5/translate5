@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment;
 
+use editor_Models_Segment_MatchRateType as MatchRateType;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
 use MittagQI\Translate5\Statistics\Dto\StatisticSegmentDTO;
 use Throwable;
@@ -42,7 +43,7 @@ use ZfExtended_Logger;
  */
 class SegmentHistoryAggregation
 {
-    private const string INITIAL_WORKFLOW_STEP = '_initial';
+    public const string INITIAL_WORKFLOW_STEP = '_initial';
 
     public const string TABLE_NAME_POSTEDITING = 'LEK_statistics_postediting_aggregation';
 
@@ -164,6 +165,45 @@ class SegmentHistoryAggregation
             $this->client->query(
                 'UPDATE ' . self::TABLE_NAME_STATISTICS . ' SET qualityScore=' . $value .
                 ' WHERE taskGuid = :taskGuid AND segmentId = :segmentId AND workflowStepName = :workflowStepName',
+                $bind
+            );
+        } catch (Throwable $e) {
+            $this->logError($e->getMessage() . ' [' . __FUNCTION__ . ']');
+        }
+    }
+
+    public function updatePretranslationStatistics(
+        string $taskGuid,
+        int $segmentId,
+        int $matchRate,
+        ?string $matchRateType,
+        int $langResId,
+        int $editable,
+        ?int $qualityScore,
+    ): void {
+        if ($this->client === null) {
+            return;
+        }
+
+        $bind = [
+            'taskGuid' => trim($taskGuid, '{}'),
+            'segmentId' => $segmentId,
+            'matchRate' => $matchRate,
+            'langResType' => $matchRateType === null ? null : MatchRateType::getLangResourceType($matchRateType),
+            'langResId' => $langResId,
+            'editable' => $editable,
+            'qualityScore' => $qualityScore,
+        ];
+
+        try {
+            $this->client->query(
+                'UPDATE ' . self::TABLE_NAME_STATISTICS . '
+                SET matchRate = :matchRate,
+                    langResType = :langResType,
+                    langResId = :langResId,
+                    editable = :editable,
+                    qualityScore = :qualityScore
+                WHERE taskGuid = :taskGuid AND segmentId = :segmentId',
                 $bind
             );
         } catch (Throwable $e) {

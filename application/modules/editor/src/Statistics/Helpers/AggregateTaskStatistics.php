@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Statistics\Helpers;
 
+use editor_Models_Segment;
 use editor_Models_Segment_AutoStates;
 use editor_Models_SegmentField;
 use editor_Models_Task;
@@ -46,8 +47,6 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class AggregateTaskStatistics
 {
-    public const string SYNTHETIC_INITIAL_STEP = '_initial';
-
     /**
      * @var array<string, int>
      */
@@ -107,6 +106,27 @@ class AggregateTaskStatistics
         }
         $this->aggregator->flushUpserts();
         $this->cloneUnmodifiedSegmentsPerWorkflowStep($task);
+    }
+
+    /**
+     * On pre-translation no manually segment edits may exist, therefore we just update all
+     * stat entries (what are only synthetic cloned ones) for that segment
+     */
+    public function syncPretranslationStatisticsForSegment(editor_Models_Segment $segment): void
+    {
+        $this->aggregator->updatePretranslationStatistics(
+            $segment->getTaskGuid(),
+            (int) $segment->getId(),
+            (int) $segment->getMatchRate(),
+            $segment->getMatchRateType(),
+            $this->resolveLangResId([
+                'langResId' => $segment->meta()->getPreTransLangResUuid(),
+            ]),
+            (int) $segment->getEditable(),
+            ($segment->getQualityScore() !== null && $segment->getQualityScore() !== '')
+                ? (int) $segment->getQualityScore()
+                : null,
+        );
     }
 
     public function removeData(string $taskGuid): void
@@ -313,12 +333,7 @@ class AggregateTaskStatistics
      */
     private function processSegments(editor_Models_Task $task, array $segment, array $historyEntries): void
     {
-        // is only available from current segment
-        if (array_key_exists($segment['langResId'], $this->languageResourceIdMap)) {
-            $langResId = (int) $this->languageResourceIdMap[$segment['langResId']];
-        } else {
-            $langResId = 0;
-        }
+        $langResId = $this->resolveLangResId($segment);
 
         $currentSegment = $this->getAggregationDto($segment);
 
@@ -331,6 +346,18 @@ class AggregateTaskStatistics
         }
         $toBeProcessed[0]->latestEntry = 1;
         $this->saveSegmentEntries($task, $langResId, $toBeProcessed);
+    }
+
+    /**
+     * @param array{langResId:int|string|null} $segment
+     */
+    private function resolveLangResId(array $segment): int
+    {
+        if (array_key_exists($segment['langResId'], $this->languageResourceIdMap)) {
+            return (int) $this->languageResourceIdMap[$segment['langResId']];
+        }
+
+        return 0;
     }
 
     private function getAggregationDto(
@@ -366,7 +393,7 @@ class AggregateTaskStatistics
          */
         $initialEntry = end($toBeProcessed);
         if ($initialEntry->levenshteinPrevious === 0 && $initialEntry->levenshteinOriginal === 0) {
-            $initialEntry->editedInStep = self::SYNTHETIC_INITIAL_STEP;
+            $initialEntry->editedInStep = $this->aggregator::INITIAL_WORKFLOW_STEP;
         }
 
         $result = [];
@@ -443,7 +470,7 @@ class AggregateTaskStatistics
     private function cloneUnmodifiedSegmentsPerWorkflowStep(editor_Models_Task $task): void
     {
         $steps = $this->taskWorkflowLogRepository->getDistinctStepsInOrder($task->getTaskGuid());
-        $previousStep = self::SYNTHETIC_INITIAL_STEP;
+        $previousStep = $this->aggregator::INITIAL_WORKFLOW_STEP;
         foreach ($steps as $step) {
             $this->aggregator->cloneSyntheticEntriesOnAggregation(
                 $task->getTaskGuid(),

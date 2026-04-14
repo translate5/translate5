@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Workflow_Default as WfDef;
+use MittagQI\Translate5\Segment\SegmentHistoryAggregation;
 use MittagQI\Translate5\Statistics\AbstractStatisticsDB;
 use MittagQI\Translate5\Statistics\Factory;
 use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
@@ -161,7 +162,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-1', U::TestTranslator, AutoStates::TRANSLATED, 4, 4, 103, 'pretranslated;tm;T5Memory - MatchAnalysisTest_TM;auto-propag', 42),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 103),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 103),
                     self::stat('seg-1', U::TestTranslator, 'translation', 4, 4, 103, latestEntry: 1),
                 ),
                 'posteditingTime' => self::postediting(
@@ -242,12 +243,12 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::stat('seg-1', U::TestTranslator, 'translation', 3, 1, 70, latestEntry: 1),
                     self::stat('seg-1', U::TestTranslator, 'reviewing', 3, 0, 70, 1, 1), // synthetic cloned row
                     self::stat('seg-1', U::TestTranslator, WfDef::STEP_WORKFLOW_ENDED, 3, 0, 70, 1, 1), // synthetic cloned row
-                    self::stat('seg-2', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 90),
+                    self::stat('seg-2', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 90),
                     self::stat('seg-2', U::TestManager, WfDef::STEP_NO_WORKFLOW, 0, 0, 90, 1), // synthetic cloned row
                     self::stat('seg-2', U::TestLector, 'reviewing', 1, 1, 95, latestEntry: 1),
                     self::stat('seg-2', U::TestTranslator, 'translation', 2, 2, 90),
                     self::stat('seg-2', U::TestLector, WfDef::STEP_WORKFLOW_ENDED, 1, 0, 95, 1, 1), // synthetic cloned row
-                    self::stat('seg-3', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 100),
+                    self::stat('seg-3', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 100),
                     self::stat('seg-3', U::TestManager, WfDef::STEP_NO_WORKFLOW, 0, 0, 100), //synthetic
                     self::stat('seg-3', U::TestManager, WfDef::STEP_WORKFLOW_ENDED, 3, 3, 100, 1, 3, latestEntry: 1),
                     self::stat('seg-3', U::TestManager, 'translation', 0, 0, 100),
@@ -327,7 +328,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-1', U::TestManager, AutoStates::PRETRANSLATED, 0, 0, 100, 'pretranslated;tm', 0),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 100, latestEntry: 1),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 100, latestEntry: 1),
                 ),
                 'posteditingTime' => [],
                 'kpi' => [
@@ -350,7 +351,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-1', U::TestTranslator, AutoStates::TRANSLATED, 4, 4, 103, 'pretranslated;tm', 20),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 103),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 103),
                     self::stat('seg-1', U::TestTranslator, 'translation', 4, 4, 103, latestEntry: 1),
                 ),
                 'posteditingTime' => self::postediting(
@@ -548,7 +549,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-1', U::TestLector, AutoStates::REVIEWED_UNTOUCHED, 2, 0, 90, 'import;tm', 666, 1, 'translation', 'translation', 13),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 90, 1, 13, 0),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 90, 1, 13, 0),
                     self::stat('seg-1', U::TestTranslator, 'translation', 2, 2, 90, 1, 13, 1),
                     self::stat('seg-1', U::TestTranslator, 'reviewing', 2, 0, 90, 1, 13, 0),
                     self::stat('seg-1', U::TestTranslator, editor_Workflow_Default::STEP_WORKFLOW_ENDED, 2, 0, 90, 1, 13, 0),
@@ -589,7 +590,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-1', U::TestTranslator, AutoStates::TRANSLATED, 7, 7, 0, 'manual', 14),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 0),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 0),
                     self::stat('seg-1', U::TestTranslator, 'translation', 7, 7, 0, latestEntry: 1),
                 ),
                 'posteditingTime' => self::postediting(
@@ -731,7 +732,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-1', U::TestTranslator, AutoStates::TRANSLATED, 2, 2, 92, 'fuzzy', 4, 0),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 100, 0),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 100, 0),
                     self::stat('seg-1', U::TestTranslator, 'translation', 2, 2, 92, 0, latestEntry: 1),
                 ),
                 'posteditingTime' => self::postediting(
@@ -759,7 +760,7 @@ class AggregateTaskHistorySeedTest extends JsonTestAbstract
                     self::row('seg-2', U::TestLector, AutoStates::REVIEWED, 3, 1, 89, 'fuzzy', 4),
                 ),
                 'statistics' => self::statistics(
-                    self::stat('seg-1', U::TestManager, AggregateTaskStatistics::SYNTHETIC_INITIAL_STEP, 0, 0, 100, 0),
+                    self::stat('seg-1', U::TestManager, SegmentHistoryAggregation::INITIAL_WORKFLOW_STEP, 0, 0, 100, 0),
                     self::stat('seg-1', U::TestTranslator, 'translation', 3, 3, 92, 0),
                     self::stat('seg-1', U::TestLector, 'reviewing', 4, 1, 92, 0, latestEntry: 1),
                     self::stat('seg-2', U::TestTranslator, 'translation', 2, 2, 89),

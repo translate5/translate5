@@ -30,6 +30,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Services_Connector as Connector;
 use MittagQI\Translate5\Integration\FileBasedInterface;
+use MittagQI\Translate5\Statistics\Helpers\AggregateTaskStatistics;
 
 class editor_Plugins_MatchAnalysis_Pretranslation
 {
@@ -129,6 +130,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation
      */
     protected $batchQuery = false;
 
+    protected AggregateTaskStatistics $aggregateTaskStatistics;
+
     public function __construct(int $analysisId)
     {
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
@@ -136,6 +139,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', ['editor_Plugins_MatchAnalysis_Pretranslation']);
         $this->analysisId = $analysisId;
+        $this->aggregateTaskStatistics = AggregateTaskStatistics::create();
     }
 
     /**
@@ -439,6 +443,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         $history->save();
         $segment->setTimestamp(NOW_ISO);
         $segment->save();
+
+        // Pretranslation is persisted segment-by-segment and only for not-yet-translated segments.
+        // Updating the statistics metadata here keeps the sync scoped to the actually pretranslated segment
+        // and avoids broad task-wide rewrites that could overwrite legitimate manual edit statistics rows.
+        $this->aggregateTaskStatistics->syncPretranslationStatisticsForSegment($segment);
     }
 
     public function setUserGuid($userGuid)
