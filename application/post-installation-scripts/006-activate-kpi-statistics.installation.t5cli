@@ -1,2 +1,2 @@
-statistics:workflowstep:backfill
-statistics:sqlite:init --re-create --aggregate
+statistics:workflowstep:backfill -n
+statistics:sqlite:init -n --re-create --aggregate
