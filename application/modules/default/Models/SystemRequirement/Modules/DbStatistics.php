@@ -56,6 +56,12 @@ class Models_SystemRequirement_Modules_DbStatistics extends ZfExtended_Models_Sy
         $this->result->id = 'statisticsdb';
         $this->result->name = 'Statistics ' . (str_ends_with(get_class($db), 'MariaDB') ? 'Tables' : 'Database');
 
+        //when disabled don't check!
+        if (Zend_Registry::get('config')->resources->db->statistics->enabled !== 1) {
+            //$this->result->warning[] = "Connection to Statistics DB not tested since feature is disabled.";
+            return $this->result;
+        }
+
         $this->validateDb($db);
 
         return $this->result;
