@@ -94,6 +94,10 @@ class StatisticsSqliteInitCommand extends Translate5AbstractCommand
 
         $db = SQLite::create();
 
+        //TODO delete old tables, can be removed in some months (today april 2026)
+        $db->query('DROP TABLE IF EXISTS LEK_segment_history_aggregation');
+        $db->query('DROP TABLE IF EXISTS LEK_segment_history_aggregation_lev');
+
         $tableSql = [
             SegmentHistoryAggregation::TABLE_NAME_POSTEDITING => 'CREATE TABLE %s (
 taskGuid TEXT,
