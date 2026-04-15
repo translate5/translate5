@@ -12,12 +12,6 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 - PATCH version change: Only bug fixes and small enhancements
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
-onfig
-
-onfig
-
-onfig
-
 
 ## [7.36.0] - 2026-04-15
 
