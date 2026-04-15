@@ -13,6 +13,177 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.36.0] - 2026-04-15
+
+### Important Notes:
+#### [TRANSLATE-5381](https://jira.translate5.net/browse/TRANSLATE-5381)
+⚠️ Security Header Changes (Content Security Policy & Framing Restrictions)
+
+We have introduced stricter security headers, including a Content Security Policy (CSP) and optional frame restrictions.
+
+These changes may impact:
+- Integration of external JavaScript, styles, or APIs not explicitly whitelisted
+- Single Sign-On (SSO) setups relying on external resources
+- Embedding the application in iframes on other domains
+- Use of third-party widgets or HTML snippets
+
+If you are using custom integrations or embedding the application, please verify compatibility and update your configuration (e.g., CSP whitelists) accordingly.
+
+#### [TRANSLATE-5355](https://jira.translate5.net/browse/TRANSLATE-5355)
+Due the rework of the statistic feature the data also must be re-aggregated what is time consuming on large installations. By default this is done on update automatically. It is possible to do the re-aggregation separately. 
+Therefore disable statistics in installation.ini: 
+Set or add "resources.db.statistics.enabled = 0" in installation.ini config file. Then update the installation. When its suitable, enable statistics again and call "t5 statistics:sqlite:init --re-create --aggregate"
+
+#### [TRANSLATE-5294](https://jira.translate5.net/browse/TRANSLATE-5294)
+If you want to mimic what this setting change for translate5 default IDML setting does, you need to empty the field "Protect listed whitespace characters" in the IDML filter settings of your customized file format conversion settings.
+
+#### [TRANSLATE-5196](https://jira.translate5.net/browse/TRANSLATE-5196)
+Refactoring of Localization: Customized locale-files in ./client-specific/locales are automatically reformatted to ".zxliff". The old ".xliff" files can be deleted. Use the CLI command "l10n:upgrade-clientspecific" if this somehow did not work. 
+IMPORTANT: client-specific/locales folder and its files must belong to the www-data user and group in order that the tool might modify the files. Check the sys log for warnings in that regard.
+
+#### [TRANSLATE-5093](https://jira.translate5.net/browse/TRANSLATE-5093)
+This FIX reqires version 1.5 of the pdfconverter container
+ 
+
+
+### Added
+**[TRANSLATE-5260](https://jira.translate5.net/browse/TRANSLATE-5260): translate5 AI - Add TQE as filter option in task grid and for KPI calculation** <br>
+New advance filter TQE: translation quality estimate score is available.
+
+**[TRANSLATE-4289](https://jira.translate5.net/browse/TRANSLATE-4289): VisualReview / VisualTranslation - Optionally hide the visual in editor** <br>
+Visual review now have a stateful show/hide functionality: toggle button for simple segments grid, and a menu item for settings dropdown in normal/detailed segments grid.
+
+**[TRANSLATE-3536](https://jira.translate5.net/browse/TRANSLATE-3536): Editor general, usability editor - Make optionally space visible (like in MS Word)** <br>
+In the target text editor spaces visibility can now be toggled on/of
+
+
+### Changed
+**[TRANSLATE-5384](https://jira.translate5.net/browse/TRANSLATE-5384): t5memory - Introduce TMX processor to delete prop tags from seg tags** <br>
+Introduce TMX processor to delete prop tags from seg tags
+
+**[TRANSLATE-5381](https://jira.translate5.net/browse/TRANSLATE-5381): Editor general, Security Related - Add headers suggested by HTTP Observatory** <br>
+Some new headers were added for security reasons.
+Content-Security-Policy and X-Frame-Options may influence how the application works if you have custom scripts or styles loaded from different source or you load translate5 in <iframe> or <embed>
+To make headers be configurable we added the following config values, which can be added to installation.ini: 
+runtimeOptions.headers.enableXFrameHeader
+runtimeOptions.headers.defaultSrcUrls
+runtimeOptions.headers.scriptSrcUrls
+runtimeOptions.headers.connectSrcUrls
+runtimeOptions.headers.styleSrcUrls
+runtimeOptions.headers.imgSrcUrls
+runtimeOptions.headers.fontSrcUrls
+
+Please check the reference in the application.ini file
+
+**[TRANSLATE-5370](https://jira.translate5.net/browse/TRANSLATE-5370): t5memory - Process author, document and creation time from TUV** <br>
+Process author, document and creation time from TUV
+
+**[TRANSLATE-5343](https://jira.translate5.net/browse/TRANSLATE-5343): Task Management - Group advanced filters in field sets** <br>
+Rearranged filters in Task grid's advanced filters window
+
+**[TRANSLATE-5325](https://jira.translate5.net/browse/TRANSLATE-5325): Auto-QA - Reimport of Translator Package: Add AutoQA after reimport, Fix diffing strategy / target at import time** <br>
+Enhancement: Add AutoQA after translator-package reimport to show accurate QA and show & fix potential tag-errors
+
+**[TRANSLATE-5306](https://jira.translate5.net/browse/TRANSLATE-5306): Import/Export, LanguageResources - TMX-Import: further segmentation may lead to empty entries in TM** <br>
+Fix re-segmentation of TMX segments
+
+**[TRANSLATE-5250](https://jira.translate5.net/browse/TRANSLATE-5250): LanguageResources - Adding new languages (bo, za, ug)** <br>
+add new language 'Zhuang', existing languages 'Tibetisch' and 'Uigurisch'
+
+**[TRANSLATE-5230](https://jira.translate5.net/browse/TRANSLATE-5230): t5memory - Log non-tmx files in zip import** <br>
+Log non-tmx files in zip import
+
+**[TRANSLATE-5217](https://jira.translate5.net/browse/TRANSLATE-5217): Workflows - improve message to user when assigning same step to same user twice** <br>
+Improve message to user when assigning same step to same user twice
+
+**[TRANSLATE-5196](https://jira.translate5.net/browse/TRANSLATE-5196): localization - Localization Workflow tools** <br>
+7.36.0 Finalize refactoring of Localization:
+* replace most german localizations with the english targets to clean up the source code
+* Add several tools to enable a localzation workflow independant from developers (CLI tools to extract, update and create tasks for the localization of t5)
+* JSON based localizations now also will be exported/imported as XLIFF in the localization tasks to enable the proper use of TMs
+7.34.0: First set of internal CLI tools for internal application translation management released
+
+**[TRANSLATE-5195](https://jira.translate5.net/browse/TRANSLATE-5195): file format settings - Improve File Format Segmentation Rules after colons, fix OKAPI quirk** <br>
+File Format Settings: Improve Segmentation after Colons: Take quotes into account
+
+**[TRANSLATE-5189](https://jira.translate5.net/browse/TRANSLATE-5189): Okapi integration - Make OKAPI-1.48-snapshot-6 the new default in translate5** <br>
+new default Okapi version Okapi-1.48-snapshot-6
+
+**[TRANSLATE-5076](https://jira.translate5.net/browse/TRANSLATE-5076): LanguageResources, Task Management - Change language filters in project, task and language resource overviews for better usability** <br>
+Added a new filter type langtagfield and used it for language filtering in the projects/tasks/language resources tabs
+
+**[TRANSLATE-5052](https://jira.translate5.net/browse/TRANSLATE-5052): TM Maintenance - Search for entries with quotes in TM-Maintenance** <br>
+Search for entries with quotes in TM-Maintenance
+
+**[TRANSLATE-4987](https://jira.translate5.net/browse/TRANSLATE-4987): Editor general - Allow to save incorrect tags structure if it is incorrect in source** <br>
+Now if reference field contains incorrect tags structure editor will allow to save target with incorrect tags structure too
+
+**[TRANSLATE-4720](https://jira.translate5.net/browse/TRANSLATE-4720): t5memory - Escape UTF characters that are not allowed by XML** <br>
+Added escaping UTF characters that are not allowed in XML 1.0 or 1.1 in comunication with t5memory
+
+**[TRANSLATE-4233](https://jira.translate5.net/browse/TRANSLATE-4233): Content Protection, LanguageResources - Exclude task TMs from Content Protection's "Convert all" TM conversion** <br>
+Exclude task TMs from Content Protection's "Convert all" TM conversion
+
+
+### Bugfixes
+**[TRANSLATE-5399](https://jira.translate5.net/browse/TRANSLATE-5399): translate5 AI - Rag promt: UI error on loading multiple prompts** <br>
+Fix for a problem where UI error was triggered if the user loads a lot of prompts for RAG.
+
+**[TRANSLATE-5389](https://jira.translate5.net/browse/TRANSLATE-5389): LanguageResources - remove git commit from tmx header** <br>
+On TMX export remove git commit from tmx header
+
+**[TRANSLATE-5366](https://jira.translate5.net/browse/TRANSLATE-5366): file format settings - File Format Settings: Save Export-Bconf at the time the task is imported in the okapi-data dir and use it from there** <br>
+File Format Settings: Save BCONF to be used on export in the task's okapi-data dir to be able to delete existing BCONF's at any time and be immune against quirks when bconfs are updated
+
+**[TRANSLATE-5355](https://jira.translate5.net/browse/TRANSLATE-5355): kpi - KPI (Levenshtein and Post-editinig time): Unchanged segments are not taken into account in current active workflow step** <br>
+Completly reworked the levenshtein and postediting time statistic feature due several bugs and changes in conception
+
+**[TRANSLATE-5354](https://jira.translate5.net/browse/TRANSLATE-5354): kpi, Repetition editor - Repetitions are not correctly handled with task statistics feature** <br>
+For repetitions the postediting time and levenshtein distances statistical data was not recorded.
+
+**[TRANSLATE-5353](https://jira.translate5.net/browse/TRANSLATE-5353): Workflows - Workflow jumps on finished, when last step is finished, but other one not** <br>
+Fix workflow behaviour.
+
+**[TRANSLATE-5338](https://jira.translate5.net/browse/TRANSLATE-5338): Content Protection, Editor general - adding a protected number in source editing will not save it** <br>
+Fix source editing
+
+**[TRANSLATE-5308](https://jira.translate5.net/browse/TRANSLATE-5308): LanguageResources - TMX import sometimes does not delete temporary files** <br>
+Implemented automatic deletion of temporary files created on TMX import
+
+**[TRANSLATE-5294](https://jira.translate5.net/browse/TRANSLATE-5294): Okapi integration - IDML default settings: Field "Protect listed whitespace characters" should be empty for translate5** <br>
+If this field is not empty, all special whitespacse characters from Indesign are normal tags in translate5, because Okapi then protects them as such. To enable translate5 to treat them as special whitespace, this setting must be empty.
+
+**[TRANSLATE-5248](https://jira.translate5.net/browse/TRANSLATE-5248): Export - Check user permissions in task export action** <br>
+Use permission checks in task export action
+
+**[TRANSLATE-5245](https://jira.translate5.net/browse/TRANSLATE-5245): VisualReview / VisualTranslation - Visual: Annotation in non-document encodings are scrambled** <br>
+FIX: The visual export may rendered annotations in non-document charsets with broken characters
+
+**[TRANSLATE-5198](https://jira.translate5.net/browse/TRANSLATE-5198): LanguageResources - add warning on tmx import when languages not matching TM** <br>
+Add to log on tmx import when translation unit languages not matching TM languages
+
+**[TRANSLATE-5179](https://jira.translate5.net/browse/TRANSLATE-5179): Editor general - Multiple strange behaviors of segment with tags in new editor when editing the segment** <br>
+[🐞 Fix] Improved experience in the Track Changes plugin so now it handles changes more correct
+
+**[TRANSLATE-5156](https://jira.translate5.net/browse/TRANSLATE-5156): LanguageResources - Language Resource glossary synchronisation window improvements** <br>
+Make glossary synchronisation grid scrollable
+
+**[TRANSLATE-5137](https://jira.translate5.net/browse/TRANSLATE-5137): VisualReview / VisualTranslation - Visual segmentation does not take protected content into account** <br>
+Visual: Protected Content was not respected correctly in the segmentation or WYSIWYG leading to e.g. doubling of numbers in the visual export
+
+**[TRANSLATE-5096](https://jira.translate5.net/browse/TRANSLATE-5096): Auto-QA - run AutoQA tag check for all InstantTranslate tasks** <br>
+InstantTranslate: For all InstantTranslate File translation tasks, the tag-check of the AutoQA is active so tag-errors are repaired automatically. When sending such tasks to Humanevision, a full AutoQA will be added.
+
+**[TRANSLATE-5093](https://jira.translate5.net/browse/TRANSLATE-5093): VisualReview / VisualTranslation - Office conversion with more than 20 files fails** <br>
+FIX: Visual office conversion or PDF import with more than 20 files fails
+
+**[TRANSLATE-4868](https://jira.translate5.net/browse/TRANSLATE-4868): VisualReview / VisualTranslation - Remove "blue overflow background" when printing the visual as PDF** <br>
+Improvement: Remove "blue background" hinting at longer pages when printing the Visual to PDF
+
+**[TRANSLATE-4865](https://jira.translate5.net/browse/TRANSLATE-4865): Configuration - reset customer-specific config is not possible** <br>
+Allow to reset customer-specific config
+
+
 ## [7.35.6] - 2026-04-13
 
 ### Important Notes:
