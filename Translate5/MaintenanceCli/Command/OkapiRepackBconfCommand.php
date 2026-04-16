@@ -109,11 +109,16 @@ class OkapiRepackBconfCommand extends Translate5AbstractCommand
         foreach ($ids as $id) {
             $bconfEntity = new BconfEntity();
             $bconfEntity->load($id);
-            $bconfEntity->pack($isOutdatedRepack);
-            $names[] = $bconfEntity->getName();
+            if ($bconfEntity->isOutdated()) {
+                $bconfEntity->repackIfOutdated(true);
+                $names[] = '"' . $bconfEntity->getName() . '" (was outdated)';
+            } else {
+                $bconfEntity->pack($isOutdatedRepack);
+                $names[] = '"' . $bconfEntity->getName() . '"';
+            }
         }
 
-        $this->io->success('Re-packed: "' . implode("\",\n   \"", $names) . '"');
+        $this->io->success("Re-packed the following bconfs:\n" . implode("\n", $names));
 
         return self::SUCCESS;
     }

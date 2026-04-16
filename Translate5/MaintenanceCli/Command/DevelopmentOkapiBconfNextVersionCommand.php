@@ -73,7 +73,7 @@ class DevelopmentOkapiBconfNextVersionCommand extends Translate5AbstractCommand
         $okapiInitPath = APPLICATION_PATH . '/modules/editor/Plugins/Okapi/Init.php';
         $content = file_get_contents($okapiInitPath);
         // increase the version index in the PHP file
-        $content = preg_replace('/const\s*BCONF_VERSION_INDEX\s*=\s*' . $version . ';\s*/U', 'const BCONF_VERSION_INDEX = ' . $newVersion . ';', $content, 1);
+        $content = preg_replace('/const\s+int\s+BCONF_VERSION_INDEX\s*=\s*' . $version . ';\s*/U', 'const int BCONF_VERSION_INDEX = ' . $newVersion . ';', $content, 1);
         file_put_contents($okapiInitPath, $content);
         $this->messages[] = 'Increased editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX to ' . $newVersion;
 

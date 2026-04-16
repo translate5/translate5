@@ -66,7 +66,7 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
         $this->addOption(
             name: 'only-offline',
             mode: InputOption::VALUE_NONE,
-            description: 'Purges only the entries being offline, gnores "no-keep" and "keep" options'
+            description: 'Purges only the entries being offline, ignores "no-keep" and "keep" options'
         );
 
         $this->addOption(
