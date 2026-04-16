@@ -58,7 +58,7 @@ class TagHandlerFactory
             'xliff' => Factory::get(editor_Services_Connector_TagHandler_Xliff::class, [$params]),
             'html_image' => Factory::get(editor_Services_Connector_TagHandler_HtmlRepaired::class, [$params]),
             't5memoryxliff' => Factory::get(editor_Services_Connector_TagHandler_T5MemoryXliff::class, [$params]),
-            'xliff_paired_tags' => Factory::get(editor_Services_Connector_TagHandler_PairedTags::class, [$params]),
+            'xml_paired_tags' => Factory::get(editor_Services_Connector_TagHandler_PairedTags::class, [$params]),
             default => Factory::get(editor_Services_Connector_TagHandler_Remover::class, [$params]),
         };
     }

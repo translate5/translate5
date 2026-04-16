@@ -156,10 +156,14 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     /**
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function processBatchResult($segmentResults)
-    {
+    protected function processBatchResult(
+        $segmentResults,
+        ?editor_Services_Connector_TagHandler_Abstract $tagHandler = null
+    ) {
+        $tagHandler ??= $this->tagHandler;
+
         $this->resultList->addResult(
-            $this->tagHandler->restoreInResult($segmentResults['text'] ?? ''),
+            $tagHandler->restoreInResult($segmentResults['text'] ?? ''),
             $this->defaultMatchRate
         );
     }

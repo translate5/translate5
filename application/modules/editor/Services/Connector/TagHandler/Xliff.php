@@ -128,7 +128,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $this->map = [];
         $queryString = $this->convertQueryContent($queryString, $isSource);
 
-        $this->realTagCount = $this->utilities->internalTag->count($queryString);
+        $this->realTagCount = $this->countRealTagsInPreparedQuery($queryString);
 
         $queryString = $this->processXliffTags($queryString);
 
@@ -138,6 +138,37 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $this->setQuerySegment($queryString);
 
         return $queryString;
+    }
+
+    /**
+     * Get list of tag types to be restored/replaced with original content.
+     * Ex: when we send whitespaces as tags, we need to remove the whitespaces tags from this list so they
+     * are not restored with the actual content, and they are send as tags to the resources.
+     */
+    public function getTagsForRestore(): array
+    {
+        $tags = parent::getTagsForRestore();
+
+        if (! $this->keepWhitespaceTagsAsXliffTags()) {
+            return $tags;
+        }
+
+        // With keepWhitespaceTags=true we do not restore whitespace tags to real characters here.
+        // That leaves them as internal tags, so processXliffTags() can convert them to XLIFF tags
+        // before the text is sent to the remote resource.
+        return array_values(array_diff($tags, editor_Models_Segment_Whitespace::WHITESPACE_TAGS));
+    }
+
+    protected function countRealTagsInPreparedQuery(string $queryString): int
+    {
+        // If keepWhitespaceTags is enabled, whitespace is still an internal tag here.
+        // Count only non-whitespace tags so newline, tab, and space tags do not increase this number.
+        return count($this->utilities->internalTag->getRealTagMatches($queryString));
+    }
+
+    protected function keepWhitespaceTagsAsXliffTags(): bool
+    {
+        return $this->keepWhitespaceTags;
     }
 
     protected function processXliffTags(string $queryString): string

@@ -229,15 +229,19 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     /**
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function processBatchResult($segmentResults)
-    {
+    protected function processBatchResult(
+        $segmentResults,
+        ?editor_Services_Connector_TagHandler_Abstract $tagHandler = null
+    ) {
+        $tagHandler ??= $this->tagHandler;
+
         if (! isset($segmentResults->translations) || empty($segmentResults->translations[0])) {
             //if there is no translation we do not process any result
             return;
         }
         //since we translate only to one target language, we will receive only one result in the translations array:
         $result = $segmentResults->translations[0];
-        $this->resultList->addResult($this->tagHandler->restoreInResult($result->text), $this->defaultMatchRate);
+        $this->resultList->addResult($tagHandler->restoreInResult($result->text), $this->defaultMatchRate);
     }
 
     /**

@@ -68,8 +68,6 @@ trait editor_Services_Connector_BatchTrait
      */
     private string $contentField = editor_Models_SegmentField::TYPE_TARGET;
 
-    private editor_Models_Segment $lastDefaultSegmentSet;
-
     private ?QueryDurationLogger $queryDurationLogger = null;
 
     /**
@@ -138,25 +136,14 @@ trait editor_Services_Connector_BatchTrait
             if (strlen($contentField) > 0 && $this->languageResource->isMt()) {
                 continue;
             }
-            $this->tagHandler->setCurrentSegment($segment);
-            $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+            $batchSegment = clone $segment;
+            $tagHandler = $this->createBatchTagHandler($batchSegment);
+            $querySegment = $tagHandler->prepareQuery($this->getQueryString($batchSegment));
             $batchQuery[] = [
-                //set the query string to segment map. Later it will be used to reapply the tags
-                'segment' => clone $segment,
-                //collect the source text
+                // Keep the segment-local tag handler so all restoration state stays inside it.
+                'segment' => $batchSegment,
                 'query' => $querySegment,
-                // INFO: why we have query and querySegment fields
-                // For almost all tag handlers the query and query segment is the same expect for the RepairedTags(xliff_paired_tags)
-                // For this tag handler we convert the xliff tags to custom translate5 tags (<t5_1_1>) and sent this kind of
-                // structure to the translation services. In that case, the "query" field contains segments with this structure
-                // and the querySegment contains the segment with xliff structure. Since our tag repair works with xliff
-                // tag structure we need to store this value of the segment here and use it later for repair
-                'querySegment' => $this->tagHandler->getQuerySegment() ?? $querySegment,
-                'tagMap' => $this->tagHandler->getTagMap(),
-                // Store whitespace ID map for PairedTags handler (maps XLIFF IDs to whitespace content)
-                'whitespaceIdMap' => method_exists($this->tagHandler, 'getWhitespaceIdMap')
-                    ? $this->tagHandler->getWhitespaceIdMap()
-                    : [],
+                'tagHandler' => $tagHandler,
             ];
 
             // collect the segment size in bytes in temporary variable
@@ -212,7 +199,6 @@ trait editor_Services_Connector_BatchTrait
 
     /**
      * Check if calculate content size exceeds the allowed limit
-     * @param int $totalContentSize
      */
     protected function isAllowedByContentSize(int|float $totalContentSize): bool
     {
@@ -245,6 +231,16 @@ trait editor_Services_Connector_BatchTrait
         editor_Models_Segment $relatedSegment
     ): float|int {
         return $currentBufferSize + $this->getQuerySegmentSize($querySegment);
+    }
+
+    protected function createBatchTagHandler(
+        editor_Models_Segment $segment
+    ): editor_Services_Connector_TagHandler_Abstract {
+        $tagHandler = $this->createTagHandler();
+        $tagHandler->setLanguages((int) $this->sourceLang, (int) $this->targetLang);
+        $tagHandler->setCurrentSegment($segment);
+
+        return $tagHandler;
     }
 
     /**
@@ -286,15 +282,10 @@ trait editor_Services_Connector_BatchTrait
 
             /* @var editor_Models_Segment $segment */
             $segment = $query['segment'];
+            $tagHandler = $query['tagHandler'] ?? $this->tagHandler;
 
-            $this->getQueryStringAndSetAsDefault($query['segment']);
-            $this->tagHandler->setTagMap($query['tagMap']);
-            $this->tagHandler->setQuerySegment($query['querySegment']);
-            // Restore whitespace ID map for PairedTags handler
-            if (method_exists($this->tagHandler, 'setWhitespaceIdMap')) {
-                $this->tagHandler->setWhitespaceIdMap($query['whitespaceIdMap'] ?? []);
-            }
-            $this->processBatchResult($segmentResults);
+            $this->getQueryStringAndSetAsDefault($segment);
+            $this->processBatchResult($segmentResults, $tagHandler);
 
             $this->logForSegment($query['segment']);
 
@@ -311,16 +302,6 @@ trait editor_Services_Connector_BatchTrait
     }
 
     /**
-     * get query string from segment and set it as result default source
-     */
-    protected function getQueryStringAndSetAsDefault(editor_Models_Segment $segment): string
-    {
-        $this->lastDefaultSegmentSet = $segment;
-
-        return parent::getQueryStringAndSetAsDefault($segment);
-    }
-
-    /**
      * Sends the prepared queryStrings as a batch to the language resource
      */
     abstract protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool;
@@ -329,7 +310,10 @@ trait editor_Services_Connector_BatchTrait
      * process (add to the result list and decode) results from the language resource
      * @param mixed $segmentResults
      */
-    abstract protected function processBatchResult($segmentResults);
+    abstract protected function processBatchResult(
+        $segmentResults,
+        ?editor_Services_Connector_TagHandler_Abstract $tagHandler = null
+    );
 
     /**
      * Retrieves the Json-Response of the last request

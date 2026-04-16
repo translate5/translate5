@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\ProtectionTagsFilter;
 use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
+use MittagQI\Translate5\Segment\TagRepair\Xliff\TagConversionContext;
 use MittagQI\Translate5\Segment\TagRepair\Xliff\TranslationTagConverter;
 use MittagQI\Translate5\Segment\TagRepair\Xliff\XliffTagRepairer;
 
@@ -47,6 +48,8 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
      */
     private array $whitespaceIdMap = [];
 
+    private ?TagConversionContext $tagConversionContext = null;
+
     public function __construct(array $options = [])
     {
         $options['gTagPairing'] = false;
@@ -60,14 +63,20 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
         $this->translationTagConverter = new TranslationTagConverter($this->logger);
     }
 
+    protected function countRealTagsInPreparedQuery(string $queryString): int
+    {
+        return $this->utilities->internalTag->count($queryString);
+    }
+
     public function prepareQuery(string $queryString, bool $isSource = true): string
     {
         $convertedString = '';
         $preparedQuery = '';
 
         try {
-            // reset whitespace tracking for each query
+            // reset tracking for each query
             $this->whitespaceIdMap = [];
+            $this->tagConversionContext = null;
 
             $preparedQuery = parent::prepareQuery($queryString, $isSource);
 
@@ -77,7 +86,8 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
             }
 
             // Convert to service format (e.g., <x id="1"/> -> <t5x_1 />)
-            $convertedString = $this->translationTagConverter->convertToServiceFormat($preparedQuery);
+            $this->tagConversionContext = $this->translationTagConverter->convertToServiceFormat($preparedQuery);
+            $convertedString = $this->tagConversionContext->convertedText;
 
             // Convert whitespace XLIFF tags (now in service format) to actual whitespace
             // This is what gets sent to the translation service
@@ -107,7 +117,10 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
         $convertedString = '';
 
         try {
-            $convertedString = $this->translationTagConverter->convertToOriginalFormat($resultString);
+            $convertedString = $this->translationTagConverter->convertToOriginalFormat(
+                $resultString,
+                $this->tagConversionContext ?? new TagConversionContext('', [], [])
+            );
 
             // Convert actual whitespace back to XLIFF tags BEFORE the repairer runs.
             // This prevents the repairer from seeing whitespace as "missing" and adding duplicates.
@@ -246,23 +259,5 @@ class editor_Services_Connector_TagHandler_PairedTags extends editor_Services_Co
         }
 
         return $content;
-    }
-
-    /**
-     * Returns the whitespace ID map for batch processing.
-     * This allows BatchTrait to store the map per segment.
-     */
-    public function getWhitespaceIdMap(): array
-    {
-        return $this->whitespaceIdMap;
-    }
-
-    /**
-     * Sets the whitespace ID map for batch processing.
-     * This allows BatchTrait to restore the map per segment before calling restoreInResult.
-     */
-    public function setWhitespaceIdMap(array $whitespaceIdMap): void
-    {
-        $this->whitespaceIdMap = $whitespaceIdMap;
     }
 }
