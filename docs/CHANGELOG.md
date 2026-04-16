@@ -13,6 +13,39 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.36.1] - 2026-04-16
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5383](https://jira.translate5.net/browse/TRANSLATE-5383): Okapi integration - Import Across abbreviations or language segmentation rules** <br>
+OKAPI: Add CLI command to import Across Segmentation Settings regarding Abbrevation ("terms") to an SRX as used in translate5
+
+**[TRANSLATE-5164](https://jira.translate5.net/browse/TRANSLATE-5164): TBX-Import - Plugin TermImport: leave SFTP instruction.ini where it is** <br>
+Added new config to instruction.ini file to keep that file in Import-directory on sftp host, that allows to reuse that file for further imports, so only tbx-files are needed to be uploaded into that directory for any further imports
+
+
+### Bugfixes
+**[TRANSLATE-5424](https://jira.translate5.net/browse/TRANSLATE-5424): translate5 AI - Translate5 AI: make reasoning effort configurable** <br>
+Make reasoning effort configurable in model properties for reasoning models.
+
+**[TRANSLATE-5399](https://jira.translate5.net/browse/TRANSLATE-5399): translate5 AI - Rag promt: UI error on loading multiple prompts** <br>
+7.36.1: prevent additional UI error
+7.36.0: Fix for a problem where UI error was triggered if the user loads a lot of prompts for RAG.
+
+**[TRANSLATE-5360](https://jira.translate5.net/browse/TRANSLATE-5360): Main back-end mechanisms (Worker, Logging, etc.) - Send valid xml with paired tag handler** <br>
+Send valid xml tags with the xml paired tags tag handler.
+
+**[TRANSLATE-5097](https://jira.translate5.net/browse/TRANSLATE-5097): Editor general - RootCause: Strange request to GET /Editor.model.admin.TaskUserAssoc leading to RootCause error. 4rd attempt** <br>
+FIXED: missing URL for loading associated users for a task that is in status Import
+
+**[TRANSLATE-4795](https://jira.translate5.net/browse/TRANSLATE-4795): Export - Implement clean up of the data/Export folder to save disk space** <br>
+7.36.1: Enabled for all instances
+7.26.0: Enabled for some instances - sometimes data generated for export is not properly cleaned up, what might lead to unneeded hard disk usage. An automatic clean up for such data is generated.
+
+
 ## [7.36.0] - 2026-04-15
 
 ### Important Notes:
