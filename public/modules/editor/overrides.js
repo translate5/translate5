@@ -2315,3 +2315,32 @@ Ext.override(Ext.ux.DateTimePicker, {
         }
     },
 });
+
+/**
+ * Overridden to add logging for 'a.setVisibilityMode is not a function' RootCause error
+ */
+Ext.override(Ext.form.trigger.Trigger, {
+    onFieldRender: function() {
+        var me = this,
+            /**
+             * @property {Ext.dom.Element} el
+             * @private
+             * The trigger's main element
+             */
+            el = me.el = me.field.triggerWrap.selectNode('#' + me.domId, false);
+        // ensure that the trigger does not consume space when hidden
+        if (typeof el.setVisibilityMode !== 'function') {                               // +
+            console.log(                                                                // +
+                'TRANSLATE-5429:',                                                      // +
+                'me.field.name =>', me.field.name,                                      // +
+                'me.field.itemId =>', me.field.itemId,                                  // +
+                'me.domId => ', me.domId,                                               // +
+                'el.id => ', el.id,                                                     // +
+                'typeof el.setVisibilityMode =>', typeof el.setVisibilityMode,          // +
+                'el => ', el                                                            // +
+            );                                                                          // +
+        }                                                                               // +
+        el.setVisibilityMode(Ext.Element.DISPLAY);
+        me.rendered = true;
+    }
+});
