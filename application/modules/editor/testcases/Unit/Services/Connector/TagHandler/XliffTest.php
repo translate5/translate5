@@ -48,6 +48,7 @@ class XliffTest extends UnitTestAbstract
         '</3>' => '<div class="close 1234 internal-tag ownttip"><span class="short" title="&lt;/Variable&gt;">&lt;/3&gt;</span><span class="full" data-originalid="10" data-length="-1">&lt;/Variable&gt;</span></div>',
         '<5/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="&lt;fct:Variable /&gt;">&lt;5/&gt;</span><span class="full" data-originalid="12" data-length="-1">another tag</span></div>',
         '<6/>' => '<div class="single 1234 internal-tag ownttip"><span class="short" title="&lt;fct:Variable /&gt;">&lt;6/&gt;</span><span class="full" data-originalid="13" data-length="-1">another tag</span></div>',
+        '<7/>' => '<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;7/&gt;: Newline" class="short">&lt;7/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">↵</span></div>',
     ];
 
     private Xliff $xliffUnderTestPaired;
@@ -225,6 +226,42 @@ class XliffTest extends UnitTestAbstract
 
         $this->assertEquals($expectedSource, $source, 'prepared source');
         $this->assertEquals($expectedTarget, $target, 'prepared target with source tags');
+    }
+
+    public function testPrepareQueryKeepsWhitespaceAsTagWhenEnabled(): void
+    {
+        $handler = new Xliff([
+            'gTagPairing' => false,
+            Xliff::OPTION_KEEP_WHITESPACE_TAGS => true,
+        ]);
+        $handler->setLanguages(5, 6);
+
+        $prepared = $handler->prepareQuery($this->convertToInternalTags('Hello<7/>World'));
+
+        $this->assertSame('Hello<x id="1"/>World', $prepared);
+        $this->assertSame(0, $handler->getRealTagCount());
+        $this->assertEquals(
+            $this->convertToInternalTags('Hallo<7/>Welt'),
+            $handler->restoreInResult('Hallo<x id="1"/>Welt')
+        );
+    }
+
+    public function testPrepareQuerySendsWhitespaceAsCharactersWhenDisabled(): void
+    {
+        $handler = new Xliff([
+            'gTagPairing' => false,
+            Xliff::OPTION_KEEP_WHITESPACE_TAGS => false,
+        ]);
+        $handler->setLanguages(5, 6);
+
+        $prepared = $handler->prepareQuery($this->convertToInternalTags('Hello<7/>World'));
+
+        $this->assertSame("Hello\nWorld", $prepared);
+        $this->assertSame(0, $handler->getRealTagCount());
+        $this->assertEquals(
+            $this->convertToInternalTags('Hallo<7/>Welt'),
+            $handler->restoreInResult("Hallo\nWelt")
+        );
     }
 
     private function convertToInternalTags(string $query): string

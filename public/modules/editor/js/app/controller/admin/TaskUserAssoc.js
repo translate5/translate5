@@ -102,10 +102,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                     return;
                 }
 
-                if (task.get('state') === 'import' && ! Ext.ComponentQuery.query('adminTaskUserAssocWizard').length) {
-                    return;
-                }
-
                 let jobStore = this.getUserAssocGrid().getStore();
 
                 if (jobStore)

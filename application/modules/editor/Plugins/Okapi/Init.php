@@ -70,7 +70,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      * The current internal version index of the bconf's
      * This must be increased each time, a git-based fprm or srx is changed
      */
-    public const int BCONF_VERSION_INDEX = 12;
+    public const int BCONF_VERSION_INDEX = 13;
 
     /**
      * The filename of the system default import bconf

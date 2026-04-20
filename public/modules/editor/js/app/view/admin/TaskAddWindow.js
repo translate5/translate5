@@ -239,6 +239,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 },{
                                     xtype:'tagfield',
                                     itemId:'targetLangaugeTaskUploadWizard',
+                                    bulkPasteProperty: 'rfc5646',
                                     name:'targetLang[]',
                                     listeners:{
                                         beforedeselect:'onBeforeTargetLangDeselect'

@@ -326,4 +326,14 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             dontRemoveTags: ['<' . T5NTag::TAG . '>']
         );
     }
+
+    protected function countRealTagsInPreparedQuery(string $queryString): int
+    {
+        return $this->utilities->internalTag->count($queryString);
+    }
+
+    protected function keepWhitespaceTagsAsXliffTags(): bool
+    {
+        return false;
+    }
 }

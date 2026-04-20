@@ -64,8 +64,8 @@ class SegmentationService
         $rules = $srx->getSegmentationRules($rfc5646);
 
         // If it's not possible to get splitting-rules from srx-file for given $rfc5646
-        if (! $rules) {
-            // Use basic splitting
+        if (empty($rules)) {
+            // Fallback: Use basic splitting
             return preg_split("/([\s]*[.\n:?!]+)([\s]*)/", $text);
         }
 

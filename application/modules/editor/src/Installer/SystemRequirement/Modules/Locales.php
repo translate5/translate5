@@ -47,14 +47,17 @@ class Locales extends ZfExtended_Models_SystemRequirement_Modules_Abstract
     public function validate(): ZfExtended_Models_SystemRequirement_Result
     {
         $this->result->id = 'locales';
-        $this->result->name = 'Locales XML syntax check';
+        $this->result->name = 'Locales check';
 
         $checksDone = 0;
         $paths = ZfExtended_Zendoverwrites_Translate::getInstance()->getTranslationDirectories();
         foreach ($paths as $path) {
-            $xlfFiles = glob($path . '*.xliff');
+            $xlfFiles = glob($path . '*.zxliff');
             foreach ($xlfFiles as $xlfFile) {
                 $checksDone++;
+                if (str_contains($xlfFile, 'client-specific') && !is_writable($xlfFile)) {
+                    $this->result->error[] = 'Client specific file "' . $xlfFile . '" is not writable for application!';
+                }
                 $this->parseXliff($xlfFile);
             }
         }

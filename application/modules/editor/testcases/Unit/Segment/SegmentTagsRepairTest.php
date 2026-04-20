@@ -247,9 +247,19 @@ class SegmentTagsRepairTest extends SegmentTagsTestAbstract
         $source = '<1>Hello</1><7/><2>World</2>';
 
         // Service returns text without the newline but with tags
-        $brokenTranslation = '<t5x_1_1>Hallo</t5x_1_1><t5x_2_2>Welt</t5x_2_2>';
+        // New service format: paired tags use RID as the tag name (valid XML).
+        // rid=1 for the first pair, rid=2 for the second pair; whitespace tag is dropped by the "service".
+        $brokenTranslation = '<t5x_1>Hallo</t5x_1><t5x_2>Welt</t5x_2>';
 
         $this->createWhitespaceMixedRepairTest($source, $brokenTranslation);
+    }
+
+    public function testPairedTagsRealTagCountStillIncludesWhitespace(): void
+    {
+        $tagHandler = new editor_Services_Connector_TagHandler_PairedTags();
+        $tagHandler->prepareQuery($this->shortToFull('Hello<7/>World'));
+
+        self::assertSame(1, $tagHandler->getRealTagCount());
     }
 
     /**

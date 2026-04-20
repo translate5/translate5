@@ -2271,6 +2271,43 @@ Ext.override(Ext.data.request.Form, {
 });
 
 /**
+ * Overridden to: add bulkPasteProperty-config, which allows to specify a property (in addition to id-property)
+ * to be used for searching the matching record(s) in the store, so the found ones
+ * are added into the current value/selection
+ */
+Ext.override(Ext.form.field.Tag, {
+    config: {
+        bulkPasteProperty: null,
+    },
+    initEvents: function(){
+        this.inputEl.on('input', this.parseBulkPaste, this);
+        this.callParent();
+    },
+    parseBulkPaste: function () {
+        let me = this,
+            inputEl = me.inputEl,
+            rawValue = inputEl.dom.value;
+
+        if (me.multiSelect && me.delimiterRegexp && me.delimiterRegexp.test(rawValue)) {
+
+            rawValue = Ext.Array.clean(rawValue.split(me.delimiterRegexp));
+
+            if (this.bulkPasteProperty) {
+                rawValue = Ext.Array.clean(
+                    rawValue.map(item => Ext.isNumeric(item)
+                        ? item
+                        : me.getStore().findRecord(this.bulkPasteProperty, item.trim())?.id)
+                );
+            }
+
+            inputEl.dom.value = '';
+            me.setValue(me.valueStore.getRange().concat(rawValue));
+            inputEl.focus();
+        }
+    }
+});
+
+/**
  * https://jira.translate5.net/browse/TRANSLATE-5373
  * Sometimes the value is me.pickerField.getValue() is non-falsy, but is not a Date
  * so it does not have getHours() method. This can be a string value, but it was not
@@ -2314,4 +2351,33 @@ Ext.override(Ext.ux.DateTimePicker, {
             me.pickerField.fireEvent('select', me.pickerField, auxValue);
         }
     },
+});
+
+/**
+ * Overridden to add logging for 'a.setVisibilityMode is not a function' RootCause error
+ */
+Ext.override(Ext.form.trigger.Trigger, {
+    onFieldRender: function() {
+        var me = this,
+            /**
+             * @property {Ext.dom.Element} el
+             * @private
+             * The trigger's main element
+             */
+            el = me.el = me.field.triggerWrap.selectNode('#' + me.domId, false);
+        // ensure that the trigger does not consume space when hidden
+        if (typeof el.setVisibilityMode !== 'function') {                               // +
+            console.log(                                                                // +
+                'TRANSLATE-5429:',                                                      // +
+                'me.field.name =>', me.field.name,                                      // +
+                'me.field.itemId =>', me.field.itemId,                                  // +
+                'me.domId => ', me.domId,                                               // +
+                'el.id => ', el.id,                                                     // +
+                'typeof el.setVisibilityMode =>', typeof el.setVisibilityMode,          // +
+                'el => ', el                                                            // +
+            );                                                                          // +
+        }                                                                               // +
+        el.setVisibilityMode(Ext.Element.DISPLAY);
+        me.rendered = true;
+    }
 });
