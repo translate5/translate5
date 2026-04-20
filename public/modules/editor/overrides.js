@@ -2271,6 +2271,43 @@ Ext.override(Ext.data.request.Form, {
 });
 
 /**
+ * Overridden to: add bulkPasteProperty-config, which allows to specify a property (in addition to id-property)
+ * to be used for searching the matching record(s) in the store, so the found ones
+ * are added into the current value/selection
+ */
+Ext.override(Ext.form.field.Tag, {
+    config: {
+        bulkPasteProperty: null,
+    },
+    initEvents: function(){
+        this.inputEl.on('input', this.parseBulkPaste, this);
+        this.callParent();
+    },
+    parseBulkPaste: function () {
+        let me = this,
+            inputEl = me.inputEl,
+            rawValue = inputEl.dom.value;
+
+        if (me.multiSelect && me.delimiterRegexp && me.delimiterRegexp.test(rawValue)) {
+
+            rawValue = Ext.Array.clean(rawValue.split(me.delimiterRegexp));
+
+            if (this.bulkPasteProperty) {
+                rawValue = Ext.Array.clean(
+                    rawValue.map(item => Ext.isNumeric(item)
+                        ? item
+                        : me.getStore().findRecord(this.bulkPasteProperty, item.trim())?.id)
+                );
+            }
+
+            inputEl.dom.value = '';
+            me.setValue(me.valueStore.getRange().concat(rawValue));
+            inputEl.focus();
+        }
+    }
+});
+
+/**
  * https://jira.translate5.net/browse/TRANSLATE-5373
  * Sometimes the value is me.pickerField.getValue() is non-falsy, but is not a Date
  * so it does not have getHours() method. This can be a string value, but it was not
