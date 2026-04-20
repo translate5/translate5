@@ -60,7 +60,7 @@ class editor_Models_Import_Configuration implements DirectoryLayoutInterface
     /**
      * The max number of segments allowed in a trans-unit, if exceeded, the import will be rejected
      */
-    public const MAX_SEGMENTS_PER_TRANSUNIT = 250;
+    public const MAX_SEGMENTS_PER_TRANSUNIT = 500;
 
     /**
      * @var editor_Models_Languages language entity instance
