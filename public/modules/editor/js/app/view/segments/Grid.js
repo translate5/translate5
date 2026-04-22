@@ -339,6 +339,7 @@ Ext.define('Editor.view.segments.Grid', {
             {
                 xtype: 'gridcolumn',
                 itemId: 'qualityScore',
+                stateId: 'qualityScore',
                 dataIndex: 'qualityScore',
                 text: Editor.data.l10n.segmentGrid.column.qualityScore,
                 renderer: colorizeScores ?
@@ -360,6 +361,7 @@ Ext.define('Editor.view.segments.Grid', {
             {
                 xtype: 'gridcolumn',
                 itemId: 'qualityScoreReasoning',
+                stateId: 'qualityScoreReasoning',
                 dataIndex: 'qualityScoreReasoning',
                 text: Editor.data.l10n.segmentGrid.column.qualityScoreReasoning,
                 width: 250,
@@ -406,7 +408,7 @@ Ext.define('Editor.view.segments.Grid', {
     
         //allow the view mode controller to prepare (and store) the columns setup
         me.fireEvent('beforeinitcolumns', columns);
-    
+
         Ext.applyIf(me, {
        /**
         * for information se below onReconfigure
@@ -430,6 +432,7 @@ Ext.define('Editor.view.segments.Grid', {
     
     initConfig: function(instanceConfig) {
             var me = this,
+            checkedItems = Ext.state.Manager.getProvider().get('editor.segmentActionMenu')?.checkedItems || '',
             config = {
                 title: Ext.String.htmlEncode(me.title), //see EXT6UPD-9
                 viewConfig: {
@@ -457,11 +460,28 @@ Ext.define('Editor.view.segments.Grid', {
                     xtype: 'panel',
                     dock: 'top',
                     itemId: 'taskDescPanel',
+                    hidden: true,
                     bind: {
                         html: '{taskDescription}',
                         hidden: '{!taskDescription}'
                     },
                     bodyPadding: 10
+                },{
+                    xtype: 'fieldset',
+                    cls: 'segment-grid-filters-bar',
+                    title: 'Filters',
+                    itemId: 'filterToolbar',
+                    hidden: !~checkedItems.indexOf('filterToolbar'),
+                    padding: 0,
+                    margin: '0 9 9 9',
+                    layout: {
+                        type: 'column'
+                    },
+                    defaults: {
+                        margin: '0 0 9 9',
+                        xtype: 'textfield'
+                    },
+                    items: []
                 },{
                     xtype: 'segmentsToolbar',
                     dock: 'top'

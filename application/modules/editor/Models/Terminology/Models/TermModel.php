@@ -1476,9 +1476,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             return $isSource;
         }
 
-        if ($term1->used !== $term2->used) {
-            return (int) ($term1->used < $term2->used);
-        } elseif ($term1->used) {
+        // Null-safe shortcuts to prevent 'Undefined property: stdClass::$used' PHP warnings
+        $t1used = $term1->used ?? null;
+        $t2used = $term2->used ?? null;
+
+        if ($t1used !== $t2used) {
+            return (int) ($t1used < $t2used);
+        } elseif ($t1used) {
             return -1;
         }
 

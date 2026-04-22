@@ -129,6 +129,9 @@ Ext.define('Editor.controller.Editor', {
                  click: 'onSegmentActionMenuItemClick',
                  checkchange: 'onSegmentActionMenuItemToggle'
              },
+            '#clearSortAndFilterBtn menucheckitem': {
+                checkchange: 'onSegmentActionMenuItemToggle'
+            },
             '#t5RowEditor': {
                 initialize: 'onRowEditorInitialize',
                 contentErrors: 'onSaveWithErrors',
@@ -222,6 +225,7 @@ Ext.define('Editor.controller.Editor', {
             // 'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             // 'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-l':         ['L',{ctrl: true, alt: false}, me.toggleSegmentLock, true],
+            'ctrl-alt-f':     ['F',{ctrl: true, alt: true}, me.toggleFilterToolbar, true],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false, shift: false}, me.saveNextByWorkflow],
             'ctrl-shift-enter':     [[10,13],{ctrl: true, alt: false, shift: true}, me.saveDraftNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
@@ -2288,19 +2292,41 @@ Ext.define('Editor.controller.Editor', {
     },
 
     /**
-     * Toggle corresponding segment action button in the toolbar
+     * Toggle:
+     *  - corresponding segment action button in the toolbar
+     *  - filter toolbar
      *
      * @param item
      */
     onSegmentActionMenuItemToggle: function(item) {
+        let grid = item.up('grid'),
+            menu = grid.down('#segmentActionMenu'),
+            checked = grid.query('#segmentActionMenu [checked], #clearSortAndFilterBtn [checked]');
 
         // Update comma-separated itemIds of checked items within menu's stateful checkedItems-prop
-        item.up().checkedItems = Ext.Array.pluck(item.up().query('[checked]'), 'itemId').join(',');
+        menu.checkedItems = Ext.Array.pluck(checked, 'itemId');
 
         // Save state
-        item.up().saveState();
+        menu.saveState();
 
-        // Toggle button visibility
-        item.up('toolbar').down('#' + item.itemId).setVisible(item.checked);
+        // Toggle visibility of a button (or filter toolbar)
+        if (item.up('#segmentActionMenu')) {
+            item.up('toolbar').down('#' + item.itemId).setVisible(item.checked);
+        } else {
+            grid.down('#' + item.itemId).setVisible(item.checked);
+            item.up().hide();
+        }
+    },
+
+    /**
+     * Keyboard shortcut handler for 'ctrl+alt+f' to toggle a check for menucheckitem#filterToolbar
+     */
+    toggleFilterToolbar: function() {
+
+        // Get menucheckitem
+        let menucheckitem = Ext.getCmp('segment-grid').down('#clearSortAndFilterBtn menucheckitem#filterToolbar');
+
+        // Toggle check
+        menucheckitem.setChecked(!menucheckitem.checked);
     }
 });

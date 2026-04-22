@@ -209,7 +209,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator'
                 },
                 {
-                    xtype: 'button',
+                    xtype: 'splitbutton',
                     glyph: 'e17b@FontAwesome5FreeSolid',
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
@@ -218,6 +218,19 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             text: '{l10n.segmentGrid.toolbar.clearSortAndFilterTooltip}',
                             showDelay: 0
                         }
+                    },
+                    menu: {
+                        xtype: 'menu',
+                        items: [
+                            {
+                                xtype: 'menucheckitem',
+                                itemId: 'filterToolbar',
+                                checked: !!~checkedItems.indexOf('filterToolbar'),
+                                bind: {
+                                    text: '{l10n.segmentGrid.toolbar.showFilterToolbar}'
+                                }
+                            }
+                        ]
                     }
                 },
                 {

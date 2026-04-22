@@ -2370,6 +2370,18 @@ ins.tmMatchGridResultTooltip {
 .x-menu-item.isRepeated-include-first {
     border-top: 1px solid gray;
 }
+.x-fieldset.segment-grid-filters-bar {
+    border-bottom-width: 1px !important;
+}
+.x-fieldset.segment-grid-filters-bar legend.x-fieldset-header {
+    padding: 3px 5px 0 5px;
+}
+.x-fieldset.segment-grid-filters-bar legend.x-fieldset-header .x-fieldset-header-text {
+    font-size: 15px;
+    height: 15px;
+    padding: 0;
+    line-height: 15px;
+}
 [data-componentid^="editorAdminTaskFilterFilterWindow-"] legend.x-fieldset-header {
     padding: 0;
 }

@@ -347,6 +347,11 @@ Ext.define('Editor.controller.Segments', {
         if (store.getFilters().length > 0) {
             //reloading of the store is caused by clearFilter call
             filters.clearFilters();
+            grid.up().query('fieldset field').forEach(field => {
+                field.suspendEvent('change');
+                field.setValue('');
+                field.resumeEvent('change');
+            });
         } else {
             store.reload();
         }

@@ -1999,6 +1999,45 @@ Ext.define('Translate5.override.data.request.Ajax', {
         }
     }
 });
+
+/**
+ * Overridden to add fieldLabelFit-config
+ */
+Ext.override(Ext.form.field.Base, {
+    config: {
+        fieldLabelFit: false
+    },
+
+    /**
+     * This method is picked from example at this page
+     * https://docs.sencha.com/extjs/6.2.0/classic/Ext.util.TextMetrics.html
+     */
+    getTextMetrics: function () {
+        var me = this,
+            // Using me.self allows labelCls etc. to vary by derived
+            // class, but not by instance.
+            cls = me.self,
+            tm = cls.measurer,
+            el;
+
+        if (!tm) {
+            el = Ext.getBody().createChild();
+            el.addCls(me.labelCls + ' ' + me.labelClsExtra).
+            applyStyles(me.labelStyle);
+
+            cls.measurer = tm = new Ext.util.TextMetrics(el);
+        }
+
+        return tm;
+    },
+    initComponent: function() {
+        this.callParent();
+        if (this.fieldLabelFit && this.fieldLabel) {
+            this.labelWidth = this.getTextMetrics().getWidth(this.fieldLabel + this.labelSeparator);
+        }
+    },
+});
+
 Ext.define('Ext.overrides.grid.filters.filter.Base', {
     override: 'Ext.grid.filters.filter.Base',
     createMenu: function () {
