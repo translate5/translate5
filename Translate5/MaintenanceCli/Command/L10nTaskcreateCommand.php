@@ -29,6 +29,8 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
     public const CUSTOMER = 'customer';
 
+    public const EMPTY_TARGETS = 'empty-targets';
+
     protected static $defaultName = 'l10n:taskcreate';
 
     protected function configure()
@@ -51,6 +53,13 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
+            self::CUSTOMER,
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'The customer number of the customer to be used. Defaults to “defaultcustomer”.'
+        );
+
+        $this->addOption(
             self::PM_LOGIN,
             'p',
             InputOption::VALUE_REQUIRED,
@@ -59,10 +68,11 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
-            self::CUSTOMER,
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'The customer number of the customer to be used. Defaults to “defaultcustomer”.'
+            self::EMPTY_TARGETS,
+            'e',
+            InputOption::VALUE_NONE,
+            'If this option is used, the targets will not be prefilled with the' .
+            ' existing translations but all remain empty'
         );
     }
 
@@ -98,6 +108,10 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
             '--export' => null,
             '--hide-warnings' => null,
         ];
+
+        if ($this->input->getOption(self::EMPTY_TARGETS)) {
+            $commandData['--empty-targets'] = null;
+        }
 
         try {
             $error = $this->getApplication()->doRun(new ArrayInput($commandData), $output);

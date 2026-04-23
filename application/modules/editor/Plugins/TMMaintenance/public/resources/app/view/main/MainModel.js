@@ -27,9 +27,9 @@ Ext.define('TMMaintenance.view.main.MainModel', {
 
             if (get('loadingTotalAmount') || total !== null) {
 
-                title += total === false
-                    ? get('l10n.list.title')
-                    : get('l10n.list.totalAmount');
+                title += total === false ?
+                    get('l10n.list.title') :
+                    get('l10n.list.totalAmount') + ': ';
 
                 if (total === null) {
                     title += get('l10n.list.calculating');
@@ -44,7 +44,7 @@ Ext.define('TMMaintenance.view.main.MainModel', {
             }
 
             if (chunk === false && get('lastOffset') === null) {
-                title = get('l10n.list.totalAmount') + total;
+                title = get('l10n.list.totalAmount') + ': ' + total;
             }
 
             if (title.length === 0) {

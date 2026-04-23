@@ -202,15 +202,15 @@ abstract class editor_Models_Import_FileParser
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
     {
-        $this->config = $task->getConfig();
+        $this->task = $task;
+        $this->_taskGuid = $task->getTaskGuid();
+        $this->setTaskConfig($task);
 
         $this->loadOriginalFile($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
         $this->_fileId = $fileId;
         $this->transunitHash = ZfExtended_Factory::get(TransUnitHash::class, [$this->config, $fileId]);
-        $this->task = $task;
-        $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class);
         $this->matchRateType = ZfExtended_Factory::get(editor_Models_Segment_MatchRateType::class);
         $this->updateFile(get_class($this));
@@ -218,6 +218,19 @@ abstract class editor_Models_Import_FileParser
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
 
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
+    }
+
+    /**
+     * This API just extracts the task-config in the constructor
+     * It enables inheriting classes to manipulate the config if needed
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     */
+    protected function setTaskConfig(editor_Models_Task $task): void
+    {
+        $this->config = $task->getConfig();
     }
 
     /**

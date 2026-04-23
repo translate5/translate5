@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\ZendXlf;
 
@@ -49,9 +43,10 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
 
     /**
      * Storing the original source chunks containing the original HTML and Mail Placeholders for the skeleton
-     * @var array
      */
-    protected $originalSourceChunks = [];
+    protected array $originalSourceChunks = [];
+
+    protected array $tagMaps;
 
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
     {
@@ -68,7 +63,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
         return ['xlfzend', 'zxliff'];
     }
 
-    protected function calculateMid($opener, $source)
+    protected function calculateMid(array $opener, $source)
     {
         //our zend xliff uses just ids instead mids, so we generate them out of the very long ids:
         //override completly the mid calculation, since we dont use subs or mrks!
@@ -77,7 +72,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
         return $this->shortenMid($this->xmlparser->getAttribute($transUnit['attributes'], 'id'));
     }
 
-    private function shortenMid($mid)
+    private function shortenMid(string $mid): string
     {
         return md5($mid);
     }
@@ -92,42 +87,65 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
         $mid = explode('_', $mid);
         //remove the segment count part from MID.
         // 1. Not needed since we don't have MRKs
-        // 2. can not be used otherwise relais matching won't work since our de.xliff and en.xliff are not aligned in segment position.
+        // 2. can not be used otherwise relais matching won't work since our de.xliff and en.xliff
+        // are not aligned in segment position.
         // therefore there would be different MIDs for same content then.
         array_pop($mid);
         $mid = $this->shortenMid(join('_', $mid));
         parent::setMid($mid);
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     */
+    protected function setTaskConfig(editor_Models_Task $task): void
+    {
+        // we need to force several import options that cannot be supported for Zend-XLFs
+        $this->config = new Zend_Config($task->getConfig()->toArray(), true);
+        // force preserve Whitespace
+        $this->config->runtimeOptions->import->xlf->preserveWhitespace = true;
+        // prevent remove framing tags as these would end up as real XLIFF-Tags in the skeleton ...
+        $this->config->runtimeOptions->import->xlf->ignoreFramingTags = 'none';
+        $this->config->setReadOnly();
+    }
+
     protected function parse()
     {
-        //force preserve Whitespace
-        //this->config is task specific config
-        $this->config = new Zend_Config($this->config->toArray(), true);
-        $this->config->runtimeOptions->import->xlf->preserveWhitespace = true;
-        $this->config->setReadOnly();
-
         $this->_origFile = preg_replace("/id='([^']+)'/", "id=\"$1\"", $this->_origFile);
 
-        return parent::parse();
+        parent::parse();
     }
 
     /**
      * Convert the internal HTML tags to <ph> tags
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf::extractSegment()
+     * @param array<string, string> $transUnit
+     * @return int[]
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Models_Import_FileParser_Exception
+     * @throws editor_Models_Import_MetaData_Exception
      */
     protected function extractSegment($transUnit): array
     {
-        foreach ($this->currentTarget as $mid => $target) {
-            $this->protectHtml($target);
-        }
-        //resetting here the original source chunks container, after protecting target,
-        // since we don't want to reset the targets, only the source ones
-        $this->originalSourceChunks = [];
+        $this->tagMaps = []; // will ensure sync of tag-ids in source/target
         foreach ($this->currentSource as $mid => $source) {
-            $this->protectHtml($source);
+            $this->tagMaps[$mid] = [];
+            $this->protectHtml($source, true, $mid);
         }
+
+        foreach ($this->currentTarget as $mid => $target) {
+            if (! array_key_exists($mid, $this->tagMaps)) {
+                $this->tagMaps[$mid] = [];
+            }
+            $this->protectHtml($target, false, $mid);
+        }
+
         $result = parent::extractSegment($transUnit);
         $this->unprotectHtmlInSource();
 
@@ -136,55 +154,111 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
 
     /**
      * protect the HTML content inside the trans unit as ph tag with content
-     * @return string
+     * @param array{opener:int, closer:int} $nodeInfo
+     * @throws ReflectionException
+     * @throws ZfExtended_Exception
      */
-    protected function protectHtml($nodeInfo)
+    private function protectHtml(array $nodeInfo, bool $isSource, string $mid): void
     {
         $j = 0;
-        $start = $nodeInfo['opener'] + 1; //we have to exclude the <source>|<target> tags them self
+        $start = $nodeInfo['opener'] + 1; // we have to exclude the <source>|<target> tags themselves
         $end = $nodeInfo['closer'] - 1;
-        $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $parser editor_Models_Import_FileParser_XmlParser */
-
-        //register other content to replace the mail template placeholders there
-        $parser->registerOther(function ($other, $i) use (&$j, $start) {
+        $parser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
+        // register other content to replace the mail template placeholders there
+        $parser->registerOther(function ($other, $i) use (&$j, $start, $isSource, $mid) {
             $origKey = $start + $i;
-            //mask {variables} as tags
-            $other = preg_replace_callback('#({[a-zA-Z0-9_-]+})#', function ($matches) use ($other, &$j, $origKey) {
-                $this->originalSourceChunks[$origKey] = $other;
+            // mask {variables} as tags
+            $other = preg_replace_callback(
+                '#({[a-zA-Z0-9_-]+})#',
+                function ($matches) use ($other, &$j, $origKey, $isSource, $mid) {
+                    if ($isSource) {
+                        $j++;
+                        $this->tagMaps[$mid][$j] = $matches[1];
+                        $this->originalSourceChunks[$origKey] = $other;
+                    } else {
+                        $j = $this->calculateTargetTagId($mid, $j, $matches[1]);
+                    }
 
-                return '<ph id="' . (++$j) . '">' . htmlspecialchars($matches[1]) . '</ph>';
-            }, $other);
+                    return '<ph id="' . $j . '">' . htmlspecialchars($matches[1]) . '</ph>';
+                },
+                $other
+            );
             $this->xmlparser->replaceChunk($origKey, $other);
         });
 
-        //register to all XML nodes to replace html tags, this is currently the only valid tag content between <source></source> and target tags
-        $parser->registerElement('*', null, function ($tag, $key, $opener) use (&$j, $start, $parser) {
-            $origOpenerKey = $start + $opener['openerKey'];
-            $origEndKey = $start + $key;
+        // register to all XML nodes to replace html tags, this is currently the only valid tag content
+        // between <source></source> and target tags
+        $parser->registerElement(
+            '*',
+            null,
+            function ($tag, $key, $opener) use (&$j, $start, $parser, $isSource, $mid) {
+                $origOpenerKey = $start + $opener['openerKey'];
+                $origEndKey = $start + $key;
+                $chunk = $parser->getChunk($opener['openerKey']);
+                // calculate id of opener/single
+                if ($isSource) {
+                    $j++;
+                    $this->tagMaps[$mid][$j] = $chunk;
+                    $this->originalSourceChunks[$origOpenerKey] = $chunk;
+                } else {
+                    $j = $this->calculateTargetTagId($mid, $j, $chunk);
+                }
 
-            $chunk = $parser->getChunk($opener['openerKey']);
-            $this->originalSourceChunks[$origOpenerKey] = $chunk;
-            if ($opener['isSingle']) {
-                $chunk = '<ph id="' . (++$j) . '">' . htmlspecialchars($chunk) . '</ph>';
-            } else {
-                $chunk = '<bpt id="' . (++$j) . '" rid="' . ($j) . '">' . htmlspecialchars($chunk) . '</bpt>';
+                if ($opener['isSingle']) {
+                    $chunk = '<ph id="' . $j . '">' . htmlspecialchars($chunk) . '</ph>';
+                } else {
+                    $chunk = '<bpt id="' . $j . '" rid="' . $j . '">' . htmlspecialchars($chunk) . '</bpt>';
+                }
+                $this->xmlparser->replaceChunk($origOpenerKey, $chunk);
+
+                // we have a closer as well
+                if (! $opener['isSingle']) {
+                    $rid = $j; // the RID is the id of the opener
+                    $chunk = $parser->getChunk($key);
+                    // calculate id of closer
+                    if ($isSource) {
+                        $j++;
+                        $this->tagMaps[$mid][$j] = $chunk;
+                        $this->originalSourceChunks[$origEndKey] = $chunk;
+                    } else {
+                        $j = $this->calculateTargetTagId($mid, $j, $chunk);
+                    }
+                    $chunk = '<ept rid="' . $rid . '" id="' . $j . '">' . htmlspecialchars($chunk) . '</ept>';
+                    $this->xmlparser->replaceChunk($origEndKey, $chunk);
+                }
             }
-            $this->xmlparser->replaceChunk($origOpenerKey, $chunk);
-            if (! $opener['isSingle']) {
-                $chunk = $parser->getChunk($key);
-                $this->originalSourceChunks[$origEndKey] = $chunk;
-                $chunk = '<ept rid="' . ($j) . '" id="' . (++$j) . '">' . htmlspecialchars($chunk) . '</ept>';
-                $this->xmlparser->replaceChunk($origEndKey, $chunk);
-            }
-        });
+        );
         $parser->parseList($this->xmlparser->getRange($start, $end));
     }
 
     /**
-     * Before source is stored in skeleton, we have to unprotect the HTML tags, since we need the original content in the skel
+     * Calculates the tag-id for a tag in the target segment
      */
-    protected function unprotectHtmlInSource()
+    private function calculateTargetTagId(string $mid, int $currentIndex, string $currentHash): int
+    {
+        $idx = 0;
+        foreach ($this->tagMaps[$mid] as $idx => $hash) {
+            if ($hash === $currentHash) {
+                $this->tagMaps[$mid][$idx] = null; // invalidate entry so it cannot be reused
+
+                return $idx;
+            }
+        }
+
+        // when we could not find the tag in the source-tags, we have to make sure, to use a non-used tag-id
+        // we achieve that by creating one bigger than the existing biggest $idx
+        if ($currentIndex > $idx) {
+            return $currentIndex + 1;
+        }
+
+        return $idx + 1;
+    }
+
+    /**
+     * Before source is stored in skeleton, we have to unprotect the HTML tags,
+     * since we need the original content in the skeleton
+     */
+    private function unprotectHtmlInSource(): void
     {
         foreach ($this->originalSourceChunks as $i => $chunk) {
             $this->xmlparser->replaceChunk($i, $chunk);

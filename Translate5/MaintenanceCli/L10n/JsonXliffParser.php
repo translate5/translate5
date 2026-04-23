@@ -111,6 +111,7 @@ class JsonXliffParser extends AbstractXliffProcessor
     }
 
     /**
+     * API usede when exporting JSON based localization to ZXLIFF
      * Expects 2 id => text maps, one for source-locale, one for target-locale with identical keys
      * @throws ZfExtended_Exception
      */
@@ -118,6 +119,15 @@ class JsonXliffParser extends AbstractXliffProcessor
     {
         $this->body = '';
         foreach ($sourceMap as $id => $source) {
+            // Leading/trailing whitespace cannot be saved to a TM so we generate an Exception here
+            // so that Problem needs to be solved first
+            if (trim($source) !== $source) {
+                throw new \ZfExtended_Exception(
+                    'Found JSON localization source string that has leading or trailing whitespace.' .
+                    ' This must be solved before an export/import can be made: "' . $source . '"'
+                );
+            }
+
             if (array_key_exists($id, $targetMap)) {
                 $this->body .= $this->createTransUnit(
                     $id . '" resname="' . $id, // HACK: adding the resname-attributes in a dirty way ...

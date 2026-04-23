@@ -154,20 +154,29 @@ class JsonParser
      * Localization::PRIMARY_LOCALE-variant as source
      * @throws ZfExtended_Exception
      */
-    public function saveAsImportZxliff(string $absoluteTargetPath): void
+    public function saveAsImportZxliff(string $absoluteTargetPath, bool $withEmptyTargets): void
     {
         if (! str_ends_with($absoluteTargetPath, Localization::FILE_EXTENSION_WITH_DOT)) {
             throw new ZfExtended_Exception('JsonParser::saveAsImportZxliff can only be called with a ZXLIFF-path');
         }
+        // if we want empty targets we make a temporary target-map with empty strings ...
+        if ($withEmptyTargets) {
+            $targetMap = [];
+            foreach ($this->stringMap as $id => $source) {
+                $targetMap[$id] = '';
+            }
+        } else {
+            $targetMap = $this->stringMap;
+        }
         $xliffParser = new JsonXliffParser($absoluteTargetPath, $this->locale);
         if ($this->locale === Localization::PRIMARY_LOCALE) {
             // if we are the primary JSON-language
-            $xliffParser->saveFromSourceTargetMaps($this->stringMap, $this->stringMap);
+            $xliffParser->saveFromSourceTargetMaps($this->stringMap, $targetMap);
         } else {
             $primaryLoc = Localization::PRIMARY_LOCALE;
             $primaryPath = L10nHelper::createLocalizedJsonPath($this->absoluteFilePath, $this->locale, $primaryLoc);
             $parser = new JsonParser($primaryPath, $primaryLoc);
-            $xliffParser->saveFromSourceTargetMaps($parser->getStringMap(), $this->stringMap);
+            $xliffParser->saveFromSourceTargetMaps($parser->getStringMap(), $targetMap);
         }
     }
 

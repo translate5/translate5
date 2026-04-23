@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="U2VnbWVudCB3YXMgY2hhbmdlZCBvbiBzZXJ2ZXIgc2lkZS48YnIvPjxici8+PGI+U291cmNlIHRleHQ6PC9iPjxici8+e3NvdXJjZX08YnIvPjxici8+PGI+VGFyZ2V0IHRleHQ6PC9iPjxici8+e3RhcmdldH08YnIvPjxici8+RG8geW91IHdhbnQgdG8gYWNjZXB0IGNoYW5nZXM/">
                 <source>Segment was changed on server side.<br/><br/><b>Source text:</b><br/>{source}<br/><br/><b>Target text:</b><br/>{target}<br/><br/>Do you want to accept changes?</source>
-                <target>Segment wurde auf Serverseite geändert.<br/><br/><b>Quelltext:</b><br/>{source}<br/><br/><b>Zieltext:</b><br/>{target}<br/><br/>Möchten Sie die Änderungen akzeptieren?</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="U2VsZWN0ZWQgYnk=">
                 <source>Selected by</source>
@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="WW91IGFyZSBleHBlcmllbmNpbmcgY29ubmVjdGlvbiBwcm9ibGVtcy4gPGJyIC8+UGxlYXNlIGNoZWNrIHRoZSBzdGFiaWxpdHkgb2YgeW91ciBJbnRlcm5ldCBjb25uZWN0aW9uLiA8YnIgLz5JZiB5b3Uga2VlcCBzZWVpbmcgdGhpcyBtZXNzYWdlLCBpdCBtYXkgYWxzbyBpbmRpY2F0ZSA8YnIgLz50aGF0IHRoZSBXZWJTb2NrZXQgcHJvdG9jb2wgKHdzczovLykgaXMgYmxvY2tlZCBieSB5b3VyIGZpcmV3YWxsLg==">
                 <source>You are experiencing connection problems. <br />Please check the stability of your Internet connection. <br />If you keep seeing this message, it may also indicate <br />that the WebSocket protocol (wss://) is blocked by your firewall.</source>
-                <target>Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass in Ihrer Firewall das Websocket-Protokoll wss:// blockiert ist.</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="WW91IGhhdmUgY2xvc2VkIHRoZSB0YXNrIGluIGFub3RoZXIgd2luZG93LiBQbGVhc2UgY2xvc2UgdGhpcyB3aW5kb3cgdG9vLCBvciByZWxvYWQgaXQgdG8gcmVvcGVuIHRoZSB0YXNrLg==">
                 <source>You have closed the task in another window. Please close this window too, or reload it to reopen the task.</source>

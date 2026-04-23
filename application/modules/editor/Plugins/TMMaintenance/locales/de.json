@@ -74,7 +74,7 @@
     },
     "list": {
         "title": "Segmente",
-        "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
+        "totalAmount": "Gesamtzahl der gefundenen Segmente",
         "calculating": "Wird berechnet...",
         "loadingSegmentPlaceholder": "Lade...",
         "loadingSegmentNumber": "Lade Segment #",

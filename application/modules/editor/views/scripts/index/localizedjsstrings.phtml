@@ -107,15 +107,14 @@ Ext.define('Editor.controller.Localizer', {
     //handling application name separatly, since used in different applications
     $app = $this->translate->_('translate5');
     $disclaimer = $this->translate->_('Your browser or your browser-version is not officially supported by {app}.
-                    <br />The application was officially tested in the following browsers regarding functionality and performance:
-                    <ul>
-                        <li>Google Chrome from version 48</li>
-                        <li>Mozilla Firefox from version 44</li>
-                        <li>Apple Safari from version 9</li>
-                        <li>Microsoft Edge from version 80</li>
-                    </ul>
-                    In general {app} should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won’t work at all.
-                ');
+<br/>The application was officially tested in the following browsers regarding functionality and performance:
+<ul>
+<li>Google Chrome from version 48</li>
+<li>Mozilla Firefox from version 44</li>
+<li>Apple Safari from version 9</li>
+<li>Microsoft Edge from version 80</li>
+</ul>
+In general {app} should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won’t work at all.');
     $disclaimer = str_replace('{app}', $app, $disclaimer); //replacing application name placeholders
 ?>
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Unsupported browser version'); ?>';
@@ -355,8 +354,8 @@ Ext.define('Editor.controller.Localizer', {
             tagExcessTextTarget: '<?php echo $this->translate->_('The following tags were not present in the target text (at import/pre-translation):<br/><ul><li>{0}</li></ul>This is how to solve this error:<br/><ul><li>Click “OK” to close this window</li><li>Press ESC to leave the segment without saving</li><li>Reopen the segment</li></ul>Re-apply your changes.'); ?>',
             tagRemovedText: '<?php echo $this->translate->_('Tags with missing opening or closing tag have been removed!'); ?>',
             cantEditContents: '<?php echo $this->translate->_('You are not allowed to edit segment content. Please use CTRL + Z to undo your changes or completely cancel editing.'); ?>',
-            segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>'); ?>',
-            cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!'); ?>'
+            segmentNotSavedUserMessage: '<?php echo $this->translate->_('The segment could not be saved. Please close the segment by pressing “cancel”, then open, edit and save it again. Thank You!<br/><br/>Last edited Text was:<br/><br/>'); ?>',
+            cantSaveEmptySegment: '<?php echo $this->translate->_('The segment could not be saved without content!'); ?>'
         }
     });
 
@@ -2576,16 +2575,14 @@ Editor.data.l10n = {
         conversionConfirmText: '<?= $this->translate->_('Warning: Conversion may take a long time, during which the TM(s) cannot be accessed. If multiple TMs are converted, TM access is only blocked for the one currently in conversion. Conversion may also lead to decreased fuzzy match rates for tasks in progress.'); ?>',
         contentRecognition: {
             title: '<?= $this->translate->_('Content Recognition rules') ?>',
-            infobox: '<?= $this->translate->_('
-                List of predefined regular expressions that can be used to protect and/or convert content.
-                <br/>Or define your own rules.
-                <br/>Activate any rule you want to use as input or output here.
-                <br/>To find format-string rules, you can look at:
-                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
-                <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>
-                <br/><a href="https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank" rel="noopener noreferrer">3. Number syntax</a>
-                <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>
-                ') ?>',
+            infobox: '<?= $this->translate->_('List of predefined regular expressions that can be used to protect and/or convert content.
+<br/>Or define your own rules.
+<br/>Activate any rule you want to use as input or output here.
+<br/>To find format-string rules, you can look at:
+<br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
+<br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>
+<br/><a href="https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank" rel="noopener noreferrer">3. Number syntax</a>
+<br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>') ?>',
             create_title: '<?= $this->translate->_('Create content recognition rule') ?>',
             confirm_deletion_message: '<?= $this->translate->_('Are you sure you want to delete this rule? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.') ?>',
             matchId: '<?= $this->translate->_('Protected regex group') ?>',
@@ -2608,20 +2605,17 @@ Editor.data.l10n = {
             input_rule_name: '<?= $this->translate->_('Input Rule name') ?>',
             input_rule_description: '<?= $this->translate->_('Input Rule description') ?>',
             input_title: '<?= $this->translate->_('Active Input Rules') ?>',
-            input_infobox: '<?= $this->translate->_('
-                List of active Input Rules.
-                <br/>In order to activate a rule, it must first be mapped to a source language.               <br/>Once the content is found in the source language <b>and</b> an active output rule for the target language is defined, it will be protected as an internal tag <b>and</b> automatically converted according to the defined output rule.
-                <br/><b>Rules with higher priorities will be applied first.</b>
-                <br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.
-                ') ?>',
+            input_infobox: '<?= $this->translate->_('List of active Input Rules.
+<br/>In order to activate a rule, it must first be mapped to a source language.
+<br/>Once the content is found in the source language <b>and</b> an active output rule for the target language is defined, it will be protected as an internal tag <b>and</b> automatically converted according to the defined output rule.
+<br/><b>Rules with higher priorities will be applied first.</b>
+<br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.') ?>',
             output_rule_name: '<?= $this->translate->_('Output Rule name') ?>',
             output_rule_description: '<?= $this->translate->_('Output Rule description') ?>',
             output_title: '<?= $this->translate->_('Active Output Rules') ?>',
-            output_infobox: '<?= $this->translate->_('
-                List of active Output Rules.
-                <br/>Add rules here per <b>target language</b>. These rules work together with your active input rules to protect and convert content.
-                <br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.
-                ') ?>',
+            output_infobox: '<?= $this->translate->_('List of active Output Rules.
+<br/>Add rules here per <b>target language</b>. These rules work together with your active input rules to protect and convert content.
+<br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.') ?>',
             output_format: '<?= $this->translate->_('Output format') ?>',
             create_title: '<?= $this->translate->_('Create mapping') ?>',
             confirm_deletion_message: '<?= $this->translate->_('Are you sure you want to delete this mapping? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.') ?>'
@@ -2694,18 +2688,15 @@ Editor.data.l10n = {
         synchronisationQueued: '<?= $this->translate->_('Synchronization was queued and will be processed soon.') ?>',
         failedToQueue: '<?= $this->translate->_('Failed to queue Synchronization.') ?>',
         confirmSynchronisation: '<?= $this->translate->_('Confirm synchronization.') ?>',
-        emptyTableText: '<?= $this->translate->_('
-This language resource is not yet connected to any other language resource.<br/>
-Connections are created from source language resource to target one.<br/>
-The language resource can only be connected to another language resource if the following conditions are met:<br/>
-- Both language resources have the same language pair<br/>
-- Both language resources are assigned to the same client<br/>
-- Both language resources have data that can be synchronized, e.g: terms can be converted into a glossary<br/>
-- The target language resource is not yet linked to the other language resource (at the moment we do not support multiple sources)<br/>
-Synchronization always takes place in one direction: source data -&gt; target
-                ') ?>',
+        emptyTableText: '<?= $this->translate->_('This language resource is not yet connected to any other language resource.
+<br/>Connections are created from source language resource to target one.
+<br/>The language resource can only be connected to another language resource if the following conditions are met:
+<br/>- Both language resources have the same language pair
+<br/>- Both language resources are assigned to the same client
+<br/>- Both language resources have data that can be synchronized, e.g: terms can be converted into a glossary
+<br/>- The target language resource is not yet linked to the other language resource (at the moment we do not support multiple sources)
+<br/>Synchronization always takes place in one direction: source data -&gt; target') ?>',
     },
-
     coordinatorGroup: {
         tooltip: '<?= $this->translate->_('Switch to Coordinator group overview') ?>',
         title: '<?= $this->translate->_('Coordinator Group') ?>',
@@ -2722,13 +2713,11 @@ Synchronization always takes place in one direction: source data -&gt; target
             assignClient: '<?= $this->translate->_('Assign client') ?>',
         },
         edit: {
-            infobox: '<?= $this->translate->_('
-A coordinator group is an organizational unit in translate5 consisting of at least one job coordinator, to whom workflow steps can be assigned, and any editors created by the job coordinator, to whom the job coordinator can in turn assign their jobs.<br/>
+            infobox: '<?= $this->translate->_('A coordinator group is an organizational unit in translate5 consisting of at least one job coordinator, to whom workflow steps can be assigned, and any editors created by the job coordinator, to whom the job coordinator can in turn assign their jobs.<br/>
 A coordinator group can be your external language service provider, for example, and the job coordinator is then your associated project manager.<br/>
 A coordinator group could also be a foreign branch of your organization that carries out reviews for you and coordinates them itself.<br/>
 <br/>
-Create a new group here, then you can create the job coordinator belonging to the group in the user overview.
-                ') ?>',
+Create a new group here, then you can create the job coordinator belonging to the group in the user overview.') ?>',
             name: {
                 tooltip: '<?= $this->translate->_('Enter a name for your coordinator group. Associated job coordinators will be able to see this name.') ?>',
             },
@@ -2738,19 +2727,16 @@ Create a new group here, then you can create the job coordinator belonging to th
         },
         customers: {
             title: '<?= $this->translate->_('Group – client assignment') ?>',
-            infobox: '<?= $this->translate->_('
-To be able to assign workflow steps to job coordinators, the corresponding coordinator group and project need to belong to the same client, therefore assign the needed clients here.<br/>
-<b>Unassigning a client from a coordinator group will delete all related jobs.</b>
-                ') ?>',
+            infobox: '<?= $this->translate->_('To be able to assign workflow steps to job coordinators, the corresponding coordinator group and project need to belong to the same client, therefore assign the needed clients here.
+<br/><b>Unassigning a client from a coordinator group will delete all related jobs.</b>') ?>',
             assignButton: '<?= $this->translate->_('Assign client') ?>',
             iconTooltips: {
                 delete: '<?= $this->translate->_('Unassign client') ?>',
             },
             unassignCustomerWindow: {
                 title: '<?= $this->translate->_('Unassign client') ?>',
-                confirmUnassignCustomer: '<?= $this->translate->_('
-Are you sure you want to unassign this client {0} from the Coordinator group {1}?<br/>
-<b>This will delete all client-group related jobs, including all jobs of the whole supply chain (subgroups etc.).</b>') ?>',
+                confirmUnassignCustomer: '<?= $this->translate->_('Are you sure you want to unassign this client {0} from the Coordinator group {1}?
+<br/><b>This will delete all client-group related jobs, including all jobs of the whole supply chain (subgroups etc.).</b>') ?>',
                 buttons: {
                     yes: '<?= $this->translate->_('Unassign client and delete all related jobs') ?>',
                     no: '<?= $this->translate->_('Cancel') ?>',

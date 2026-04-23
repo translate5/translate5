@@ -70,8 +70,11 @@ class LocalizationExample
 ### How Localization strings look like
 * The localization generally is made in english
 * The strings preferrably should be as showing up in the english localization
+* IMPORTANT: No trailing or leading whitespace is allowed (creates problems with saving localization to TMs)
+* Avoid "pretty-pinting": Multiline-strings will start at the first position, no identation
+* Avoid adding Markup and try to create Markup-structures in the Code
 * Please no fancy "variables" like "what.this.string.is.for"
-* Please do use typographical quotes, no real quotes like " or '
+* Please do use typographical quotes, no real quotes like " or '. Especially the single quote can be toxic in the GUI
 * Typographical Apostroph: ’ (won’t), Quotes: ‘, ’, “, ”, “quoted”
 * The strings in the code preferrably need to be delimited by single quotes
 * No Markup but `<br/>`, `<a>`, `<p>`, `<li>`, `<ol>` and `<ul>` is allowed in the localizations. Anything else will be escaped and won't show up properly in the frontend

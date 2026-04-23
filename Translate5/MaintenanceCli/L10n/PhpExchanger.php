@@ -132,6 +132,8 @@ class PhpExchanger extends PhpExtractor
 
     protected array $exchangedStrings = [];
 
+    protected array $unchangableStrings = [];
+
     /**
      * Exchanges the extracted string according to the given source-map
      * @param array<string, string> $sourceMap must be included with all the whitespace present in the original content!
@@ -163,6 +165,9 @@ class PhpExchanger extends PhpExtractor
                 $doSave = true;
             }
             $this->brokenMatches = $attributeExchanger->getBrokenMatches();
+
+            $unchangableExtractor = new PhpAttributeUnchangableExtractor($content, $this->absoluteFilePath);
+            $this->unchangableStrings = $unchangableExtractor->extract();
         }
 
         // find matches for the known translation-function signatures
@@ -280,6 +285,14 @@ class PhpExchanger extends PhpExtractor
     public function getExchangedStrings(): array
     {
         return $this->exchangedStrings;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getUnchangableStrings(): array
+    {
+        return $this->unchangableStrings;
     }
 
     /**

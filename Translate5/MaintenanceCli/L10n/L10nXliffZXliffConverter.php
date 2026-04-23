@@ -41,10 +41,18 @@ class L10nXliffZXliffConverter
      */
     private array $exchangeMap;
 
+    /**
+     * Unfortunately, the conversion to english sources may converted strings that must not be converted
+     * this array will fix those
+     * @var array<string, string>>
+     */
+    private array $unExchangeMap;
+
     public function __construct(
         private readonly string $directory
     ) {
         $this->exchangeMap = include APPLICATION_DATA . '/' . L10nConfiguration::EXCHANGE_MAP_PATH;
+        $this->unExchangeMap = include APPLICATION_DATA . '/locales/revert-exchanged-strings.php';
     }
 
     public function upgrade(bool $doUpgrade = true): array
@@ -60,7 +68,12 @@ class L10nXliffZXliffConverter
                 $parser = $zxliffExists ? new XliffParser($zxliffPpath) : new XliffParser($xliffPath);
                 $translations = [];
                 foreach ($parser->getTranslations() as $source => $target) {
-                    if (array_key_exists($source, $this->exchangeMap)) {
+                    if (array_key_exists($source, $this->unExchangeMap)) {
+                        // fixes strings that were unwantedly changed
+                        $adjusted = true;
+                        $translations[$this->unExchangeMap[$source]] = $target;
+                    } elseif (array_key_exists($source, $this->exchangeMap)) {
+                        // fixes strings that were exchanged to english
                         $adjusted = true;
                         $translations[$this->exchangeMap[$source]] = $target;
                     } else {

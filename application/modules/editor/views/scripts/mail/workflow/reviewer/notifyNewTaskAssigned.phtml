@@ -60,15 +60,13 @@ In the project portal {portalLink}, a task was assigned to you.<br />
 {taskFragment}{reviewersFragment}{footer}', $params));
 
 if (! empty($this->associatedUsers)) {
-    $params['reviewersFragment'] = $this->translate->_('
-<br/><b>All users assigned to the task:</b>
+    $params['reviewersFragment'] = $this->translate->_('<br/><b>All users assigned to the task:</b>
 <br/>');
     $params['reviewersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers, $this->receiver->userGuid);
 }
 if ($this->addCompetitiveDisclaimer) {
     //the disclaimer is injected to the role for correct positioning also we do not have to touch all client overwritten templates
-    $params['role'] .= $this->translate->_('
-<br/>
+    $params['role'] .= $this->translate->_('<br/>
 <br/><b>Warning:</b> Competing users: Only the first user to accept a job can perform it; the task is automatically removed from others.
 <br/>');
 }
