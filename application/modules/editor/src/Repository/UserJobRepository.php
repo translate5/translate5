@@ -298,7 +298,6 @@ class UserJobRepository
             ->from(UserJobTable::TABLE_NAME)
             ->where('userGuid = ?', $userGuid)
             ->where('taskGuid = ?', $taskGuid)
-            ->where('workflowStepName = ?', $workflowStepName)
             ->where('type != ?', TypeEnum::Coordinator->value)
             ->order(new Zend_Db_Expr($order));
 
