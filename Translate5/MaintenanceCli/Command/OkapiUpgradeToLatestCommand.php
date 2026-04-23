@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\Translate5\Plugins\Okapi\Config\ServerConfigUpgrade;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 
@@ -48,6 +49,13 @@ class OkapiUpgradeToLatestCommand extends Translate5AbstractCommand
                 'Adds the latest OKAPI version in the container to the available ones if not already existing' .
                 ' and upgrades all configs using the current latest to that version'
             );
+
+        $this->addOption(
+            'list',
+            'l',
+            InputOption::VALUE_NONE,
+            'List available OKAPI endpoints for each distinct configured server and exit'
+        );
     }
 
     /**
@@ -61,9 +69,21 @@ class OkapiUpgradeToLatestCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->writeTitle('Upgrade to the latest available OKAPI version');
-
         $upgrade = new ServerConfigUpgrade();
+        if ($input->getOption('list')) {
+            $this->writeTitle('Available OKAPI endpoints by configured server');
+            $rows = $upgrade->getAvailableEndpointsByConfiguredServer();
+            if (empty($rows)) {
+                $this->io->warning('No configured OKAPI servers found.');
+
+                return self::SUCCESS;
+            }
+            $this->writeTable($rows);
+
+            return self::SUCCESS;
+        }
+
+        $this->writeTitle('Upgrade to the latest available OKAPI version');
         if ($upgrade->update()) {
             $this->io->success($upgrade->getMessages());
         } else {

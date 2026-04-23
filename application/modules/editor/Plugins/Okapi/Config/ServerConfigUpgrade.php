@@ -140,6 +140,65 @@ class ServerConfigUpgrade
         return $this->messages;
     }
 
+    /**
+     * Returns all available Okapi endpoints for the distinct configured server URLs.
+     * The result contains one row per available endpoint.
+     *
+     * @return array<int, array<string, string>>
+     * @throws \Zend_Uri_Exception
+     */
+    public function getAvailableEndpointsByConfiguredServer(): array
+    {
+        $configuredServerList = $this->maintenance->getServerList();
+        if (empty($configuredServerList)) {
+            return [];
+        }
+
+        $serversByBaseUrl = [];
+        foreach ($configuredServerList as $version => $url) {
+            if (! is_string($url) || $url === '') {
+                continue;
+            }
+            $uri = \Zend_Uri_Http::fromString($url);
+            $uri->setPath('');
+            $baseUrl = rtrim($uri->__toString(), '/');
+            $normalizedEndpoint = rtrim($url, '/') . '/';
+            $serversByBaseUrl[$baseUrl][$version] = $normalizedEndpoint;
+        }
+
+        if (empty($serversByBaseUrl)) {
+            return [];
+        }
+
+        ksort($serversByBaseUrl, SORT_NATURAL);
+        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID);
+        $supportedVersions = array_flip(array_map('strtolower', editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION));
+        $rows = [];
+
+        foreach ($serversByBaseUrl as $baseUrl => $configuredEndpoints) {
+            $availableEndpoints = $service->findAllOkapiVersions($baseUrl);
+
+            // Single-instance setups may not expose the jetty context listing.
+            if (empty($availableEndpoints)) {
+                $availableEndpoints = $configuredEndpoints;
+            }
+
+            ksort($availableEndpoints, SORT_NATURAL);
+            foreach ($availableEndpoints as $version => $endpoint) {
+                $normalizedEndpoint = rtrim((string) $endpoint, '/') . '/';
+                $rows[] = [
+                    'server' => $baseUrl,
+                    'version' => (string) $version,
+                    'endpoint' => $normalizedEndpoint,
+                    'configured' => in_array($normalizedEndpoint, $configuredEndpoints, true) ? 'yes' : 'no',
+                    't5 supported' => array_key_exists(strtolower((string) $version), $supportedVersions) ? 'yes' : 'no',
+                ];
+            }
+        }
+
+        return $rows;
+    }
+
     private function customerConfigsNeedUpdate(string $latestConfigured): bool
     {
         $updateNeeded = (int) Zend_Db_Table::getDefaultAdapter()->fetchOne(
