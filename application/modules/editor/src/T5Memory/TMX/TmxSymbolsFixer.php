@@ -104,7 +104,7 @@ class TmxSymbolsFixer
             }
 
             $fixHtmlEntitiesCallback = function (array $matches) {
-                return htmlentities(html_entity_decode($matches[0]), ENT_XML1, 'UTF-8');
+                return htmlentities(html_entity_decode($matches[0]), ENT_XML1, 'UTF-8', false);
             };
 
             // Match HTML entities that are NOT inside tags
