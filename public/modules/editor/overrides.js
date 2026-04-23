@@ -2381,3 +2381,51 @@ Ext.override(Ext.form.trigger.Trigger, {
         me.rendered = true;
     }
 });
+
+/**
+ * Overridden to add logging for 'Range.selectNodeContents: Argument 1 does not implement interface Node.' RootCause error
+ */
+Ext.override(Ext.view.Table, {
+    bufferRender: function(records, index) {
+        var me = this,
+            div = me.renderBuffer,
+            result,
+            range = document.createRange ? document.createRange() : null;
+        me.tpl.overwrite(div, me.collectData(records, index));
+        // We don't want references to be retained on the prototype
+        me.cleanupData();
+        // Newly added rows must be untabbable by default
+        Ext.fly(div).saveTabbableState({
+            skipSelf: true,
+            includeHidden: true
+        });
+        let was = div;                                                           // +
+        div = Ext.fly(div).down(me.getNodeContainerSelector(), true);
+        let isNode = div instanceof Node;                                        // +
+        if (isNode === false) {                                                  // +
+            console.error(                                                       // +
+                "TRANSLATE-5432",                                                // +
+                "typeof div => ", typeof div,                                    // +
+                "div =>", div,                                                   // +
+                "was.outerHTML =>", was.outerHTML,                               // +
+                'selector => ', me.getNodeContainerSelector(),                   // +
+                'me.xtype => ', me.xtype,                                        // +
+                'me.refreshing => ', me.refreshing                               // +
+            );                                                                   // +
+        }                                                                        // +
+
+        if (range) {
+            range.selectNodeContents(div);
+            result = range.extractContents();
+        } else {
+            result = document.createDocumentFragment();
+            while (div.firstChild) {
+                result.appendChild(div.firstChild);
+            }
+        }
+        return {
+            fragment: result,
+            children: Ext.Array.toArray(result.childNodes)
+        };
+    }
+});
