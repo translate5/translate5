@@ -166,7 +166,11 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                                                 ? `<div style="${style}" class="${className}" data-qtip="${tooltip}"></div>`
                                                 : ''
                                         ) +
-                                        Ext.String.htmlEncode(value)
+                                        '<a class="language-resource-link" href="#languageresource/' +
+                                        record.get('languageResourceId') +
+                                        '">' +
+                                        Ext.String.htmlEncode(value) +
+                                        '</a>'
                                     );
                                 },
                                 dataIndex: 'name',

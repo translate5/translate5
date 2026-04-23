@@ -740,11 +740,16 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         }
         var record = selected[0],
             status = record.get('status'),
+            route = 'languageresource/' + record.getId(),
             callbackCheck = function (r) {
                 if (typeof callback !== 'undefined' && typeof callback === 'function') {
                     callback(r);
                 }
             };
+
+        if (Ext.util.History.getToken() !== route) {
+            Editor.app.redirectTo(route);
+        }
 
         if (status !== record.STATUS_NOTCHECKED) {
             callbackCheck(record);
