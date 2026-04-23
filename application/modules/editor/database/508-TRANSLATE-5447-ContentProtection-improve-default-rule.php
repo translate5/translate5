@@ -86,7 +86,7 @@ REGEX,
 foreach ($names as $name => $regex) {
     $s = $db->select()
         ->from(ContentRecognitionTable::TABLE_NAME)
-        ->where('type = float')
+        ->where("type = 'float'")
         ->where('name = ?', $name);
 
     $row = $db->fetchRow($s);
