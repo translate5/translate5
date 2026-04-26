@@ -519,6 +519,7 @@ abstract class AbstractRequest
     ): ZfExtended_ErrorCodeException {
         // do not cast for no reason
         if (get_class($exception) === $this->exceptionClass && $exception->getErrorCode() === $newEcode) {
+            /** @var ZfExtended_ErrorCodeException $exception */
             return $exception;
         }
         // a "real" cast only if the thrown exception already is error-coded
