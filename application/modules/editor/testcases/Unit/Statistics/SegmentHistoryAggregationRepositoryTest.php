@@ -191,7 +191,7 @@ class SegmentHistoryAggregationRepositoryTest extends TestCase
             ])
         );
 
-        $this->assertSame([], $result);
+        $this->assertSame(null, $result);
     }
 
     public function testGetFilteredTaskIdsReturnsGuidWithBraces(): void
