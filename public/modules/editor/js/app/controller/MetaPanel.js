@@ -184,7 +184,8 @@ Ext.define('Editor.controller.MetaPanel', {
      * @param event
      */
     onSegmentContextMenu: function(view, record, dom, idx, event) {
-        var me = this, tag = event.getTarget('[data-t5qid]'), id;
+        const me = this,
+            tag = event.getTarget('[data-t5qid]');
 
         // If right-click was NOT on tag having data-t5qid attribute
         if (!tag) {
@@ -196,16 +197,41 @@ Ext.define('Editor.controller.MetaPanel', {
         }
 
         // Get quality id
-        id = tag.getAttribute('data-t5qid');
+        const id = tag.getAttribute('data-t5qid');
+        const segmentId = parseInt(tag.getAttribute('data-t5segmentid'));
+        const qualityType = tag.getAttribute('data-t5qtype');
 
         // Prevent native content menu from being shown
         event.preventDefault();
+        event.stopPropagation();
 
-        // In case there is grid, destroy it. Bellow new one will be created.
+        // In case there is grid, destroy it. Below new one will be created.
         // In case the same grid is reused, multiple javascript error can occur.
         // Ex: 3 point in: https://jira.translate5.net/browse/TRANSLATE-3280
         if (me.segmentRightClickGrid) {
             me.segmentRightClickGrid.destroy();
+        }
+
+        if (qualityType === 'spellCheck') {
+            const store = Ext.getStore('Segments');
+            const segment = store.getById(segmentId);
+            const spellCheck = segment.get('spellCheck');
+            const match = Object.values(spellCheck)
+                .flat()
+                .find(q => parseInt(q.id) === parseInt(id));
+
+            if (!match) {
+                return;
+            }
+
+            Editor.app.getController('Editor.plugins.SpellCheck.controller.SpellChecker').showSpellCheckTooltip(
+                segment,
+                match,
+                event.pageX,
+                event.pageY,
+            );
+
+            return;
         }
 
         me.segmentRightClickGrid = Ext.create({
@@ -285,10 +311,14 @@ Ext.define('Editor.controller.MetaPanel', {
         if (me.hasQmQualities) {
             me.getMetaQmPanel().createInactiveCheckBoxes();
         }
-        me.getQualitiesStore().load({
+        this.reloadStore(segmentId);
+        me.loadRecord(me.record);
+    },
+
+    reloadStore: function (segmentId) {
+        this.getQualitiesStore().load({
             params: {segmentId: segmentId}
         });
-        me.loadRecord(me.record);
     },
 
     /**

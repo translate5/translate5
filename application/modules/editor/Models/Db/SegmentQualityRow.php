@@ -136,14 +136,9 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract
     /**
      * Get quantity of similar qualities triggered by same content, including the current quality
      *
-     * @return int|string
      * @throws Zend_Db_Statement_Exception
      */
-    /**
-     * @param string $mode
-     * @return PDOStatement
-     */
-    private function getSimilarQualityStmt($mode = 'qty')
+    private function getSimilarQualityStmt(string $mode = 'qty'): Zend_Db_Statement_Interface
     {
         // Shortcut
         $db = $this->getTable()->getAdapter();
@@ -155,20 +150,25 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract
         ];
 
         // Prepare and return statement
-        return $db->query('
-            SELECT ' . $select[$mode] . ' FROM `LEK_segment_quality` WHERE `taskGuid` = ?
-              AND `type` = ?
-              AND `category` = ?
-              AND `field` = ?
-              AND NOT ISNULL(`additionalData`) 
-              AND JSON_EXTRACT(`additionalData`, "$.content") = ?
-        ', [
-            $this->taskGuid,
-            $this->type,
-            $this->category,
-            $this->field,
-            $this->getContent(),
-        ]);
+        return $db->query(
+            '
+                SELECT ' . $select[$mode] . ' 
+                FROM `LEK_segment_quality` 
+                WHERE `taskGuid` = ?
+                  AND `type` = ?
+                  AND `category` = ?
+                  AND `field` = ?
+                  AND NOT ISNULL(`additionalData`)
+                  AND BINARY JSON_UNQUOTE(JSON_EXTRACT(`additionalData`, "$.content")) = BINARY ?
+            ',
+            [
+                $this->taskGuid,
+                $this->type,
+                $this->category,
+                $this->field,
+                $this->getContent(),
+            ]
+        );
     }
 
     /**

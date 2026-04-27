@@ -1,12 +1,15 @@
 Ext.define('Editor.view.segments.new.EditorNew', {
     extend: 'Ext.form.FieldContainer',
     mixins: {
-        field: 'Ext.form.field.Field'
+        field: 'Ext.form.field.Field',
     },
 
     xtype: 't5editor',
     itemId: 't5Editor',
     isFormField: false,
+    /**
+     * @type {EditorWrapper|null}
+     */
     editor: null,
     viewModesController: null,
 
@@ -14,13 +17,11 @@ Ext.define('Editor.view.segments.new.EditorNew', {
     currentlyEditingRecord: null,
     currentlyEditingColumnToEdit: null,
 
-    requires: [
-        'Editor.view.segments.StatusStrip',
-    ],
+    requires: ['Editor.view.segments.StatusStrip'],
 
     layout: 'form',
     style: {
-        overflow: 'visible'
+        overflow: 'visible',
     },
     focusable: true,
     componentTpl: [
@@ -28,32 +29,29 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         '{[Ext.util.Format.htmlEncode(values.value)]}',
         '</textarea>',
         {
-            disableFormats: true
-        }
+            disableFormats: true,
+        },
     ],
 
     initComponent: function () {
         let me = this;
 
         // Prepare items
-        me.items = [
-            me.createInputCmp(),
-            me.createStatusStrip()
-        ];
+        me.items = [me.createInputCmp(), me.createStatusStrip()];
 
         // Call parent
         me.callParent(arguments);
     },
 
-    createStatusStrip: function() {
-        return this.statusStrip = Ext.widget({
+    createStatusStrip: function () {
+        return (this.statusStrip = Ext.widget({
             xtype: 'segments.statusstrip',
             htmlEditor: this,
-        });
+        }));
     },
 
-    createInputCmp: function(){
-        return this.inputCmp = Ext.widget({
+    createInputCmp: function () {
+        return (this.inputCmp = Ext.widget({
             xtype: 'component',
             flex: 1,
             tpl: this.lookupTpl('componentTpl'),
@@ -64,14 +62,15 @@ Ext.define('Editor.view.segments.new.EditorNew', {
                 id: this.id + '-inputCmp',
                 name: this.name,
                 value: this.value,
-            }
-        });
+            },
+        }));
     },
 
-    afterRender: function() {
+    afterRender: function () {
         let me = this;
         me.callParent(arguments);
         me.textareaEl = me.inputEl = me.inputCmp.textareaEl;
+        this._instantiateEditor(me.textareaEl.id);
     },
 
     onFocusLeave: function () {
@@ -90,7 +89,7 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         const referenceField = this.getReferenceField(
             this.currentlyEditingRecord.get('target'),
             this.currentlyEditingRecord.get('pretrans'),
-            this.currentlyEditingRecord.get('matchRateType')
+            this.currentlyEditingRecord.get('matchRateType'),
         );
         const isSource = this.currentlyEditingColumnToEdit && this.currentlyEditingColumnToEdit.includes('source');
 
@@ -113,17 +112,17 @@ Ext.define('Editor.view.segments.new.EditorNew', {
                 metaCache.sizeUnit,
                 metaCache.font.toLowerCase(),
                 metaCache.fontSize,
-                this.currentlyEditingRecord.get('fileId')
+                this.currentlyEditingRecord.get('fileId'),
             ),
-            isSource
+            isSource,
         );
     },
 
-    insertWhitespace: function(whitespaceType, position = null, replaceWhitespaceBeforePosition = false) {
+    insertWhitespace: function (whitespaceType, position = null, replaceWhitespaceBeforePosition = false) {
         this.editor.insertWhitespace(whitespaceType, position, replaceWhitespaceBeforePosition);
     },
 
-    insertSymbol: function(symbol) {
+    insertSymbol: function (symbol) {
         this.editor.insertSymbol(symbol);
     },
 
@@ -131,15 +130,15 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         this.editor.addDataT5Format(data);
     },
 
-    undo: function() {
+    undo: function () {
         this.editor.undo();
     },
 
-    redo: function() {
+    redo: function () {
         this.editor.redo();
     },
 
-    setValue: function(value, record, columnToEdit, isReplacing = false, isAdding = false) {
+    setValue: function (value, record, columnToEdit, isReplacing = false, isAdding = false) {
         let me = this,
             textarea = me.textareaEl;
 
@@ -168,16 +167,17 @@ Ext.define('Editor.view.segments.new.EditorNew', {
             me.currentlyEditingColumnToEdit = columnToEdit;
         }
 
+        me.fireEvent('beforeStartEdit', me);
+
         if (null === me.editor) {
             me._instantiateEditor(me.textareaEl.id).then(() => {
                 me.fireEvent('afterInstantiateEditor', me);
-                me.editor.getEditorViewNode().addEventListener(
-                    RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED,
-                    () => {
+                me.editor
+                    .getEditorViewNode()
+                    .addEventListener(RichTextEditor.EditorWrapper.EDITOR_EVENTS.DATA_CHANGED, () => {
                         me.fitSize();
                         me.fireEvent('editorDataChanged', me);
-                    }
-                );
+                    });
 
                 me.setData(value);
                 me.fireEvent('afterStartEdit', me);
@@ -192,24 +192,25 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         return me;
     },
 
-    fitSize: function() {
-        let me = this, wu_was = me.getWidthUsage();
+    fitSize: function () {
+        let me = this,
+            wu_was = me.getWidthUsage();
 
         Ext.defer(() => {
             me.fitHeight();
             me.fitWidth(wu_was);
         }, 10);
     },
-    fitWidth: function(wasWidthUsage) {
+    fitWidth: function (wasWidthUsage) {
         let me = this,
             nowWidthUsage = me.getWidthUsage(),
             diff = nowWidthUsage - wasWidthUsage,
-            rowEditorInnerCt, width;
+            rowEditorInnerCt,
+            width;
 
         // Here we only handle case when ckeditor width became smaller, because
         // 'became bigger' case is handled by ckeditor and/or extjs by themselves
         if (diff < 0) {
-
             // Get row editor inner container
             rowEditorInnerCt = me.up().el.down('[data-ref=innerCt]');
 
@@ -218,25 +219,24 @@ Ext.define('Editor.view.segments.new.EditorNew', {
 
             // Prevent setting row editor inner container width to be less than row editor general width
             if (width > me.up().getWidth()) {
-
                 // Decrease width
                 rowEditorInnerCt.setWidth(width - Math.abs(diff));
             }
         }
     },
-    getWidthUsage: function() {
+    getWidthUsage: function () {
         return this.editor._editor.ui.view.element.clientWidth;
     },
-    fitHeight: function() {
+    fitHeight: function () {
         let recordHeight = this.getRecordHeightUsage(),
             statusStripHeight = this.statusStrip.getHeight(),
             inputMinHeight = recordHeight - statusStripHeight + (statusStripHeight ? 20 : 0);
 
-        if (! this.currentlyEditingRecord) {
+        if (!this.currentlyEditingRecord) {
             return;
         }
 
-        if (! this.inputCmp) {
+        if (!this.inputCmp) {
             return;
         }
 
@@ -260,17 +260,17 @@ Ext.define('Editor.view.segments.new.EditorNew', {
             recNode.style.height = targetHeight + 'px';
         }
     },
-    getTargetHeightUsage: function() {
+    getTargetHeightUsage: function () {
         return this.editor._editor.ui.view.element.clientHeight + this.statusStrip.getHeight() + 2;
     },
-    getRecordHeightUsage: function() {
+    getRecordHeightUsage: function () {
         return this.up('[?rowToEditOrigHeight]').rowToEditOrigHeight + 2;
     },
 
-    pushValue: function() {
+    pushValue: function () {
         let me = this,
             v;
-        if(me.initialized){
+        if (me.initialized) {
             v = me.textareaEl.dom.value || '';
             if (!me.activated && v.length < 1) {
                 v = me.defaultValue;
@@ -281,13 +281,13 @@ Ext.define('Editor.view.segments.new.EditorNew', {
         }
     },
 
-    cancelEdit: function() {
+    cancelEdit: function () {
         this.currentlyEditingRecord = null;
         this.currentlyEditingColumnToEdit = null;
         this.editor.resetEditor();
     },
 
-    getEditorBody: function() {
+    getEditorBody: function () {
         return this.editor.getEditorViewNode();
     },
 
@@ -324,21 +324,17 @@ Ext.define('Editor.view.segments.new.EditorNew', {
      * @returns {boolean}
      */
     isExternalTranslation: function (matchRateType) {
-
-        if (matchRateType.startsWith("import;")) {
+        if (matchRateType.startsWith('import;')) {
             const remainingValue = matchRateType.substring(7);
 
-            const parts = remainingValue.split(";");
+            const parts = remainingValue.split(';');
 
-            if(parts.length <=1) {
+            if (parts.length <= 1) {
                 return false;
             }
 
-            const isFromMtOrTm =  ['tm', 'mt'].some(
-                element =>
-                    parts.some(item =>
-                        item.toLowerCase() === element.toLowerCase()
-                    )
+            const isFromMtOrTm = ['tm', 'mt'].some((element) =>
+                parts.some((item) => item.toLowerCase() === element.toLowerCase()),
             );
 
             // ensure the second part exists (tm or mt) and there's a name following it
@@ -380,7 +376,7 @@ Ext.define('Editor.view.segments.new.EditorNew', {
             isFullTagMode() {
                 return this.viewModesController.isFullTag();
             }
-        }
+        };
 
         return new RichTextEditor.EditorWrapper(
             element,
@@ -401,7 +397,7 @@ Ext.define('Editor.view.segments.new.EditorNew', {
      *
      * @param width
      */
-    setWidth: function(width) {
+    setWidth: function (width) {
         this.callParent([width + 3]);
-    }
+    },
 });

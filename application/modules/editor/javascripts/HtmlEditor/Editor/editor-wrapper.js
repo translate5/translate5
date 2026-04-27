@@ -4,7 +4,6 @@ import stringToDom from "../Tools/string-to-dom";
 import DataTransformer from "../DataTransform/data-transformer";
 import CallbacksQueue from "./callbacks-queue";
 import ModelNode from "./model-node";
-import DocumentFragment from "../Mixin/document-fragment";
 import InsertPreprocessor from "../DataCleanup/insert-preprocessor";
 import calculateNodeLength from "../Tools/calculate-node-length";
 import LanguageResolver from "../Editor/language-resolver";
@@ -463,14 +462,14 @@ export default class EditorWrapper {
      * @param {integer} rangeEnd
      * @param {String} content
      * @param {Boolean} skipDataChangeEvent
-     * @param {Boolean} moveCarret - if true, move caret to the end of the inserted content
+     * @param {Boolean} moveCaret - if true, move caret to the end of the inserted content
      */
     replaceContentInRange(
         rangeStart,
         rangeEnd,
         content,
         skipDataChangeEvent = false,
-        moveCarret = false
+        moveCaret = false
     ) {
         this._editor.model.change((writer) => {
             const preservedSelection = this._editor.model.document.selection.getFirstRange();
@@ -499,7 +498,7 @@ export default class EditorWrapper {
 
             this._editor.model.insertContent(modelFragment, range);
 
-            if (moveCarret) {
+            if (moveCaret) {
                 const length = calculateNodeLength(stringToDom(content));
                 preservedSelection.start.path[1] += length;
                 preservedSelection.end.path[1] += length;
@@ -777,7 +776,6 @@ export default class EditorWrapper {
      * Returns content of an editor as is, without any modifications
      *
      * @returns {string}
-     * @private
      */
     getRawData() {
         return this.#getRawDataNode().innerHTML;
@@ -896,8 +894,6 @@ export default class EditorWrapper {
 
     #onDataChange(event, data) {
         // console.log('The data has changed!');
-        this.modifiersLastRunId = null;
-
         if (data.isUndo) {
             this.#triggerDataChanged();
 
@@ -907,6 +903,8 @@ export default class EditorWrapper {
         if (!data.isTyping && !this.#isProcessingDrop && !this.#isProcessingPaste && !this.#isProcessingCut) {
             return;
         }
+
+        this.modifiersLastRunId = null;
 
         const isProcessingDrop = this.#isProcessingDrop;
         const isProcessingCut = this.#isProcessingCut;

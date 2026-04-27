@@ -76,6 +76,7 @@ class SearchQueryDtoFactory
     public function fromRequest(Zend_Controller_Request_Abstract $request): SearchQueryDto
     {
         $params = $request->getParams();
+        $this->checkRequiredSearchParameters($params);
 
         $searchField = htmlentities($params['searchField'], ENT_XML1);
 
@@ -118,6 +119,28 @@ class SearchQueryDtoFactory
             ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Check if the required search parameters are provided
+     *
+     * @throws ZfExtended_ValidateException
+     */
+    protected function checkRequiredSearchParameters(array $parameters): void
+    {
+        if (
+            empty($parameters['searchInField'])
+            || (empty($parameters['searchField']) && strlen($parameters['searchField']) === 0)
+            || empty($parameters['searchType'])
+        ) {
+            $e = new ZfExtended_ValidateException();
+            $e->setMessage(
+                'Missing search parameter. Required parameters: searchInField, searchField, searchType. Given was: '
+                . print_r($parameters, true)
+            );
 
             throw $e;
         }

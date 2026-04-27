@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract
 {
+    public const string TABLE_NAME = 'LEK_segment_quality';
+
     /**
      * Removes all qualities for a task
      * If the type is given, it removes only for the given type

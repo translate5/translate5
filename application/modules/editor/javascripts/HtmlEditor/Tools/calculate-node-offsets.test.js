@@ -70,8 +70,6 @@ describe('calculateNodeOffsets', () => {
             const target = root.lastChild;
             const result = calculateNodeOffsets(root, target);
 
-            console.log(target.data);
-
             expect(result).toEqual({
                 start: 15, // "One"(3) + "Two"(3) + "Three"(5) + "Four"(4) = 15, but "Five" starts at 15
                 end: 19 // + "Five"(4) = 19, but ends at 18

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Terminology_Models_TermModel as TermModel;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
+use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
 use MittagQI\Translate5\Segment\ActionAssert\Permission\SegmentActionPermissionAssert;
 use MittagQI\Translate5\Segment\ActionAssert\SegmentAction;
@@ -403,9 +404,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     private function isOpenedByMoreThanOneUser(string $taskGuid): bool
     {
-        $usedBy = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->loadUsed($taskGuid);
-
-        return count($usedBy) > 1;
+        return UserJobRepository::create()->isTaskOpenedByMoreThanOneUser($taskGuid);
     }
 
     /***
@@ -460,14 +459,18 @@ class Editor_SegmentController extends ZfExtended_RestController
         $replaceDto = $replaceDtoFactory->fromRequest($this->getRequest());
 
         if ($this->_getParam('async', false)) {
-            $searchAndReplaceService->queueReplaceAll($replaceDto);
+            $searchAndReplaceService->queueReplace($replaceDto);
 
             $this->view->total = count($results);
 
             return;
         }
 
-        $searchAndReplaceService->replaceAll($replaceDto);
+        $foundSegments = $searchService->search($replaceDto->searchQuery);
+
+        if (! empty($foundSegments)) {
+            $searchAndReplaceService->replace($replaceDto, $foundSegments);
+        }
 
         //return the modified segments
         $this->view->rows = $searchService->search($searchQuery);
@@ -792,7 +795,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             ?: ZfExtended_Authentication::getInstance()->getUser()->getLocale();
 
         // Get locale
-        $locale = Localization::getLocale($desiredLocale);
+        $locale = Localization::getLocale();
 
         //generate portlet data
         $data = (new TermportletData(

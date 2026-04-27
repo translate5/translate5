@@ -77,6 +77,8 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         ATTRIBUTE_QUALITY_ID: 'data-t5qid',
         ATTRIBUTE_QUALITY_FALSEPOSITIVE: 'data-t5qfp',
         ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP: 'data-qtip',
+        ATTRIBUTE_SEGMENT_ID: 'data-t5segmentid',
+        ATTRIBUTE_QUALITY_TYPE: 'data-t5qtype',
     },
 
     /**
@@ -88,6 +90,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
     onEditableColumnRender: function (column) {
         let me = this;
+
         column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
             // If TrackChanges plugin is active - append 'is-mqm' class to the <del> tags containing <img> tag
             if (Editor.plugins.TrackChanges) {
@@ -123,16 +126,18 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
             setTimeout(function () {
                 // in case no segments grid exist, ignore the logic below.
-                // this can happen i the user leaves the task, and the timeout callback kicks in
-                if(!me.getSegmentGrid()){
+                // this can happen if the user leaves the task, and the timeout callback kicks in
+                if (!me.getSegmentGrid()) {
                     return;
                 }
+
                 if (me.getSegmentGrid().editingPlugin.context) {
                     return;
                 }
 
                 me.applyQualityStylesForRecord(store, record);
             }, 50);
+
             return value;
         };
     },
@@ -167,7 +172,6 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
         // If background colors info has been set up
         if (this.background) {
-
             var itemCol = this.background.column === 'target' ? 'targetEdit' : 'source',
                 itemColSelector = '[data-columnid="' + itemCol + 'Column"] .x-grid-cell-inner',
                 itemNode = document.querySelector(rowSelector + ' ' + itemColSelector);
@@ -185,34 +189,23 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
         // Foreach quality type that can appear inside the segment
         for (const type of Editor.data.quality.types) {
-
-            // Get qualities data
             let data = rec.get(type.field);
 
-            // Foreach field where qualities were detected
             for (const field in data) {
-                // Get
                 for (const columnPostfix of type.columnPostfixes) {
 
                     // Build grid cell column selector
                     const colSelector = '[data-columnid="' + field + columnPostfix + '"] .x-grid-cell-inner';
-
-                    // Get grid cell node
                     const cellNode = document.querySelector(rowSelector + ' ' + colSelector);
 
                     // If we're going to apply termtagger-qualities styles
                     if (type.field === 'termTagger') {
-
-                        // Foreach quality - apply false positive styles
                         for (const quality of data[field]) {
                             Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(quality.id, quality.falsePositive, rec);
                         }
-
                     // Else if we're going to apply styles for other quality types (only spellcheck-qualities currently)
                     } else {
-
-                        // Apply matches
-                        this.applyCustomMatches(cellNode, data[field]);
+                        this.applyCustomMatches(cellNode, data[field], rec.getId(), type.field);
                     }
                 }
             }
@@ -240,13 +233,12 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
           }
 
         */
-    applyCustomMatches: function (cellNode, matches) {
+    applyCustomMatches: function (cellNode, matches, segmentId, qualityType) {
         if (!cellNode || !this.editor) {
             return;
         }
 
-        var match, decorationProps,
-            domManipulation = Ext.create('Editor.util.dom.Manipulation'),
+        const domManipulation = Ext.create('Editor.util.dom.Manipulation'),
             // full definition of internal-tags and with which placeholders they are sent
             // CRUCIAL: more qualified classes must come first !
             // see MittagQI\Translate5\Plugins\SpellCheck\Segment\Check
@@ -261,9 +253,9 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 { "tag": "del", "classes": [], "placeholder": '' },
             ];
 
-        for(var i = 0; i < matches.length; i++){
-            match = matches[i];
-            decorationProps = this.createQualityHighlightProps(match, i);
+        for(let i = 0; i < matches.length; i++){
+            const match = matches[i];
+            const decorationProps = this.createQualityHighlightProps(match, i, segmentId, qualityType);
             domManipulation
                 .selectIndices(cellNode, match.range.start, match.range.end, ignored)
                 .decorate(decorationProps.tagName, decorationProps.classes, decorationProps.attributes);
@@ -274,25 +266,30 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
      * Create the element-properties for a Quality-Match of the given index.
      * For match-specific data, get the data from the tool.
      *
+     * @param {Object} match
      * @param {integer} index
-     * @param {Object} matches
+     * @param {int} segmentId
+     * @param qualityType
      *
      * @returns {Object}
      */
-    createQualityHighlightProps: function(match, index){
-        var props = {
+    createQualityHighlightProps: function(match, index, segmentId, qualityType){
+        const props = {
             tagName: this.self.NODE_NAME_MATCH,
             classes: [ this.self.CSS_CLASSNAME_MATCH, match.cssClassErrorType ],
             attributes: {}
         };
-        // activeMatchIndex
+
         props.attributes[this.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
         props.attributes[this.self.ATTRIBUTE_QUALITY_ID] = match.id;
         props.attributes[this.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
+        props.attributes[this.self.ATTRIBUTE_SEGMENT_ID] = segmentId;
+        props.attributes[this.self.ATTRIBUTE_QUALITY_TYPE] = qualityType;
+
         if (!match.falsePositive) {
             props.attributes[this.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = Editor.data.l10n.falsePositives.hover;
         }
-        // create and return node-props
+
         return props;
     },
 

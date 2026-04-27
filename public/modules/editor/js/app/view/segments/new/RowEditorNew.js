@@ -21,6 +21,11 @@ Ext.define('Editor.view.segments.new.RowEditorNew', {
     columns: null,
     statusStrip: null,
 
+    /**
+     * @type {Editor.view.segments.new.EditorNew|null}
+     */
+    mainEditor: null,
+
     strings: {
         tagOrderErrorText: '#UT#Some of the tags used in the segment are in the wrong order (closing tag before opening tag).',
         tagMissingText: '#UT#The following tags are missing:<br/><ul><li>{0}</li></ul>This is how to solve the error:<br/><ul><li>Click “OK” to close this window</li><li>Press ESC to leave the segment without saving</li><li>Reopen the segment</li></ul>Re-apply your changes.<br/>Alternatively, use the help button and search for the keyboard shortcut to enter the missing tags from the source',

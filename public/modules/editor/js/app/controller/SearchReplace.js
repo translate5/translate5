@@ -1492,13 +1492,11 @@ Ext.define('Editor.controller.SearchReplace', {
      * Get the search parameter from the search form.
      */
     getSearchReplaceParams: function (isReplace) {
-        const me = this,
-            tabPanel = me.getTabPanel(),
+        const tabPanel = this.getTabPanel(),
             activeTab = tabPanel.getActiveTab(),
             form = activeTab.getForm(),
             formFields = form.getFields().items,
-            segmentGrid = me.getSegmentGrid(),
-            segmentStore = segmentGrid.editingPlugin.grid.store,
+            segmentStore = this.getSegmentGrid().editingPlugin.grid.store,
             proxy = segmentStore.getProxy(),
             params = {};
 
@@ -1515,11 +1513,11 @@ Ext.define('Editor.controller.SearchReplace', {
         }
 
         if (isReplace) {
-            params['durations'] = me.timeTracking;
+            params['durations'] = this.timeTracking;
         }
 
         //if track changes are active, set the trackchanges flag and parameters
-        if (me.isActiveTrackChanges()) {
+        if (this.isActiveTrackChanges()) {
             params['isActiveTrackChanges'] = true;
             params['attributeWorkflowstep'] = Editor.data.task.get('workflowStepName') + Editor.data.task.get('workflowStep');
             params['userTrackingId'] = Editor.data.task.get('userTrackingId');

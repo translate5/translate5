@@ -227,19 +227,21 @@ class Check
                     continue;
                 }
 
+                $targetContent = $targetText ?? self::$batch['target'][$segment->getSegmentNrInTask()] ?? '';
+
                 // Convert into special data structure
                 $this->states[$category][] = (object) [
-                    'content' => mb_substr($match->sentence, $match->offset, $match->length),
-                    'matchIndex' => $index,                                                 // Integer
+                    'content' => mb_substr($targetContent, $match->offset, $match->length),
+                    'matchIndex' => $index, // Integer
                     'range' => [
                         // Text coordinates
                         'start' => $match->offset,
                         'end' => $match->offset + $match->context->length,
                     ],
-                    'message' => $match->message,                                                   // String
+                    'message' => $match->message, // String
                     'replacements' => array_column($match->replacements ?? [], 'value'), // Array
                     'infoURLs' => array_column($match->rule->urls ?? [], 'value'), // Array
-                    'cssClassErrorType' => self::$css[$category],                                              // String
+                    'cssClassErrorType' => self::$css[$category], // String
                 ];
 
                 // Else log that detected error is of a kind previously unknown to translate5 app

@@ -34,6 +34,7 @@ use MittagQI\Translate5\Segment\Repetition\DTO\ReplaceDto as ReplaceRepetitionDt
 use MittagQI\Translate5\Segment\Repetition\RepetitionService;
 use MittagQI\Translate5\Segment\SearchAndReplace\DTO\ReplaceDto as SearchAndReplaceDto;
 use MittagQI\Translate5\Segment\SearchAndReplace\SearchAndReplaceService;
+use MittagQI\Translate5\Segment\SearchAndReplace\SearchService;
 use MittagQI\Translate5\Segment\SyncStatus\DTO\SyncDto;
 use MittagQI\Translate5\Segment\SyncStatus\SyncStatusService;
 
@@ -45,12 +46,15 @@ class QueuedBatchUpdateWorker extends \ZfExtended_Worker_Abstract
 
     private readonly SyncStatusService $syncStatusService;
 
+    private readonly SearchService $searchService;
+
     public function __construct()
     {
         parent::__construct();
         $this->repetitionService = RepetitionService::create();
         $this->searchAndReplaceService = SearchAndReplaceService::create();
         $this->syncStatusService = SyncStatusService::create();
+        $this->searchService = SearchService::create();
     }
 
     protected function validateParameters(array $parameters): bool
@@ -64,7 +68,10 @@ class QueuedBatchUpdateWorker extends \ZfExtended_Worker_Abstract
 
         match ($dto::class) {
             ReplaceRepetitionDto::class => $this->repetitionService->replaceBatch($dto),
-            SearchAndReplaceDto::class => $this->searchAndReplaceService->replaceAll($dto),
+            SearchAndReplaceDto::class => $this->searchAndReplaceService->replace(
+                $dto,
+                $this->searchService->search($dto->searchQuery)
+            ),
             SyncDto::class => $this->syncStatusService->syncAll($dto),
             default => throw new \InvalidArgumentException('Unsupported DTO type: ' . $dto::class),
         };

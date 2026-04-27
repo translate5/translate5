@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\SearchAndReplace;
@@ -69,7 +70,6 @@ use MittagQI\Translate5\Segment\QueuedBatchUpdateWorker;
 use MittagQI\Translate5\Segment\SearchAndReplace\DTO\ReplaceDto;
 use MittagQI\Translate5\Segment\SearchAndReplace\Event\SearchAndReplaceProcessingFailedEvent;
 use MittagQI\Translate5\Segment\SearchAndReplace\Event\SearchAndReplaceProcessingRequestedEvent;
-use MittagQI\Translate5\User\Model\User;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 use Zend_Registry;
@@ -80,7 +80,6 @@ class SearchAndReplaceService
     public function __construct(
         private readonly TaskRepository $taskRepository,
         private readonly ReplaceMatchesSegment $replacer,
-        private readonly SearchService $searchService,
         private readonly UpdateSegmentOperation $updateSegmentOperation,
         private readonly SegmentRepository $segmentRepository,
         private readonly ZfExtended_Logger $logger,
@@ -97,7 +96,6 @@ class SearchAndReplaceService
         return new self(
             TaskRepository::create(),
             ReplaceMatchesSegment::create(),
-            SearchService::create(),
             UpdateSegmentOperation::create(),
             SegmentRepository::create(),
             Zend_Registry::get('logger')->cloneMe('editor.segment.searchAndReplace'),
@@ -106,7 +104,7 @@ class SearchAndReplaceService
         );
     }
 
-    public function queueReplaceAll(ReplaceDto $replaceDto): void
+    public function queueReplace(ReplaceDto $replaceDto): void
     {
         $worker = new QueuedBatchUpdateWorker();
 
@@ -120,34 +118,28 @@ class SearchAndReplaceService
         }
     }
 
-    public function replaceAll(ReplaceDto $dto): void
+    public function replace(ReplaceDto $dto, array $segments): void
     {
-        $foundSegments = $this->searchService->search($dto->searchQuery);
-
-        if (empty($foundSegments)) {
-            return;
-        }
-
         $this->eventDispatcher->dispatch(
             new SearchAndReplaceProcessingRequestedEvent(
                 $dto->searchQuery->taskGuid,
-                array_column($foundSegments, 'id')
+                array_column($segments, 'id')
             )
         );
 
         try {
-            $this->executeReplaceAll($dto, $foundSegments);
+            $this->executeReplace($dto, $segments);
         } catch (Throwable) {
             $this->eventDispatcher->dispatch(
                 new SearchAndReplaceProcessingFailedEvent(
                     $dto->searchQuery->taskGuid,
-                    array_column($foundSegments, 'id')
+                    array_column($segments, 'id')
                 )
             );
         }
     }
 
-    private function executeReplaceAll(ReplaceDto $dto, array $foundSegments): void
+    private function executeReplace(ReplaceDto $dto, array $foundSegments): void
     {
         $actor = $this->userRepository->get($dto->actorId);
         $task = $this->taskRepository->getByGuid($dto->searchQuery->taskGuid);

@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
+/**
  * @property editor_Models_Db_SegmentQualityRow $row
  *
  * @method void setId(int $id)
@@ -53,7 +53,7 @@ END LICENSE AND COPYRIGHT
  * @method string getSeverity()
  * @method void setComment(string $comment)
  * @method string getComment()
-*/
+ */
 
 class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
 {
@@ -90,7 +90,8 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
               `field`,
               `falsePositive`,
               `additionalData`,
-              JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`
+              JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`,
+              `category`
             FROM `LEK_segment_quality`
             WHERE 1
               AND `segmentId` IN (' . join(',', $segmentIds) . ')
@@ -104,6 +105,7 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
             $additionalData = json_decode($_item['additionalData']);
             $additionalData->id = (int) $_item['id'];
             $additionalData->falsePositive = (int) $_item['falsePositive'];
+            $additionalData->category = $_item['category'];
             $data[$_item['segmentId']][$_item['field']][] = $additionalData;
         }
 

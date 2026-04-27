@@ -65,6 +65,11 @@ Ext.define('Editor.view.segments.RowEditing', {
         'canceledit'
     ],
 
+    /**
+     * @type {Editor.view.segments.new.RowEditorNew|null}
+     */
+    editor: null,
+
     initEditorConfig: function () {
         var me = this,
             grid = me.grid,
@@ -82,6 +87,9 @@ Ext.define('Editor.view.segments.RowEditing', {
         };
     },
 
+    /**
+     * @returns {Editor.view.segments.new.RowEditorNew}
+     */
     initEditor: function () {
         return new Editor.view.segments.new.RowEditorNew(this.initEditorConfig());
     },

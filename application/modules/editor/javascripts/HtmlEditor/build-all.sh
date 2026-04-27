@@ -72,6 +72,9 @@ build_project "HtmlEditor (Main)" "$ROOT_DIR"
 # Build TrackChanges plugin
 build_project "TrackChanges Plugin" "$ROOT_DIR/../../PrivatePlugins/TrackChanges/javascripts"
 
+# Build SpellCheck plugin
+build_project "SpellCheck Plugin" "$ROOT_DIR/../../Plugins/SpellCheck/javascripts"
+
 # Add more plugins here as needed
 # Example:
 # build_project "AnotherPlugin" "$ROOT_DIR/../../PrivatePlugins/AnotherPlugin/javascripts"

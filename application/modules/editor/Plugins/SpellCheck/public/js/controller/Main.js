@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -32,29 +31,31 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.SpellCheck.controller.Main', {
     extend: 'Ext.app.Controller',
+    requires: ['Editor.plugins.SpellCheck.controller.SpellChecker'],
     listen: {
         controller: {
             '#Editor.$application': {
-                editorConfigLoaded:'onEditorConfigLoaded'
-            }
-        }
+                editorConfigLoaded: 'onEditorConfigLoaded',
+            },
+        },
     },
 
     /***
      * On editor config load event
      */
-    onEditorConfigLoaded:function(app, task){
-        var me=this,
+    onEditorConfigLoaded: function (app, task) {
+        var me = this,
             isPluginActive = app.getTaskConfig('plugins.SpellCheck.liveCheckOnEditing'),
             controller = Editor.app.getController('Editor.plugins.SpellCheck.controller.Editor');
+        const controller2 = Editor.app.getController('Editor.plugins.SpellCheck.controller.SpellChecker');
 
-        if(isPluginActive){
+        if (isPluginActive) {
             // this will enable the event buss for the controller
             controller.activate();
-        }else{
-             // this will disable the event buss for the controller
+            controller2.activate();
+        } else {
+            // this will disable the event buss for the controller
             controller.deactivate();
         }
-    }
-
+    },
 });

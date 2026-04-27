@@ -53,6 +53,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
          *
          * @param {int} qualityId
          * @param {boolean} falsePositive
+         * @param {Editor.model.Segment} rec
          */
         applyFalsePositiveStyle: function(qualityId, falsePositive, rec) {
             // Get quality tags/nodes
@@ -75,7 +76,6 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 // If tag is inside source-column
                 cell = tag.closest('td[data-columnid="sourceColumn"]');
                 if (cell) {
-
                     // Get record
                     row = cell.closest('table.x-grid-item');
                     rid = row.getAttribute('data-recordid');
@@ -104,13 +104,12 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
     onFalsePositiveChanged: function(column, rowIndex, checked, record){
-        var qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0,
-            other, otherRec;
+        const qualityId = record.get('id');
+        const falsePositive = (checked) ? 1 : 0;
 
         // If there are tags in the editor we need to decorate them
         // as otherwise saving the editor would set the falsePositive value back to it's original state!
         if (record.get('hasTag') && !this.decorateFalsePositive(record, qualityId, checked)) {
-
             // This will be a rare case, mostly with transitional tasks being imported before the rollout of the AutoQA but used thereafter
             console.log('Decorating a false positive tag failes: ', qualityId, falsePositive, record);
         }
@@ -127,7 +126,6 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 falsePositive: falsePositive
             },
             success: () => {
-
                 // Commit changes
                 record.commit();
 
@@ -135,28 +133,32 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(record.get('id'), falsePositive);
 
                 // Prepare component query selector for other instance of falsePositive-panel
-                other = 'falsePositives[floating=' + (!column.up('fieldset').floating).toString() + ']';
+                const otherSelector = column ? 'falsePositives[floating=' + (!column.up('fieldset').floating).toString() + ']' : false;
+                const other = otherSelector ? Ext.ComponentQuery.query(otherSelector).pop() : false;
 
                 // If other instance of falsePositive-panel exists
-                if (other = Ext.ComponentQuery.query(other).pop()) {
+                if (other) {
+                    const otherRec = other.down('grid').getStore().getById(record.get('id'));
 
                     // Replicate change of falsePositive-prop to the corresponding quality-record
-                    if (otherRec = other.down('grid').getStore().getById(record.get('id'))) {
+                    if (otherRec) {
                         otherRec.set('falsePositive', falsePositive);
                         otherRec.commit();
                     }
                 }
 
                 // Get quality filter panel
-                var qfp = Ext.ComponentQuery.query('qualityFilterPanel').pop();
+                const qfp = Ext.ComponentQuery.query('qualityFilterPanel').pop();
 
                 // Reload qualities tree
                 if (qfp) {
                     qfp.getController().reloadKeepingFilterVal();
                 }
 
-                // Hide floating panel if click came from there
-                column.up('fieldset[floating]')?.hide();
+                if (column) {
+                    // Hide floating panel if click came from there
+                    column.up('fieldset[floating]')?.hide();
+                }
             },
             failure: (response) => {
 

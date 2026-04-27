@@ -47,6 +47,11 @@ END LICENSE AND COPYRIGHT
     padding-bottom: 2px;
 }
 
+.t5spellcheck[data-t5qfp="true"] {
+    border-bottom: 1px solid limegreen;
+    padding-bottom: 6px;
+}
+
 /* gray */
 .t5spellcheck.t5general, .t5spellcheck.t5general .trackchanges {
     text-decoration-color: #808080;
@@ -72,7 +77,3 @@ END LICENSE AND COPYRIGHT
     text-decoration-color: #4d004d;
 }
 
-.t5spellcheck[data-t5qfp="true"]{
-    border-bottom: 1px solid limegreen;
-    padding-bottom: 2px;
-}

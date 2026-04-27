@@ -48,92 +48,72 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\SearchAndReplace;
+namespace MittagQI\Translate5\Repository;
 
-use editor_Models_Segment_AutoStates;
-use MittagQI\Translate5\Segment\SearchAndReplace\DTO\ReplaceDto;
-use MittagQI\Translate5\Segment\SearchAndReplace\DTO\SearchQueryDto;
-use MittagQI\Translate5\Segment\TrackChange\DTO\TrackChangeUserDto;
-use Zend_Controller_Request_Abstract;
-use ZfExtended_Authentication;
-use ZfExtended_AuthenticationInterface;
-use ZfExtended_ValidateException;
+use editor_Models_Db_SegmentQuality as SegmentQualityDb;
+use editor_Models_SegmentQuality as SegmentQuality;
+use Zend_Db_Adapter_Abstract;
+use Zend_Db_Table;
+use ZfExtended_Models_Entity_NotFoundException;
 
-class ReplaceDtoFactory
+readonly class SegmentQualityRepository
 {
     public function __construct(
-        private readonly SearchQueryDtoFactory $queryDtoFactory,
-        private readonly ZfExtended_AuthenticationInterface $authentication,
+        private Zend_Db_Adapter_Abstract $db,
     ) {
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function create(): self
     {
-        return new self(
-            SearchQueryDtoFactory::create(),
-            ZfExtended_Authentication::getInstance(),
-        );
-    }
-
-    public function fromRequest(Zend_Controller_Request_Abstract $request): ReplaceDto
-    {
-        $searchQueryDto = $this->queryDtoFactory->fromRequest($request);
-
-        return $this->fromParams($request->getParams(), $searchQueryDto);
-    }
-
-    public function fromParams(array $params, SearchQueryDto $searchQueryDto): ReplaceDto
-    {
-        $this->checkRequiredSearchParameters($params);
-
-        $isActiveTrackChanges = (bool) ($params['isActiveTrackChanges'] ?? false);
-
-        $trackChangeUserDto = null;
-
-        if ($isActiveTrackChanges) {
-            if (empty($params['userTrackingId']) || empty($params['userColorNr']) || empty($params['attributeWorkflowstep'])) {
-                $e = new ZfExtended_ValidateException();
-                $e->setMessage(
-                    'Missing user tracking parameter. Required parameters: userTrackingId, userColorNr, attributeWorkflowstep. Given was: '
-                    . print_r($params, true)
-                );
-            }
-
-            $trackChangeUserDto = new TrackChangeUserDto(
-                $params['userTrackingId'],
-                $params['userColorNr'],
-                $params['attributeWorkflowstep'],
-            );
-        }
-
-        return new ReplaceDto(
-            $this->authentication->getUserId(),
-            $searchQueryDto,
-            htmlentities($params['replaceField'], ENT_XML1),
-            (int) ($params['durations'] ?? 0),
-            $isActiveTrackChanges,
-            $trackChangeUserDto,
-            (isset($params['saveCurrentDraft']) && $params['saveCurrentDraft'] === 'true') ? editor_Models_Segment_AutoStates::DRAFT : editor_Models_Segment_AutoStates::PENDING
-        );
+        return new self(Zend_Db_Table::getDefaultAdapter());
     }
 
     /**
-     * Check if the required search parameters are provided
-     *
-     * @throws ZfExtended_ValidateException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function checkRequiredSearchParameters(array $parameters): void
+    public function get(int $id): SegmentQuality
     {
-        if (! isset($parameters['replaceField'])) {
-            $e = new ZfExtended_ValidateException();
-            $e->setMessage(
-                'Missing search parameter. Required parameters: replaceField. Given was: '
-                . print_r($parameters, true)
-            );
+        $segmentQuality = new SegmentQuality();
+        $segmentQuality->load($id);
 
-            throw $e;
-        }
+        return $segmentQuality;
+    }
+
+    public function getSameQualities(SegmentQuality $segmentQuality): array
+    {
+        $result = $this->db->query(
+            'SELECT * 
+            FROM `' . SegmentQualityDb::TABLE_NAME . '` 
+            WHERE `taskGuid` = ?
+              AND `type` = ?
+              AND `category` = ?
+              AND `field` = ?
+              AND NOT ISNULL(`additionalData`) 
+              AND BINARY JSON_UNQUOTE(JSON_EXTRACT(`additionalData`, "$.content")) = BINARY ?',
+            [
+                $segmentQuality->getTaskGuid(),
+                $segmentQuality->getType(),
+                $segmentQuality->getCategory(),
+                $segmentQuality->getField(),
+                $segmentQuality->getAdditionalData()->content ?? '',
+            ]
+        );
+
+        return $result->fetchAll();
+    }
+
+    public function removeHiddenSegmentQualitiesOfType(int $segmentId, string $type): void
+    {
+        $table = \editor_Models_Db_SegmentQuality::TABLE_NAME;
+        $this->db->query(
+            'DELETE FROM ' . $table . ' WHERE hidden = 1 AND type = ? AND segmentId = ?',
+            [$type, $segmentId]
+        );
     }
 }

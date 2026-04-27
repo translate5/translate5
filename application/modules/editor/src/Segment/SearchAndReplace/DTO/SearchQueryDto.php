@@ -48,9 +48,12 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\SearchAndReplace\DTO;
+
+use editor_Models_Segment;
 
 class SearchQueryDto
 {
@@ -63,6 +66,18 @@ class SearchQueryDto
         public readonly bool $searchInLockedSegments,
         public readonly ?string $filter = null,
     ) {
+    }
+
+    public static function createForExactMatch(string $taskGuid, string $searchInField, string $searchFor): self
+    {
+        return new self(
+            taskGuid: $taskGuid,
+            searchInField: $searchInField,
+            searchType: editor_Models_Segment::DEFAULT_SEARCH_TYPE,
+            searchFor: $searchFor,
+            matchCase: true,
+            searchInLockedSegments: false,
+        );
     }
 
     public function toArray(): array

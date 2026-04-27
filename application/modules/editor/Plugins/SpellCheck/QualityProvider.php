@@ -32,6 +32,7 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Plugins\SpellCheck\CleanupInterferencesWorker;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\AdapterConfigDTO;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
@@ -111,6 +112,20 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             return;
         }
         $worker->queue($parentWorkerId);
+
+        $cleanupWorker = new CleanupInterferencesWorker();
+        if (! $cleanupWorker->init($task->getTaskGuid())) {
+            $this->getLogger($processingMode)->error(
+                'E1477',
+                'SpellCheck CleanupInterferencesWorker can not be initialized!',
+                [
+                    'task' => $task,
+                ]
+            );
+
+            return;
+        }
+        $cleanupWorker->queue($parentWorkerId);
     }
 
     public function prepareOperation(editor_Models_Task $task, string $processingMode)

@@ -26,11 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\AdapterConfigDTO;
-use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
+use MittagQI\Translate5\Plugins\SpellCheck\Segment\ReplaceService;
+use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
+use MittagQI\Translate5\Segment\SearchAndReplace\SearchAndReplaceException;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -46,7 +51,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws NoAccessException
      */
-    public function init()
+    public function init(): void
     {
         $this->initRestControllerSpecific();
         $this->initCurrentTask();
@@ -56,7 +61,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction()
+    public function indexAction(): void
     {
         throw new ZfExtended_BadMethodCallException(__CLASS__);
     }
@@ -65,7 +70,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      * Get the languages that are supported by the tool we use (currently: LanguageTool).
      * @throws ZfExtended_Exception
      */
-    public function languagesAction()
+    public function languagesAction(): void
     {
         if ($this->getParam('targetLangCode') && $this->getParam('targetLangCode') != "") {
             $targetLangCode = $this->getParam('targetLangCode');
@@ -92,7 +97,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws editor_Models_ConfigException
      */
-    public function matchesAction()
+    public function matchesAction(): void
     {
         $text = $this->getParam('text', '');
         $language = $this->getParam('language', '');
@@ -108,22 +113,47 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             ->getMatches($text, $language);
     }
 
-    public function getAction()
+    public function replaceallAction(): void
+    {
+        $params = $this->getRequest()->getParams();
+        $this->validateTaskAccess($params['taskGuid']);
+
+        $task = TaskRepository::create()->getByGuid($params['taskGuid']);
+
+        if (
+            $task->getUsageMode() === $task::USAGE_MODE_SIMULTANEOUS
+            && UserJobRepository::create()->isTaskOpenedByMoreThanOneUser($params['taskGuid'])
+        ) {
+            throw new SearchAndReplaceException('E1192', [
+                'task' => $task,
+            ]);
+        }
+
+        $qualityId = (int) $this->getParam('qualityId');
+
+        $replaceService = ReplaceService::create();
+        $result = $replaceService->replaceInAllSegmentsWithTheSameQuality($qualityId, $params);
+
+        $this->view->rows = $result;
+        $this->view->total = count($this->view->rows);
+    }
+
+    public function getAction(): void
     {
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->get');
     }
 
-    public function putAction()
+    public function putAction(): void
     {
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->put');
     }
 
-    public function deleteAction()
+    public function deleteAction(): void
     {
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->delete');
     }
 
-    public function postAction()
+    public function postAction(): void
     {
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->post');
     }

@@ -170,6 +170,15 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract
             ]
         );
         $r->addRoute('plugins_spellcheck_matches', $matchesRoute);
+
+        $r->addRoute('plugins_spellcheck_replaceall', new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_spellcheck_spellcheckquery/replaceall',
+            [
+                'module' => 'editor',
+                'controller' => 'plugins_spellcheck_spellcheckquery',
+                'action' => 'replaceall',
+            ]
+        ));
     }
 
     /**

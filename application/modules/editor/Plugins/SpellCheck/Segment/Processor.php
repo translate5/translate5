@@ -201,6 +201,8 @@ class Processor extends AbstractProcessor
                         field: $target->getField(),
                         type: $this->qualityType,
                         category: $category,
+                        startIndex: $quality->range['start'],
+                        endIndex: $quality->range['end'],
                         additionalData: $quality
                     );
                 }

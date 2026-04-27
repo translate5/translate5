@@ -53,6 +53,7 @@ use MittagQI\Translate5\Plugins\TermTagger\Exception\RequestException;
 use MittagQI\Translate5\Plugins\TermTagger\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
+use MittagQI\Translate5\Repository\SegmentQualityRepository;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use MittagQI\Translate5\Segment\Db\Processing;
 use MittagQI\Translate5\Segment\Processing\LooperConfigurationDTO;
@@ -83,6 +84,80 @@ use ZfExtended_Models_Entity_NotFoundException;
  */
 final class Tagger extends AbstractProcessor
 {
+    private readonly SegmentQualityRepository $segmentQualityRepository;
+
+    private ServiceData $serviceData;
+
+    private RecalcTransFound $recalcTransFound;
+
+    private editor_Models_Segment_TermTagTrackChange $termTagTrackChangeHelper;
+
+    private editor_Models_Segment_TrackChangeTag $generalTrackChangesHelper;
+
+    private ZfExtended_Logger $logger;
+
+    /**
+     * Two corresponding arrays to hold replaced tags.
+     * Tags must be replaced in every text-element before send to the TermTagger-Server,
+     * because TermTagger can not handle with already TermTagged-text.
+     */
+    private array $replacedTagsNeedles = [];
+
+    private array $replacedTagsReplacements = [];
+
+    /**
+     * Holds a counter for replacedTags to make needles unique
+     * @var integer
+     */
+    private int $replaceCounter = 1;
+
+    /**
+     * Container for segment data needed before and after tagging
+     */
+    private array $segments = [];
+
+    private bool $doDebug;
+
+    /**
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ReflectionException
+     */
+    public function __construct(
+        editor_Models_Task $task,
+        DockerServiceAbstract $service,
+        string $processingMode,
+        string $serviceUrl = null,
+        bool $isWorkerContext = true
+    ) {
+        parent::__construct($task, $service, $processingMode, $serviceUrl, $isWorkerContext);
+
+        $this->logger = Zend_Registry::get('logger')->cloneMe(
+            Configuration::getLoggerDomain($processingMode)
+        );
+        $this->recalcTransFound = ZfExtended_Factory::get(RecalcTransFound::class, [$this->task]);
+        // various outdated tag-helpers - use TagSequence/FieldTags based code instead
+        $this->termTagTrackChangeHelper = ZfExtended_Factory::get(editor_Models_Segment_TermTagTrackChange::class);
+        $this->generalTrackChangesHelper = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'TermTaggerRequests');
+        $this->segmentQualityRepository = SegmentQualityRepository::create();
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
+     */
+    public static function createLooperConfiguration(editor_Models_Task $task): LooperConfigurationDTO
+    {
+        return new LooperConfigurationDTO(
+            $task->getSegmentCount(),
+            $task->getConfig()->runtimeOptions->termTagger->taggerBatchSize,
+            $task->getConfig()->runtimeOptions->termTagger->taggerLoopingInterval,
+        );
+    }
+
     /**
      * Finds term tags of certain classes (= certain term stati) in the tags that represent a problem
      */
@@ -94,7 +169,19 @@ final class Tagger extends AbstractProcessor
             foreach ($termTags as $termTag) {
                 if ($termTag->hasCategory()) {
                     $tags->addQualityByTag($termTag, $field);
+
+                    continue;
                 }
+
+                $tags->addQuality(
+                    $field,
+                    $type,
+                    'terminology',
+                    $termTag->startIndex,
+                    $termTag->endIndex,
+                    $termTag->getAdditionalData(),
+                    true
+                );
             }
         }
     }
@@ -168,77 +255,6 @@ final class Tagger extends AbstractProcessor
         }
     }
 
-    private ServiceData $serviceData;
-
-    private RecalcTransFound $recalcTransFound;
-
-    private editor_Models_Segment_TermTagTrackChange $termTagTrackChangeHelper;
-
-    private editor_Models_Segment_TrackChangeTag $generalTrackChangesHelper;
-
-    private ZfExtended_Logger $logger;
-
-    /**
-     * Two corresponding arrays to hold replaced tags.
-     * Tags must be replaced in every text-element before send to the TermTagger-Server,
-     * because TermTagger can not handle with already TermTagged-text.
-     */
-    private array $replacedTagsNeedles = [];
-
-    private array $replacedTagsReplacements = [];
-
-    /**
-     * Holds a counter for replacedTags to make needles unique
-     * @var integer
-     */
-    private int $replaceCounter = 1;
-
-    /**
-     * Container for segment data needed before and after tagging
-     */
-    private array $segments = [];
-
-    private bool $doDebug;
-
-    /**
-     * @throws Zend_Exception
-     * @throws ZfExtended_Exception
-     * @throws ReflectionException
-     */
-    public function __construct(
-        editor_Models_Task $task,
-        DockerServiceAbstract $service,
-        string $processingMode,
-        string $serviceUrl = null,
-        bool $isWorkerContext = true
-    ) {
-        parent::__construct($task, $service, $processingMode, $serviceUrl, $isWorkerContext);
-
-        $this->logger = Zend_Registry::get('logger')->cloneMe(
-            Configuration::getLoggerDomain($processingMode)
-        );
-        $this->recalcTransFound = ZfExtended_Factory::get(RecalcTransFound::class, [$this->task]);
-        // various outdated tag-helpers - use TagSequence/FieldTags based code instead
-        $this->termTagTrackChangeHelper = ZfExtended_Factory::get(editor_Models_Segment_TermTagTrackChange::class);
-        $this->generalTrackChangesHelper = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
-        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'TermTaggerRequests');
-    }
-
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws Zend_Exception
-     * @throws ReflectionException
-     * @throws editor_Models_ConfigException
-     */
-    public static function createLooperConfiguration(editor_Models_Task $task): LooperConfigurationDTO
-    {
-        return new LooperConfigurationDTO(
-            $task->getSegmentCount(),
-            $task->getConfig()->runtimeOptions->termTagger->taggerBatchSize,
-            $task->getConfig()->runtimeOptions->termTagger->taggerLoopingInterval,
-        );
-    }
-
     /**
      * Processes a batch of segments
      * @param editor_Segment_Tags[] $segmentsTags
@@ -299,6 +315,10 @@ final class Tagger extends AbstractProcessor
      */
     public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true): void
     {
+        $this->segmentQualityRepository->removeHiddenSegmentQualitiesOfType(
+            $segmentTags->getSegmentId(),
+            editor_Plugins_TermTagger_Tag::TYPE
+        );
         $segmentTags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
         // creating the service-data model used by the termtagger-service
         $this->serviceData = $this->createServiceData([$segmentTags]);

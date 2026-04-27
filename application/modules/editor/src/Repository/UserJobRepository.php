@@ -612,4 +612,11 @@ class UserJobRepository
 
         return $this->db->fetchAll($s);
     }
+
+    public function isTaskOpenedByMoreThanOneUser(string $taskGuid): bool
+    {
+        $usedBy = (new UserJob())->loadUsed($taskGuid);
+
+        return count($usedBy) > 1;
+    }
 }
