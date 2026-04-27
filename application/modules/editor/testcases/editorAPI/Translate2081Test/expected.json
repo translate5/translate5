@@ -23,6 +23,7 @@
         "longUserName": "test, translator (testtranslator)",
         "groupId": null,
         "isCoordinatorGroupJob": false,
-        "isCoordinatorGroupUserJob": false
+        "isCoordinatorGroupUserJob": false,
+        "isPreviewOnly": false
     }
 ]

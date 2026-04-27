@@ -24,7 +24,8 @@
         "longUserName": "test, translator (testtranslator)",
         "groupId": null,
         "isCoordinatorGroupJob": false,
-        "isCoordinatorGroupUserJob": false
+        "isCoordinatorGroupUserJob": false,
+        "isPreviewOnly": false
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -51,7 +52,8 @@
         "longUserName": "test, translator (testtranslator)",
         "groupId": null,
         "isCoordinatorGroupJob": false,
-        "isCoordinatorGroupUserJob": false
+        "isCoordinatorGroupUserJob": false,
+        "isPreviewOnly": false
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -78,6 +80,7 @@
         "longUserName": "test, translator (testtranslator)",
         "groupId": null,
         "isCoordinatorGroupJob": false,
-        "isCoordinatorGroupUserJob": false
+        "isCoordinatorGroupUserJob": false,
+        "isPreviewOnly": false
     }
 ]
