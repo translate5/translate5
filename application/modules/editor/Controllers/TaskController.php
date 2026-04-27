@@ -1288,7 +1288,7 @@ class editor_TaskController extends ZfExtended_RestController
         $obj = $this->entity->getDataObject();
 
         $userJobRepository = UserJobRepository::create();
-        $currentUserJob = $userJobRepository->findUserJobInTask(
+        $currentUserJob = $userJobRepository->findAppropriateUserJobInTask(
             $this->authenticatedUser->getUserGuid(),
             $taskguid,
             $this->entity->getWorkflowStepName(),
