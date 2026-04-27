@@ -84,7 +84,13 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                             v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
                         }
 
-                        return Ext.String.htmlEncode(rec.get('surName') + ', ' + rec.get('firstName')) + ' (' + v + ')';
+                        let name = Ext.String.htmlEncode(rec.get('surName') + ', ' + rec.get('firstName'));
+
+                        if (v) {
+                            name += ' (' + v + ')';
+                        }
+
+                        return name;
                     },
                     filter: {
                         type: 'string'
@@ -238,7 +244,24 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
 
         config.viewConfig = {
             getRowClass: function (record, rowIndex, rowParams, store) {
-                return record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
+                var cls = record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
+
+                if (record.get('isPreviewOnly')) {
+                    cls += ' x-item-disabled';
+                }
+
+                return cls;
+            }
+        };
+
+        config.selModel = {
+            type: 'rowmodel',
+            listeners: {
+                beforeselect: function (sm, record) {
+                    if (record.get('isPreviewOnly')) {
+                        return false;
+                    }
+                }
             }
         };
 

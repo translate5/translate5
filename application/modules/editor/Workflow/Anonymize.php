@@ -93,10 +93,10 @@ class editor_Workflow_Anonymize
     {
         $this->taskGuid = $taskGuid;
         $this->userGuid = $userGuid;
-        if (! $forced && $this->isCurrentUserOrPM($currentUserGuid ?? $this->sessionUserGuid)) {
+        if (! $forced && $this->shouldAnonymise($currentUserGuid ?? $this->sessionUserGuid)) {
             return $data;
         }
-        $keysToAnonymize = ['comments', 'email', 'firstName', 'lockingUser', 'lockingUsername', 'login', 'userGuid', 'userName', 'surName'];
+        $keysToAnonymize = ['comments', 'email', 'firstName', 'lockingUser', 'lockingUsername', 'login', 'userGuid', 'userName', 'surName', 'longUserName'];
         array_walk($data, function (&$value, $key) use ($keysToAnonymize) {
             if ($value != '' && in_array($key, $keysToAnonymize)) {
                 switch ($key) {
@@ -111,6 +111,7 @@ class editor_Workflow_Anonymize
                         break;
                     case 'lockingUsername':
                     case 'userName':
+                    case 'longUserName':
                         $value = $this->renderAnonymizedUserName($value);
 
                         break;
@@ -132,7 +133,7 @@ class editor_Workflow_Anonymize
      * @param string $currentUserGuid the user guid to be used as current user
      * @return boolean
      */
-    protected function isCurrentUserOrPM(string $currentUserGuid): bool
+    protected function shouldAnonymise(string $currentUserGuid): bool
     {
         if ($this->userGuid == $currentUserGuid) {
             return true;

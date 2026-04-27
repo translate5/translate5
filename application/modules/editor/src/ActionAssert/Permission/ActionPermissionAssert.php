@@ -49,9 +49,6 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
     ) {
     }
 
-    /**
-     * @param A $action
-     */
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
         $atLeastOneAssertionMade = false;
@@ -71,9 +68,6 @@ abstract class ActionPermissionAssert implements ActionPermissionAssertInterface
         }
     }
 
-    /**
-     * @param A $action
-     */
     public function isGranted(BackedEnum $action, object $object, PermissionAssertContext $context): bool
     {
         try {

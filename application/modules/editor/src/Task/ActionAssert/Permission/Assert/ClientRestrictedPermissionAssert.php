@@ -78,6 +78,10 @@ final class ClientRestrictedPermissionAssert implements PermissionAssertInterfac
             return;
         }
 
+        if ($object->getPmGuid() === $context->actor->getUserGuid()) {
+            return;
+        }
+
         $hasJobInTask = $this->userJobRepository->userHasJobsInTask(
             $context->actor->getUserGuid(),
             $object->getTaskGuid()

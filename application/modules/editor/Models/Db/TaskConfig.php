@@ -28,7 +28,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_Db_TaskConfig extends Zend_Db_Table_Abstract
 {
-    protected $_name = "LEK_task_config";
+    public const TABLE_NAME = 'LEK_task_config';
+
+    protected $_name = self::TABLE_NAME;
 
     public $_primary = "id";
 }

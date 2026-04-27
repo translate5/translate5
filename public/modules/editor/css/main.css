@@ -2349,6 +2349,17 @@ div.internal-tag.number span.full::after {
     background-color: rgb(181 217 250 / 60%);
 }
 
+tr.x-item-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+tr.x-item-disabled td,
+tr.x-item-disabled td * {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
 .x-boundlist-item .x-item-disabled {
     color: #ccc;
     cursor: not-allowed;

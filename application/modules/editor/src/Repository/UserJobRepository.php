@@ -478,13 +478,26 @@ class UserJobRepository
      */
     public function getTaskJobs(string $taskGuid, bool $excludePmOverride = false): iterable
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
+        $job = new UserJob();
 
         $s = $this->db
             ->select()
-            ->from(UserJobTable::TABLE_NAME)
+            ->from(
+                [
+                    'job' => UserJobTable::TABLE_NAME,
+                ],
+                'job.*'
+            )
+            ->join(
+                [
+                    'wf_step' => \editor_Models_Db_Workflow_Step::TABLE_NAME,
+                ],
+                'wf_step.name = job.workflowStepName AND wf_step.workflowName = job.workflow',
+                []
+            )
             ->where('taskGuid = ?', $taskGuid)
             ->where('type != ?', TypeEnum::Coordinator->value)
+            ->order('wf_step.position ASC')
         ;
 
         foreach ($this->db->fetchAll($s) as $jobData) {
