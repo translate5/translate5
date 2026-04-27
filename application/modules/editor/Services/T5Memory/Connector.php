@@ -331,8 +331,15 @@ class editor_Services_T5Memory_Connector extends editor_Services_Connector_Abstr
             return false;
         }
 
-        // Strip UTF-8 BOM if present
-        $head = preg_replace('/^\xEF\xBB\xBF/', '', $head);
+        // Normalize XML header probe to UTF-8 so UTF-16/32 encoded TMX files are detected correctly.
+        $head = match (true) {
+            str_starts_with($head, "\xFF\xFE\x00\x00") => mb_convert_encoding(substr($head, 4), 'UTF-8', 'UTF-32LE'),
+            str_starts_with($head, "\x00\x00\xFE\xFF") => mb_convert_encoding(substr($head, 4), 'UTF-8', 'UTF-32BE'),
+            str_starts_with($head, "\xFF\xFE") => mb_convert_encoding(substr($head, 2), 'UTF-8', 'UTF-16LE'),
+            str_starts_with($head, "\xFE\xFF") => mb_convert_encoding(substr($head, 2), 'UTF-8', 'UTF-16BE'),
+            str_starts_with($head, "\xEF\xBB\xBF") => substr($head, 3),
+            default => $head,
+        };
 
         // Trim leading whitespace/control-ish
         $trimmed = ltrim($head);

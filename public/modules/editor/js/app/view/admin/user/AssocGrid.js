@@ -186,7 +186,13 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
 
         config.viewConfig = {
             getRowClass: function (record, rowIndex, rowParams, store) {
-                return record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
+                let cls = record.get('isCoordinatorGroupJob') ? 'coordinator-group-job-row' : '';
+
+                if (record.get('isPreviewOnly')) {
+                    cls += ' x-item-disabled';
+                }
+
+                return cls;
             }
         };
 
@@ -209,7 +215,13 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
         }
         var user = store.getAt(idx);
         if (user) {
-            return Ext.String.htmlEncode(user.get('surName')+', '+user.get('firstName')+' ('+user.get('login')+')');
+            let name = Ext.String.htmlEncode(user.get('surName')+', '+user.get('firstName'));
+
+            if (user.get('login')) {
+                name += Ext.String.htmlEncode(' ('+user.get('login')+')');
+            }
+
+            return name;
         }
         return '';
     }

@@ -41,6 +41,8 @@ use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
 use MittagQI\Translate5\Repository\TaskRepository;
 use MittagQI\Translate5\Repository\UserJobRepository;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\Translate5\User\ActionAssert\Permission\UserActionPermissionAssert;
+use MittagQI\Translate5\User\ActionAssert\UserAction;
 use MittagQI\Translate5\User\Model\User;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
@@ -50,8 +52,8 @@ use ZfExtended_Factory;
  * id: string,
  * taskGuid: string,
  * userGuid: string,
- * sourceLang: string,
- * targetLang: string,
+ * sourceLang: int,
+ * targetLang: int,
  * state: string,
  * role: string,
  * workflowStepName: string,
@@ -75,6 +77,7 @@ use ZfExtended_Factory;
  * isCoordinatorGroupJob: bool,
  * isCoordinatorGroupUserJob: bool,
  * staticAuthHash?: string,
+ * isPreviewOnly: bool,
  * }
  */
 class UserJobViewDataProvider
@@ -83,6 +86,7 @@ class UserJobViewDataProvider
         private readonly UserJobRepository $userJobRepository,
         private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
         private readonly ActionPermissionAssertInterface $userJobPermissionAssert,
+        private readonly ActionPermissionAssertInterface $userPermissionAssert,
         private readonly UserRepository $userRepository,
         private readonly TaskRepository $taskRepository,
         private readonly ZfExtended_Acl $acl,
@@ -98,6 +102,7 @@ class UserJobViewDataProvider
             UserJobRepository::create(),
             CoordinatorGroupJobRepository::create(),
             UserJobActionPermissionAssert::create(),
+            UserActionPermissionAssert::create(),
             new UserRepository(),
             TaskRepository::create(),
             ZfExtended_Acl::getInstance(),
@@ -117,16 +122,26 @@ class UserJobViewDataProvider
         foreach ($jobs as $job) {
             $job = $this->getJob($job);
 
-            if (! $this->userJobPermissionAssert->isGranted(UserJobAction::Read, $job, $context)) {
+            if (! isset($tasks[$job->getTaskGuid()])) {
+                $tasks[$job->getTaskGuid()] = $this->taskRepository->getByGuid($job->getTaskGuid());
+            }
+
+            // if task anonymized - only users with managing permissions allowed to see jobs of other users
+            $action = $tasks[$job->getTaskGuid()]->anonymizeUsers(customRoles: $viewer->getRoles())
+                ? UserJobAction::Update
+                : UserJobAction::Read;
+
+            // To sse own job user don't need to be able to manage the job
+            if ($viewer->getUserGuid() === $job->getUserGuid()) {
+                $action = UserJobAction::Read;
+            }
+
+            if (! $this->userJobPermissionAssert->isGranted($action, $job, $context)) {
                 continue;
             }
 
             if (! isset($users[$job->getUserGuid()])) {
                 $users[$job->getUserGuid()] = $this->userRepository->getByGuid($job->getUserGuid());
-            }
-
-            if (! isset($tasks[$job->getTaskGuid()])) {
-                $tasks[$job->getTaskGuid()] = $this->taskRepository->getByGuid($job->getTaskGuid());
             }
 
             $result[] = $this->buildJobViewWithAssignedUserAndTask(
@@ -190,6 +205,14 @@ class UserJobViewDataProvider
             $groupJob = $this->coordinatorGroupJobRepository->get((int) $job->getCoordinatorGroupJobId());
         }
 
+        // check for Viewer permissions
+        // user may be visible in job scope for same task users but not really accessible
+        $canReadUser = $this->userPermissionAssert->isGranted(
+            UserAction::Read,
+            $assignedUser,
+            new PermissionAssertContext($viewer)
+        );
+
         $row = [
             'id' => $job->getId(),
             'taskGuid' => $job->getTaskGuid(),
@@ -211,13 +234,14 @@ class UserJobViewDataProvider
             'trackchangesShowAll' => $job->getTrackchangesShowAll(),
             'trackchangesAcceptReject' => $job->getTrackchangesAcceptReject(),
             'type' => $job->getType()->value,
-            'login' => $assignedUser->getLogin(),
+            'login' => $canReadUser ? $assignedUser->getLogin() : null,
             'firstName' => $assignedUser->getFirstName(),
             'surName' => $assignedUser->getSurName(),
-            'longUserName' => $assignedUser->getUsernameLong(),
+            'longUserName' => $assignedUser->getUsernameLong($canReadUser),
             'groupId' => $groupJob ? (int) $groupJob->getGroupId() : null,
             'isCoordinatorGroupJob' => $job->isCoordinatorGroupJob(),
             'isCoordinatorGroupUserJob' => $job->isCoordinatorGroupUserJob(),
+            'isPreviewOnly' => ! $canReadUser,
         ];
 
         if ($this->acl->isInAllowedRoles($viewer->getRoles(), Rights::ID, Rights::READ_AUTH_HASH)) {

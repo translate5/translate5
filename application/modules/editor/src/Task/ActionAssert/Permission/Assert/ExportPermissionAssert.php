@@ -63,7 +63,7 @@ final class ExportPermissionAssert implements PermissionAssertInterface
             return;
         }
 
-        if ($context->actor->isPmLight() && $object->getPmGuid() === $context->actor->getUserGuid()) {
+        if ($object->getPmGuid() === $context->actor->getUserGuid()) {
             return;
         }
 

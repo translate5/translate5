@@ -38,9 +38,9 @@ use ZfExtended_Exception;
  */
 abstract class AbstractXliffProcessor
 {
-    public const TRANSUNIT_PATTERN = '~<trans-unit([^>]+)>\s*<source>(.*?)</source>\s*<target>(.*?)</target>\s*</trans-unit>~';
+    public const TRANSUNIT_PATTERN = '~<trans-unit([^>]+)>\s*<source>(.*?)</source>\s*<target>(.*?)</target>\s*</trans-unit>~s';
 
-    public const RESNAME_PATTERN = '~<trans-unit (id="[^"]+")>\s*<source>(.*?)</source>\s*<target>.*?</target>\s*</trans-unit>~';
+    public const RESNAME_PATTERN = '~<trans-unit (id="[^"]+")>\s*<source>(.*?)</source>\s*<target>.*?</target>\s*</trans-unit>~s';
 
     public const ID_PATTERN = '~\s+id\s*=\s*["\']{1}([^"\']+)["\']{1}~';
 
@@ -134,23 +134,39 @@ abstract class AbstractXliffProcessor
     }
 
     /**
-     * Saves the file under a different name to import it to translate5 for review
+     * Saves the file under a different name to export/import it to translate5 for review
      * Optionally, a resname can be given that will be added to all transunits (adding a counter: resname-N)
      * @throws FileWriteException
      */
-    public function saveAsImport(string $absolutePath): void
+    public function saveAsImport(string $absolutePath, bool $withEmptyTargets): void
     {
         // resname will represent location of ZXLIFF in file-system
         $baseResname = $this->createBaseResname();
         // inject resnames
-        $body = preg_replace_callback(self::RESNAME_PATTERN, function ($matches) use ($baseResname) {
+        $body = preg_replace_callback(self::RESNAME_PATTERN, function ($matches) use ($baseResname, $withEmptyTargets) {
             $idAttr = $matches[1];
-            $resnameAttr = 'resname="' . $baseResname . md5($matches[2]) . '"';
+            $source = $matches[2];
+            $resnameAttr = 'resname="' . $baseResname . md5($source) . '"';
+            $transUnit = $matches[0];
+
+            // Leading/trailing whitespace cannot be saved to a TM so we generate an Exception here
+            // so that Problem needs to be solved first
+            if (trim($source) !== $source) {
+                throw new \ZfExtended_Exception(
+                    'Found localization source string that has leading or trailing whitespace.' .
+                    ' This must be solved before an export can be made: "' . $source . '"'
+                );
+            }
+
+            // may we need to empty the targets ...
+            if ($withEmptyTargets) {
+                $transUnit = preg_replace('~<target>.*</target>~s', '<target></target>', $transUnit);
+            }
 
             return str_replace(
                 '<trans-unit ' . $idAttr . '>',
                 '<trans-unit ' . $idAttr . ' ' . $resnameAttr . '>',
-                $matches[0]
+                $transUnit
             );
         }, $this->body);
         $content = $this->header . $body . $this->footer;

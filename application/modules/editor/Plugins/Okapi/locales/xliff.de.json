@@ -32,10 +32,10 @@
     "iwsTransTypeValue": "Standardwert für translation_type",
     "iwsRemoveTmOrigin": "tm_origin-Attribut entfernen",
     "iwsBlockLockStatus": "Fertiggestellte Segmente mit dem Attribut lock_status=\"locked\" attribute auf <br/>translate=\"no\" setzen",
-    "iwsBlockTmScore": "Segmente mit dem entsprechenden tm_score-Attributwert auf translate=\"no\"<br/>setzen",
+    "iwsBlockTmScore": "Segmente mit dem entsprechenden tm_score-Attributwert auf <br/>translate=\"no\" setzen",
     "iwsBlockTmScoreValue": "Matchwert des abzustimmenden tm_score",
-    "iwsIncludeMultipleExact": "Segmente mit dem Attribut multiple_exact=\"has_multiple_exact\" einbeziehen<br/>unabhängig von ihrem tm_score",
-    "iwsBlockMultipleExact": "Fertiggestellte Segmente mit dem Attribut multiple_exact=\"has_multiple_exact\"<br/> auf translate=\"no\" setzen",
-    "cdataSubfilter": "Verarbeitet CDATA-Inhalte mit diesem Subfilter<br/>(z.B. \"okf_html\"; zum Deaktivieren leer lassen)",
-    "pcdataSubfilter": "PCDATA-Inhalt mit diesem Subfilter verarbeiten<br/>(zum Deaktivieren leer lassen)"
+    "iwsIncludeMultipleExact": "Segmente mit dem Attribut multiple_exact=\"has_multiple_exact\" einbeziehen <br/>unabhängig von ihrem tm_score",
+    "iwsBlockMultipleExact": "Fertiggestellte Segmente mit dem Attribut multiple_exact=\"has_multiple_exact\" <br/>auf translate=\"no\" setzen",
+    "cdataSubfilter": "Verarbeitet CDATA-Inhalte mit diesem Subfilter <br/>(z.B. \"okf_html\"; zum Deaktivieren leer lassen)",
+    "pcdataSubfilter": "PCDATA-Inhalt mit diesem Subfilter verarbeiten <br/>(zum Deaktivieren leer lassen)"
 }

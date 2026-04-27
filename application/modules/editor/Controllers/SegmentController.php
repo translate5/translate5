@@ -795,7 +795,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             ?: ZfExtended_Authentication::getInstance()->getUser()->getLocale();
 
         // Get locale
-        $locale = Localization::getLocale();
+        $locale = Localization::evaluateLocale($desiredLocale);
 
         //generate portlet data
         $data = (new TermportletData(

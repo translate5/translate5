@@ -281,11 +281,12 @@ class UserJobRepository
         }
     }
 
-    public function findUserJobInTask(string $userGuid, string $taskGuid, string $workflowStepName): ?UserJob
+    public function findAppropriateUserJobInTask(string $userGuid, string $taskGuid, string $workflowStepName): ?UserJob
     {
         //order first by matching role, then by the states as defined
         $order = $this->db->quoteInto(
-            'state="edit" DESC,'
+            'workflowStepName = ? DESC,'
+            . 'state="edit" DESC,'
             . 'state="view" DESC,'
             . 'state="unconfirmed" DESC,'
             . 'state="open" DESC,'
@@ -298,9 +299,39 @@ class UserJobRepository
             ->from(UserJobTable::TABLE_NAME)
             ->where('userGuid = ?', $userGuid)
             ->where('taskGuid = ?', $taskGuid)
-            ->where('workflowStepName = ?', $workflowStepName)
             ->where('type != ?', TypeEnum::Coordinator->value)
             ->order(new Zend_Db_Expr($order));
+
+        $row = $this->db->fetchRow($s);
+
+        if (empty($row)) {
+            return null;
+        }
+
+        $job = new UserJob();
+        $job->init(
+            new Zend_Db_Table_Row(
+                [
+                    'table' => $job->db,
+                    'data' => $row,
+                    'stored' => true,
+                    'readOnly' => false,
+                ]
+            )
+        );
+
+        return $job;
+    }
+
+    public function findParticularUserJobInTask(string $userGuid, string $taskGuid, string $workflowStepName): ?UserJob
+    {
+        $s = $this->db->select()
+            ->from(UserJobTable::TABLE_NAME)
+            ->where('userGuid = ?', $userGuid)
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('type != ?', TypeEnum::Coordinator->value)
+            ->where('workflowStepName = ?', $workflowStepName)
+        ;
 
         $row = $this->db->fetchRow($s);
 
@@ -479,13 +510,26 @@ class UserJobRepository
      */
     public function getTaskJobs(string $taskGuid, bool $excludePmOverride = false): iterable
     {
-        $job = ZfExtended_Factory::get(UserJob::class);
+        $job = new UserJob();
 
         $s = $this->db
             ->select()
-            ->from(UserJobTable::TABLE_NAME)
+            ->from(
+                [
+                    'job' => UserJobTable::TABLE_NAME,
+                ],
+                'job.*'
+            )
+            ->join(
+                [
+                    'wf_step' => \editor_Models_Db_Workflow_Step::TABLE_NAME,
+                ],
+                'wf_step.name = job.workflowStepName AND wf_step.workflowName = job.workflow',
+                []
+            )
             ->where('taskGuid = ?', $taskGuid)
             ->where('type != ?', TypeEnum::Coordinator->value)
+            ->order('wf_step.position ASC')
         ;
 
         foreach ($this->db->fetchAll($s) as $jobData) {

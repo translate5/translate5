@@ -114,9 +114,8 @@
 {relaisLanguageFragment}<b>Data di consegna:</b> {deadlineDate}<br />
 <b>Numero di parole:</b> {wordCount}<br /></target>
             </trans-unit>
-            <trans-unit id="Cjxici8+PGI+QWxsIHVzZXJzIGFzc2lnbmVkIHRvIHRoZSB0YXNrOjwvYj4KPGJyLz4=">
-                <source>
-<br/><b>All users assigned to the task:</b>
+            <trans-unit id="PGJyLz48Yj5BbGwgdXNlcnMgYXNzaWduZWQgdG8gdGhlIHRhc2s6PC9iPgo8YnIvPg==">
+                <source><br/><b>All users assigned to the task:</b>
 <br/></source>
                 <target></target>
             </trans-unit>
@@ -124,9 +123,8 @@
                 <source><br/><br/><b>Project details:</b><br/><br/><b>Project name:</b> {task.taskName}<br/><b>Source language:</b> {sourceLanguageTranslated} <br/><b>Target language:</b> {targetLanguageTranslated} <br/><b>Due by:</b> {deadlineDate}<br/><br/></source>
                 <target></target>
             </trans-unit>
-            <trans-unit id="Cjxici8+Cjxici8+PGI+V2FybmluZzo8L2I+IENvbXBldGluZyB1c2VyczogT25seSB0aGUgZmlyc3QgdXNlciB0byBhY2NlcHQgYSBqb2IgY2FuIHBlcmZvcm0gaXQ7IHRoZSB0YXNrIGlzIGF1dG9tYXRpY2FsbHkgcmVtb3ZlZCBmcm9tIG90aGVycy4KPGJyLz4=">
-                <source>
-<br/>
+            <trans-unit id="PGJyLz4KPGJyLz48Yj5XYXJuaW5nOjwvYj4gQ29tcGV0aW5nIHVzZXJzOiBPbmx5IHRoZSBmaXJzdCB1c2VyIHRvIGFjY2VwdCBhIGpvYiBjYW4gcGVyZm9ybSBpdDsgdGhlIHRhc2sgaXMgYXV0b21hdGljYWxseSByZW1vdmVkIGZyb20gb3RoZXJzLgo8YnIvPg==">
+                <source><br/>
 <br/><b>Warning:</b> Competing users: Only the first user to accept a job can perform it; the task is automatically removed from others.
 <br/></source>
                 <target></target>
@@ -197,14 +195,12 @@
                 <source>Accuracy</source>
                 <target>Accuratezza</target>
             </trans-unit>
-            <trans-unit id="CkEgY29vcmRpbmF0b3IgZ3JvdXAgaXMgYW4gb3JnYW5pemF0aW9uYWwgdW5pdCBpbiB0cmFuc2xhdGU1IGNvbnNpc3Rpbmcgb2YgYXQgbGVhc3Qgb25lIGpvYiBjb29yZGluYXRvciwgdG8gd2hvbSB3b3JrZmxvdyBzdGVwcyBjYW4gYmUgYXNzaWduZWQsIGFuZCBhbnkgZWRpdG9ycyBjcmVhdGVkIGJ5IHRoZSBqb2IgY29vcmRpbmF0b3IsIHRvIHdob20gdGhlIGpvYiBjb29yZGluYXRvciBjYW4gaW4gdHVybiBhc3NpZ24gdGhlaXIgam9icy48YnIvPgpBIGNvb3JkaW5hdG9yIGdyb3VwIGNhbiBiZSB5b3VyIGV4dGVybmFsIGxhbmd1YWdlIHNlcnZpY2UgcHJvdmlkZXIsIGZvciBleGFtcGxlLCBhbmQgdGhlIGpvYiBjb29yZGluYXRvciBpcyB0aGVuIHlvdXIgYXNzb2NpYXRlZCBwcm9qZWN0IG1hbmFnZXIuPGJyLz4KQSBjb29yZGluYXRvciBncm91cCBjb3VsZCBhbHNvIGJlIGEgZm9yZWlnbiBicmFuY2ggb2YgeW91ciBvcmdhbml6YXRpb24gdGhhdCBjYXJyaWVzIG91dCByZXZpZXdzIGZvciB5b3UgYW5kIGNvb3JkaW5hdGVzIHRoZW0gaXRzZWxmLjxici8+Cjxici8+CkNyZWF0ZSBhIG5ldyBncm91cCBoZXJlLCB0aGVuIHlvdSBjYW4gY3JlYXRlIHRoZSBqb2IgY29vcmRpbmF0b3IgYmVsb25naW5nIHRvIHRoZSBncm91cCBpbiB0aGUgdXNlciBvdmVydmlldy4KICAgICAgICAgICAgICAgIA==">
-                <source>
-A coordinator group is an organizational unit in translate5 consisting of at least one job coordinator, to whom workflow steps can be assigned, and any editors created by the job coordinator, to whom the job coordinator can in turn assign their jobs.<br/>
+            <trans-unit id="QSBjb29yZGluYXRvciBncm91cCBpcyBhbiBvcmdhbml6YXRpb25hbCB1bml0IGluIHRyYW5zbGF0ZTUgY29uc2lzdGluZyBvZiBhdCBsZWFzdCBvbmUgam9iIGNvb3JkaW5hdG9yLCB0byB3aG9tIHdvcmtmbG93IHN0ZXBzIGNhbiBiZSBhc3NpZ25lZCwgYW5kIGFueSBlZGl0b3JzIGNyZWF0ZWQgYnkgdGhlIGpvYiBjb29yZGluYXRvciwgdG8gd2hvbSB0aGUgam9iIGNvb3JkaW5hdG9yIGNhbiBpbiB0dXJuIGFzc2lnbiB0aGVpciBqb2JzLjxici8+CkEgY29vcmRpbmF0b3IgZ3JvdXAgY2FuIGJlIHlvdXIgZXh0ZXJuYWwgbGFuZ3VhZ2Ugc2VydmljZSBwcm92aWRlciwgZm9yIGV4YW1wbGUsIGFuZCB0aGUgam9iIGNvb3JkaW5hdG9yIGlzIHRoZW4geW91ciBhc3NvY2lhdGVkIHByb2plY3QgbWFuYWdlci48YnIvPgpBIGNvb3JkaW5hdG9yIGdyb3VwIGNvdWxkIGFsc28gYmUgYSBmb3JlaWduIGJyYW5jaCBvZiB5b3VyIG9yZ2FuaXphdGlvbiB0aGF0IGNhcnJpZXMgb3V0IHJldmlld3MgZm9yIHlvdSBhbmQgY29vcmRpbmF0ZXMgdGhlbSBpdHNlbGYuPGJyLz4KPGJyLz4KQ3JlYXRlIGEgbmV3IGdyb3VwIGhlcmUsIHRoZW4geW91IGNhbiBjcmVhdGUgdGhlIGpvYiBjb29yZGluYXRvciBiZWxvbmdpbmcgdG8gdGhlIGdyb3VwIGluIHRoZSB1c2VyIG92ZXJ2aWV3Lg==">
+                <source>A coordinator group is an organizational unit in translate5 consisting of at least one job coordinator, to whom workflow steps can be assigned, and any editors created by the job coordinator, to whom the job coordinator can in turn assign their jobs.<br/>
 A coordinator group can be your external language service provider, for example, and the job coordinator is then your associated project manager.<br/>
 A coordinator group could also be a foreign branch of your organization that carries out reviews for you and coordinates them itself.<br/>
 <br/>
-Create a new group here, then you can create the job coordinator belonging to the group in the user overview.
-                </source>
+Create a new group here, then you can create the job coordinator belonging to the group in the user overview.</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="QWN0aW9ucw==">
@@ -399,10 +395,9 @@ Create a new group here, then you can create the job coordinator belonging to th
                 <source>All users assigned to a workflow step can work simultaneously</source>
                 <target>Tutti gli utenti assegnati a una fase del workflow possono lavorare contemporaneamente</target>
             </trans-unit>
-            <trans-unit id="QWxsIHVzZXJzIHdpdGggdGhlIGN1cnJlbnQgcm9sZSA8aT57Y3VycmVudFJvbGV9PC9pPjoKe2N1cnJlbnRVc2Vyc308YnIvPgo=">
+            <trans-unit id="QWxsIHVzZXJzIHdpdGggdGhlIGN1cnJlbnQgcm9sZSA8aT57Y3VycmVudFJvbGV9PC9pPjoKe2N1cnJlbnRVc2Vyc308YnIvPg==">
                 <source>All users with the current role <i>{currentRole}</i>:
-{currentUsers}<br/>
-</source>
+{currentUsers}<br/></source>
                 <target></target>
             </trans-unit>
             <trans-unit id="QWxsIHVzZXMgb2YgdGhpcyBvcHRpb24gKGlmIGFueSkgd2lsbCBiZSByZW1vdmVkIGZyb20gZXhpc3RpbmcgcHJvamVjdHMvdGFza3MuIENvbnRpbnVlPw==">
@@ -445,16 +440,8 @@ Create a new group here, then you can create the job coordinator belonging to th
                 <source>An error occurred while translating the file; no download available.</source>
                 <target>Si è verificato un errore durante la traduzione del file; il download non è disponibile.</target>
             </trans-unit>
-            <trans-unit id="QSBuZXcge3Byb2plY3RUeXBlfSBoYXMgYmVlbiBjcmVhdGVkIGluIHRoZSBwcm9qZWN0IHBvcnRhbCAuUHJvamVjdCBJRDp7cG9ydGFsTGlua30uPGJyIC8+PHN0cm9uZz5Qcm9qZWN0IElEOjwvc3Ryb25nPiB7cHJvamVjdElkfTxiciAvPgo8c3Ryb25nPlByb2plY3QgTmFtZTo8L3N0cm9uZz4ge3Byb2plY3ROYW1lfQ==">
-                <source>A new {projectType} has been created in the project portal .Project ID:{portalLink}.<br /><strong>Project ID:</strong> {projectId}<br />
-<strong>Project Name:</strong> {projectName}</source>
-                <target></target>
-            </trans-unit>
-            <trans-unit id="QSBuZXcge3Byb2plY3RUeXBlfSBoYXMgYmVlbiBjcmVhdGVkIGluIHRoZSBwcm9qZWN0IHBvcnRhbCB7cG9ydGFsTGlua30uPGJyIC8+CjxzdHJvbmc+UHJvamVjdCBJRDogPC9zdHJvbmc+IHtwcm9qZWN0SWR9IDxiciAvPgo8c3Ryb25nPlByb2plY3QgTmFtZTo8L3N0cm9uZz4ge3Byb2plY3ROYW1lfSA8YnIgLz4KPHN0cm9uZz5DcmVhdGVkIGJ5Ojwvc3Ryb25nPntjcmVhdGVkQnlVc2VyfQ==">
-                <source>A new {projectType} has been created in the project portal {portalLink}.<br />
-<strong>Project ID: </strong> {projectId} <br />
-<strong>Project Name:</strong> {projectName} <br />
-<strong>Created by:</strong>{createdByUser}</source>
+            <trans-unit id="QSBuZXcge3Byb2plY3RUeXBlfSBoYXMgYmVlbiBjcmVhdGVkIGluIHRoZSBwcm9qZWN0IHBvcnRhbCB7cG9ydGFsTGlua30u">
+                <source>A new {projectType} has been created in the project portal {portalLink}.</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="QW5vbnltaXplZA==">
@@ -585,10 +572,9 @@ Create a new group here, then you can create the job coordinator belonging to th
                 <source>Are you sure you want to delete this rule? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</source>
                 <target>Si desidera veramente eliminare il riconoscimento dei numeri?</target>
             </trans-unit>
-            <trans-unit id="CkFyZSB5b3Ugc3VyZSB5b3Ugd2FudCB0byB1bmFzc2lnbiB0aGlzIGNsaWVudCB7MH0gZnJvbSB0aGUgQ29vcmRpbmF0b3IgZ3JvdXAgezF9Pzxici8+CjxiPlRoaXMgd2lsbCBkZWxldGUgYWxsIGNsaWVudC1ncm91cCByZWxhdGVkIGpvYnMsIGluY2x1ZGluZyBhbGwgam9icyBvZiB0aGUgd2hvbGUgc3VwcGx5IGNoYWluIChzdWJncm91cHMgZXRjLikuPC9iPg==">
-                <source>
-Are you sure you want to unassign this client {0} from the Coordinator group {1}?<br/>
-<b>This will delete all client-group related jobs, including all jobs of the whole supply chain (subgroups etc.).</b></source>
+            <trans-unit id="QXJlIHlvdSBzdXJlIHlvdSB3YW50IHRvIHVuYXNzaWduIHRoaXMgY2xpZW50IHswfSBmcm9tIHRoZSBDb29yZGluYXRvciBncm91cCB7MX0/Cjxici8+PGI+VGhpcyB3aWxsIGRlbGV0ZSBhbGwgY2xpZW50LWdyb3VwIHJlbGF0ZWQgam9icywgaW5jbHVkaW5nIGFsbCBqb2JzIG9mIHRoZSB3aG9sZSBzdXBwbHkgY2hhaW4gKHN1Ymdyb3VwcyBldGMuKS48L2I+">
+                <source>Are you sure you want to unassign this client {0} from the Coordinator group {1}?
+<br/><b>This will delete all client-group related jobs, including all jobs of the whole supply chain (subgroups etc.).</b></source>
                 <target></target>
             </trans-unit>
             <trans-unit id="QXJtZW5pc2No">
@@ -841,7 +827,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="Q1RSTCArIElOUyAoYWx0ZXJuYXRpdmVseSBDVFJMICsgLiAocGVyaW9kKSkgY29waWVzIHRoZSBjb21wbGV0ZSBzb3VyY2Ugc2VnbWVudCBjb250ZW50IGludG8gdGhlIHRhcmdldCBzZWdtZW50PGJyIC8+Q1RSTCArICwgKGNvbW1hKSArICZndDtudW1iZXImbHQ7IGNvcGllcyB0aGUgY29ycmVzcG9uZGluZyB0YWcgKHplcm8gZXF1YWxzIHRhZyBuby4gMTApIGludG8gdGhlIHRhcmdldCBzZWdtZW50PGJyIC8+Q1RSTCArIFNISUZUICsgLCAoY29tbWErICZndDtudW1iZXImbHQ7IGNvcGllcyB0YWdzIDExIHRvIDIwIGludG8gdGhlIHRhcmdldCBzZWdtZW50Lg==">
                 <source>CTRL + INS (alternatively CTRL + . (period)) copies the complete source segment content into the target segment<br />CTRL + , (comma) + &gt;number&lt; copies the corresponding tag (zero equals tag no. 10) into the target segment<br />CTRL + SHIFT + , (comma+ &gt;number&lt; copies tags 11 to 20 into the target segment.</source>
-                <target>STRG + INS (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT +, (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Q1RSTCArIFNISUZUICsgUw==">
                 <source>CTRL + SHIFT + S</source>
@@ -989,7 +975,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="Q2xpY2sg4oCcU2V0IGZvciBhbGwgc2VsZWN0ZWTigJ0gdG8gY2hhbmdlIHRoZSBwcm9wZXJ0eSBmb3IgPGI+YWxsIGNoZWNrZWQ8L2I+IHRhc2tzIG9yIGNsaWNrIOKAnFNldCBmb3IgYWxsIGluIGN1cnJlbnQgZmlsdGVyaW5n4oCdIHRvIGNoYW5nZSB0aGUgcHJvcGVydHkgZm9yIDxiPmFsbDwvYj4gdGFza3MgaW4gdGhlIGN1cnJlbnRseSBhcHBsaWVkIHByb2plY3QgZmlsdGVyaW5nLg==">
                 <source>Click “Set for all selected” to change the property for <b>all checked</b> tasks or click “Set for all in current filtering” to change the property for <b>all</b> tasks in the currently applied project filtering.</source>
-                <target>Klicken Sie auf „Für alle selektierten ändern“, um die Eigenschaft für <b>alle markierten</b> Aufgaben zu ändern, oder klicken Sie auf „Für alle in Filterung ändern“, um die Eigenschaft für <b>alle</b> Aufgaben in der aktuell angewandten Projektfilterung zu ändern.</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Q2xpZW50">
                 <source>Client</source>
@@ -1295,6 +1281,10 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
                 <source>Create content recognition rule</source>
                 <target>Crea riconoscimento dei numeri</target>
             </trans-unit>
+            <trans-unit id="Q3JlYXRlZCBieQ==">
+                <source>Created by</source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="Q3JlYXRlIGVudHJ5">
                 <source>Create entry</source>
                 <target>Crea voce</target>
@@ -1366,14 +1356,6 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             <trans-unit id="RGFyayBsYXlvdXQgKEFyaWEp">
                 <source>Dark layout (Aria)</source>
                 <target>Layout scuro (Aria)</target>
-            </trans-unit>
-            <trans-unit id="RGFzIFNlZ21lbnQga2FubiBuaWNodCBvaG5lIEluaGFsdCBnZXNwZWljaGVydCB3ZXJkZW4h">
-                <source>Das Segment kann nicht ohne Inhalt gespeichert werden!</source>
-                <target></target>
-            </trans-unit>
-            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgc2NobGllw59lbiBTaWUgZGFzIFNlZ21lbnQgZ2dmLiBkdXJjaCBLbGljayBhdWYgIkFiYnJlY2hlbiIgdW5kIMO2ZmZuZW4sIGJlYXJiZWl0ZW4gdW5kIHNwZWljaGVybiBTaWUgZXMgZXJuZXV0LiBWaWVsZW4gRGFuayEgPGJyLz48YnIvPkdlcmFkZSBiZWFyYmVpdGV0ZXIgVGV4dCB3YXI6PGJyLz48YnIvPg==">
-                <source>Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/></source>
-                <target></target>
             </trans-unit>
             <trans-unit id="RGF0YWJhc2UgbmFtZQ==">
                 <source>Database name</source>
@@ -1801,7 +1783,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="RHVyaW5nIGltcG9ydCwgdXNlcnMgd2l0aCB0aGUgcmlnaHQg4oCcRWRpdG9y4oCdIGFuZCBtYXRjaGluZyBsYW5ndWFnZSBjb21iaW5hdGlvbiA8YSBocmVmPSJodHRwOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTU1NzE2NCIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJtZWhyIEluZm8iPndpbGwgYXV0b21hdGljYWxseSBiZSBhc3NpZ25lZCB0byB0aGUgdGFzazwvYT4u">
                 <source>During import, users with the right “Editor” and matching language combination <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">will automatically be assigned to the task</a>.</source>
-                <target>Beim Import von Aufgaben werden Benutzer mit dem Recht „Editor“ und den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="RMOkbmlzY2g=">
                 <source>Dänisch</source>
@@ -2381,7 +2363,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="Rm9yIG1vcmUgaW5mb3JtYXRpb24gYWJvdXQgdGhlIGV2ZW50LCBjbGljayBvbiB0aGUgZXZlbnQgY29kZS48YnIvPk5vdCBhbGwgZXJyb3JzIGNhbiBiZSBsaXN0ZWQgaGVyZS4gVGhlcmVmb3JlLCBwbGVhc2UgYWxzbyBjaGVjayB0aGUgPGEgaHJlZj0iI3ByZWZlcmVuY2VzL2FkbWluU3lzdGVtTG9nIj5nZW5lcmFsIHN5c3RlbSBsb2c8L2E+IQ==">
                 <source>For more information about the event, click on the event code.<br/>Not all errors can be listed here. Therefore, please also check the <a href="#preferences/adminSystemLog">general system log</a>!</source>
-                <target>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken.<br/>Nicht alle Fehler können hier aufgelistet werden, bitte beachten Sie daher auch das <a href="#preferences/adminSystemLog">generelle System-Log</a>!</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="Rm9yIHNlZ21lbnRzLCB0aGF0IGhhdmUgbm90IGJlZW4gZWRpdGVkIHdpdGhpbiBhIHdvcmtmbG93IHN0ZXAsIHRoZSBMZXZlbnNodGVpbiBkaXN0YW5jZSBpcyBzYXZlZCBhcyAwIGZvciB0aGlzIHN0ZXAsIHdoZW4gdGhlIGxhc3QgdXNlciBvZiBhIHdvcmtmbG93IHN0ZXAgZmluaXNoZXMgaGlzIGpvYi4=">
                 <source>For segments, that have not been edited within a workflow step, the Levenshtein distance is saved as 0 for this step, when the last user of a workflow step finishes his job.</source>
@@ -2525,7 +2507,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="SGVscCBpbXByb3ZlIHRyYW5zbGF0ZTU6IEFsbG93IHNjcmVlbiByZWNvcmRpbmcgaW4gY2FzZSBvZiBlcnJvcnMuPGJyIC8+PGJyIC8+Rm9yIGNlcnRhaW4gZXJyb3JzLCB0aGUgdHJhbnNsYXRlNSBvcGVuLXNvdXJjZSBkZXZlbG9wbWVudCB0ZWFtIGNhbiBvbmx5IHJlcHJvZHVjZSBhbmQgZml4IHRoZW0gaWYgdGhlIHVzZXIgYWN0aW9ucyB0aGF0IGxlZCB0byB0aGUgdHJhbnNsYXRlNSBlcnJvciBhcmUgcmVjb3JkZWQgYXMgYSB2aWRlby4gT25seSB3aGF0IGhhcHBlbnMgd2l0aGluIHRyYW5zbGF0ZTUgd2lsbCBiZSByZWNvcmRlZC4gVGhlIHJlY29yZGluZyBzdGFydHMgb25jZSBhIHNlZ21lbnQgaXMgb3BlbmVkIGZvciBlZGl0aW5nIGFuZCBzdG9wcyBhcyBzb29uIGFzIHRoZSBzZWdtZW50IGVkaXRpbmcgZW5kcy48YnIgLz48YnIgLz5UaGUgdHJhbnNsYXRlNSB0ZWFtIHdvdWxkIGdyZWF0bHkgYXBwcmVjaWF0ZSBpdCBpZiB5b3UgZW5hYmxlIHRoaXMgZmVhdHVyZSDigJMgdGhhbmsgeW91IGluIGFkdmFuY2UhPGJyIC8+PGJyIC8+RXZlbiB3aGVuIHZpZGVvIHJlY29yZGluZyBpcyBlbmFibGVkLCByZWNvcmRpbmdzIHdpbGwgb25seSBiZSBzZW50IGlmIHlvdSByZXBvcnQgYW4gZXJyb3IgdGhhdCBvY2N1cnJlZC48YnIgLz48YnIgLz5WaWRlb3MgYXNzb2NpYXRlZCB3aXRoIGFuIGVycm9yIGFuZCBzZW50IHRvIHRoZSBzZXJ2ZXIgd2lsbCBiZSBkZWxldGVkIGFzIHNvb24gYXMgdGhleSBhcmUgbm8gbG9uZ2VyIG5lZWRlZCB0byBmaXggdGhlIGlzc3VlLiBUaGUgc29sZSBwdXJwb3NlIG9mIHRoZXNlIHZpZGVvcyBpcyB0aGUgZGV2ZWxvcG1lbnQgb2YgdHJhbnNsYXRlNS4gVGhlIGRhdGEgd2lsbCBvbmx5IGJlIHVzZWQgZm9yIHRoaXMgcHVycG9zZS48YnIgLz48YnIgLz5Gb3IgbW9yZSBpbmZvcm1hdGlvbiBhYm91dCB2aWRlbyByZWNvcmRpbmcgd2l0aCB0aGVSb290Q2F1c2UgYW5kIGRhdGEgcHJvdGVjdGlvbiwgcGxlYXNlIHZpc2l0OiBodHRwczovL2NvbmZsdWVuY2UudHJhbnNsYXRlNS5uZXQveC9FQUFyQnc=">
                 <source>Help improve translate5: Allow screen recording in case of errors.<br /><br />For certain errors, the translate5 open-source development team can only reproduce and fix them if the user actions that led to the translate5 error are recorded as a video. Only what happens within translate5 will be recorded. The recording starts once a segment is opened for editing and stops as soon as the segment editing ends.<br /><br />The translate5 team would greatly appreciate it if you enable this feature – thank you in advance!<br /><br />Even when video recording is enabled, recordings will only be sent if you report an error that occurred.<br /><br />Videos associated with an error and sent to the server will be deleted as soon as they are no longer needed to fix the issue. The sole purpose of these videos is the development of translate5. The data will only be used for this purpose.<br /><br />For more information about video recording with theRootCause and data protection, please visit: https://confluence.translate5.net/x/EAArBw</source>
-                <target>Helfen Sie bei der Entwicklung von translate5: Erlauben Sie Bildschirmvideos im Fehlerfall.<br /><br />Bei einer Reihe von Fehlern kann das Open Source-Entwicklungsteam von translate5 diese nur reproduzieren und beheben, wenn die Benutzeraktionen, die in translate5 zu dem Fehler geführt haben, als Video aufgenommen werden. Es wird nur aufgezeichnet, was in translate5 passiert. Die Videoaufnahme startet erst, wenn ein Segment zur Bearbeitung geöffnet ist, und sie endet, sobald die Bearbeitung des Segments endet.<br /><br />Das Team von translate5 wäre sehr dankbar, wenn Sie diese Funktion aktivieren – vielen Dank im Voraus!<br /><br />Auch wenn die Videoaufzeichnung aktiviert ist, werden Videoaufzeichnungen nur gesendet, wenn Sie einen aufgetretenen Fehler melden.<br /><br />Videos, die mit einem Fehler in Verbindung stehen und an den Server gesendet wurden, werden gelöscht, sobald sie zur Behebung des Fehlers nicht mehr benötigt werden. Der einzige Verwendungszweck der Videos ist die Weiterentwicklung von translate5. Die Daten werden nur für diesen Zweck verwendet.<br /><br />Weitere Informationen zur Videoaufzeichnung mit theRootCause und zum Datenschutz finden Sie unter https://confluence.translate5.net/x/EAArBw</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="SGlkZGVuIGVkaXRhYmxlIGNvbHVtbnMgaGF2ZSBiZWVuIG1hZGUgdmlzaWJsZSBiZWNhdXNlIHRoZSB0YXNrIHdhcyBvcGVuZWQgZm9yIGVkaXRpbmcsIGJ1dCBubyBlZGl0YWJsZSBjb2x1bW5zIHdlcmUgdmlzaWJsZS4=">
                 <source>Hidden editable columns have been made visible because the task was opened for editing, but no editable columns were visible.</source>
@@ -2918,15 +2900,15 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="SW4gdGhlIHByb2plY3QgcG9ydGFsICwgdGhlIHRhc2sge3Rhc2sudGFza05yfSB7cG9ydGFsTGlua30sIHRoZSB0YXNrIDxiPnt0YXNrLnRhc2tOcn0g4oCTIHt0YXNrLnRhc2tOYW1lfTwvYj4gaGFzIGJlZW4gY29tcGxldGVkIGJ5IGEgdXNlciBvZiB0aGUgcm9sZSA8aT57Y3VycmVudFJvbGV9PC9pPjo8YnIgLz4=">
                 <source>In the project portal , the task {task.taskNr} {portalLink}, the task <b>{task.taskNr} – {task.taskName}</b> has been completed by a user of the role <i>{currentRole}</i>:<br /></source>
-                <target>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr}– {task.taskName}</b> durch einen Benutzer der Rolle <i>{currentRole}</i> abgeschlossen:<br /></target>
+                <target></target>
             </trans-unit>
             <trans-unit id="SW4gdGhlIHByb2plY3QgcG9ydGFsIHtwb3J0YWxMaW5rfSwgdGhlIHRhc2sge3Rhc2sudGFza05yfSA8Yj57dGFzay50YXNrTnJ9IOKAkyB7dGFzay50YXNrTmFtZX08L2I+IGhhcyBiZWVuIGNvbXBsZXRlZCBieSBhbGwgdXNlcnMgaW4gdGhlIHJvbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+LjxiciAvPg==">
                 <source>In the project portal {portalLink}, the task {task.taskNr} <b>{task.taskNr} – {task.taskName}</b> has been completed by all users in the role <i>{previousRole}</i>.<br /></source>
-                <target>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr}– {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></target>
+                <target></target>
             </trans-unit>
             <trans-unit id="SW4gdGhlIHByb2plY3QgcG9ydGFsIHtwb3J0YWxMaW5rfSwgdGhlIHRhc2sge3Rhc2sudGFza05yfSA8Yj57dGFzay50YXNrTnJ9IOKAkyB7dGFzay50YXNrTmFtZX08L2I+IHdhcyBhdXRvbWF0aWNhbGx5IGZpbmlzaGVkIGZvciBhbGwgdXNlcnMgb2YgdGhlIHJvbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGR1ZSB0byBhIGRlYWRsaW5lIG92ZXJydW4uPGJyIC8+">
                 <source>In the project portal {portalLink}, the task {task.taskNr} <b>{task.taskNr} – {task.taskName}</b> was automatically finished for all users of the role <i>{previousRole}</i> due to a deadline overrun.<br /></source>
-                <target>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr}– {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></target>
+                <target></target>
             </trans-unit>
             <trans-unit id="SW4gdGhlIHJlcGV0aXRpb24gZWRpdG9yLCBhbGwgc2VnbWVudHMgdGhhdCByZXBlYXQgY29tcGFyZWQgdG8gdGhlIGN1cnJlbnQgc2VnbWVudCBhcmUgZGlzcGxheWVkLiBUaGVzZSBjYW4gYmUgc2VnbWVudHMgd2hvc2Ugc291cmNlLWxhbmd1YWdlIGNvbnRlbnQgbWF0Y2hlcyB0aGUgc291cmNlLWxhbmd1YWdlIGNvbHVtbiBvZiB0aGUgY3VycmVudCBzZWdtZW50IChjbGFzc2ljIHJlcGV0aXRpb24pLiBUaGV5IGNhbiBhbHNvIGJlIHNlZ21lbnRzIHdob3NlIHRhcmdldC1sYW5ndWFnZSBjb250ZW50IG1hdGNoZXMgdGhlIHRhcmdldC1sYW5ndWFnZSBjb2x1bW4gb2YgdGhlIGN1cnJlbnQgc2VnbWVudC4=">
                 <source>In the repetition editor, all segments that repeat compared to the current segment are displayed. These can be segments whose source-language content matches the source-language column of the current segment (classic repetition). They can also be segments whose target-language content matches the target-language column of the current segment.</source>
@@ -3232,34 +3214,29 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
                 <source>Linked text on login page</source>
                 <target>Il testo collegato è una pagina di login</target>
             </trans-unit>
-            <trans-unit id="CiAgICAgICAgICAgICAgICBMaXN0IG9mIGFjdGl2ZSBJbnB1dCBSdWxlcy4KICAgICAgICAgICAgICAgIDxici8+SW4gb3JkZXIgdG8gYWN0aXZhdGUgYSBydWxlLCBpdCBtdXN0IGZpcnN0IGJlIG1hcHBlZCB0byBhIHNvdXJjZSBsYW5ndWFnZS4gICAgICAgICAgICAgICA8YnIvPk9uY2UgdGhlIGNvbnRlbnQgaXMgZm91bmQgaW4gdGhlIHNvdXJjZSBsYW5ndWFnZSA8Yj5hbmQ8L2I+IGFuIGFjdGl2ZSBvdXRwdXQgcnVsZSBmb3IgdGhlIHRhcmdldCBsYW5ndWFnZSBpcyBkZWZpbmVkLCBpdCB3aWxsIGJlIHByb3RlY3RlZCBhcyBhbiBpbnRlcm5hbCB0YWcgPGI+YW5kPC9iPiBhdXRvbWF0aWNhbGx5IGNvbnZlcnRlZCBhY2NvcmRpbmcgdG8gdGhlIGRlZmluZWQgb3V0cHV0IHJ1bGUuCiAgICAgICAgICAgICAgICA8YnIvPjxiPlJ1bGVzIHdpdGggaGlnaGVyIHByaW9yaXRpZXMgd2lsbCBiZSBhcHBsaWVkIGZpcnN0LjwvYj4KICAgICAgICAgICAgICAgIDxici8+SWYgdGhlIGRlc2lyZWQgcnVsZSBpcyBub3QgYXZhaWxhYmxlIGluIHRoZSBkcm9wLWRvd24gbGlzdCwgYWN0aXZhdGUgaXQgKG9yIGFkZCBhbmQgYWN0aXZhdGUgaXQpIGluIHRoZSDigJxDb250ZW50IFJlY29nbml0aW9uIFJ1bGVz4oCdIHRhYi4KICAgICAgICAgICAgICAgIA==">
-                <source>
-                List of active Input Rules.
-                <br/>In order to activate a rule, it must first be mapped to a source language.               <br/>Once the content is found in the source language <b>and</b> an active output rule for the target language is defined, it will be protected as an internal tag <b>and</b> automatically converted according to the defined output rule.
-                <br/><b>Rules with higher priorities will be applied first.</b>
-                <br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.
-                </source>
+            <trans-unit id="TGlzdCBvZiBhY3RpdmUgSW5wdXQgUnVsZXMuCjxici8+SW4gb3JkZXIgdG8gYWN0aXZhdGUgYSBydWxlLCBpdCBtdXN0IGZpcnN0IGJlIG1hcHBlZCB0byBhIHNvdXJjZSBsYW5ndWFnZS4KPGJyLz5PbmNlIHRoZSBjb250ZW50IGlzIGZvdW5kIGluIHRoZSBzb3VyY2UgbGFuZ3VhZ2UgPGI+YW5kPC9iPiBhbiBhY3RpdmUgb3V0cHV0IHJ1bGUgZm9yIHRoZSB0YXJnZXQgbGFuZ3VhZ2UgaXMgZGVmaW5lZCwgaXQgd2lsbCBiZSBwcm90ZWN0ZWQgYXMgYW4gaW50ZXJuYWwgdGFnIDxiPmFuZDwvYj4gYXV0b21hdGljYWxseSBjb252ZXJ0ZWQgYWNjb3JkaW5nIHRvIHRoZSBkZWZpbmVkIG91dHB1dCBydWxlLgo8YnIvPjxiPlJ1bGVzIHdpdGggaGlnaGVyIHByaW9yaXRpZXMgd2lsbCBiZSBhcHBsaWVkIGZpcnN0LjwvYj4KPGJyLz5JZiB0aGUgZGVzaXJlZCBydWxlIGlzIG5vdCBhdmFpbGFibGUgaW4gdGhlIGRyb3AtZG93biBsaXN0LCBhY3RpdmF0ZSBpdCAob3IgYWRkIGFuZCBhY3RpdmF0ZSBpdCkgaW4gdGhlIOKAnENvbnRlbnQgUmVjb2duaXRpb24gUnVsZXPigJ0gdGFiLg==">
+                <source>List of active Input Rules.
+<br/>In order to activate a rule, it must first be mapped to a source language.
+<br/>Once the content is found in the source language <b>and</b> an active output rule for the target language is defined, it will be protected as an internal tag <b>and</b> automatically converted according to the defined output rule.
+<br/><b>Rules with higher priorities will be applied first.</b>
+<br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.</source>
                 <target></target>
             </trans-unit>
-            <trans-unit id="CiAgICAgICAgICAgICAgICBMaXN0IG9mIGFjdGl2ZSBPdXRwdXQgUnVsZXMuCiAgICAgICAgICAgICAgICA8YnIvPkFkZCBydWxlcyBoZXJlIHBlciA8Yj50YXJnZXQgbGFuZ3VhZ2U8L2I+LiBUaGVzZSBydWxlcyB3b3JrIHRvZ2V0aGVyIHdpdGggeW91ciBhY3RpdmUgaW5wdXQgcnVsZXMgdG8gcHJvdGVjdCBhbmQgY29udmVydCBjb250ZW50LgogICAgICAgICAgICAgICAgPGJyLz5JZiB0aGUgZGVzaXJlZCBydWxlIGlzIG5vdCBhdmFpbGFibGUgaW4gdGhlIGRyb3AtZG93biBsaXN0LCBhY3RpdmF0ZSBpdCAob3IgYWRkIGFuZCBhY3RpdmF0ZSBpdCkgaW4gdGhlIOKAnENvbnRlbnQgUmVjb2duaXRpb24gUnVsZXPigJ0gdGFiLgogICAgICAgICAgICAgICAg">
-                <source>
-                List of active Output Rules.
-                <br/>Add rules here per <b>target language</b>. These rules work together with your active input rules to protect and convert content.
-                <br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.
-                </source>
+            <trans-unit id="TGlzdCBvZiBhY3RpdmUgT3V0cHV0IFJ1bGVzLgo8YnIvPkFkZCBydWxlcyBoZXJlIHBlciA8Yj50YXJnZXQgbGFuZ3VhZ2U8L2I+LiBUaGVzZSBydWxlcyB3b3JrIHRvZ2V0aGVyIHdpdGggeW91ciBhY3RpdmUgaW5wdXQgcnVsZXMgdG8gcHJvdGVjdCBhbmQgY29udmVydCBjb250ZW50Lgo8YnIvPklmIHRoZSBkZXNpcmVkIHJ1bGUgaXMgbm90IGF2YWlsYWJsZSBpbiB0aGUgZHJvcC1kb3duIGxpc3QsIGFjdGl2YXRlIGl0IChvciBhZGQgYW5kIGFjdGl2YXRlIGl0KSBpbiB0aGUg4oCcQ29udGVudCBSZWNvZ25pdGlvbiBSdWxlc+KAnSB0YWIu">
+                <source>List of active Output Rules.
+<br/>Add rules here per <b>target language</b>. These rules work together with your active input rules to protect and convert content.
+<br/>If the desired rule is not available in the drop-down list, activate it (or add and activate it) in the “Content Recognition Rules” tab.</source>
                 <target></target>
             </trans-unit>
-            <trans-unit id="CiAgICAgICAgICAgICAgICBMaXN0IG9mIHByZWRlZmluZWQgcmVndWxhciBleHByZXNzaW9ucyB0aGF0IGNhbiBiZSB1c2VkIHRvIHByb3RlY3QgYW5kL29yIGNvbnZlcnQgY29udGVudC4KICAgICAgICAgICAgICAgIDxici8+T3IgZGVmaW5lIHlvdXIgb3duIHJ1bGVzLgogICAgICAgICAgICAgICAgPGJyLz5BY3RpdmF0ZSBhbnkgcnVsZSB5b3Ugd2FudCB0byB1c2UgYXMgaW5wdXQgb3Igb3V0cHV0IGhlcmUuCiAgICAgICAgICAgICAgICA8YnIvPlRvIGZpbmQgZm9ybWF0LXN0cmluZyBydWxlcywgeW91IGNhbiBsb29rIGF0OgogICAgICAgICAgICAgICAgPGJyLz48YSBocmVmPSJodHRwczovL2ljdTRjLWRlbW9zLnVuaWNvZGUub3JnL2ljdS1iaW4vbG9jZXhwP2RfPWVuI3JlZ2lvbiIgdGFyZ2V0PSJfYmxhbmsiIHJlbD0ibm9vcGVuZXIgbm9yZWZlcnJlciI+MS4gTG9jYWxlIHJlbGF0ZWQgZm9ybWF0IHByZXNldHM8L2E+CiAgICAgICAgICAgICAgICA8YnIvPjxhIGhyZWY9Imh0dHBzOi8vdW5pY29kZS1vcmcuZ2l0aHViLmlvL2ljdS91c2VyZ3VpZGUvZm9ybWF0X3BhcnNlL2RhdGV0aW1lLyNkYXRldGltZS1mb3JtYXQtc3ludGF4IiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciBub3JlZmVycmVyIj4yLiBEYXRlcyBzeW50YXg8L2E+CiAgICAgICAgICAgICAgICA8YnIvPjxhIGhyZWY9Imh0dHBzOi8vdW5pY29kZS5vcmcvcmVwb3J0cy90cjM1L3RyMzUtbnVtYmVycy5odG1sI051bWJlcl9Gb3JtYXRfUGF0dGVybnMiIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIG5vcmVmZXJyZXIiPjMuIE51bWJlciBzeW50YXg8L2E+CiAgICAgICAgICAgICAgICA8YnIvPjxhIGhyZWY9Imh0dHBzOi8vaWN1NGMtZGVtb3MudW5pY29kZS5vcmciIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIG5vcmVmZXJyZXIiPjQuIElDVSBEZW1vbnN0cmF0aW9uPC9hPgogICAgICAgICAgICAgICAg">
-                <source>
-                List of predefined regular expressions that can be used to protect and/or convert content.
-                <br/>Or define your own rules.
-                <br/>Activate any rule you want to use as input or output here.
-                <br/>To find format-string rules, you can look at:
-                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
-                <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>
-                <br/><a href="https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank" rel="noopener noreferrer">3. Number syntax</a>
-                <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>
-                </source>
+            <trans-unit id="TGlzdCBvZiBwcmVkZWZpbmVkIHJlZ3VsYXIgZXhwcmVzc2lvbnMgdGhhdCBjYW4gYmUgdXNlZCB0byBwcm90ZWN0IGFuZC9vciBjb252ZXJ0IGNvbnRlbnQuCjxici8+T3IgZGVmaW5lIHlvdXIgb3duIHJ1bGVzLgo8YnIvPkFjdGl2YXRlIGFueSBydWxlIHlvdSB3YW50IHRvIHVzZSBhcyBpbnB1dCBvciBvdXRwdXQgaGVyZS4KPGJyLz5UbyBmaW5kIGZvcm1hdC1zdHJpbmcgcnVsZXMsIHlvdSBjYW4gbG9vayBhdDoKPGJyLz48YSBocmVmPSJodHRwczovL2ljdTRjLWRlbW9zLnVuaWNvZGUub3JnL2ljdS1iaW4vbG9jZXhwP2RfPWVuI3JlZ2lvbiIgdGFyZ2V0PSJfYmxhbmsiIHJlbD0ibm9vcGVuZXIgbm9yZWZlcnJlciI+MS4gTG9jYWxlIHJlbGF0ZWQgZm9ybWF0IHByZXNldHM8L2E+Cjxici8+PGEgaHJlZj0iaHR0cHM6Ly91bmljb2RlLW9yZy5naXRodWIuaW8vaWN1L3VzZXJndWlkZS9mb3JtYXRfcGFyc2UvZGF0ZXRpbWUvI2RhdGV0aW1lLWZvcm1hdC1zeW50YXgiIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIG5vcmVmZXJyZXIiPjIuIERhdGVzIHN5bnRheDwvYT4KPGJyLz48YSBocmVmPSJodHRwczovL3VuaWNvZGUub3JnL3JlcG9ydHMvdHIzNS90cjM1LW51bWJlcnMuaHRtbCNOdW1iZXJfRm9ybWF0X1BhdHRlcm5zIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciBub3JlZmVycmVyIj4zLiBOdW1iZXIgc3ludGF4PC9hPgo8YnIvPjxhIGhyZWY9Imh0dHBzOi8vaWN1NGMtZGVtb3MudW5pY29kZS5vcmciIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIG5vcmVmZXJyZXIiPjQuIElDVSBEZW1vbnN0cmF0aW9uPC9hPg==">
+                <source>List of predefined regular expressions that can be used to protect and/or convert content.
+<br/>Or define your own rules.
+<br/>Activate any rule you want to use as input or output here.
+<br/>To find format-string rules, you can look at:
+<br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
+<br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>
+<br/><a href="https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank" rel="noopener noreferrer">3. Number syntax</a>
+<br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a></source>
                 <target></target>
             </trans-unit>
             <trans-unit id="TGl0YXVpc2No">
@@ -3312,7 +3289,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="TG9ja2VkIHRhc2tzIGNhbm5vdCBiZSBzZWxlY3RlZCwgcGxlYXNlIHdhaXQgdW50aWwgdGhlc2UgYXJlIG9wZW4gYWdhaW4u">
                 <source>Locked tasks cannot be selected, please wait until these are open again.</source>
-                <target>Gesperrte Aufgaben können nicht ausgewählt werden; Sie müssen warten, bis diese wieder entsperrt sind.</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="TG9jayBzZWdtZW50cw==">
                 <source>Lock segments</source>
@@ -4362,6 +4339,10 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
                 <source>Progress: %s</source>
                 <target>Progresso: %s</target>
             </trans-unit>
+            <trans-unit id="UHJvamVjdCBJRA==">
+                <source>Project ID</source>
+                <target>ID progetto</target>
+            </trans-unit>
             <trans-unit id="UHJvamVjdCBkZXNjcmlwdGlvbg==">
                 <source>Project description</source>
                 <target>Descrizione del progetto</target>
@@ -4373,6 +4354,10 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             <trans-unit id="UHJvamVjdCBtYW5hZ2Vy">
                 <source>Project manager</source>
                 <target>Project Manager</target>
+            </trans-unit>
+            <trans-unit id="UHJvamVjdCBuYW1l">
+                <source>Project name</source>
+                <target>Nome progetto</target>
             </trans-unit>
             <trans-unit id="UHJvamVjdCBuYW1lJmx0O3N1cCZndDsxJmx0Oy9zdXAmZ3Q7">
                 <source>Project name&lt;sup&gt;1&lt;/sup&gt;</source>
@@ -5668,14 +5653,7 @@ Are you sure you want to unassign this client {0} from the Coordinator group {1}
             </trans-unit>
             <trans-unit id="U3ViLWxhbmd1YWdlIGRlZHVjdGlvbjogVGhpcyB2YWx1ZSBpcyBzdWJ0cmFjdGVkIGZyb20gdGhlIGxhbmd1YWdlIHJlc291cmNl4oCZcyBtYXRjaCByYXRlIGZvciB0aGUgYW5hbHlzaXMgSUYgdGhlIHN1Yi1sYW5ndWFnZSBvZiB0aGUgdGFzayBkaWZmZXJzIGZyb20gdGhlIHN1Yi1sYW5ndWFnZSBvZiB0aGUgbGFuZ3VhZ2UgcmVzb3VyY2Uu4oa1PGJyLz48YnIvPkV4YW1wbGVzOjxici8+4oa1IOKAkyBTb3VyY2UgbGFuZ3VhZ2UgdGFzazogZGUtQVQsIGxhbmd1YWdlIHJlc291cmNlOiBkZS1ERSA9Jmd0OyBUaGUgZGVkdWN0aW9uIGlzIGFwcGxpZWQuPGJyLz7ihrUg4oCTIFRhcmdldCBsYW5ndWFnZSB0YXNrOiBlbi1VUywgbGFuZ3VhZ2UgcmVzb3VyY2U6IGVuLUdCID0mZ3Q7IFRoZSBkZWR1Y3Rpb24gaXMgYXBwbGllZC48YnIvPuKGtSDigJMgU291cmNlIGxhbmd1YWdlIHRhc2s6IGRlLUFULCBsYW5ndWFnZSByZXNvdXJjZTogZGUgPSZndDsgVGhlIGRlZHVjdGlvbiBpcyBOT1QgYXBwbGllZC48YnIvPuKGtSDigJMgVGFyZ2V0IGxhbmd1YWdlIHRhc2s6IGRlLCBsYW5ndWFnZSByZXNvdXJjZTogZGUtREUgPSZndDsgVGhlIGRlZHVjdGlvbiBpcyBOT1QgYXBwbGllZC48YnIvPuKGtTxici8+4oa1V2hlbiB0aGUgZGVkdWN0aW9uIGlzIGFwcGxpZWQsIHJlYWQvd3JpdGUgYWNjZXNzIHRvIHRoZSBUTSBpcyByZWR1Y2VkIHRvIHJlYWQgYWNjZXNzICh0aGlzIGNhbiBiZSBjaGFuZ2VkIG1hbnVhbGx5IHBlciB0YXNrKS4=">
                 <source>Sub-language deduction: This value is subtracted from the language resource’s match rate for the analysis IF the sub-language of the task differs from the sub-language of the language resource.↵<br/><br/>Examples:<br/>↵ – Source language task: de-AT, language resource: de-DE =&gt; The deduction is applied.<br/>↵ – Target language task: en-US, language resource: en-GB =&gt; The deduction is applied.<br/>↵ – Source language task: de-AT, language resource: de =&gt; The deduction is NOT applied.<br/>↵ – Target language task: de, language resource: de-DE =&gt; The deduction is NOT applied.<br/>↵<br/>↵When the deduction is applied, read/write access to the TM is reduced to read access (this can be changed manually per task).</source>
-                <target>Sub-Sprachenabzug: Dieser Wert wird für die Analyse von der Treffer-Rate der Sprachressource abgezogen, FALLS sich die Subsprache der Aufgabe von der Subsprache der Sprachressource unterscheidet.
-<br/><br/>Beispiele:<br/>
- - Ausgangssprache: Aufgabe de-AT, Sprachressource de-DE=&gt; Der Abzug greift.<br/>
- - Zielsprache: Aufgabe en-US, Sprachressource en-GB=&gt; Der Abzug greift.<br/>
- - Ausgangssprache: Aufgabe de-AT, Sprachressource de=&gt; Der Abzug greift NICHT.<br/>
- - Zielsprache: Aufgabe de, Sprachressource de-DE =&gt; Der Abzug greif NICHT.<br/>
-<br/>
-Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff reduziert (dies kann manuell auf pro Aufgabe geändert werden).</target>
+                <target></target>
             </trans-unit>
             <trans-unit id="U3Vic2NyaXB0">
                 <source>Subscript</source>
@@ -6397,10 +6375,8 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
                 <source>There were no uploaded work files found, or the uploaded files are exceeding the maximum allowed size.</source>
                 <target>Non sono stati trovati file di lavoro caricati oppure i file caricati superano le dimensioni massime consentite.</target>
             </trans-unit>
-            <trans-unit id="VGhlIHJvbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IHdhcyBub3QgcGFydCBvZiB0aGlzIHdvcmtmbG93LCB0aGVyZWZvcmUsIG5vIGZ1cnRoZXIgdXNlcnMgd2VyZSBub3RpZmllZC48YnIgLz4KPGJyIC8+Cg==">
-                <source>The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.<br />
-<br />
-</source>
+            <trans-unit id="VGhlIHJvbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IHdhcyBub3QgcGFydCBvZiB0aGlzIHdvcmtmbG93LCB0aGVyZWZvcmUsIG5vIGZ1cnRoZXIgdXNlcnMgd2VyZSBub3RpZmllZC4=">
+                <source>The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="VGhlIHNhbWUgdXNlciBjYW5ub3QgYmUgYXNzaWduZWQgdG8gdGhlIHNhbWUgd29ya2Zsb3cgc3RlcCB0d2ljZS4gUGxlYXNlIHNlbGVjdCBhIGRpZmZlcmVudCB1c2VyIG9yIGEgZGlmZmVyZW50IHdvcmtmbG93IHN0ZXAu">
@@ -6447,9 +6423,17 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
                 <source>The segment could not be opened for editing because the previous segment was not saved correctly. Please try again. If the problem persists, press F5 to reload the application. Thank you!</source>
                 <target>Non è stato possibile aprire il segmento per l’elaborazione, poiché quello precedente non è stato ancora salvato correttamente. Riprovare di nuovo. Se non funziona, premere F5. Grazie!</target>
             </trans-unit>
+            <trans-unit id="VGhlIHNlZ21lbnQgY291bGQgbm90IGJlIHNhdmVkLiBQbGVhc2UgY2xvc2UgdGhlIHNlZ21lbnQgYnkgcHJlc3Npbmcg4oCcY2FuY2Vs4oCdLCB0aGVuIG9wZW4sIGVkaXQgYW5kIHNhdmUgaXQgYWdhaW4uIFRoYW5rIFlvdSE8YnIvPjxici8+TGFzdCBlZGl0ZWQgVGV4dCB3YXM6PGJyLz48YnIvPg==">
+                <source>The segment could not be saved. Please close the segment by pressing “cancel”, then open, edit and save it again. Thank You!<br/><br/>Last edited Text was:<br/><br/></source>
+                <target></target>
+            </trans-unit>
             <trans-unit id="VGhlIHNlZ21lbnQgY291bGQgbm90IGJlIHNhdmVkIHRvIHRoZSBUTQ==">
                 <source>The segment could not be saved to the TM</source>
                 <target>Non è stato possibile salvare il segmento nella TM</target>
+            </trans-unit>
+            <trans-unit id="VGhlIHNlZ21lbnQgY291bGQgbm90IGJlIHNhdmVkIHdpdGhvdXQgY29udGVudCE=">
+                <source>The segment could not be saved without content!</source>
+                <target></target>
             </trans-unit>
             <trans-unit id="VGhlIHNlZ21lbnQgY291bGQgb25seSBiZSBzYXZlZCB0byB0aGUgdGFzaywgYnV0IG5vdCB0byB0aGUgVE0uIFNlZ21lbnRzIGxvbmdlciB0aGFuIDIwNDggYnl0ZXMgY2Fubm90IGJlIHNhdmVkIHRvIHRoZSBUTS4=">
                 <source>The segment could only be saved to the task, but not to the TM. Segments longer than 2048 bytes cannot be saved to the TM.</source>
@@ -6547,18 +6531,14 @@ Wenn der Abzug greift, wird der Lese-/Schreibzugriff auf das TM auf Lesezugriff 
                 <source>The task does not belong to one of the Coordinator group customers</source>
                 <target></target>
             </trans-unit>
-            <trans-unit id="VGhlIHRhc2sgaGFzIGJlZW4gZnVsbHkgcHJvY2Vzc2VkLCBubyBmdXJ0aGVyIHVzZXJzIGFyZSBhc3NpZ25lZCB0byB0aGUgdGFzay48YnIgLz4KPGJyIC8+Cg==">
-                <source>The task has been fully processed, no further users are assigned to the task.<br />
-<br />
-</source>
+            <trans-unit id="VGhlIHRhc2sgaGFzIGJlZW4gZnVsbHkgcHJvY2Vzc2VkLCBubyBmdXJ0aGVyIHVzZXJzIGFyZSBhc3NpZ25lZCB0byB0aGUgdGFzay4=">
+                <source>The task has been fully processed, no further users are assigned to the task.</source>
                 <target></target>
             </trans-unit>
-            <trans-unit id="VGhlIHRhc2sgaGFzIG5vdyBhdXRvbWF0aWNhbGx5IGJlZW4gbWFkZSBhdmFpbGFibGUgdG8gdGhlIGZvbGxvd2luZyB1c2VycyB3aXRoIHRoZSByb2xlIDxpPntuZXh0Um9sZX08L2k+OjxiciAvPgp7dXNlckxpc3R9PGJyIC8+ClRoZSB1c2VycyBoYXZlIGJlZW4gaW5mb3JtZWQgYWNjb3JkaW5nbHkgdmlhIGUtbWFpbC48YnIgLz4KPGJyIC8+Cg==">
+            <trans-unit id="VGhlIHRhc2sgaGFzIG5vdyBhdXRvbWF0aWNhbGx5IGJlZW4gbWFkZSBhdmFpbGFibGUgdG8gdGhlIGZvbGxvd2luZyB1c2VycyB3aXRoIHRoZSByb2xlIDxpPntuZXh0Um9sZX08L2k+OjxiciAvPgp7dXNlckxpc3R9PGJyIC8+ClRoZSB1c2VycyBoYXZlIGJlZW4gaW5mb3JtZWQgYWNjb3JkaW5nbHkgdmlhIGUtbWFpbC4=">
                 <source>The task has now automatically been made available to the following users with the role <i>{nextRole}</i>:<br />
 {userList}<br />
-The users have been informed accordingly via e-mail.<br />
-<br />
-</source>
+The users have been informed accordingly via e-mail.</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="VGhlIHRhc2sgaXMgaW4gdXNlIGFuZCB0aGVyZWZvcmUgY2Fubm90IGJlIGRlbGV0ZWQu">
@@ -6665,17 +6645,15 @@ The users have been informed accordingly via e-mail.<br />
                 <source>This job will be closed automatically on %s when the task deadline is reached.</source>
                 <target>Questo incarico verrà chiuso automaticamente al raggiungimento della scadenza il %s.</target>
             </trans-unit>
-            <trans-unit id="ClRoaXMgbGFuZ3VhZ2UgcmVzb3VyY2UgaXMgbm90IHlldCBjb25uZWN0ZWQgdG8gYW55IG90aGVyIGxhbmd1YWdlIHJlc291cmNlLjxici8+CkNvbm5lY3Rpb25zIGFyZSBjcmVhdGVkIGZyb20gc291cmNlIGxhbmd1YWdlIHJlc291cmNlIHRvIHRhcmdldCBvbmUuPGJyLz4KVGhlIGxhbmd1YWdlIHJlc291cmNlIGNhbiBvbmx5IGJlIGNvbm5lY3RlZCB0byBhbm90aGVyIGxhbmd1YWdlIHJlc291cmNlIGlmIHRoZSBmb2xsb3dpbmcgY29uZGl0aW9ucyBhcmUgbWV0Ojxici8+Ci0gQm90aCBsYW5ndWFnZSByZXNvdXJjZXMgaGF2ZSB0aGUgc2FtZSBsYW5ndWFnZSBwYWlyPGJyLz4KLSBCb3RoIGxhbmd1YWdlIHJlc291cmNlcyBhcmUgYXNzaWduZWQgdG8gdGhlIHNhbWUgY2xpZW50PGJyLz4KLSBCb3RoIGxhbmd1YWdlIHJlc291cmNlcyBoYXZlIGRhdGEgdGhhdCBjYW4gYmUgc3luY2hyb25pemVkLCBlLmc6IHRlcm1zIGNhbiBiZSBjb252ZXJ0ZWQgaW50byBhIGdsb3NzYXJ5PGJyLz4KLSBUaGUgdGFyZ2V0IGxhbmd1YWdlIHJlc291cmNlIGlzIG5vdCB5ZXQgbGlua2VkIHRvIHRoZSBvdGhlciBsYW5ndWFnZSByZXNvdXJjZSAoYXQgdGhlIG1vbWVudCB3ZSBkbyBub3Qgc3VwcG9ydCBtdWx0aXBsZSBzb3VyY2VzKTxici8+ClN5bmNocm9uaXphdGlvbiBhbHdheXMgdGFrZXMgcGxhY2UgaW4gb25lIGRpcmVjdGlvbjogc291cmNlIGRhdGEgLSZndDsgdGFyZ2V0CiAgICAgICAgICAgICAgICA=">
-                <source>
-This language resource is not yet connected to any other language resource.<br/>
-Connections are created from source language resource to target one.<br/>
-The language resource can only be connected to another language resource if the following conditions are met:<br/>
-- Both language resources have the same language pair<br/>
-- Both language resources are assigned to the same client<br/>
-- Both language resources have data that can be synchronized, e.g: terms can be converted into a glossary<br/>
-- The target language resource is not yet linked to the other language resource (at the moment we do not support multiple sources)<br/>
-Synchronization always takes place in one direction: source data -&gt; target
-                </source>
+            <trans-unit id="VGhpcyBsYW5ndWFnZSByZXNvdXJjZSBpcyBub3QgeWV0IGNvbm5lY3RlZCB0byBhbnkgb3RoZXIgbGFuZ3VhZ2UgcmVzb3VyY2UuCjxici8+Q29ubmVjdGlvbnMgYXJlIGNyZWF0ZWQgZnJvbSBzb3VyY2UgbGFuZ3VhZ2UgcmVzb3VyY2UgdG8gdGFyZ2V0IG9uZS4KPGJyLz5UaGUgbGFuZ3VhZ2UgcmVzb3VyY2UgY2FuIG9ubHkgYmUgY29ubmVjdGVkIHRvIGFub3RoZXIgbGFuZ3VhZ2UgcmVzb3VyY2UgaWYgdGhlIGZvbGxvd2luZyBjb25kaXRpb25zIGFyZSBtZXQ6Cjxici8+LSBCb3RoIGxhbmd1YWdlIHJlc291cmNlcyBoYXZlIHRoZSBzYW1lIGxhbmd1YWdlIHBhaXIKPGJyLz4tIEJvdGggbGFuZ3VhZ2UgcmVzb3VyY2VzIGFyZSBhc3NpZ25lZCB0byB0aGUgc2FtZSBjbGllbnQKPGJyLz4tIEJvdGggbGFuZ3VhZ2UgcmVzb3VyY2VzIGhhdmUgZGF0YSB0aGF0IGNhbiBiZSBzeW5jaHJvbml6ZWQsIGUuZzogdGVybXMgY2FuIGJlIGNvbnZlcnRlZCBpbnRvIGEgZ2xvc3NhcnkKPGJyLz4tIFRoZSB0YXJnZXQgbGFuZ3VhZ2UgcmVzb3VyY2UgaXMgbm90IHlldCBsaW5rZWQgdG8gdGhlIG90aGVyIGxhbmd1YWdlIHJlc291cmNlIChhdCB0aGUgbW9tZW50IHdlIGRvIG5vdCBzdXBwb3J0IG11bHRpcGxlIHNvdXJjZXMpCjxici8+U3luY2hyb25pemF0aW9uIGFsd2F5cyB0YWtlcyBwbGFjZSBpbiBvbmUgZGlyZWN0aW9uOiBzb3VyY2UgZGF0YSAtJmd0OyB0YXJnZXQ=">
+                <source>This language resource is not yet connected to any other language resource.
+<br/>Connections are created from source language resource to target one.
+<br/>The language resource can only be connected to another language resource if the following conditions are met:
+<br/>- Both language resources have the same language pair
+<br/>- Both language resources are assigned to the same client
+<br/>- Both language resources have data that can be synchronized, e.g: terms can be converted into a glossary
+<br/>- The target language resource is not yet linked to the other language resource (at the moment we do not support multiple sources)
+<br/>Synchronization always takes place in one direction: source data -&gt; target</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="VGhpcyBsb2dpbm5hbWUgaXMgYWxyZWFkeSBpbiB1c2Uh">
@@ -6746,11 +6724,9 @@ Synchronization always takes place in one direction: source data -&gt; target
                 <source>Tip: Disable/configure this window in the editor settings on the left above the segment table</source>
                 <target>Suggerimento: disattivare/configurare questa finestra nelle impostazioni dell’editor, situate a sinistra sopra la tabella dei segmenti</target>
             </trans-unit>
-            <trans-unit id="ClRvIGJlIGFibGUgdG8gYXNzaWduIHdvcmtmbG93IHN0ZXBzIHRvIGpvYiBjb29yZGluYXRvcnMsIHRoZSBjb3JyZXNwb25kaW5nIGNvb3JkaW5hdG9yIGdyb3VwIGFuZCBwcm9qZWN0IG5lZWQgdG8gYmVsb25nIHRvIHRoZSBzYW1lIGNsaWVudCwgdGhlcmVmb3JlIGFzc2lnbiB0aGUgbmVlZGVkIGNsaWVudHMgaGVyZS48YnIvPgo8Yj5VbmFzc2lnbmluZyBhIGNsaWVudCBmcm9tIGEgY29vcmRpbmF0b3IgZ3JvdXAgd2lsbCBkZWxldGUgYWxsIHJlbGF0ZWQgam9icy48L2I+CiAgICAgICAgICAgICAgICA=">
-                <source>
-To be able to assign workflow steps to job coordinators, the corresponding coordinator group and project need to belong to the same client, therefore assign the needed clients here.<br/>
-<b>Unassigning a client from a coordinator group will delete all related jobs.</b>
-                </source>
+            <trans-unit id="VG8gYmUgYWJsZSB0byBhc3NpZ24gd29ya2Zsb3cgc3RlcHMgdG8gam9iIGNvb3JkaW5hdG9ycywgdGhlIGNvcnJlc3BvbmRpbmcgY29vcmRpbmF0b3IgZ3JvdXAgYW5kIHByb2plY3QgbmVlZCB0byBiZWxvbmcgdG8gdGhlIHNhbWUgY2xpZW50LCB0aGVyZWZvcmUgYXNzaWduIHRoZSBuZWVkZWQgY2xpZW50cyBoZXJlLgo8YnIvPjxiPlVuYXNzaWduaW5nIGEgY2xpZW50IGZyb20gYSBjb29yZGluYXRvciBncm91cCB3aWxsIGRlbGV0ZSBhbGwgcmVsYXRlZCBqb2JzLjwvYj4=">
+                <source>To be able to assign workflow steps to job coordinators, the corresponding coordinator group and project need to belong to the same client, therefore assign the needed clients here.
+<br/><b>Unassigning a client from a coordinator group will delete all related jobs.</b></source>
                 <target></target>
             </trans-unit>
             <trans-unit id="VG9nZ2xlIHZpc2liaWxpdHkgb2Ygc3BhY2VzIChDdHJsICsgRjEwKQ==">
@@ -7093,10 +7069,9 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Users</source>
                 <target>Plurale utente</target>
             </trans-unit>
-            <trans-unit id="VXNlcnMgb2YgcHJldmlvdXMgcm9sZSA8aT57cHJldmlvdXNSb2xlfTwvaT46CntwcmV2aW91c1VzZXJzfTxici8+Cg==">
+            <trans-unit id="VXNlcnMgb2YgcHJldmlvdXMgcm9sZSA8aT57cHJldmlvdXNSb2xlfTwvaT46CntwcmV2aW91c1VzZXJzfTxici8+">
                 <source>Users of previous role <i>{previousRole}</i>:
-{previousUsers}<br/>
-</source>
+{previousUsers}<br/></source>
                 <target></target>
             </trans-unit>
             <trans-unit id="VXNlciBzcGVjaWFsIHByb3BlcnRpZXM=">
@@ -7395,17 +7370,16 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>Younger than or equal</source>
                 <target>Più recente o uguale a</target>
             </trans-unit>
-            <trans-unit id="WW91ciBicm93c2VyIG9yIHlvdXIgYnJvd3Nlci12ZXJzaW9uIGlzIG5vdCBvZmZpY2lhbGx5IHN1cHBvcnRlZCBieSB7YXBwfS4KICAgICAgICAgICAgICAgICAgICA8YnIgLz5UaGUgYXBwbGljYXRpb24gd2FzIG9mZmljaWFsbHkgdGVzdGVkIGluIHRoZSBmb2xsb3dpbmcgYnJvd3NlcnMgcmVnYXJkaW5nIGZ1bmN0aW9uYWxpdHkgYW5kIHBlcmZvcm1hbmNlOgogICAgICAgICAgICAgICAgICAgIDx1bD4KICAgICAgICAgICAgICAgICAgICAgICAgPGxpPkdvb2dsZSBDaHJvbWUgZnJvbSB2ZXJzaW9uIDQ4PC9saT4KICAgICAgICAgICAgICAgICAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBmcm9tIHZlcnNpb24gNDQ8L2xpPgogICAgICAgICAgICAgICAgICAgICAgICA8bGk+QXBwbGUgU2FmYXJpIGZyb20gdmVyc2lvbiA5PC9saT4KICAgICAgICAgICAgICAgICAgICAgICAgPGxpPk1pY3Jvc29mdCBFZGdlIGZyb20gdmVyc2lvbiA4MDwvbGk+CiAgICAgICAgICAgICAgICAgICAgPC91bD4KICAgICAgICAgICAgICAgICAgICBJbiBnZW5lcmFsIHthcHB9IHNob3VsZCBiZSBhYmxlIHRvIHdvcmsgd2l0aCBvdGhlciBicm93c2VycyBhbmQgb2xkZXIgdmVyc2lvbnMuIFVuZm9yZXNlZW4gZXJyb3JzIGFyZSBwb3NzaWJsZSB0aGVuLiBJdCBpcyBwb3NzaWJsZSB0aGF0IHNvbWUgZmVhdHVyZXMgd29u4oCZdCB3b3JrIGF0IGFsbC4KICAgICAgICAgICAgICAgIA==">
+            <trans-unit id="WW91ciBicm93c2VyIG9yIHlvdXIgYnJvd3Nlci12ZXJzaW9uIGlzIG5vdCBvZmZpY2lhbGx5IHN1cHBvcnRlZCBieSB7YXBwfS4KPGJyLz5UaGUgYXBwbGljYXRpb24gd2FzIG9mZmljaWFsbHkgdGVzdGVkIGluIHRoZSBmb2xsb3dpbmcgYnJvd3NlcnMgcmVnYXJkaW5nIGZ1bmN0aW9uYWxpdHkgYW5kIHBlcmZvcm1hbmNlOgo8dWw+CjxsaT5Hb29nbGUgQ2hyb21lIGZyb20gdmVyc2lvbiA0ODwvbGk+CjxsaT5Nb3ppbGxhIEZpcmVmb3ggZnJvbSB2ZXJzaW9uIDQ0PC9saT4KPGxpPkFwcGxlIFNhZmFyaSBmcm9tIHZlcnNpb24gOTwvbGk+CjxsaT5NaWNyb3NvZnQgRWRnZSBmcm9tIHZlcnNpb24gODA8L2xpPgo8L3VsPgpJbiBnZW5lcmFsIHthcHB9IHNob3VsZCBiZSBhYmxlIHRvIHdvcmsgd2l0aCBvdGhlciBicm93c2VycyBhbmQgb2xkZXIgdmVyc2lvbnMuIFVuZm9yZXNlZW4gZXJyb3JzIGFyZSBwb3NzaWJsZSB0aGVuLiBJdCBpcyBwb3NzaWJsZSB0aGF0IHNvbWUgZmVhdHVyZXMgd29u4oCZdCB3b3JrIGF0IGFsbC4=">
                 <source>Your browser or your browser-version is not officially supported by {app}.
-                    <br />The application was officially tested in the following browsers regarding functionality and performance:
-                    <ul>
-                        <li>Google Chrome from version 48</li>
-                        <li>Mozilla Firefox from version 44</li>
-                        <li>Apple Safari from version 9</li>
-                        <li>Microsoft Edge from version 80</li>
-                    </ul>
-                    In general {app} should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won’t work at all.
-                </source>
+<br/>The application was officially tested in the following browsers regarding functionality and performance:
+<ul>
+<li>Google Chrome from version 48</li>
+<li>Mozilla Firefox from version 44</li>
+<li>Apple Safari from version 9</li>
+<li>Microsoft Edge from version 80</li>
+</ul>
+In general {app} should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won’t work at all.</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="WW91ciBkYXRhIGNvdWxkIG5vdCBiZSBzYXZlZDsgYSBjb25mbGljdCBvY2N1cnJlZCB3aGlsZSBzYXZpbmch">
@@ -8044,8 +8018,8 @@ To be able to assign workflow steps to job coordinators, the corresponding coord
                 <source>waiting</source>
                 <target>in attesa</target>
             </trans-unit>
-            <trans-unit id="d2l0aCBwcmVmZXJlbmNlcyBmb3I6IA==">
-                <source>with preferences for: </source>
+            <trans-unit id="d2l0aCBwcmVmZXJlbmNlcyBmb3I=">
+                <source>with preferences for</source>
                 <target></target>
             </trans-unit>
             <trans-unit id="d29yayBmaWxl">

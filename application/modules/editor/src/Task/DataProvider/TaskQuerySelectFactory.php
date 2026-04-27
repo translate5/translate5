@@ -243,7 +243,7 @@ class TaskQuerySelectFactory
                 $where[] = $this->db->quoteInto(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
             }
 
-            $select->where(implode(' OR ', $where));
+            $this->joinRestriction($select, $where, $isTaskSelect);
 
             return;
         }
@@ -267,7 +267,7 @@ class TaskQuerySelectFactory
                 $where[] = $this->db->quoteInto(UserJobDb::TABLE_NAME . '.userGuid = ?', $viewer->getUserGuid());
             }
 
-            $select->where(implode(' OR ', $where));
+            $this->joinRestriction($select, $where, $isTaskSelect);
 
             return;
         }
@@ -363,5 +363,39 @@ class TaskQuerySelectFactory
         } catch (Zend_Acl_Exception) {
             return true;
         }
+    }
+
+    /**
+     * @param string[] $where
+     */
+    private function joinRestriction(Zend_Db_Select $select, array $where, bool $isTaskSelect): void
+    {
+        $taskTableName = TaskDb::TABLE_NAME;
+        $userJobTableName = UserJobDb::TABLE_NAME;
+
+        $wheres = $this->db->quoteInto(
+            $taskTableName . '.taskType in (?)',
+            $isTaskSelect ? $this->taskType->getNonInternalTaskTypes() : $this->taskType->getNonInternalProjectTypes()
+        );
+        $wheres .= PHP_EOL . 'AND (' . implode(PHP_EOL . 'OR ', $where) . ')';
+
+        $sub = new \Zend_Db_Expr(
+            <<<SQL
+(
+    SELECT distinct `$taskTableName`.id as taskId
+    FROM `$taskTableName`
+         LEFT JOIN `$userJobTableName` ON `$taskTableName`.`taskGuid` = `$userJobTableName`.`taskGuid`
+    WHERE $wheres
+)
+SQL
+        );
+
+        $select->join(
+            [
+                'restricted' => $sub,
+            ],
+            "`restricted`.taskId = `$taskTableName`.id",
+            []
+        );
     }
 }

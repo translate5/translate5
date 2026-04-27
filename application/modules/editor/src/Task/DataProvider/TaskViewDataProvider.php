@@ -184,12 +184,7 @@ class TaskViewDataProvider
                 continue;
             }
 
-            $resultList[] = $this->anonymizer->anonymizeUserdata(
-                $taskGuid,
-                $rowTrack['userGuid'],
-                $rowTrack,
-                $viewer->getUserGuid()
-            );
+            $resultList[] = $rowTrack;
         }
 
         return $resultList;
@@ -205,7 +200,7 @@ class TaskViewDataProvider
         $task['isUsed'] = false;
         $task['lockingUsername'] = null;
 
-        foreach ($task['users'] as &$job) {
+        foreach ($task['users'] as $job) {
             $viewersJob = $job['userGuid'] === $viewer->getUserGuid();
             $matchingWorkflowStep = $task['workflowStepName'] === $job['workflowStepName'];
 
@@ -223,15 +218,6 @@ class TaskViewDataProvider
             }
 
             $task['isUsed'] = $task['isUsed'] || ! empty($job['usedState']);
-
-            if ($anonymizeUsers) {
-                $job = $this->anonymizer->anonymizeUserdata(
-                    $task['taskGuid'],
-                    $job['userGuid'],
-                    $job,
-                    $viewer->getUserGuid()
-                );
-            }
         }
 
         if (! empty($task['lockingUser'])) {

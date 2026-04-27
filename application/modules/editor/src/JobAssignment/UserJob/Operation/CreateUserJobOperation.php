@@ -96,7 +96,7 @@ class CreateUserJobOperation implements CreateUserJobOperationInterface
             throw new RuntimeException('Could not acquire lock for task ' . $dto->taskGuid);
         }
 
-        $job = $this->userJobRepository->findUserJobInTask(
+        $job = $this->userJobRepository->findParticularUserJobInTask(
             $dto->userGuid,
             $dto->taskGuid,
             $dto->workflow->workflowStepName,

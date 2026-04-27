@@ -44,8 +44,8 @@ use MittagQI\Translate5\User\Model\User;
  * id: string,
  * taskGuid: string,
  * userGuid: string,
- * sourceLang: string,
- * targetLang: string,
+ * sourceLang: int,
+ * targetLang: int,
  * state: string,
  * role: string,
  * workflowStepName: string,
@@ -69,6 +69,7 @@ use MittagQI\Translate5\User\Model\User;
  * isCoordinatorGroupJob: bool,
  * isCoordinatorGroupUserJob: bool,
  * staticAuthHash?: string,
+ * isPreviewOnly: bool,
  * }
  */
 class JobAssignmentViewDataProvider

@@ -32,11 +32,15 @@ namespace MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission;
 
 use editor_Models_TaskUserAssoc as UserJob;
 use MittagQI\Translate5\ActionAssert\Permission\ActionPermissionAssert;
+use MittagQI\Translate5\ActionAssert\Permission\Asserts\PermissionAssertInterface;
+use MittagQI\Translate5\ActionAssert\Permission\PermissionAssertContext;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\CoordinatorGroupDataJobAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\CoordinatorGroupUserJobAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\TaskRestrictionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\Permission\Asserts\UserRestrictionAssert;
 use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
+use MittagQI\Translate5\Repository\CoordinatorGroupJobRepository;
+use MittagQI\Translate5\Repository\UserJobRepository;
 
 /**
  * @extends ActionPermissionAssert<UserJobAction, UserJob>
@@ -44,15 +48,55 @@ use MittagQI\Translate5\JobAssignment\UserJob\ActionAssert\UserJobAction;
 class UserJobActionPermissionAssert extends ActionPermissionAssert
 {
     /**
+     * @param PermissionAssertInterface[] $asserts
+     */
+    public function __construct(
+        private readonly UserJobRepository $userJobRepository,
+        private readonly CoordinatorGroupJobRepository $coordinatorGroupJobRepository,
+        iterable $asserts,
+    ) {
+        parent::__construct($asserts);
+    }
+
+    /**
      * @codeCoverageIgnore
      */
     public static function create(): self
     {
-        return new self([
-            TaskRestrictionAssert::create(),
-            UserRestrictionAssert::create(),
-            CoordinatorGroupDataJobAssert::create(),
-            CoordinatorGroupUserJobAssert::create(),
-        ]);
+        return new self(
+            UserJobRepository::create(),
+            CoordinatorGroupJobRepository::create(),
+            [
+                TaskRestrictionAssert::create(),
+                UserRestrictionAssert::create(),
+                CoordinatorGroupDataJobAssert::create(),
+                CoordinatorGroupUserJobAssert::create(),
+            ]
+        );
+    }
+
+    public function assertGranted(\BackedEnum $action, object $object, PermissionAssertContext $context): void
+    {
+        if (UserJobAction::Read === $action) {
+            if ($object->getUserGuid() === $context->actor->getUserGuid()) {
+                return;
+            }
+
+            if ($this->userJobRepository->userHasJobsInTask($context->actor->getUserGuid(), $object->getTaskGuid())) {
+                return;
+            }
+
+            if (
+                $context->actor->isCoordinator()
+                && $this->coordinatorGroupJobRepository->coordinatorGroupOfCoordinatorHasJobInTask(
+                    $context->actor->getUserGuid(),
+                    $object->getTaskGuid()
+                )
+            ) {
+                return;
+            }
+        }
+
+        parent::assertGranted($action, $object, $context);
     }
 }

@@ -26,21 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/*
- * SECTION TO INCLUDE PROGRAMMATIC LOCALIZATION
- * ============================================
-
-    $translate->_('A new {projectType} has been created in the project portal .Project ID:{portalLink}.<br /><strong>Project ID:</strong> {projectId}<br />
-<strong>Project Name:</strong> {projectName}');
-
-    $translate->_('A new {projectType} has been created in the project portal {portalLink}.<br />
-<strong>Project ID: </strong> {projectId} <br />
-<strong>Project Name:</strong> {projectName} <br />
-<strong>Created by:</strong>{createdByUser}');
-
- */
-
-/* @var $this Zend_View */
+/** @var ZfExtended_View $this */
 
 $this->render('general.phtml');
 
@@ -59,26 +45,24 @@ $data = [
     'projectType' => $this->translate->_('taskType::' . $this->project->getTaskType()->id()),
 ];
 
-$message = 'A new {projectType} has been created in the project portal .Project ID:{portalLink}.<br /><strong>Project ID:</strong> {projectId}<br />
-<strong>Project Name:</strong> {projectName}';
+$message =
+    $this->translate->_('A new {projectType} has been created in the project portal {portalLink}.') .
+    "<br/>\n<strong>" . $this->translate->_('Project ID') . ':</strong> {projectId}' .
+    "<br/>\n<strong>" . $this->translate->_('Project name') . ':</strong> {projectName}';
 
-if(!empty($this->showTaskDescription)){
+if (! empty($this->showTaskDescription)) {
     $data['taskDescription'] = $this->project->getDescription();
-    $message .= '<br /> <strong>'.$this->translate->_('Project description').':</strong> {taskDescription}';
+    $message .= "<br/>\n<strong>" . $this->translate->_('Project description') . ':</strong> {taskDescription}';
 }
 
 if ($this->createdByUser) {
     $data['createdByUser'] = $this->createdByUser;
-    $message .= ' <br />
-<strong>Erstellt von:</strong> {createdByUser}';
+    $message .= "<br/>\n<strong>" . $this->translate->_('Created by') . ':</strong> {createdByUser}';
 }
 
 if (! empty($this->taskCustomFields)) {
     foreach ($this->taskCustomFields as $customField) {
-        $message .= ' <br />'
-            . '<strong>' .
-            $customField['label']
-            . ':</strong> ' . $customField['value'];
+        $message .= "<br/>\n<strong>" . $customField['label'] . ':</strong> ' . $customField['value'];
     }
 }
 

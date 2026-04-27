@@ -329,11 +329,12 @@ class editor_TaskController extends ZfExtended_RestController
      */
     public function userlistAction()
     {
-        //set default sort
-        $this->addDefaultSort();
-        //set the default table to lek_task
-        $this->entity->getFilter()->setDefaultTable('LEK_task');
-        $this->view->rows = $this->entity->loadUserList($this->authenticatedUser->getUserGuid());
+        $userProvider = \MittagQI\Translate5\Task\DataProvider\FilterUserProvider::create();
+
+        $this->view->rows = $userProvider->getUserList(
+            $this->authenticatedUser,
+            $this->entity->getFilter(),
+        );
     }
 
     /**
@@ -1287,7 +1288,7 @@ class editor_TaskController extends ZfExtended_RestController
         $obj = $this->entity->getDataObject();
 
         $userJobRepository = UserJobRepository::create();
-        $currentUserJob = $userJobRepository->findUserJobInTask(
+        $currentUserJob = $userJobRepository->findAppropriateUserJobInTask(
             $this->authenticatedUser->getUserGuid(),
             $taskguid,
             $this->entity->getWorkflowStepName(),
@@ -2522,29 +2523,41 @@ class editor_TaskController extends ZfExtended_RestController
             buildTaskView: false
         );
 
-        if (! empty($taskDataList['rows'])) { // tasks re-filtering may be needed
-            $taskGuids = array_column($taskDataList['rows'], 'taskGuid');
-            $aggregate = SegmentStatisticsRepository::create();
-            $taskGuidsFiltered = $aggregate->getTaskGuidsMatchingFilter($taskGuids, $statisticFilter);
-            if (empty($taskGuidsFiltered)) {
-                // make filter return nothing, maybe there is a better way ?
-                $filter->addFilter(
-                    (object) [
-                        'field' => 'id',
-                        'type' => 'list',
-                        'value' => [0],
-                    ]
-                );
-            } elseif (count($taskGuidsFiltered) != count($taskGuids)) {
-                // to re-filter tasks
-                $filter->addFilter(
-                    (object) [
-                        'field' => 'taskGuid',
-                        'type' => 'list',
-                        'value' => $taskGuidsFiltered,
-                    ]
-                );
-            }
+        if (empty($taskDataList['rows'])) {
+            return $filter;
+        }
+
+        // tasks re-filtering may be needed
+        $taskGuids = array_column($taskDataList['rows'], 'taskGuid');
+        $aggregate = SegmentStatisticsRepository::create();
+        $taskGuidsFiltered = $aggregate->getTaskGuidsMatchingFilter($taskGuids, $statisticFilter);
+
+        if (null === $taskGuidsFiltered) {
+            return $filter;
+        }
+
+        if (empty($taskGuidsFiltered)) {
+            // make filter return nothing, maybe there is a better way ?
+            $filter->addFilter(
+                (object) [
+                    'field' => 'id',
+                    'type' => 'list',
+                    'value' => [0],
+                ]
+            );
+
+            return $filter;
+        }
+
+        if (count($taskGuidsFiltered) !== count($taskGuids)) {
+            // to re-filter tasks
+            $filter->addFilter(
+                (object) [
+                    'field' => 'taskGuid',
+                    'type' => 'list',
+                    'value' => $taskGuidsFiltered,
+                ]
+            );
         }
 
         return $filter;

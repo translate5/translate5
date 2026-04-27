@@ -116,6 +116,44 @@ class CoordinatorGroupJobRepository
         return (int) $this->db->fetchOne($select) > 0;
     }
 
+    public function coordinatorGroupOfCoordinatorHasJobInTask(string $userGuid, string $taskGuid): bool
+    {
+        $select = $this->db
+            ->select()
+            ->from(
+                [
+                    'groupJob' => CoordinatorGroupJobTable::TABLE_NAME,
+                ],
+                'COUNT(*)'
+            )
+            ->join(
+                [
+                    'task' => TaskTable::TABLE_NAME,
+                ],
+                'groupJob.taskGuid = task.taskGuid',
+                []
+            )
+            ->join(
+                [
+                    'groupUser' => CoordinatorGroupUserTable::TABLE_NAME,
+                ],
+                'groupUser.groupId = groupJob.groupId',
+                []
+            )
+            ->join(
+                [
+                    'user' => ZfExtended_Models_Db_User::TABLE_NAME,
+                ],
+                'groupUser.userId = user.id',
+                []
+            )
+            ->where('groupJob.taskGuid = ?', $taskGuid)
+            ->where('user.userGuid = ?', $userGuid)
+        ;
+
+        return (int) $this->db->fetchOne($select) > 0;
+    }
+
     public function coordinatorGroupOfCoordinatorHasJobForTaskWorkflowStep(string $userGuid, string $taskGuid): bool
     {
         $select = $this->db

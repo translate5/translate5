@@ -62,6 +62,7 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         {name: 'coordinatorGroupId', type: 'int', persist: false},
         {name: 'isCoordinatorGroupJob', type: 'bool', persist: false},
         {name: 'isCoordinatorGroupUserJob', type: 'bool', persist: false},
+        {name: 'isPreviewOnly', type: 'bool', persist: false},
     ],
     validators: {
         taskGuid: 'presence',

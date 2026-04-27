@@ -44,6 +44,8 @@ class L10nExchanger
 
     private array $exchangedStrings = [];
 
+    private array $unchangableStrings = [];
+
     public function __construct(
         private readonly bool $doWriteFiles = false
     ) {
@@ -69,6 +71,10 @@ class L10nExchanger
         $this->extractAndExchange();
         $this->exchangeInJavaScript();
         $this->rewriteXliffs();
+        // write the source-map to an own file, we need it to adjust client-specific translations after the release ...
+        if ($this->doWriteFiles) {
+            $this->createSourceMapFile();
+        }
     }
 
     public function getBrokenMatches(): array
@@ -114,10 +120,6 @@ class L10nExchanger
                 );
             }
         }
-        // write the source-map to an own file, we need it to adjust client-specific translations after the release ...
-        if ($this->doWriteFiles) {
-            $this->createSourceMapFile();
-        }
     }
 
     /**
@@ -125,10 +127,11 @@ class L10nExchanger
      */
     private function createSourceMapFile(): void
     {
+        $unchangableStrings = array_values(array_unique($this->unchangableStrings));
         $sourceMapFile = APPLICATION_DATA . '/' . L10nConfiguration::EXCHANGE_MAP_PATH;
         $content = "<?php\n/* programmatic created php file to store rewritten localization sources */\nreturn [";
         foreach ($this->sourceMap as $source => $target) {
-            if (PhpExchanger::seemsValidTranslation($source)) {
+            if (PhpExchanger::seemsValidTranslation($source) && ! in_array($source, $unchangableStrings)) {
                 $content .= "\n" . '    ' .
                     PhpExchanger::toDoubleQuotedString(str_replace(["\n", '$'], ['\n', '\$'], $source)) .
                     ' => ' .
@@ -217,6 +220,7 @@ class L10nExchanger
                     $this->brokenMatches = array_merge($this->brokenMatches, $exchanger->getBrokenMatches());
                     $this->exchangedStrings = array_merge($this->exchangedStrings, $exchanger->getExchangedStrings());
                 }
+                $this->unchangableStrings = array_merge($this->unchangableStrings, $exchanger->getUnchangableStrings());
             }
         }
     }

@@ -505,19 +505,19 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/> string',
         ];
         yield [
             'string' => 'string -1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="-1,234,567.89" iso="-1234567.89" target="-1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="-1,234,567.89" iso="-1234567.89" target="-1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/> string',
         ];
         yield [
             'string' => 'string +1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="+1,234,567.89" iso="+1234567.89" target="+1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="+1,234,567.89" iso="+1234567.89" target="+1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/> string',
         ];
         yield [
             'string' => 'string 1,234,567·89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal middle dot" source="1,234,567·89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXA9KHtMSnamhoa0TF6OtZW9oqxICNUNDVrQFRNjKamfikA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal middle dot" source="1,234,567·89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NQ9tjUrQ1gRIxejrWVvaKsSCTVTQ1a0BUTYympn4pAA==" key="aaa"/> string',
         ];
         yield [
             'string' => 'string 12,34,567.89 string',
@@ -525,61 +525,61 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 123,4567.89 string',
-            'expected' => 'string <number type="float" name="default chinese" source="123,4567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4jJqXaUMekVkez2rAWxAExtcB0jF5MiramhkZ0jJ6OtZW9YixIt4qmZg2IqonR1NQvBQA=" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default chinese" source="123,4567.89" iso="1234567.89" target="1234567.89" regex="HYy5DYAwEARrQSK4xb8gAQIX4jORO0BEPoqiBSrDJpodjbSO+JRDmEDpfdioHImISw16uTVquLv0Of2EEKVg1tzM67m5B9hyUWiBrd63OOR+OgLSIQy46wM=" key="aaa"/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with whitespace thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWQbPasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with whitespace thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZBs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with whitespace thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWQbPasFYDyDEGMrXAtE5MiramhkZ0jJ6OtZW9YizIBBVNzRoQVROjqalfCgA=" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with whitespace thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZBs9qwVgPIMQYytcC0Zg2qEs0aA01NnZgUbU2geIyejrWVvWIsyGAVTc0aEFUTo6mpXwoA" key="aaa"/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6g2pqLayMDAslaz2rBWAyhmjBDRgnD1YlK0NTU0omP0dKyt7BVjQQaqaGrWgKiaGE1N/VIA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqDamotrIwMCyVrPasFYDKGaMENECczVrUDVo1hhoasboxaRoawIlYvR0rK3sFWNB9qhoataAqJoYTU39UgA=" key="aaa"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6g2pqLayMDAslaz2rBWAyhmjBDRAnN1YlK0NTU0omP0dKyt7BVjQeapaGrWgKiaGE1N/VIA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqDamotrIwMCyVrPasFYDKGaMENECczVrUDVo1hhoaurEpGhrAsVj9HSsrewVY0HWqGhq1oComhhNTf1SAA==" key="aaa"/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6g2pqLayMDIrVaz2rBWAyhmjBDRgnD1YlK0NTU0omP0dKyt7BVjQQaqaGrWgKiaGE1N/VIA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqDamotrIwMitVrPasFYDKGaMENECczVrUDVo1hhoasboxaRoawIlYvR0rK3sFWNB9qhoataAqJoYTU39UgA=" key="aaa"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6g2pqLayMDIrVaz2rBWAyhmjBDRAnN1YlK0NTU0omP0dKyt7BVjQeapaGrWgKiaGE1N/VIA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqDamotrIwMitVrPasFYDKGaMENECczVrUDVo1hhoaurEpGhrAsVj9HSsrewVY0HWqGhq1oComhhNTf1SAA==" key="aaa"/> string',
         ];
 
         yield [
             'string' => 'string 1˙234˙567.89 string',
-            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal dot" source="1˙234˙567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6j29EzNasNaDSDPGMTWAjNi9GJStDU1NKJj9HSsrewVY0GGqGhq1oComhhNTf1SAA==" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal dot" source="1˙234˙567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqPb0TM1qw1oNIM8YxNYCMzRrUBVp1hhoasboxaRoawIlYvR0rK3sFWNBZqtoataAqJoYTU39UgA=" key="aaa"/> string',
         ];
         yield [
             'string' => 'string 1˙234˙567,89 string',
-            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal comma" source="1˙234˙567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6j29EzNasNaDSDPGMTWAjN0YlK0NTU0omP0dKyt7BVjQWaoaGrWgKiaGE1N/VIA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal comma" source="1˙234˙567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqPb0TM1qw1oNIM8YxNYCMzRrUBVp1hhoaurEpGhrAsVj9HSsrewVY0FGq2hq1oComhhNTf1SAA==" key="aaa"/> string',
         ];
 
         yield [
             'string' => "string 1'234'567.89 string",
-            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWXbPasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZds9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/> string',
         ];
         yield [
             'string' => "string 1'234'567,89 string",
-            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWXbPasFYDyDEGMrXAtE5MiramhkZ0jJ6OtZW9YizIBBVNzRoQVROjqalfCgA=" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZds9qwVgPIMQYytcC0Zg2qEs0aA01NnZgUbU2geIyejrWVvWIsyGAVTc0aEFUTo6mpXwoA" key="aaa"/> string',
         ];
 
         yield [
             'string' => 'string 1.234.567,89 string',
-            'expected' => 'string <number type="float" name="default with dot thousand decimal comma" source="1.234.567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6g2Rk+z2rBWA8gzBrG1wAydmBRtTQ2N6Bg9HWsre8VYkBkqmpo1IKomRlNTvxQA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with dot thousand decimal comma" source="1.234.567,89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqDZGT7PasFYDyDMGsbXADM0aVEWaNQaamjoxKdqaQPEYPR1rK3vFWJDRKpqaNSCqJkZTU78UAA==" key="aaa"/> string',
         ];
         yield [
             'string' => "string 1.234.567'89 string",
-            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6g2Rk+z2rBWA8gzBrG1wAz1mBRtTQ2N6Bg9HWsre8VYkBkqmpo1IKomRlNTvxQA" key="aaa"/> string',
+            'expected' => 'string <number type="float" name="default with &quot;&#039;&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqDZGT7PasFYDyDMGsbXADM0aVEWaNQaamuoxKdqaQPEYPR1rK3vFWJDRKpqaNSCqJkZTU78UAA==" key="aaa"/> string',
         ];
 
         yield [

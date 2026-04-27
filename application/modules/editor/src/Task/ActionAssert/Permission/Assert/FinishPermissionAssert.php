@@ -71,7 +71,7 @@ class FinishPermissionAssert implements PermissionAssertInterface
 
     public function assertGranted(BackedEnum $action, object $object, PermissionAssertContext $context): void
     {
-        $job = $this->userJobRepository->findUserJobInTask(
+        $job = $this->userJobRepository->findAppropriateUserJobInTask(
             $context->actor->getUserGuid(),
             $object->getTaskGuid(),
             $object->getWorkflowStepName(),

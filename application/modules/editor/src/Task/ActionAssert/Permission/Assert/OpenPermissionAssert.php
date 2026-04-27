@@ -94,7 +94,7 @@ class OpenPermissionAssert implements PermissionAssertInterface
             )
         );
 
-        $job = $this->userJobRepository->findUserJobInTask(
+        $job = $this->userJobRepository->findAppropriateUserJobInTask(
             $context->actor->getUserGuid(),
             $object->getTaskGuid(),
             $object->getWorkflowStepName(),

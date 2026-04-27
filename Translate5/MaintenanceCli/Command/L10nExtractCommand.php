@@ -72,6 +72,13 @@ class L10nExtractCommand extends Translate5AbstractCommand
         );
 
         $this->addOption(
+            'empty-targets',
+            't',
+            InputOption::VALUE_NONE,
+            'The zxliffs in the export package will have empty targets'
+        );
+
+        $this->addOption(
             'amend-missing',
             'a',
             InputOption::VALUE_NONE,
@@ -123,7 +130,7 @@ class L10nExtractCommand extends Translate5AbstractCommand
 
         $isUpdate = $input->getOption('update');
         $isExport = $input->getOption('export');
-
+        $exportEmptyTargets = $input->getOption('empty-targets');
         $doAmendMissing = $input->getOption('amend-missing');
         $fillUntranslated = $input->getOption('fill-untranslated');
         $markUntranslated = $input->getOption('mark-untranslated');
@@ -158,6 +165,7 @@ class L10nExtractCommand extends Translate5AbstractCommand
             $extraction = new L10nUpdater(
                 $isUpdate,
                 $isExport,
+                $exportEmptyTargets,
                 $doAmendMissing,
                 $markUntranslated,
                 $fillUntranslated,

@@ -73,7 +73,7 @@ class SegmentIsEditableAssert implements PermissionAssertInterface
         $task = $this->taskRepository->getByGuid($object->getTaskGuid());
 
         // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
-        $tua = $this->userJobRepository->findUserJobInTask(
+        $tua = $this->userJobRepository->findAppropriateUserJobInTask(
             $context->actor->getUserGuid(),
             $task->getTaskGuid(),
             $task->getWorkflowStepName()

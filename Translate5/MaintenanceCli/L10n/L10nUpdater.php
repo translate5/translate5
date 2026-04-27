@@ -74,6 +74,7 @@ class L10nUpdater
     public function __construct(
         private bool $doUpdateXliffs = false,
         private bool $doCollectData = false,
+        private bool $collectWithEmptyTargets = false,
         private bool $doAmendMissing = false,
         private bool $markUntranslated = false,
         private bool $fillUntranslated = false,
@@ -289,7 +290,7 @@ class L10nUpdater
             $this->numXliffsChanged++;
         }
         if ($this->doCollectData) {
-            $xliffUpdater->saveAsImport($this->createExportSaveName($editorXliffPath));
+            $xliffUpdater->saveAsImport($this->createExportSaveName($editorXliffPath), $this->collectWithEmptyTargets);
             // add all JSON files if we collect data
             $this->copyJsonFiles();
         }
@@ -347,7 +348,7 @@ class L10nUpdater
                     $this->numXliffsChanged++;
                 }
                 if ($this->doCollectData) {
-                    $cloner->saveAsImport($this->createExportSaveName($xliff));
+                    $cloner->saveAsImport($this->createExportSaveName($xliff), $this->collectWithEmptyTargets);
                 }
                 $this->addNumUntranslated($data['name'], $this->locale, $cloner->getNumUntranslated());
             }
@@ -394,7 +395,7 @@ class L10nUpdater
             $this->numXliffsChanged++;
         }
         if ($this->doCollectData) {
-            $xliffUpdater->saveAsImport($this->createExportSaveName($xliffPath));
+            $xliffUpdater->saveAsImport($this->createExportSaveName($xliffPath), $this->collectWithEmptyTargets);
         }
         $this->addNumUntranslated($moduleName, $this->locale, $xliffUpdater->getNumUntranslated());
     }
@@ -472,7 +473,10 @@ class L10nUpdater
         foreach ($this->jsons[$this->locale] as $file) {
             $exportJsonpath = $this->createExportSaveName($file);
             $parser = new JsonParser($file, $this->locale);
-            $parser->saveAsImportZxliff($exportJsonpath . Localization::FILE_EXTENSION_WITH_DOT);
+            $parser->saveAsImportZxliff(
+                $exportJsonpath . Localization::FILE_EXTENSION_WITH_DOT,
+                $this->collectWithEmptyTargets
+            );
         }
     }
 

@@ -154,9 +154,9 @@ class SegmentStatisticsRepository
     public function getTaskGuidsMatchingFilter(
         array $taskGuids,
         StatisticFilterDTO $statisticFilter,
-    ): array {
+    ): ?array {
         if (! $this->client->isAlive()) {
-            return [];
+            return null;
         }
 
         $bind = [

@@ -37,15 +37,13 @@ $action = $this->templateApply('In the project portal , the task {task.taskNr} {
 
 //list of current users:
 $usersCurrentText = $this->templateApply('All users with the current role <i>{currentRole}</i>:
-{currentUsers}<br/>
-', [
+{currentUsers}<br/>', [
     'currentUsers' => $this->htmlOnly,
-]);
+]) . "\n";
 $usersCurrentHTML = $this->templateApply('All users with the current role <i>{currentRole}</i>:
-{currentUsers}<br/>
-', [
+{currentUsers}<br/>', [
     'currentUsers' => $this->workflowNotifyMail()->renderUserList($this->currentUsers),
-]);
+]) . "\n";
 
 //create text body
 $this->textbody = strip_tags($this->templateApply('{header}

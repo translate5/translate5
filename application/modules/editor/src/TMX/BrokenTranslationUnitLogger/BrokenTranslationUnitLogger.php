@@ -41,7 +41,7 @@ class BrokenTranslationUnitLogger implements BrokenTranslationUnitLoggerInterfac
      */
     private function __construct(
         private readonly ZfExtended_Logger $logger,
-        private readonly LanguageResource $languageResource,
+        private readonly ?LanguageResource $languageResource,
         private readonly array $collectors,
     ) {
     }

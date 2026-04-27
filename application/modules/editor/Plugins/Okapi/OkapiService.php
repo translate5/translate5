@@ -369,12 +369,12 @@ final class OkapiService extends DockerServiceAbstract
     }
 
     /**
-     * returns all translate5 supported Okapi versions provided by the queried jetty root URL
+     * returns all Okapi versions provided by the queried jetty root URL
      * by default jetty delivers an error page providing all valid contexts (installed .war-files).
      *
      * @throws Zend_Uri_Exception
      */
-    public function findOkapiVersions(mixed $url): array
+    public function findAllOkapiVersions(mixed $url): array
     {
         $url = Zend_Uri_Http::fromString($url);
         $url->setPath(''); //clean path if given to get okapi root server
@@ -389,9 +389,7 @@ final class OkapiService extends DockerServiceAbstract
                 && str_contains($response->getBody(), 'Contexts known to this server are:')
                 && preg_match_all('#href="/(okapi-longhorn-[^/]+)/#', $response->getBody(), $matches)) {
                 foreach ($matches[1] as $match) {
-                    if (in_array($match, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)) {
-                        $result[$match] = $url . '/' . $match . '/';
-                    }
+                    $result[$match] = $url . '/' . $match . '/';
                 }
             }
         } catch (Throwable) {
@@ -400,6 +398,19 @@ final class OkapiService extends DockerServiceAbstract
         ksort($result, SORT_NATURAL);
 
         return $result;
+    }
+
+    /**
+     * returns all translate5 supported Okapi versions provided by the queried jetty root URL
+     *
+     * @throws Zend_Uri_Exception
+     */
+    public function findOkapiVersions(mixed $url): array
+    {
+        return array_intersect_key(
+            $this->findAllOkapiVersions($url),
+            array_flip(editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)
+        );
     }
 
     /**

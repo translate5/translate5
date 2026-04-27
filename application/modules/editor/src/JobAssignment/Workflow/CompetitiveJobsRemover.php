@@ -94,7 +94,7 @@ class CompetitiveJobsRemover
             $responsibleUser = $this->userRepository->getByGuid($userGuid);
             $anonymizeUsers = $task->anonymizeUsers(false);
 
-            $userJob = $this->userJobRepository->findUserJobInTask(
+            $userJob = $this->userJobRepository->findParticularUserJobInTask(
                 $userGuid,
                 $taskGuid,
                 $workflowStepName,

@@ -119,9 +119,10 @@ class TmxImportPreprocessor implements TmxImportPreprocessorInterface
 
         $this->symbolsFixer->fixInvalidXmlSymbols($filepath);
 
-        $processedFilename = str_replace('.tmx', '', basename($filepath)) . '_processed.tmx';
+        $processedFilename = str_replace('.tmx', '', basename($filepath))
+            . '_processed_' . bin2hex(random_bytes(3)) . '.tmx';
 
-        $resultFilepath = $processingDir . $processedFilename;
+        $resultFilepath = $processingDir . '/' . $processedFilename;
 
         $writer = new XMLWriter();
 

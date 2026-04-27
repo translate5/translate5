@@ -117,7 +117,7 @@ $this->translations = [
         'message' => $translate->_('Save task to TM?'),
     ],
     'mtResourcesComboPrefix' => $translate->_('MT resource used for translation:'),
-    'customerComboPrefix' => $translate->_('with preferences for: '),
+    'customerComboPrefix' => $translate->_('with preferences for'),
     'autoDetectLanguage' => $translate->_('Detect language'),
     'averageQualityEstimation' => $translate->_('Average quality estimation value for the task'),
 ];
@@ -237,7 +237,7 @@ $languageSelector[] = '</form>';
             class="icon icon-t5_translate_file"/> <?= $translate->_('Translate file'); ?>
     </span>
     <span>
-        <label class="userCustomersLabel" for="userCustomers"><?= $this->translations['customerComboPrefix'] ?></label>
+        <label class="userCustomersLabel" for="userCustomers"><?= $this->translations['customerComboPrefix'] ?>: </label>
         <select id="userCustomers" class="sourceSelectorItem selectSourceTarget" name="userCustomers"></select>
     </span>
 </div>

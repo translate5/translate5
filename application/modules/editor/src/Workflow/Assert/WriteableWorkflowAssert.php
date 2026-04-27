@@ -101,7 +101,7 @@ class WriteableWorkflowAssert
 
     private function findJob(Task $task, string $userGuid): ?Job
     {
-        $tua = $this->userJobRepository->findUserJobInTask(
+        $tua = $this->userJobRepository->findAppropriateUserJobInTask(
             $userGuid,
             $task->getTaskGuid(),
             $task->getWorkflowStepName(),

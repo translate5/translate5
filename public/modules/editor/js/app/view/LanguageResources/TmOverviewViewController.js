@@ -35,6 +35,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     requires: ['Editor.view.mixin.UserFilterPresetable'],
     routes: {
         languageresource: 'onTmOverviewRoute',
+        'languageresource/:id': 'onTmOverviewRecordRoute',
     },
     listen: {
         component: {
@@ -53,6 +54,32 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     },
     onTmOverviewRoute: function () {
         Editor.app.openAdministrationSection(this.getView());
+    },
+    onTmOverviewRecordRoute: async function (id) {
+        var grid = this.getView(),
+            store = grid.getStore(),
+            selected,
+            toSelect,
+            correctRoute;
+
+        Editor.app.openAdministrationSection(grid, 'languageresource/' + id);
+        await Editor.util.Util.awaitStore(store);
+
+        selected = grid.getSelectionModel().getSelectionStart();
+        toSelect = store.getById(id);
+
+        if (!toSelect) {
+            correctRoute = 'languageresource' + (selected ? '/' + selected.id : '');
+            this.redirectTo(correctRoute);
+
+            return;
+        }
+
+        if (toSelect !== selected) {
+            grid.setSelection(toSelect);
+        }
+
+        grid.ensureVisible(toSelect);
     },
     onShowOnlyNotConverted: function (btn, pressed) {
         if (pressed) {

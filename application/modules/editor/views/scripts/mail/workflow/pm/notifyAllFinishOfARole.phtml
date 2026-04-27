@@ -26,12 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package portal
- * @version 2.0
- *
- */
+/** @var ZfExtended_View $this */
 
 $this->render('general.phtml');
 
@@ -52,53 +47,42 @@ if ($this->isCron) {
 
 //Define User List of next role users
 if (empty($this->nextStep) && in_array($this->triggeringStep, $this->workflow->getSteps())) {
-    $userNotificationHTML = $this->templateApply('The task has been fully processed, no further users are assigned to the task.<br />
-<br />
-');
-    $userNotificationText = $this->templateApply('The task has been fully processed, no further users are assigned to the task.<br />
-<br />
-', [
+    $userNotificationHTML = $this->templateApply('The task has been fully processed, no further users are assigned to the task.') . "<br/>\n<br/>\n";
+    $userNotificationText = $this->templateApply('The task has been fully processed, no further users are assigned to the task.', [
         'userList' => $this->htmlOnly,
-    ]);
+    ]) . "<br/>\n<br/>\n";
 } elseif (! empty($this->nextStep) && in_array($this->triggeringStep, $this->workflow->getSteps())) {
     //Fucking here up with role and step. Since in the heavily overwritten texts we still have nextRole we set the nextStep just the into the nextRole param
     $userNotificationHTML = $this->templateApply('The task has now automatically been made available to the following users with the role <i>{nextRole}</i>:<br />
 {userList}<br />
-The users have been informed accordingly via e-mail.<br />
-<br />
-', [
+The users have been informed accordingly via e-mail.', [
         'nextRole' => $this->translate->_($this->nextStep),
         'userList' => $this->workflowNotifyMail()->renderUserList($this->users),
-    ]);
+    ]) . "<br/>\n<br/>\n";
     $userNotificationText = $this->templateApply('The task has now automatically been made available to the following users with the role <i>{nextRole}</i>:<br />
 {userList}<br />
-The users have been informed accordingly via e-mail.<br />
-<br />
-', [
+The users have been informed accordingly via e-mail.', [
         'userList' => $this->htmlOnly,
-    ]);
+    ]) . "<br/>\n<br/>\n";
 } else {
-    $userNotificationHTML = $this->templateApply('The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.<br />
-<br />
-');
-    $userNotificationText = $this->templateApply('The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.<br />
-<br />
-', [
-        'userList' => $this->htmlOnly,
-    ]);
+    $userNotificationHTML = $this->templateApply('The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.') . "<br/>\n<br/>\n";
+    $userNotificationText = $this->templateApply(
+        'The role <i>{previousRole}</i> was not part of this workflow, therefore, no further users were notified.',
+        [
+            'userList' => $this->htmlOnly,
+        ]
+    ) . "<br/>\n<br/>\n";
 }
 
 //list of previous users:
 $userPreviousText = $this->templateApply('Users of previous role <i>{previousRole}</i>:
-{previousUsers}<br/>
-', [
+{previousUsers}<br/>', [
     'previousUsers' => $this->htmlOnly,
-]);
+]) . "\n";
 $userPreviousHTML = $this->templateApply('Users of previous role <i>{previousRole}</i>:
-{previousUsers}<br/>
-', [
+{previousUsers}<br/>', [
     'previousUsers' => $this->workflowNotifyMail()->renderUserList($this->previousUsers),
-]);
+]) . "\n";
 
 //create text body
 $this->textbody = strip_tags($this->templateApply('{header}

@@ -48,6 +48,7 @@ START LICENSE AND COPYRIGHT
              http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
+
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Integration\ContentProtection;
@@ -238,7 +239,7 @@ class ContentProtectorTest extends UnitTestAbstract
     {
         yield 'whitespace right after number' => [
             'text' => 'string 123,456.789 mm',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/><char ts="c2a0" length="1"/>mm',
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/><char ts="c2a0" length="1"/>mm',
             'entityHandling' => EntityHandlingMode::Restore,
         ];
 
@@ -262,7 +263,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
-            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B" key="aaa"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B" key="aaa"/>',
+            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B" key="aaa"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24" regex="PUy5DYAwDFyG4k4iJA40zBKbig0oMbvjIIXmfl2GXn64gtDz3p6E0iTt5tJKquaf4Z8GVosm5BokY0BAl341kY55qE6uZH4B" key="aaa"/>',
             'entityHandling' => EntityHandlingMode::Restore,
         ];
 
@@ -280,7 +281,7 @@ class ContentProtectorTest extends UnitTestAbstract
 
         yield '&lt; in text' => [
             'text' => 'string &lt; 123,456.789',
-            'expected' => 'string &lt; <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmpdpAx6hWR7PasFYDyDEGMrXAdIxeTIq2poZGdIyejrWVvWIsyAgVTc0aEFUTo6mpXwoA" key="aaa"/>',
+            'expected' => 'string &lt; <number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789" regex="09eIKa6Jq4nR0NSIPrQxRlc71l5DQyPaUNcyNial2kDHqFZHs9qwVgPIMQYytcC0Zg2qEs0aA03NGL2YFG1NoESMno61lb1iLMhkFU3NGhBVE6OpqV8KAA==" key="aaa"/>',
             'entityHandling' => EntityHandlingMode::Off,
         ];
     }

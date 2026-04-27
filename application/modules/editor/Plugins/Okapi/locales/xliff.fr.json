@@ -34,8 +34,8 @@
     "iwsBlockLockStatus": "Définir les segments terminés avec l’attribut lock_status=\"locked\" sur <br/>translate=\"no\"",
     "iwsBlockTmScore": "Définir les segments avec la valeur d’attribut tm_score correspondante sur <br/>translate=\"no\"",
     "iwsBlockTmScoreValue": "Valeur de correspondance du tm_score à rapprocher",
-    "iwsIncludeMultipleExact": "Inclure des segments avec l’attribut multiple_exact=\"has_multiple_exact\"<br/>indépendamment de leur tm_score",
-    "iwsBlockMultipleExact": "Définir les segments terminés avec l’attribut multiple_exact=\"has_multiple_exact\"<br/> sur translate=\"no\"",
-    "cdataSubfilter": "Traiter les contenus CDATA avec ce sous-filtre<br/>(p. ex. \"okf_html\"; laisser vide pour désactiver)",
-    "pcdataSubfilter": "Traiter le contenu PCDATA avec ce sous-filtre<br/>(laisser vide pour désactiver)"
+    "iwsIncludeMultipleExact": "Inclure des segments avec l’attribut multiple_exact=\"has_multiple_exact\" <br/>indépendamment de leur tm_score",
+    "iwsBlockMultipleExact": "Définir les segments terminés avec l’attribut multiple_exact=\"has_multiple_exact\" <br/>sur translate=\"no\"",
+    "cdataSubfilter": "Traiter les contenus CDATA avec ce sous-filtre <br/>(p. ex. \"okf_html\"; laisser vide pour désactiver)",
+    "pcdataSubfilter": "Traiter le contenu PCDATA avec ce sous-filtre <br/>(laisser vide pour désactiver)"
 }

@@ -111,7 +111,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         }
         // set app locale
         $session = new \Zend_Session_Namespace();
-        $session->locale = Localization::getLocale($locale);
+        $session->locale = Localization::evaluateLocale($locale);
 
         $sessionDb = new ZfExtended_Models_Db_Session();
         $sessionId = session_id();
