@@ -244,7 +244,6 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
             }
 
             // evaluate the configs to fix
-            $values = [];
             $taskConfigs = $this->getTaskConfigModel($model->getTaskGuid());
             foreach ($taskConfigs as $config) {
                 if ($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT) {
