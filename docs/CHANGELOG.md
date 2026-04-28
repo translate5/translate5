@@ -13,6 +13,71 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.36.2] - 2026-04-28
+
+### Important Notes:
+#### [TRANSLATE-5381](https://jira.translate5.net/browse/TRANSLATE-5381)
+⚠️ Security Header Changes (Content Security Policy & Framing Restrictions)
+
+We have introduced stricter security headers, including a Content Security Policy (CSP) and optional frame restrictions.
+
+These changes may impact:
+- Integration of external JavaScript, styles, or APIs not explicitly whitelisted
+- Single Sign-On (SSO) setups relying on external resources
+- Embedding the application in iframes on other domains
+- Use of third-party widgets or HTML snippets
+
+If you are using custom integrations or embedding the application, please verify compatibility and update your configuration (e.g., CSP whitelists) accordingly.
+ 
+
+
+### Changed
+**[TRANSLATE-5447](https://jira.translate5.net/browse/TRANSLATE-5447): Content Protection - ContentProtection improve default rule** <br>
+Improve default rule
+
+**[TRANSLATE-5381](https://jira.translate5.net/browse/TRANSLATE-5381): Editor general, Security Related - Add headers suggested by HTTP Observatory** <br>
+7.36.2: help video fix
+7.36.0: Some new headers were added for security reasons.
+Content-Security-Policy and X-Frame-Options may influence how the application works if you have custom scripts or styles loaded from different source or you load translate5 in <iframe> or <embed>
+To make headers be configurable we added the following config values, which can be added to installation.ini: 
+runtimeOptions.headers.enableXFrameHeader
+runtimeOptions.headers.defaultSrcUrls
+runtimeOptions.headers.scriptSrcUrls
+runtimeOptions.headers.connectSrcUrls
+runtimeOptions.headers.styleSrcUrls
+runtimeOptions.headers.imgSrcUrls
+runtimeOptions.headers.fontSrcUrls
+
+Please check the reference in the application.ini file
+
+**[TRANSLATE-5372](https://jira.translate5.net/browse/TRANSLATE-5372): Task Management - Language selection in Create Project wizard through comma-separated input** <br>
+Added ability to paste comma-separated language codes (.g. “cs-CZ, de-DE, es-ES, ja-JP") into 'Target language'-tagfield in project import wizard
+
+
+### Bugfixes
+**[TRANSLATE-5462](https://jira.translate5.net/browse/TRANSLATE-5462): LanguageResources - Deep linking for Language Resources overview** <br>
+Improved navigation by adding deep-link support for Language Resources, including direct jump-and-select from task-assigned language resources and URL-based state restoration.
+
+**[TRANSLATE-5461](https://jira.translate5.net/browse/TRANSLATE-5461): Okapi integration - Add --list option to okapi:upgrade-to-latest to show available Okapi endpoints per configured server** <br>
+Added a new --list mode to okapi:upgrade-to-latest so admins can preview available Okapi endpoints per configured server without performing an upgrade.
+
+**[TRANSLATE-5433](https://jira.translate5.net/browse/TRANSLATE-5433): translate5 AI - Translate5AI: TQE Stop retrying when language resource uses incompatible model** <br>
+Fix problem where TQE will re-try to evaluate segment with resource with invalide model configured.
+
+**[TRANSLATE-5430](https://jira.translate5.net/browse/TRANSLATE-5430): t5memory - Escaped apostrophe processed incorrectly in TMX import** <br>
+Fix html entities processing in TMX import
+
+**[TRANSLATE-5428](https://jira.translate5.net/browse/TRANSLATE-5428): Workflows - inconsistent workflow prevents working in task** <br>
+Fix user permissions to enter tasks
+
+**[TRANSLATE-5248](https://jira.translate5.net/browse/TRANSLATE-5248): Export - Check user permissions in task export action** <br>
+7.36.2: Fix InstantTranslate downloads
+7.36.0: Use permission checks in task export action
+
+**[TRANSLATE-5010](https://jira.translate5.net/browse/TRANSLATE-5010): Task Management, User Management - Performance issues with userlistAction** <br>
+Loading users for tasks may lead to excessive full scans and per-row subquery execution, slowing down the DB. This is optimised.
+
+
 ## [7.36.1] - 2026-04-16
 
 ### Important Notes:
