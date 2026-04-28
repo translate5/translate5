@@ -13,6 +13,28 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.37.0] - 2026-04-28
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4440](https://jira.translate5.net/browse/TRANSLATE-4440): Editor general - Simple filters in editor UI** <br>
+Added filters toolbar at the very top of segments grid, toggleable with CTRL+ALT+F keyboard shortcut
+
+
+### Changed
+**[TRANSLATE-5383](https://jira.translate5.net/browse/TRANSLATE-5383): Okapi integration - Import Across abbreviations or language segmentation rules** <br>
+OKAPI: Add CLI command to import Across Segmentation Settings regarding Abbrevation ("terms") to an SRX as used in translate5
+
+**[TRANSLATE-5365](https://jira.translate5.net/browse/TRANSLATE-5365): SpellCheck (LanguageTool integration), TermTagger integration - No languagetool error inside term mark-up** <br>
+In case spellcheck error is inside the existing terminology entry it is now skipped.
+
+**[TRANSLATE-3707](https://jira.translate5.net/browse/TRANSLATE-3707): usability editor - Enhance handling of spelling errors** <br>
+Added a spellcheck window for working with the spellcheck errors for all segments. Added capability to apply spellcheck replacement for closed segment. 
+
+
 ## [7.36.2] - 2026-04-28
 
 ### Important Notes:
