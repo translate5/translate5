@@ -7970,7 +7970,7 @@ In general {app} should be able to work with other browsers and older versions. 
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSBpcyBhdmFpbGFibGUgaW4gdmVyc2lvbiB7b25saW5lVmVyc2lvbn0sIHZlcnNpb24ge2N1cnJlbnRWZXJzaW9ufSBpcyBjdXJyZW50bHkgdXNlZC4gPGJyLz5QbGVhc2UgdXNlIHRoZSBpbnN0YWxsYXRpb24gYW5kIHVwZGF0ZSBzY3JpcHQgdG8gaW5zdGFsbCB0aGUgbGF0ZXN0IHZlcnNpb24u">
                 <source>translate5 is available in version {onlineVersion}, version {currentVersion} is currently used. <br/>Please use the installation and update script to install the latest version.</source>
-                <target>translate5 is available in version %1$s, version %2$s is currently used. <br/>Please use the installation and update script to install the latest version.</target>
+                <target>translate5 is available in version {onlineVersion}, version {currentVersion} is currently used. <br/>Please use the installation and update script to install the latest version.</target>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSBpcyBsb2FkaW5nOg==">
                 <source>translate5 is loading:</source>
