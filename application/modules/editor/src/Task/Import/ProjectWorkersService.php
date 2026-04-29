@@ -128,15 +128,24 @@ class ProjectWorkersService
      */
     public function startImportWorkers(editor_Models_Task $task): void
     {
-        $tasks = [$task];
+        // this will be an array of project-tasks
+        $tasks = [];
         //if it is a project, start the import workers for each sub-task
         if ($task->isProject()) {
-            $tasks = $task->loadProjectTasks((int) $task->getProjectId(), true);
+            $tasksData = $task->loadProjectTasks((int) $task->getProjectId(), true);
 
             ZfExtended_Factory::get(editor_Workflow_Manager::class)
                 ->getActiveByTask($task)
                 ->hookin()
                 ->doHandleProjectCreated($task);
+
+            foreach ($tasksData as $taskData) {
+                $projectTask = new editor_Models_Task();
+                $projectTask->load($taskData['id']);
+                $tasks[] = $projectTask;
+            }
+        } else {
+            $tasks[] = $task;
         }
 
         // we fix all task-specific configs of the task for it's remaining lifetime
@@ -145,28 +154,15 @@ class ProjectWorkersService
         $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
         $taskConfig->fixAfterImport($tasks);
 
-        $model = ZfExtended_Factory::get(editor_Models_Task::class);
-        foreach ($tasks as $t) {
-            if (is_array($t)) {
-                $model->load($t['id']);
-            } else {
-                $model = $t;
-            }
-
-            //import workers can only be started for tasks
-            if ($model->isProject()) {
-                continue;
-            }
-
+        foreach ($tasks as $task) {
             $workerModel = new ZfExtended_Models_Worker();
 
             try {
                 $workerModel->loadFirstOf(
                     editor_Models_Import_Worker::class,
-                    $model->getTaskGuid(),
+                    $task->getTaskGuid(),
                     [ZfExtended_Models_Worker::STATE_PREPARE]
                 );
-
                 //set the prepared worker to scheduled and set them to waiting where possible
                 $workerModel->schedulePrepared();
             } catch (ZfExtended_Models_Entity_NotFoundException) {

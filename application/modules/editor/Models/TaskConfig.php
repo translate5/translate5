@@ -222,32 +222,23 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Fixes the config for a task/project after Import.
+     * Fixes the config for project-tasks after Import.
      * This means, that all configs with task-import-level will be inserted to the task-config table and thus never can be changed again in the lifetime of the task after import
+     * @param editor_Models_Task[] $tasks These are expected to be project-tasks, not project(s)
      */
     public function fixAfterImport(array $tasks)
     {
         $db = $this->db->getAdapter();
         $values = [];
 
-        /** @var editor_Models_Task $model */
+        /** @var editor_Models_Task $task */
         foreach ($tasks as $task) {
-            if (is_array($task)) {
-                $model = editor_ModelInstances::task($task['id']);
-            } else {
-                $model = $task;
-            }
-
-            //import workers can only be started for tasks
-            if ($model->isProject()) {
-                continue;
-            }
-
             // evaluate the configs to fix
-            $taskConfigs = $this->getTaskConfigModel($model->getTaskGuid());
+            $taskConfigs = $this->getTaskConfigModel($task->getTaskGuid());
             foreach ($taskConfigs as $config) {
                 if ($config['level'] == editor_Models_Config::CONFIG_LEVEL_TASKIMPORT) {
-                    $values[] = '(' . $db->quote($model->getTaskGuid()) . ',' . $db->quote($config['name']) . ',' . $db->quote($config['value']) . ')';
+                    $values[] = '(' . $db->quote($task->getTaskGuid()) . ',' . $db->quote($config['name']) .
+                        ',' . $db->quote($config['value']) . ')';
                 }
             }
         }
@@ -256,8 +247,10 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
             return;
         }
 
-        // inset all new values, and leave the existing one inside the table.
-        $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES ' . implode(',', $values) . '  ON DUPLICATE KEY UPDATE `value`=`value`';
+        // insert all new values, and leave the existing one inside the table.
+        $sql = 'INSERT INTO `LEK_task_config` (`taskGuid`, `name`, `value`) VALUES ' . implode(',', $values) .
+            ' ON DUPLICATE KEY UPDATE `value`=`value`';
+
         $db->query($sql);
     }
 

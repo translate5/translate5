@@ -67,7 +67,7 @@ class ProjectTaskTest extends JsonTestAbstract
             ->setProperty('taskName', static::NAME_PREFIX . 'ProjectTaskTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
-    /***
+    /**
      * Validate the basic project task values
      */
     public function testProjectTaskCreation()
@@ -94,7 +94,7 @@ class ProjectTaskTest extends JsonTestAbstract
         }
     }
 
-    /***
+    /**
      * For each project task, check the segment content. Some of the segments are with terms.
      */
     public function testProjectTasksSegmentContent()
@@ -107,10 +107,51 @@ class ProjectTaskTest extends JsonTestAbstract
         static::api()->setTask($project);
     }
 
-    /***
+    /**
+     * Tests, if the pure task-config (the entries in LEK_task_config) have been saved for all projects properly
+     * @throws Zend_Http_Client_Exception
+     */
+    public function testProjectTasksTaskConfigs()
+    {
+        static::api()->reloadProjectTasks();
+        $last = -1;
+        $okapiConfig = 'runtimeOptions.plugins.Okapi.serverUsed';
+        foreach (static::api()->getProjectTasks() as $task) {
+            // fetch the pure task config for the project-task
+            $params = [
+                'taskGuid' => $task->taskGuid,
+                'pureTaskConfig' => '1',
+            ];
+            $taskConfigs = static::api()->getJson('editor/config/apitest', $params);
+            $numConfigs = count($taskConfigs);
+
+            // we must have at least 50 configs - until we thin out our config drastically, what will never happen ;-)
+            static::assertTrue($numConfigs > 50, 'The number of fixated task-configs is too low');
+
+            // the task-configs amount must match between the tasks
+            static::assertTrue($last === -1 || $last === $numConfigs, 'The number of fixed differs between tasks');
+
+            // the okapi-server must be part of the config (we could test several others ...)
+            $okapiConfigFound = false;
+            foreach ($taskConfigs as $taskConfig) {
+                if ($taskConfig->name === $okapiConfig) {
+                    $okapiConfigFound = true;
+
+                    break;
+                }
+            }
+            static::assertTrue(
+                $okapiConfigFound,
+                'The config “' . $okapiConfig . '” was not found in the task-configs'
+            );
+
+            $last = $numConfigs;
+        }
+    }
+
+    /**
      * Check the segments content for the given task.
      * For this, first the task needs to be opened for editing. After the check the task will be set to open again.
-     * @param stdClass $task
      */
     private function checkProjectTaskSegments(stdClass $task)
     {
