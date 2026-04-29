@@ -123,7 +123,22 @@ class TmxSymbolsFixer
                 }
 
                 if (strpos($part, '<tu ') !== false) {
-                    $result .= preg_replace('/&[a-zA-Z0-9#]+;/', '', $part);
+                    $part = preg_replace_callback(
+                        '#<tu\s+([^>]*)>#Uu',
+                        fn (array $matches) => str_replace(
+                            $matches[1],
+                            mb_encode_numericentity(
+                                preg_replace('/&[a-zA-Z0-9#]+;/', '', $matches[1]),
+                                [0x80, 0x10FFFF, 0, ~0], // encode non-ASCII
+                                'UTF-8'
+                            ),
+                            $matches[0],
+                        ),
+                        $part,
+                        1,
+                    );
+
+                    $result .= $part;
 
                     continue;
                 }

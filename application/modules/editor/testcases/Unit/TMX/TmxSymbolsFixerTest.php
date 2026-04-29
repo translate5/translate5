@@ -370,6 +370,23 @@ class TmxSymbolsFixerTest extends TestCase
         self::assertStringNotContainsString('hello again hello&quot;', $result);
     }
 
+    public function testUtf8InsideCreationIdIsFixed(): void
+    {
+        $content = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tmx version=\"1.4\">\n  <body>\n    <tu creationid="&lt;PAUL.DöHR&quot;&gt;">hello again hello&quot;</tu>\n  </body>\n</tmx>';
+        $inputFile = $this->createTestFile($content);
+
+        $this->fixer->fixInvalidXmlSymbols($inputFile);
+
+        $result = file_get_contents($inputFile);
+
+        // Entities inside the tag attribute should remain as-is
+        self::assertStringContainsString('creationid="PAUL.D&#246;HR"', $result);
+
+        // Entity outside the tag should be converted to actual character
+        self::assertStringContainsString('hello again hello"', $result);
+        self::assertStringNotContainsString('hello again hello&quot;', $result);
+    }
+
     /**
      * Helper method to create a test file
      */

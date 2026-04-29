@@ -289,7 +289,7 @@ TMX,
 </tu>
 TMX,
             'expected' => <<<TMX
-<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationid="DavidMckeown" creationdate="20180821T131628Z">
+<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationdate="20180821T131628Z" creationid="DAVIDMCKEOWN">
   <prop type="tmgr:docname">DIE BUNDESTAGSFRAKTION IN DER 19.docx</prop>
 <tuv xml:lang="de">
     <seg>drei Kinder, Baden-Württemberg</seg>
@@ -359,7 +359,7 @@ TMX,
 </tu>
 TMX,
             'expected' => <<<TMX
-<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationdate="20100101T101010Z" creationid="DavidMckeown">
+<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationdate="20100101T101010Z" creationid="DAVIDMCKEOWN">
   <prop type="tmgr:docname">DIE BUNDESTAGSFRAKTION IN DER 19.docx</prop>
 <tuv xml:lang="de">
     <seg>drei Kinder, Baden-Württemberg</seg>
@@ -395,7 +395,7 @@ TMX,
 </tu>
 TMX,
             'expected' => <<<TMX
-<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationid="DavidMckeown" creationdate="20180821T131628Z">
+<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationdate="20180821T131628Z" creationid="DAVIDMCKEOWN">
   <prop type="tmgr:docname">test.txt</prop>
   <tuv xml:lang="de">
     <seg>drei Kinder, Baden-Württemberg</seg>
@@ -430,7 +430,7 @@ TMX,
 </tu>
 TMX,
             'expected' => <<<TMX
-<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationid="DavidMckeown" creationdate="20180821T131628Z">
+<tu tuid="_0000ShBleQXBw1620oZMFEDDm" creationdate="20180821T131628Z" creationid="DAVIDMCKEOWN">
   <prop type="tmgr:docname">DIE BUNDESTAGSFRAKTION IN DER 19.docx</prop>
 <tuv xml:lang="de">
     <seg>drei Kinder, Baden-Württemberg</seg>
@@ -439,6 +439,41 @@ TMX,
     <seg>three children, Baden-Württemberg</seg>
   </tuv>
 </tu>
+TMX,
+        ];
+
+        yield 'utf-8 symbols in author name' => [
+            'transformTusMapping' => [
+                'creationDate' => '//tuv[@xml:lang="{targetLang}"]/@creationdate',
+                'author' => '//tu/tuv[@xml:lang="{targetLang}"]/prop[@type="created_by"]',
+                'document' => '//tu/tuv[@xml:lang="{targetLang}"]/prop[@type="filename"]',
+            ],
+            'tu' => <<<TMX
+<tu tuid="_lucwQanE0SB5Mk9M5jxkpojo1">
+      <tuv xml:lang="de">
+        <seg>Gewerberaummietvertrag</seg>
+      </tuv>
+      <tuv xml:lang="en-gb" creationdate="20161118T121348Z" changedate="20161119T144213Z">
+        <prop type="project">1559481</prop>
+        <prop type="reviewed">false</prop>
+        <prop type="aligned">false</prop>
+        <prop type="created_by">Paul.Döhr</prop>
+        <prop type="modified_by">Paul.Döhr</prop>
+        <prop type="filename">Gewerbemietvertrag ehem. Offiziersheim - Wedlich Servicegruppe - Medi Prosthetics - 01.01.2017.doc</prop>
+        <seg>Rental agreement for commercial facilities</seg>
+      </tuv>
+    </tu>
+TMX,
+            'expected' => <<<TMX
+<tu tuid="_lucwQanE0SB5Mk9M5jxkpojo1" creationdate="20161118T121348Z" creationid="PAUL.D&#246;HR">
+      <prop type="tmgr:docname">Gewerbemietvertrag ehem. Offiziersheim - Wedlich Servicegruppe - Medi Prosthetics - 01.01.2017.doc</prop>
+<tuv xml:lang="de">
+        <seg>Gewerberaummietvertrag</seg>
+      </tuv>
+      <tuv xml:lang="en-gb">
+        <seg>Rental agreement for commercial facilities</seg>
+      </tuv>
+    </tu>
 TMX,
         ];
     }

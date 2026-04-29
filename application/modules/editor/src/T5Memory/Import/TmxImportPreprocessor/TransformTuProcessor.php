@@ -134,14 +134,9 @@ class TransformTuProcessor extends Processor
         // Get the <tu> element
         $tuNode = $xpath->query('//tu')->item(0);
 
-        // Set author as creationid attribute on <tu> only if not already set
-        if ($author !== null && ! $authorIsSet) {
-            $tuNode->setAttribute('creationid', $author);
-        }
-
         // Set creation date as creationdate attribute on <tu> only if not already set
         if ($creationDate !== null && ! $creationDateIsSet) {
-            $tuNode->setAttribute('creationdate', $creationDate);
+            $tuNode->setAttribute('creationdate', $creationDate); // @phpstan-ignore-line
         }
 
         // Add document as <prop type="tmgr:docname"> child of <tu>
@@ -193,12 +188,33 @@ class TransformTuProcessor extends Processor
                 }
             }
             foreach ($attributesToRemove as $attrName) {
-                $tuvNode->removeAttribute($attrName);
+                $tuvNode->removeAttribute($attrName); // @phpstan-ignore-line
             }
         }
 
-        // Return the transformed TU
-        yield $dom->saveXML($tuNode);
+        $tu = (string) $dom->saveXML($tuNode);
+
+        // Set author as creationid attribute on <tu> only if not already set
+        if ($author !== null && ! $authorIsSet) {
+            $author = mb_encode_numericentity(
+                $author,
+                [0x80, 0x10FFFF, 0, ~0], // encode non-ASCII
+                'UTF-8'
+            );
+
+            $tu = preg_replace_callback(
+                '#<tu\s+([^>]*)>#Uu',
+                fn (array $matches) => str_replace(
+                    $matches[1],
+                    $matches[1] . ' creationid="' . strtoupper($author) . '"',
+                    $matches[0],
+                ),
+                $tu,
+                1,
+            );
+        }
+
+        yield $tu;
     }
 
     private function getValueByPath(
