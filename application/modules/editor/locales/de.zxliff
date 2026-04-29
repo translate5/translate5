@@ -954,6 +954,14 @@ Legen Sie hier eine neue Gruppe an, anschließend können Sie in der Benutzerüb
                 <source>Chinesisch (vereinfacht)</source>
                 <target>Chinesisch (vereinfacht)</target>
             </trans-unit>
+            <trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQgQWNyb3NzKQ=='>
+                <source>Chinesisch (vereinfacht Across)</source>
+                <target>Chinesisch (vereinfacht Across)</target>
+            </trans-unit>
+            <trans-unit id='SmFwYW5pc2NoICh2ZXJlaW5mYWNodCBBY3Jvc3Mp'>
+                <source>Japanisch (vereinfacht Across)</source>
+                <target>Japanisch (vereinfacht Across)</target>
+            </trans-unit>
             <trans-unit id="Q2hvb3NlIGFuIGVudHJ5IGluIHRoZSB0YWJsZSB0byBlZGl0IGl0IQ==">
                 <source>Choose an entry in the table to edit it!</source>
                 <target>Wählen Sie einen Eintrag in der Tabelle aus, um diesen zu bearbeiten!</target>

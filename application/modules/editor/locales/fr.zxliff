@@ -945,6 +945,14 @@ Create a new group here, then you can create the job coordinator belonging to th
                 <source>Chinesisch (vereinfacht)</source>
                 <target>Chinois (simplifié)</target>
             </trans-unit>
+            <trans-unit id='Q2hpbmVzaXNjaCAodmVyZWluZmFjaHQgQWNyb3NzKQ=='>
+                <source>Chinesisch (vereinfacht Across)</source>
+                <target>Chinois (simplifié Across)</target>
+            </trans-unit>
+            <trans-unit id='SmFwYW5pc2NoICh2ZXJlaW5mYWNodCBBY3Jvc3Mp'>
+                <source>Japanisch (vereinfacht Across)</source>
+                <target>Japonais (simplifié Across)</target>
+            </trans-unit>
             <trans-unit id="Q2hvb3NlIGFuIGVudHJ5IGluIHRoZSB0YWJsZSB0byBlZGl0IGl0IQ==">
                 <source>Choose an entry in the table to edit it!</source>
                 <target>Sélectionnez une entrée dans le tableau pour la modifier!</target>

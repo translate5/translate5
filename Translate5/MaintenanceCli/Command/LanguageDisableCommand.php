@@ -33,6 +33,10 @@ use MittagQI\Translate5\Language\LanguageVisibility;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Db_Statement_Exception;
+use Zend_Exception;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class LanguageDisableCommand extends Translate5AbstractCommand
@@ -40,7 +44,7 @@ class LanguageDisableCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'language:disable';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             // the short description shown while running "php bin/console list"
@@ -57,7 +61,13 @@ class LanguageDisableCommand extends Translate5AbstractCommand
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
@@ -77,14 +87,14 @@ class LanguageDisableCommand extends Translate5AbstractCommand
             } else {
                 $language->loadById((int) $languageId);
             }
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->io->error('Language not found: ' . $languageId);
 
             return self::FAILURE;
         }
 
         if ($language->getHidden() === '1') {
-            $this->io->warning('Language is disabled already: ' . $languageId);
+            $this->io->warning('Language is disabled already: ' . $languageId . ' - ' . $language->getLangName());
 
             return self::SUCCESS;
         }
@@ -94,10 +104,12 @@ class LanguageDisableCommand extends Translate5AbstractCommand
         } else {
             $language->setHidden(true);
             $language->save();
-            $languageIds = [$languageId];
+            $languageIds = [$languageId . ' - ' . $language->getLangName()];
         }
 
-        $this->io->success('Language' . (count($languageIds) > 1 ? 's' : '') . ' disabled: ' . implode(',', $languageIds));
+        $this->io->success(
+            'Language' . (count($languageIds) > 1 ? 's' : '') . ' disabled: ' . implode(',', $languageIds)
+        );
 
         return self::SUCCESS;
     }
