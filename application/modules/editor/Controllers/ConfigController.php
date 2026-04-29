@@ -254,7 +254,13 @@ class editor_ConfigController extends ZfExtended_RestController
         $configs = $this->_request->getParam('configs');
         $taskGuid = $this->_request->getParam('taskGuid');
         $this->view->rows = [];
-        if (! empty($configs)) {
+        if (! empty($taskGuid) && (int) $this->_request->getParam('pureTaskConfig', '0') === 1) {
+            // special mode to retrieve only the pure task-configs from the task-config table
+            $this->view->rows = $this->entity->db->getAdapter()->fetchAll(
+                'SELECT * FROM LEK_task_config WHERE taskGuid = ?',
+                [$taskGuid]
+            );
+        } elseif (! empty($configs)) {
             // config is either the task-config or the global config
             $config = empty($taskGuid) ?
                 Zend_Registry::get('config')
