@@ -543,6 +543,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
     public function getAccessibleCollectionIds(ZfExtended_Models_User $user): array
     {
+        if (empty($user->getCustomersArray())) {
+            return [];
+        }
+
         $s = $this->db->select()
             ->distinct()
             ->from([
