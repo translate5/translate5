@@ -223,5 +223,126 @@ class IntegerProtectorTest extends TestCase
             'protectionDto' => $protectionDtoNbspEscaped,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDto = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
+            0,
+            null,
+            false,
+            '#.###,–',
+            1,
+            'aaa',
+        );
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de');
+
+        yield 'integer formated with dot separator and comma + dash at end' => [
+            'number' => '123,456.–',
+            'expected' => '<number type="integer" name="test-default" source="123,456.–" iso="123456" target="123.456,–" regex="049JijbUtYyNSak20DGu1dDRtNcAsk1qYww1tSGMJP1SAA==" key="aaa"/>',
+            'protectionDto' => $protectionDto,
+            'targetLang' => $targetLangDe,
+        ];
+
+        // --- Currency formats ---
+
+        $protectionDtoEuroSuffix = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '#.###€',
+            1,
+            'aaa',
+        );
+
+        yield 'euro suffix with dot thousands separator' => [
+            'number' => '1234567',
+            'expected' => '<number type="integer" name="test-default" source="1234567" iso="1234567" target="1.234.567€" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoEuroSuffix,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $protectionDtoDollarPrefix = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '$#,###',
+            1,
+            'aaa',
+        );
+
+        yield 'dollar prefix with comma thousands separator' => [
+            'number' => '$1234567',
+            'expected' => '<number type="integer" name="test-default" source="$1234567" iso="1234567" target="$1,234,567" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoDollarPrefix,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $protectionDtoEuroDashSuffix = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '#.###,–€',
+            1,
+            'aaa',
+        );
+
+        yield 'euro suffix with dot separator and comma + dash' => [
+            'number' => '1234567',
+            'expected' => '<number type="integer" name="test-default" source="1234567" iso="1234567" target="1.234.567,–€" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoEuroDashSuffix,
+            'targetLang' => $targetLangDe,
+        ];
+
+        // --- Measurement formats ---
+
+        $protectionDtoKgSuffix = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '#.### kg',
+            1,
+            'aaa',
+        );
+
+        yield 'kg suffix with dot thousands separator' => [
+            'number' => '1234567 kg',
+            'expected' => '<number type="integer" name="test-default" source="1234567 kg" iso="1234567" target="1.234.567 kg" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoKgSuffix,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $protectionDtoM2Suffix = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/(\s|^|\()([±\-+]?([1-9]\d+|\d))(([\.,;:?!](\s|$))|\s|$|\))/u',
+            0,
+            null,
+            false,
+            '#,### m²',
+            1,
+            'aaa',
+        );
+
+        yield 'm² suffix with comma thousands separator' => [
+            'number' => '1234567 m²',
+            'expected' => '<number type="integer" name="test-default" source="1234567 m²" iso="1234567" target="1,234,567 m²" regex="09eIKa6Jq4nR0NSIPrQxRlc71l4j2lDXMjYmRbsmJkVTU0MjOkZPx9rKXjEWpFRFU7MGRNXEaGrqlwIA" key="aaa"/>',
+            'protectionDto' => $protectionDtoM2Suffix,
+            'targetLang' => $targetLangDe,
+        ];
     }
 }

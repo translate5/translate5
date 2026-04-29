@@ -77,18 +77,24 @@ class FloatObject
 
         $firstChar = mb_substr($float, 0, 1);
         $sign = in_array($firstChar, self::SIGNS) ? $firstChar : '';
-        $decimalPart = explode($decimalSeparator, $float)[1];
+        $decimalPart = explode($decimalSeparator, $float)[1] ?? '';
         // if format at the end has currency for example
         if (! preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
-            array_pop($symbols);
-            $decimalSeparator = end($symbols);
+            // Handle multi-char last segment where first char is the actual decimal separator
+            // e.g. '.-' where '.' is the decimal separator and '-' is a zero-fraction placeholder
+            if (mb_strlen($decimalSeparator) > 1 && in_array(mb_substr($decimalSeparator, 0, 1), ['.', ','])) {
+                $decimalSeparator = mb_substr($decimalSeparator, 0, 1);
+            } else {
+                array_pop($symbols);
+                $decimalSeparator = end($symbols);
+            }
         }
 
         $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
         $number = preg_replace("/[^\d$regSymbol]/u", '', $float);
         $number = str_replace($decimalSeparator, '.', $number);
 
-        return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]), $sign);
+        return new self($formater->parse($number), mb_strlen(explode('.', $number)[1] ?? ''), $sign);
     }
 
     public function format(string $format, ?string $locale = null): string

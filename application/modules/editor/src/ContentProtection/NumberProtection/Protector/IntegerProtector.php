@@ -127,6 +127,14 @@ class IntegerProtector extends FloatProtector
 
             // convert visual format to ICU pattern format
             $icuPattern = str_replace($m[1], ',', $targetFormat);
+
+            // quote ICU-special ',' chars in the suffix part so they are treated as literals
+            // The suffix starts after the last digit/hash char that is not followed by more digit/hash/dot chars
+            if (preg_match('/^(.*[#0](?:\.[#0]+)?)(,+[^#0.,].*)$/us', $icuPattern, $suffixMatch)) {
+                $suffix = str_replace(',', "','", $suffixMatch[2]);
+                $icuPattern = $suffixMatch[1] . $suffix;
+            }
+
             $fmt->setPattern($icuPattern);
 
             if ($groupingChar !== null) {

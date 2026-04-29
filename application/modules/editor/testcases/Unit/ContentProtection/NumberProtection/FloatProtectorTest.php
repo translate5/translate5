@@ -258,6 +258,25 @@ class FloatProtectorTest extends TestCase
             'protectionDto' => $protectionDtoWithSimpleFloat,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDtoDotCommaAndDash = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,#',
+            false,
+            '#,###.–',
+            1,
+            'aaa',
+        );
+
+        yield 'float with thousand comma, decimal dot and dash in output' => [
+            'number' => '1.230,–',
+            'expected' => '<number type="float" name="test-default" source="1.230,–" iso="1230" target="1,230.–" regex="049J0og21LWMjUmpNtAxqtXRrDas1QByjIFMLTAdoxeToh2TpF8KAA==" key="aaa"/>',
+            'protectionDto' => $protectionDtoDotCommaAndDash,
+            'targetLang' => $targetLangDe,
+        ];
     }
 
     public function testExceptionOnEmptyFormat(): void

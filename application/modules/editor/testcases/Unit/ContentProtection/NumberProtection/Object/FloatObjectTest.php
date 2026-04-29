@@ -410,12 +410,20 @@ class FloatObjectTest extends TestCase
             'float' => '12,32,34,567.89',
             'object' => new FloatObject(123234567.89, 2),
         ];
+        yield [
+            'float' => '1,2323,4567.-',
+            'object' => new FloatObject(123234567.0, 0),
+        ];
+        yield [
+            'float' => '1,2323,4567.-€',
+            'object' => new FloatObject(123234567.0, 0),
+        ];
     }
 
     /**
      * @dataProvider formatProvider
      */
-    public function testFormat(float $float, string $locale, ?string $format, string $expected): void
+    public function testFormat(float|string $float, string $locale, ?string $format, string $expected): void
     {
         self::assertEquals($expected, FloatObject::parse((string) $float)->format($format, $locale));
     }
@@ -470,6 +478,18 @@ class FloatObjectTest extends TestCase
             'locale' => 'en',
             'format' => '#.#',
             'expected' => '1234567.123456',
+        ];
+        yield [
+            'float' => '1234567.-',
+            'locale' => 'en',
+            'format' => '#.###,-',
+            'expected' => '1.234.567,-',
+        ];
+        yield [
+            'float' => '1234567.-€',
+            'locale' => 'en',
+            'format' => '#.###,-€',
+            'expected' => '1.234.567,-€',
         ];
     }
 }
