@@ -13,6 +13,37 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.37.1] - 2026-04-29
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5479](https://jira.translate5.net/browse/TRANSLATE-5479): Content Protection - Improve float and integer parsing** <br>
+Improve float and integer parsing
+
+**[TRANSLATE-5398](https://jira.translate5.net/browse/TRANSLATE-5398): VisualReview / VisualTranslation - Improve Officeconverter Container to remove field functions before conversion** <br>
+Visual: remove dynamic field functions before converting office documents to PDFs
+
+**[TRANSLATE-5136](https://jira.translate5.net/browse/TRANSLATE-5136): t5connect - add new languages for simplified Chinese and Japan (as used in Across)** <br>
+- add new languages for simplified Chinese and Japan (as used in Across)
+
+
+### Bugfixes
+**[TRANSLATE-5477](https://jira.translate5.net/browse/TRANSLATE-5477): Editor general - Fix phpstan findings** <br>
+7.37.1: Fix first bunch of several coding problems found by static analysis.
+
+**[TRANSLATE-5476](https://jira.translate5.net/browse/TRANSLATE-5476): Import/Export - Task Config only saved for last task of multi-target import** <br>
+FIX: task-Config was not properly set for multi-target tasks
+
+**[TRANSLATE-5431](https://jira.translate5.net/browse/TRANSLATE-5431): TermPortal - PHP error when user has no customers assigned** <br>
+PHP error fixed
+
+**[TRANSLATE-5427](https://jira.translate5.net/browse/TRANSLATE-5427): t5memory - non-ASCII characters handled incorrectly on TMX transform** <br>
+Fix non-ASCII characters in author name
+
+
 ## [7.37.0] - 2026-04-28
 
 ### Important Notes:
