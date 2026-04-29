@@ -156,9 +156,7 @@ trait TaskContextTrait
             $exception = new NoJobFoundException('E1600', [
                 'debug' => $debug,
             ]);
-            $log = (isset($this->log) && is_a($this->log, \ZfExtended_Logger::class)) ? $this->log :
-                ZfExtended_Factory::get(\editor_Logger_Workflow::class, [$this->_currentTask]);
-            $log->exception($exception);
+            $this->log->exception($exception);
 
             throw $exception;
         }

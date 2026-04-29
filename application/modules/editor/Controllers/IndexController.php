@@ -52,6 +52,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 {
     use TaskContextTrait;
 
+    protected ZfExtended_Logger $log;
+
     protected ZfExtended_Zendoverwrites_Translate $translate;
 
     protected Zend_Config $config;
@@ -120,6 +122,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         parent::init();
         $this->acl = ZfExtended_Acl::getInstance();
         $this->config = Zend_Registry::get('config');
+        $this->log = Zend_Registry::get('logger');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->pluginManager = Zend_Registry::get('PluginManager');
     }
@@ -249,7 +252,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         } catch (\MittagQI\Translate5\Task\Current\Exception) {
             //then add nothing
         }
-        Zend_Registry::get('logger')->info('E1606', 'Rootcause logged: {link}', $extra);
+        $this->log->info('E1606', 'Rootcause logged: {link}', $extra);
     }
 
     /**
@@ -271,7 +274,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $onlineVersion = $downloader->getAvailableVersion();
 
         if (! empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
-            $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
+            $msgBoxConf = $this->view->php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
             $msg = $this->translate->_(
                 'translate5 is available in version {onlineVersion}, version {currentVersion} is currently used. ' .
@@ -322,19 +325,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         ));
 
         // Video-recording: If allowed in general, then it can be set by the user after every login.
-        $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
+        $this->view->php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
         // Feedback button
-        $this->view->Php2JsVars()->set('enableJsLoggerFeedback', ! empty($rop->debug->enableJsLoggerFeedback) && str_contains(
+        $this->view->php2JsVars()->set('enableJsLoggerFeedback', ! empty($rop->debug->enableJsLoggerFeedback) && str_contains(
             ',' . $rop->debug->enableJsLoggerFeedback . ',',
             ',' . ZfExtended_Authentication::getInstance()->getLogin() . ','
         ));
 
         //for initial loading we have to set the restpath to empty string to trigger relative paths in the proxy setups
-        $this->view->Php2JsVars()->set('restpath', '');
-        $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
-        $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath . '/');
-        $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath . '/js/app');
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set('restpath', '');
+        $this->view->php2JsVars()->set('basePath', APPLICATION_RUNDIR);
+        $this->view->php2JsVars()->set('moduleFolder', $this->view->publicModulePath . '/');
+        $this->view->php2JsVars()->set('appFolder', $this->view->publicModulePath . '/js/app');
+        $this->view->php2JsVars()->set(
             'pluginFolder',
             APPLICATION_RUNDIR . '/' . Zend_Registry::get('module') . '/plugins/js'
         );
@@ -342,15 +345,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'ExtJs'
         );
         $extJs->init();
-        $this->view->Php2JsVars()->set('pathToHeaderFile', $rop->headerOptions->pathToHeaderFile);
+        $this->view->php2JsVars()->set('pathToHeaderFile', $rop->headerOptions->pathToHeaderFile);
 
         $disabledList = $rop->segments->disabledFields->toArray();
-        $this->view->Php2JsVars()->create('segments.column');
+        $this->view->php2JsVars()->create('segments.column');
         foreach ($disabledList as $disabled) {
             if (empty($disabled)) {
                 continue;
             }
-            $this->view->Php2JsVars()->set('segments.column.' . $disabled . '.hidden', true);
+            $this->view->php2JsVars()->set('segments.column.' . $disabled . '.hidden', true);
         }
 
         $this->setJsSegmentFlags('segments.qualityFlags', $rop->segments->qualityFlags->toArray());
@@ -360,12 +363,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $states = new editor_Models_Segment_AutoStates();
 
         $this->setJsSegmentFlags('segments.autoStateFlags', $states->getStateNamesMap());
-        $this->view->Php2JsVars()->set('segments.autoStates', $states->getStateMap());
-        $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
+        $this->view->php2JsVars()->set('segments.autoStates', $states->getStateMap());
+        $this->view->php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
 
         $tagPath = APPLICATION_RUNDIR . '/' . $rop->dir->tagImagesBasePath . '/';
-        $this->view->Php2JsVars()->set('segments.shortTagPath', $tagPath);
-        $this->view->Php2JsVars()->set('segments.fullTagPath', $tagPath);
+        $this->view->php2JsVars()->set('segments.shortTagPath', $tagPath);
+        $this->view->php2JsVars()->set('segments.fullTagPath', $tagPath);
 
         //matchrate type to icon map
         $typesWihtIcons = [];
@@ -374,96 +377,96 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         //needed to give plugins the abilty to add own icons as matchrate types
-        $this->view->Php2JsVars()->set('segments.matchratetypes', $typesWihtIcons);
-        $this->view->Php2JsVars()->set('segments.matchratemaxvalue', editor_Models_Segment_MatchRateType::MAX_VALUE);
+        $this->view->php2JsVars()->set('segments.matchratetypes', $typesWihtIcons);
+        $this->view->php2JsVars()->set('segments.matchratemaxvalue', editor_Models_Segment_MatchRateType::MAX_VALUE);
 
-        $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
+        $this->view->php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
 
         // this initializes the CSRF token for the Frontend
-        $this->view->Php2JsVars()->set('csrfToken', CsrfProtection::getInstance()->getToken());
-        $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR . $rop->loginUrl);
-        $this->view->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);
+        $this->view->php2JsVars()->set('csrfToken', CsrfProtection::getInstance()->getToken());
+        $this->view->php2JsVars()->set('loginUrl', APPLICATION_RUNDIR . $rop->loginUrl);
+        $this->view->php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);
 
-        $this->view->Php2JsVars()->set('errorCodesUrl', $rop->errorCodesUrl);
+        $this->view->php2JsVars()->set('errorCodesUrl', $rop->errorCodesUrl);
 
-        $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
+        $this->view->php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
 
-        $this->view->Php2JsVars()->set('headerOptions.height', (int) $rop->headerOptions->height);
-        $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
+        $this->view->php2JsVars()->set('headerOptions.height', (int) $rop->headerOptions->height);
+        $this->view->php2JsVars()->set('languages', $this->getAvailableLanguages());
 
         //Editor.data.enableSourceEditing → still needed for enabling / disabling the
         // whole feature (Checkbox at Import).
-        $this->view->Php2JsVars()->set('enableSourceEditing', (bool) $rop->import->enableSourceEditing);
+        $this->view->php2JsVars()->set('enableSourceEditing', (bool) $rop->import->enableSourceEditing);
 
         // set supported extensions
         // TODO FIXME: when implementing the "Bconf per workfile" feature, use only the
         // extensionsWithParser list from FileTypeSupport since then the check for Okapi parseable filetypes
         // is fully dynamic
-        $this->view->Php2JsVars()->set('import.validExtensions', FileTypeSupport::defaultInstance()->getSupportedExtensions());
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set('import.validExtensions', FileTypeSupport::defaultInstance()->getSupportedExtensions());
+        $this->view->php2JsVars()->set(
             'import.forbiddenReferenceExtensions',
             editor_Models_Import_DirectoryParser_ReferenceFiles::FORBIDDEN_EXTENSIONS
         );
-        $this->view->Php2JsVars()->set('import.nativeParserExtensions', FileTypeSupport::defaultInstance()->getNativeParserExtensions());
+        $this->view->php2JsVars()->set('import.nativeParserExtensions', FileTypeSupport::defaultInstance()->getNativeParserExtensions());
 
-        $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float) $rop->editor->columns->widthFactorHeader);
-        $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int) $rop->editor->columns->widthOffsetEditable);
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set('columns.widthFactorHeader', (float) $rop->editor->columns->widthFactorHeader);
+        $this->view->php2JsVars()->set('columns.widthOffsetEditable', (int) $rop->editor->columns->widthOffsetEditable);
+        $this->view->php2JsVars()->set(
             'columns.widthFactorErgonomic',
             (float) $rop->editor->columns->widthFactorErgonomic
         );
-        $this->view->Php2JsVars()->set('columns.maxWidth', (int) $rop->editor->columns->maxWidth);
+        $this->view->php2JsVars()->set('columns.maxWidth', (int) $rop->editor->columns->maxWidth);
 
-        $this->view->Php2JsVars()->set('browserAdvice', $rop->browserAdvice);
+        $this->view->php2JsVars()->set('browserAdvice', $rop->browserAdvice);
         if ($rop->showSupportedBrowsersMsg) {
-            $this->view->Php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
+            $this->view->php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
         }
 
         //create mailto link in the task list grid pm name column
-        $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (bool) $rop->frontend->tasklist->pmMailTo);
+        $this->view->php2JsVars()->set('frontend.tasklist.pmMailTo', (bool) $rop->frontend->tasklist->pmMailTo);
 
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set(
             'frontend.importTask.edit100PercentMatch',
             (bool) $rop->import->edit100PercentMatch
         );
 
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set(
             'frontend.importTask.pivotDropdownVisible',
             (bool) $rop->frontend->importTask->pivotDropdownVisible
         );
 
-        $this->view->Php2JsVars()->set('frontend.changeUserThemeVisible', (bool) $rop->frontend->changeUserThemeVisible);
+        $this->view->php2JsVars()->set('frontend.changeUserThemeVisible', (bool) $rop->frontend->changeUserThemeVisible);
 
         // to identify the default customer in the frontend
-        $this->view->Php2JsVars()->set('customers.defaultCustomerName', 'defaultcustomer');
+        $this->view->php2JsVars()->set('customers.defaultCustomerName', 'defaultcustomer');
 
         $this->editorOnlyModeConfig($rop);
 
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set(
             'tasks.simultaneousEditingKey',
             editor_Models_Task::INTERNAL_LOCK . editor_Models_Task::USAGE_MODE_SIMULTANEOUS
         );
         $this->setLanguageResourceJsVars();
 
-        $this->view->Php2JsVars()->set('editor.editorBrandingSource', $rop->editor->editorBrandingSource);
+        $this->view->php2JsVars()->set('editor.editorBrandingSource', $rop->editor->editorBrandingSource);
 
         $helpWindowConfig = [];
         if (isset($rop->frontend->helpWindow)) {
             $helpWindowConfig = $rop->frontend->helpWindow->toArray() ?? [];
         }
         //helpWindow config values for each section (loaderUrl,documentationUrl)
-        $this->view->Php2JsVars()->set('frontend.helpWindow', $helpWindowConfig);
+        $this->view->php2JsVars()->set('frontend.helpWindow', $helpWindowConfig);
 
         //show references files popup
-        $this->view->Php2JsVars()->set('frontend.showReferenceFilesPopup', $rop->editor->showReferenceFilesPopup);
+        $this->view->php2JsVars()->set('frontend.showReferenceFilesPopup', $rop->editor->showReferenceFilesPopup);
 
         $db = Zend_Db_Table::getDefaultAdapter();
         //set db version as frontend param
-        $this->view->Php2JsVars()->set('dbVersion', $db->getServerVersion());
+        $this->view->php2JsVars()->set('dbVersion', $db->getServerVersion());
 
         $config = ZfExtended_Factory::get('editor_Models_Config');
         /* @var $config editor_Models_Config */
-        $this->view->Php2JsVars()->set('frontend.config.configLabelMap', $config->getLabelMap());
+        $this->view->php2JsVars()->set('frontend.config.configLabelMap', $config->getLabelMap());
 
         $tmFileUploadSizeText = $this->translate->_('Your file is larger than the allowed limit of {upload_max_filesize} MB. To be able to upload larger files, please contact the translate5 support.');
         $uploadMaxFilesize = preg_replace('/\D/', '', ini_get('upload_max_filesize'));
@@ -472,38 +475,38 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         //Info: custom vtype text must be translated here and set as frontend var.
         // There is no way of doing this with localizedjsstrings
-        $this->view->Php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $tmFileUploadSizeText);
+        $this->view->php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $tmFileUploadSizeText);
 
         // set the max allowed upload filesize into frontend variable.
         // This is used for upload file size validation in tm import
-        $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize', $uploadMaxFilesize);
+        $this->view->php2JsVars()->set('frontend.php.upload_max_filesize', $uploadMaxFilesize);
 
         // show Consortium Logos on application load for xyz seconds [default 3]
-        $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
+        $this->view->php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
 
         //sets a list of url hashes to their redirects, shortcut to the applets
-        $this->view->Php2JsVars()->set('directRedirects', Dispatcher::getInstance()->getHashPathMap());
+        $this->view->php2JsVars()->set('directRedirects', Dispatcher::getInstance()->getHashPathMap());
 
         // set special characters list into a front-end view variable.
         // This should be removed after this config is moved to lvl 16
 
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set(
             'editor.segments.editorSpecialCharacters',
             self::addGlobalSpecialCharactersInsertInfo($rop->editor->segments?->editorSpecialCharacters)
         );
 
         // add the supported file extensions for task reimport as frontend variable
-        $this->view->Php2JsVars()->set(
+        $this->view->php2JsVars()->set(
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
 
-        $this->view->Php2JsVars()->set('statistics.enabled', (bool) $this->config->resources->db->statistics?->enabled);
+        $this->view->php2JsVars()->set('statistics.enabled', (bool) $this->config->resources->db->statistics?->enabled);
 
         $this->setupAllowedCustomFields();
 
         $this->setJsAppData();
-        editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
+        editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->php2JsVars());
     }
 
     /***
@@ -518,7 +521,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         foreach ($themes as $item) {
             $translated[$item] = $this->translate->_($item);
         }
-        $this->view->Php2JsVars()->set('frontend.config.themesName', $translated);
+        $this->view->php2JsVars()->set('frontend.config.themesName', $translated);
     }
 
     /***
@@ -528,7 +531,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     {
         $rop = $this->config->runtimeOptions;
 
-        $this->view->Php2JsVars()->setMultiple([
+        $this->view->php2JsVars()->setMultiple([
             'LanguageResources.preloadedSegments' => $rop->LanguageResources?->preloadedTranslationSegments,
             'LanguageResources.matchrateTypeChangedState' =>
                 editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED,
@@ -536,7 +539,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
-        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllNames());
+        $this->view->php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllNames());
     }
 
     /**
@@ -547,7 +550,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     {
         $ed = $this->config->runtimeOptions->editor;
 
-        $php2js = $this->view->Php2JsVars();
+        $php2js = $this->view->php2JsVars();
 
         //the list of frontend controllers to be required for JS compiling (values should be static,
         // so not influenced by ACLs or Plugins)
@@ -768,7 +771,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $result[] = $flag;
         }
 
-        $this->view->Php2JsVars()->set($type, $result);
+        $this->view->php2JsVars()->set($type, $result);
     }
 
     /**
@@ -999,7 +1002,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $forceLeaveButton = $this->isAllowed(Rights::ID, Rights::EDITOR_ONLY_OVERRIDE);
         $hideClosebutton = $config->hideCloseButton || $forceLeaveButton;
         $hideLeaveButton = $config->hideLeaveTaskButton && ! $forceLeaveButton;
-        $this->view->Php2JsVars()->setMultiple([
+        $this->view->php2JsVars()->setMultiple([
             //boolean config if the logout button in the segments editor header is visible or not
             'editor.toolbar.hideCloseButton' => $hideClosebutton,
             //boolean config if the leave task button in the segments editor header is visible or not
@@ -1038,7 +1041,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
                 $allowed[] = $field;
             }
         }
-        $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
+        $this->view->php2JsVars()->set('editor.task.customFields', $allowed);
     }
 
     private static function addGlobalSpecialCharactersInsertInfo(?string $specialCharactersJson): string

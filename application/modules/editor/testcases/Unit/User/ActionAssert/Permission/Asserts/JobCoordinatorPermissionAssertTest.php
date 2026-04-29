@@ -116,14 +116,10 @@ class JobCoordinatorPermissionAssertTest extends TestCase
     public function testAssertNotGrantedWhenAuthUserIsCoordinatorAndUserNotCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
-        $user->method('__call')->willReturnMap([
-            ['getId', [], '16'],
-        ]);
+        $user->method('getId')->willReturn(16);
 
         $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
-            ['getId', [], '17'],
-        ]);
+        $manager->method('getId')->willReturn(17);
         $manager->method('getRoles')->willReturn([Roles::PM]);
 
         $context = new PermissionAssertContext($manager);
@@ -139,14 +135,10 @@ class JobCoordinatorPermissionAssertTest extends TestCase
     public function testAssertNotGrantedWhenAuthCoordinatorIsNotSupervisorOfCoordinatorGroupUser(): void
     {
         $user = $this->createMock(User::class);
-        $user->method('__call')->willReturnMap([
-            ['getId', [], '16'],
-        ]);
+        $user->method('getId')->willReturn(16);
 
         $manager = $this->createMock(User::class);
-        $manager->method('__call')->willReturnMap([
-            ['getId', [], '17'],
-        ]);
+        $manager->method('getId')->willReturn(17);
         $manager->method('getRoles')->willReturn([Roles::PM]);
 
         $context = new PermissionAssertContext($manager);
