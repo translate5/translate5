@@ -13,6 +13,17 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.36.3] - 2026-04-29
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5476](https://jira.translate5.net/browse/TRANSLATE-5476): Import/Export - Task Config only saved for last task of multi-target import** <br>
+FIX: task-Config was not properly set for multi-target tasks
+
+
 ## [7.36.2] - 2026-04-28
 
 ### Important Notes:
