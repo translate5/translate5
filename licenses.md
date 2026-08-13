@@ -210,7 +210,7 @@ Licenses Used: Not configured.
    See the License for the specific language governing permissions and
    limitations under the License.
 
-### brick/math (Version 0.14.8 | 6342235)
+### brick/math (Version 0.18.0 | 8294432)
 Arbitrary-precision arithmetic library
 Homepage: Not configured.
 Licenses Used: MIT
@@ -236,7 +236,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-### cesargb/php-log-rotation (Version 2.7.1 | bb54f44)
+### cesargb/php-log-rotation (Version 2.8.0 | 85de520)
 PHP Class to rotate log files
 Homepage: https://github.com/cesargb/php-log-rotation
 Licenses Used: MIT
@@ -263,7 +263,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-### comcast/php-legal-licenses (Version v1.2.0 | dbdeb6e)
+### comcast/php-legal-licenses (Version v1.3.0 | 0e003a4)
 A utility to generate a Licenses file containing the full license text for every dependency in your project for legal purposes.
 Homepage: https://github.com/Comcast/php-legal-licenses
 Licenses Used: Apache-2.0
@@ -470,7 +470,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### composer/pcre (Version 3.1.4 | 04229f1)
+### composer/pcre (Version 3.4.0 | d5a341b)
 PCRE wrapping library that offers type-safe preg_* replacements.
 Homepage: Not configured.
 Licenses Used: MIT
@@ -520,7 +520,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-### deeplcom/deepl-php (Version v1.16.0 | 4dd0a38)
+### deeplcom/deepl-php (Version v1.20.0 | c092b9a)
 Official DeepL API Client Library
 Homepage: Not configured.
 Licenses Used: MIT
@@ -681,9 +681,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### firebase/php-jwt (Version v7.0.5 | 47ad26b)
+### firebase/php-jwt (Version v7.1.0 | b374a5d)
 A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.
-Homepage: https://github.com/firebase/php-jwt
+Homepage: https://github.com/googleapis/php-jwt
 Licenses Used: BSD-3-Clause
 Copyright (c) 2011, Neuman Vong
 
@@ -717,7 +717,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-### fortawesome/font-awesome (Version 6.4.2 | f0c2583)
+### fortawesome/font-awesome (Version 6.7.2 | af62053)
 The iconic font, CSS, and SVG framework
 Homepage: https://fontawesome.com
 Licenses Used: CC-BY-4.0, OFL-1.1, MIT
@@ -746,7 +746,7 @@ as SVG and JS file types.
 In the Font Awesome Free download, the SIL OFL license applies to all icons
 packaged as web and desktop font files.
 
-Copyright (c) 2023 Fonticons, Inc. (https://fontawesome.com)
+Copyright (c) 2024 Fonticons, Inc. (https://fontawesome.com)
 with Reserved Font Name: "Font Awesome".
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
@@ -846,7 +846,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 In the Font Awesome Free download, the MIT license applies to all non-font and
 non-icon files.
 
-Copyright 2023 Fonticons, Inc.
+Copyright 2024 Fonticons, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in the
@@ -1095,7 +1095,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### google/auth (Version v1.50.1 | 870c17e)
+### google/auth (Version v1.53.0 | d677d0b)
 Google Auth Library for PHP
 Homepage: https://github.com/google/google-auth-library-php
 Licenses Used: Apache-2.0
@@ -1304,7 +1304,7 @@ limitations under the License.
 
 
 
-### google/cloud-core (Version v1.72.0 | 62cf5d2)
+### google/cloud-core (Version v1.73.1 | 23f6a68)
 Google Cloud PHP shared dependency, providing functionality useful to all components.
 Homepage: Not configured.
 Licenses Used: Apache-2.0
@@ -1720,7 +1720,7 @@ Licenses Used: Apache-2.0
 
 
 
-### google/common-protos (Version 4.14.0 | f8e72f7)
+### google/common-protos (Version 4.14.1 | 4eb6813)
 Google API Common Protos for PHP
 Homepage: https://github.com/googleapis/common-protos-php
 Licenses Used: Apache-2.0
@@ -1927,7 +1927,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### google/gax (Version v1.42.2 | 126bd80)
+### google/gax (Version v1.47.1 | 0c25a24)
 Google API Core for PHP
 Homepage: https://github.com/googleapis/gax-php
 Licenses Used: BSD-3-Clause
@@ -2166,7 +2166,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### google/longrunning (Version 0.7.1 | cac9bed)
+### google/longrunning (Version 0.8.0 | 2c22ca5)
 Google LongRunning Client for PHP
 Homepage: Not configured.
 Licenses Used: Apache-2.0
@@ -2374,7 +2374,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### google/protobuf (Version v5.34.1 | da52fbc)
+### google/protobuf (Version v5.35.1 | 55bb4a7)
 proto library for PHP
 Homepage: https://developers.google.com/protocol-buffers/
 Licenses Used: BSD-3-Clause
@@ -2435,13 +2435,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### graham-campbell/result-type (Version v1.1.1 | 672eff8)
+### graham-campbell/result-type (Version v1.1.4 | e01f4a8)
 An Implementation Of The Result Type
 Homepage: Not configured.
 Licenses Used: MIT
 The MIT License (MIT)
 
-Copyright (c) 2020-2023 Graham Campbell <hello@gjcampbell.co.uk>
+Copyright (c) 2020-2024 Graham Campbell <hello@gjcampbell.co.uk>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2462,7 +2462,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### grpc/grpc (Version 1.80.0 | a0dc463)
+### grpc/grpc (Version 1.82.0 | be984cb)
 gRPC library for PHP
 Homepage: https://grpc.io
 Licenses Used: Apache-2.0
@@ -2669,7 +2669,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### guzzlehttp/guzzle (Version 7.10.0 | b51ac70)
+### guzzlehttp/guzzle (Version 7.15.3 | ae311b8)
 Guzzle is a PHP HTTP client library
 Homepage: Not configured.
 Licenses Used: MIT
@@ -2702,7 +2702,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### guzzlehttp/promises (Version 2.3.0 | 481557b)
+### guzzlehttp/promises (Version 2.5.2 | 2823687)
 Guzzle promises library
 Homepage: Not configured.
 Licenses Used: MIT
@@ -2732,7 +2732,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### guzzlehttp/psr7 (Version 2.9.0 | 7d0ed42)
+### guzzlehttp/psr7 (Version 2.13.0 | dad8962)
 PSR-7 message implementation that also provides common utility methods
 Homepage: Not configured.
 Licenses Used: MIT
@@ -2764,7 +2764,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### http-interop/http-factory-guzzle (Version 1.2.0 | 8f06e92)
+### http-interop/http-factory-guzzle (Version 1.2.1 | c2c859c)
 An HTTP Factory using Guzzle PSR7
 Homepage: Not configured.
 Licenses Used: MIT
@@ -2791,7 +2791,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-### ifsnop/mysqldump-php (Version v2.12 | 2d3a43f)
+### ifsnop/mysqldump-php (Version v2.13 | d328c86)
 PHP version of mysqldump cli that comes with MySQL
 Homepage: https://github.com/ifsnop/mysqldump-php
 Licenses Used: GPL-3.0-or-later
@@ -3754,7 +3754,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### lcobucci/jwt (Version 5.3.0 | 08071d8)
+### lcobucci/jwt (Version 5.6.0 | bb3e9f2)
 A simple library to work with JSON Web Token and JSON Web Signature
 Homepage: Not configured.
 Licenses Used: BSD-3-Clause
@@ -3787,11 +3787,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-### league/flysystem (Version 3.17.0 | bd4c9b2)
+### league/flysystem (Version 3.35.2 | b277b5d)
 File storage abstraction for PHP
 Homepage: Not configured.
 Licenses Used: MIT
-Copyright (c) 2013-2023 Frank de Jonge
+Copyright (c) 2013-2026 Frank de Jonge
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3812,11 +3812,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### league/flysystem-ftp (Version 3.29.0 | 17e8e42)
+### league/flysystem-ftp (Version 3.31.0 | cd6ab06)
 FTP filesystem adapter for Flysystem.
 Homepage: Not configured.
 Licenses Used: MIT
-Copyright (c) 2013-2024 Frank de Jonge
+Copyright (c) 2013-2026 Frank de Jonge
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3837,11 +3837,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### league/flysystem-local (Version 3.16.0 | ec7383f)
+### league/flysystem-local (Version 3.31.0 | 2f669db)
 Local filesystem adapter for Flysystem.
 Homepage: Not configured.
 Licenses Used: MIT
-Copyright (c) 2013-2023 Frank de Jonge
+Copyright (c) 2013-2026 Frank de Jonge
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3862,13 +3862,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### league/flysystem-sftp (Version 3.15.0 | 0c594f2)
+### league/flysystem-sftp (Version 3.28.0 | 45df160)
 SFTP filesystem adapter for Flysystem.
 Homepage: Not configured.
 Licenses Used: MIT
 Full license text not found in dependency source.
 
-### league/mime-type-detection (Version 1.13.0 | a6dfb11)
+### league/mime-type-detection (Version 1.17.0 | f5f47ef)
 Mime-type detection for Flysystem
 Homepage: Not configured.
 Licenses Used: MIT
@@ -3920,7 +3920,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### league/uri (Version 7.7.0 | 8d587cd)
+### league/uri (Version 7.8.1 | 08cf38e)
 URI manipulation library
 Homepage: https://uri.thephpleague.com
 Licenses Used: MIT
@@ -3946,7 +3946,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-### league/uri-interfaces (Version 7.7.0 | 62ccc1a)
+### league/uri-interfaces (Version 7.8.1 | 85d5c77)
 Common tools for parsing and resolving RFC3987/RFC3986 URI
 Homepage: https://uri.thephpleague.com
 Licenses Used: MIT
@@ -4565,7 +4565,7 @@ Exhibit B - “Incompatible With Secondary Licenses” Notice
 
 
 
-### maennchen/zipstream-php (Version 3.1.0 | b817449)
+### maennchen/zipstream-php (Version 3.2.2 | 77bebeb)
 ZipStream is a library for dynamically streaming dynamic zip files from PHP without writing to the disk at all on the server.
 Homepage: Not configured.
 Licenses Used: MIT
@@ -4655,7 +4655,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-### masterminds/html5 (Version 2.8.1 | f47dcf3)
+### masterminds/html5 (Version 2.10.1 | fd5018f)
 An HTML5 parser and serializer.
 Homepage: http://masterminds.github.io/html5-php
 Licenses Used: MIT
@@ -5011,7 +5011,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### myclabs/deep-copy (Version 1.13.4 | 07d290f)
+### myclabs/deep-copy (Version 1.14.0 | 8680aa2)
 Create deep copies (clones) of your objects
 Homepage: Not configured.
 Licenses Used: MIT
@@ -5037,9 +5037,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-### myclabs/php-enum (Version 1.8.4 | a867478)
+### myclabs/php-enum (Version 1.8.5 | e7be269)
 PHP Enum implementation
-Homepage: http://github.com/myclabs/php-enum
+Homepage: https://github.com/myclabs/php-enum
 Licenses Used: MIT
 The MIT License (MIT)
 
@@ -5061,7 +5061,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-### netresearch/jsonmapper (Version v4.2.0 | f60565f)
+### netresearch/jsonmapper (Version v4.5.0 | 8e76efb)
 Map nested JSON structures onto PHP classes
 Homepage: Not configured.
 Licenses Used: OSL-3.0
@@ -5113,7 +5113,7 @@ This Open Software License (the "License") applies to any original work of autho
 
 16) Modification of This License. This License is Copyright (c) 2005 Lawrence Rosen. Permission is granted to copy, distribute, or communicate this License without modification. Nothing in this License permits You to modify this License as applied to the Original Work or to Derivative Works. However, You may modify the text of this License and copy, distribute or communicate your modified version (the "Modified License") and apply it to other original works of authorship subject to the following conditions: (i) You may not indicate in any way that your Modified License is the "Open Software License" or "OSL" and you may not use those names in the name of your Modified License; (ii) You must replace the notice specified in the first paragraph above with the notice "Licensed under <insert your license name here>" or with a notice of your own that is not confusingly similar to the notice in this License; and (iii) You may not claim that your original works are open source software unless your Modified License has been approved by Open Source Initiative (OSI) and You comply with its license review and certification process.
 
-### nikic/php-parser (Version v4.19.5 | 51bd93c)
+### nikic/php-parser (Version v5.8.0 | 044a6a3)
 A PHP parser written in PHP
 Homepage: Not configured.
 Licenses Used: BSD-3-Clause
@@ -5175,7 +5175,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-### open-telemetry/api (Version 1.9.0 | 6f8d237)
+### open-telemetry/api (Version 1.10.0 | 7c029c4)
 API for OpenTelemetry PHP.
 Homepage: Not configured.
 Licenses Used: Apache-2.0
@@ -5187,7 +5187,7 @@ Homepage: Not configured.
 Licenses Used: Apache-2.0
 Full license text not found in dependency source.
 
-### open-telemetry/sdk (Version 1.14.0 | 6e3d0ce)
+### open-telemetry/sdk (Version 1.15.0 | 77e1aa7)
 SDK for OpenTelemetry PHP.
 Homepage: Not configured.
 Licenses Used: Apache-2.0
@@ -5914,7 +5914,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### phpoffice/phpspreadsheet (Version 5.7.0 | 9f55d3b)
+### phpoffice/phpspreadsheet (Version 5.9.0 | 05e99eb)
 PHPSpreadsheet - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine
 Homepage: https://github.com/PHPOffice/PhpSpreadsheet
 Licenses Used: MIT
@@ -5941,7 +5941,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-### phpoption/phpoption (Version 1.9.1 | dd3a383)
+### phpoption/phpoption (Version 1.9.5 | 75365b9)
 Option Type for PHP
 Homepage: Not configured.
 Licenses Used: Apache-2.0
@@ -6147,7 +6147,7 @@ Licenses Used: Apache-2.0
    See the License for the specific language governing permissions and
    limitations under the License.
 
-### phpseclib/phpseclib (Version 2.0.54 | a96a835)
+### phpseclib/phpseclib (Version 2.0.55 | d73c9e0)
 PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.
 Homepage: http://phpseclib.sourceforge.net
 Licenses Used: MIT
@@ -6363,7 +6363,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 
-### phpunit/phpunit (Version 9.6.34 | b36f023)
+### phpunit/phpunit (Version 9.6.36 | abab27e)
 The PHP Unit Testing framework.
 Homepage: https://phpunit.de/
 Licenses Used: BSD-3-Clause
@@ -6689,7 +6689,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### ramsey/uuid (Version 4.9.2 | 8429c78)
+### ramsey/uuid (Version 4.9.3 | 1df1584)
 A PHP library for generating and working with universally unique identifiers (UUIDs).
 Homepage: Not configured.
 Licenses Used: MIT
@@ -6714,7 +6714,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-### rize/uri-template (Version 0.4.1 | abb53c8)
+### rize/uri-template (Version 0.4.2 | 7ad2294)
 PHP URI Template (RFC 6570) supports both expansion & extraction
 Homepage: Not configured.
 Licenses Used: MIT
@@ -7013,7 +7013,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 
-### sebastian/exporter (Version 4.0.8 | 14c6ba5)
+### sebastian/exporter (Version 4.0.9 | 4352c1a)
 Provides the functionality to export PHP variables for visualization
 Homepage: https://www.github.com/sebastianbergmann/exporter
 Licenses Used: BSD-3-Clause
@@ -7208,7 +7208,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 
-### sebastian/recursion-context (Version 4.0.6 | 539c669)
+### sebastian/recursion-context (Version 4.0.7 | c85be69)
 Provides functionality to recursively process PHP variables
 Homepage: https://github.com/sebastianbergmann/recursion-context
 Licenses Used: BSD-3-Clause
@@ -7397,9 +7397,9 @@ Homepage: http://fpdf.org/en/script/script92.php
 Licenses Used: LGPL-2.1
 Full license text not found in dependency source.
 
-### shardj/zf1-future (Version dev-master | f42b369)
+### shardj/zf1-future (Version dev-master | f67b2e4)
 Zend Framework 1. The aim is to keep ZF1 working with the latest PHP versions
-Homepage: http://framework.zend.com/
+Homepage: https://github.com/Shardj/zf1-future/
 Licenses Used: BSD-3-Clause
 Copyright (c) 2005-2015, Zend Technologies USA, Inc.
 All rights reserved.
@@ -7430,7 +7430,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-### smi2/phpclickhouse (Version 1.6.0 | f79dfb7)
+### smi2/phpclickhouse (Version 1.26.610 | a2783e6)
 PHP ClickHouse Client
 Homepage: https://github.com/smi2/phpClickHouse
 Licenses Used: MIT
@@ -7456,7 +7456,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-### spatie/temporary-directory (Version 2.3.1 | 662e481)
+### spatie/temporary-directory (Version 2.4.0 | 32cbb96)
 Easily create, use and destroy temporary directories
 Homepage: https://github.com/spatie/temporary-directory
 Licenses Used: MIT
@@ -7483,13 +7483,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### stduritemplate/stduritemplate (Version 2.0.8 | 4c08308)
+### stduritemplate/stduritemplate (Version 2.0.12 | fd18ebe)
 Std UriTemplate, RFC 6570 implementation
 Homepage: Not configured.
 Licenses Used: Apache-2.0
 Full license text not found in dependency source.
 
-### symfony/cache (Version v6.4.36 | 5b94fba)
+### symfony/cache (Version v7.4.16 | 23a2c52)
 Provides extended PSR-6, PSR-16 (and tags) implementations
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7514,7 +7514,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/cache-contracts (Version v3.6.0 | 5d68a57)
+### symfony/cache-contracts (Version v3.7.1 | 9789738)
 Generic abstractions related to caching
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7539,7 +7539,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/console (Version v6.4.36 | 9f481cf)
+### symfony/console (Version v6.4.43 | 3b643aa)
 Eases the creation of beautiful and testable command line interfaces
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7564,7 +7564,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/deprecation-contracts (Version v3.6.0 | 63afe74)
+### symfony/deprecation-contracts (Version v3.7.1 | f3202fa)
 A generic function and convention to trigger deprecation notices
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7589,7 +7589,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/filesystem (Version v6.4.13 | 4856c9c)
+### symfony/filesystem (Version v6.4.43 | 9ff03da)
 Provides basic utilities for the filesystem
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7614,7 +7614,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/html-sanitizer (Version v7.4.0 | 5b0bbcc)
+### symfony/html-sanitizer (Version v7.4.14 | c328df6)
 Provides an object-oriented API to sanitize untrusted HTML input for safe insertion into a document's DOM.
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7639,7 +7639,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/lock (Version v6.4.13 | a69c3dd)
+### symfony/lock (Version v6.4.42 | b9e0464)
 Creates and manages locks, a mechanism to provide exclusive access to a shared resource
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7664,7 +7664,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-ctype (Version v1.36.0 | 141046a)
+### symfony/polyfill-ctype (Version v1.37.0 | 141046a)
 Symfony polyfill for ctype functions
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7689,7 +7689,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-intl-grapheme (Version v1.36.0 | ad1b7b9)
+### symfony/polyfill-intl-grapheme (Version v1.41.0 | bb899c1)
 Symfony polyfill for intl's grapheme_* functions
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7714,7 +7714,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-intl-normalizer (Version v1.36.0 | 3833d72)
+### symfony/polyfill-intl-normalizer (Version v1.38.0 | 2d446c2)
 Symfony polyfill for intl's Normalizer class and related functions
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7739,7 +7739,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-mbstring (Version v1.36.0 | 6a21eb9)
+### symfony/polyfill-mbstring (Version v1.38.2 | d3d318b)
 Symfony polyfill for the Mbstring extension
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7764,7 +7764,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-php80 (Version v1.36.0 | dfb5572)
+### symfony/polyfill-php80 (Version v1.37.0 | dfb5572)
 Symfony polyfill backporting some PHP 8.0+ features to lower PHP versions
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7789,7 +7789,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-php81 (Version v1.36.0 | 4a4cfc2)
+### symfony/polyfill-php81 (Version v1.38.1 | 6bfb9c7)
 Symfony polyfill backporting some PHP 8.1+ features to lower PHP versions
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7814,7 +7814,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/polyfill-php82 (Version v1.36.0 | 34808ef)
+### symfony/polyfill-php82 (Version v1.38.1 | 002dc0c)
 Symfony polyfill backporting some PHP 8.2+ features to lower PHP versions
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7839,7 +7839,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/process (Version v6.4.33 | c46e854)
+### symfony/polyfill-php83 (Version v1.41.0 | 5ea9908)
+Symfony polyfill backporting some PHP 8.3+ features to lower PHP versions
+Homepage: https://symfony.com
+Licenses Used: MIT
+Copyright (c) 2022-present Fabien Potencier
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is furnished
+to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+### symfony/process (Version v7.4.13 | f5804be)
 Executes commands in sub-processes
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7864,7 +7889,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/service-contracts (Version v3.6.1 | 4511256)
+### symfony/service-contracts (Version v3.7.1 | c0a284b)
 Generic abstractions related to writing services
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7889,7 +7914,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/string (Version v7.4.8 | 114ac57)
+### symfony/string (Version v7.4.15 | e394af3)
 Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7914,7 +7939,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/translation-contracts (Version v3.5.0 | b9d2189)
+### symfony/translation-contracts (Version v3.7.1 | ccb206b)
 Generic abstractions related to translation
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7939,7 +7964,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/var-exporter (Version v7.4.8 | 398907e)
+### symfony/var-exporter (Version v7.4.16 | ca31404)
 Allows exporting any serializable PHP data structure to plain PHP code
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -7964,7 +7989,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-### symfony/yaml (Version v6.3.3 | e23292e)
+### symfony/yaml (Version v6.4.43 | d2ee2da)
 Loads and dumps YAML files
 Homepage: https://symfony.com
 Licenses Used: MIT
@@ -8494,7 +8519,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### vlucas/phpdotenv (Version v5.5.0 | 1a7ea2a)
+### vlucas/phpdotenv (Version v5.6.4 | 416df70)
 Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.
 Homepage: Not configured.
 Licenses Used: BSD-3-Clause

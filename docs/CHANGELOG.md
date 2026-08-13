@@ -13,6 +13,46 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.41.2] - 2026-08-13
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5669](https://jira.translate5.net/browse/TRANSLATE-5669): PlunetConnector - Plugin PlunetConnector: respect runtimeOptions.import.edit100PercentMatch on task creation** <br>
+Plugin PlunetConnector: respect config runtimeOptions.import.edit100PercentMatch for tasks created by Plugin PlunetConnector
+
+**[TRANSLATE-5595](https://jira.translate5.net/browse/TRANSLATE-5595): LanguageResources, translate5 AI - Make Azure and OpenAI model configurable for existing language resources** <br>
+Engine field in model properties modal is now editable for Azure language resources
+
+
+### Bugfixes
+**[TRANSLATE-5692](https://jira.translate5.net/browse/TRANSLATE-5692): Editor general - E1334 DeepL error in task log is missing concrete error message - improve glossary error handling** <br>
+Some DeepL errors did not properly write the error to the task log
+
+**[TRANSLATE-5658](https://jira.translate5.net/browse/TRANSLATE-5658): Workflows - task state not respecting workflow state when last step deleted in PrintApproval workflow** <br>
+Send Visual Approval e-mail if last open Print Approval job was deleted
+
+**[TRANSLATE-5642](https://jira.translate5.net/browse/TRANSLATE-5642): Editor general - Optimize max_parallel handling for scalable pooled services** <br>
+Improve throughput for scalable pooled services by allowing configurable parallel worker capacity per reported service endpoint.
+
+**[TRANSLATE-5629](https://jira.translate5.net/browse/TRANSLATE-5629): file format settings - File-Format-Settings: XLIFF filter is not editable in the GUI** <br>
+FIX: The XLIFF Filter was not editable with the GUI
+
+**[TRANSLATE-5581](https://jira.translate5.net/browse/TRANSLATE-5581): Editor general - Segment menu doesn't disappear when clicking on the menu items** <br>
+Add hiding segment menu when click on "Copy segment source to target" in current segment menu
+
+**[TRANSLATE-5575](https://jira.translate5.net/browse/TRANSLATE-5575): Client management - Filter in client tab also effects list of clients on create project** <br>
+FIXED: Customers dropdown in Project Wizard is not affected anymore by filtering in Clients tab, if any applied
+
+**[TRANSLATE-5549](https://jira.translate5.net/browse/TRANSLATE-5549): Editor general - delete tag by hitting backspace only once** <br>
+Now tag is deleted by pressing backspace or del key only once instead of two times.
+
+**[TRANSLATE-5503](https://jira.translate5.net/browse/TRANSLATE-5503): Repetition editor - repetition editor: "only replace if target is empty" not respected** <br>
+Fix "only replace if target is empty" behaviour
+
+
 ## [7.41.1] - 2026-07-30
 
 ### Important Notes:
