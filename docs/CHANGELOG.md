@@ -13,6 +13,34 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.41.3] - 2026-08-18
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5709](https://jira.translate5.net/browse/TRANSLATE-5709): Workflows - Schedule workers in preparation state in hotfloder plugins** <br>
+Schedule workers in preparation state in hotfolder plugins
+
+**[TRANSLATE-5706](https://jira.translate5.net/browse/TRANSLATE-5706): file format settings - OKAPI: Prevent Export-Worker run twice at a time for a task** <br>
+Enhancement: With workflow-Actions it can happen, a task-export is triggered twice. To prevent corrupted exports we prevent, an OKAPI Export workers can run parallel for a task
+
+
+### Bugfixes
+**[TRANSLATE-5708](https://jira.translate5.net/browse/TRANSLATE-5708): Workflows - Workflow logic works incorrectly** <br>
+Fix workflow actions handling
+
+**[TRANSLATE-5698](https://jira.translate5.net/browse/TRANSLATE-5698): VisualReview / VisualTranslation - Comment navigation for annotations does not work properly** <br>
+FIX: Comment Navigation in Grid does not highlight correct Annotations when page-numbers are greater 8
+
+**[TRANSLATE-5622](https://jira.translate5.net/browse/TRANSLATE-5622): translate5 AI - translate5 AI: A system-message  textfield will not grow properly when pasting text** <br>
+FIX: A system-message component was not growing properly when text had been pasted
+
+**[TRANSLATE-5578](https://jira.translate5.net/browse/TRANSLATE-5578): Editor general - Improper zooming when using mouse wheel** <br>
+Fixed behavior of the zoom in/out with ctrl + mouse wheel
+
+
 ## [7.41.2] - 2026-08-13
 
 ### Important Notes:
