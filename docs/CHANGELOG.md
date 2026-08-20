@@ -13,6 +13,38 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.41.4] - 2026-08-20
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5226](https://jira.translate5.net/browse/TRANSLATE-5226): translate5 AI - Speed up of AI-based pre-translations by parallelization of requests to the AI** <br>
+7.41.4: Some fixes regarding batch parallelism
+7.41.0: Improve pre-translation speed when using AI resources.
+
+
+### Changed
+**[TRANSLATE-5471](https://jira.translate5.net/browse/TRANSLATE-5471): VisualReview / VisualTranslation - Do not Export outdated annotations in a Visual to PDF** <br>
+Visual: Exclude outdated annotations from the visual export
+
+
+### Bugfixes
+**[TRANSLATE-5715](https://jira.translate5.net/browse/TRANSLATE-5715): Auto-QA - QA incorrectly reports tag errors** <br>
+Fix QA checks for Content Protection tags
+
+**[TRANSLATE-5647](https://jira.translate5.net/browse/TRANSLATE-5647): Editor general - Styling issue in editor when there is a tag deletion** <br>
+Fixed styling issue which may cause the black line appear in the middle of the editor.
+
+**[TRANSLATE-5639](https://jira.translate5.net/browse/TRANSLATE-5639): Workflows - Workflow: users of different workflow steps can work on tasks simultaneously** <br>
+Forbid users to work on task before their turn.
+
+**[TRANSLATE-4323](https://jira.translate5.net/browse/TRANSLATE-4323): Editor general - moved tags inserted as text after external editing in excel** <br>
+7.41.4: Excel reimport produced errors when a lot of nested tags were given
+7.37.7: Excel reimport lost tags when importing with track changes.
+
+
 ## [7.41.3] - 2026-08-18
 
 ### Important Notes:
