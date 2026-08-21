@@ -13,6 +13,35 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.41.5] - 2026-08-21
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5717](https://jira.translate5.net/browse/TRANSLATE-5717): Editor general, VisualReview / VisualTranslation - Error rowToEditOrigHeight** <br>
+Fixed bug which caused UI error in visual tasks time to time
+
+**[TRANSLATE-5716](https://jira.translate5.net/browse/TRANSLATE-5716): MatchAnalysis & Pretranslation - Match analysis: wrong categorization in the Trados-compatible XML report** <br>
+Filter out and ignore invalid segment match rates from resources.
+
+**[TRANSLATE-5701](https://jira.translate5.net/browse/TRANSLATE-5701): Export - SDLXLIFF Export: Fix redundant structure tag generated during track changes export** <br>
+SDLXLIFF Export: Fix redundant structure tag generated during track changes export
+
+**[TRANSLATE-5700](https://jira.translate5.net/browse/TRANSLATE-5700): Editor general - "Show repetitions and hide first" works incorrectly** <br>
+Now first segment to hide in repetition filtering always chosen by segment number in task.
+
+**[TRANSLATE-5699](https://jira.translate5.net/browse/TRANSLATE-5699): InstantTranslate - InstantTranslate: Error in check if task is pretranslated** <br>
+InstantTranslate: Fixed checking if file translation is fully pretranslated and can be downloaded
+
+**[TRANSLATE-5640](https://jira.translate5.net/browse/TRANSLATE-5640): Editor general, TrackChanges - Tag is duplicated when drag'n'dropping it to different location** <br>
+Fixed bug which may produce tag dupplicates in some cases when drag'n'drop a tag to a different location within the same segment
+
+**[TRANSLATE-5519](https://jira.translate5.net/browse/TRANSLATE-5519): Editor general - for some segments status "reviewed, unchanged" broken** <br>
+Fix setting of segment status for Reviewer role
+
+
 ## [7.41.4] - 2026-08-20
 
 ### Important Notes:
