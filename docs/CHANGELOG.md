@@ -13,6 +13,31 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.41.6] - 2026-08-25
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5723](https://jira.translate5.net/browse/TRANSLATE-5723): Workflows - Task remains locked after setting status open to unconfirmed job in project overview** <br>
+Fix task locking logic
+
+**[TRANSLATE-5722](https://jira.translate5.net/browse/TRANSLATE-5722): Editor general - Linebreaks only visualized in the editable fields** <br>
+Fixed styling issue which caused linebreaks to look like linebreaks only in sourceEdit and targetEdit fields.
+
+**[TRANSLATE-5720](https://jira.translate5.net/browse/TRANSLATE-5720): Task Management - Task remains locked after failing to assign an already assigned user job** <br>
+Release task lock after failing to assign an already assigned user job
+
+**[TRANSLATE-5712](https://jira.translate5.net/browse/TRANSLATE-5712): file format settings - OKAPI: CodeFinder Rules create invalid properties, error in IDML editor** <br>
+FIX In the File Format Settings all Formats utilizing CodeFinder rules may create faulty properties when editing, the IDML editor created errors when defining formatting threshholds
+
+**[TRANSLATE-4323](https://jira.translate5.net/browse/TRANSLATE-4323): Editor general - moved tags inserted as text after external editing in excel** <br>
+7.41.6: The remove algorithm was ignoring the order of the nesting when removing nested tags, what may lead to changed nesting-order or changed nesting of bordering singular tags
+7.41.4: Excel reimport produced errors when a lot of nested tags were given
+7.37.7: Excel reimport lost tags when importing with track changes.
+
+
 ## [7.41.5] - 2026-08-21
 
 ### Important Notes:
