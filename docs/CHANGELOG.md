@@ -13,6 +13,60 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.41.6] - 2026-08-25
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5723](https://jira.translate5.net/browse/TRANSLATE-5723): Workflows - Task remains locked after setting status open to unconfirmed job in project overview** <br>
+Fix task locking logic
+
+**[TRANSLATE-5722](https://jira.translate5.net/browse/TRANSLATE-5722): Editor general - Linebreaks only visualized in the editable fields** <br>
+Fixed styling issue which caused linebreaks to look like linebreaks only in sourceEdit and targetEdit fields.
+
+**[TRANSLATE-5720](https://jira.translate5.net/browse/TRANSLATE-5720): Task Management - Task remains locked after failing to assign an already assigned user job** <br>
+Release task lock after failing to assign an already assigned user job
+
+**[TRANSLATE-5712](https://jira.translate5.net/browse/TRANSLATE-5712): file format settings - OKAPI: CodeFinder Rules create invalid properties, error in IDML editor** <br>
+FIX In the File Format Settings all Formats utilizing CodeFinder rules may create faulty properties when editing, the IDML editor created errors when defining formatting threshholds
+
+**[TRANSLATE-4323](https://jira.translate5.net/browse/TRANSLATE-4323): Editor general - moved tags inserted as text after external editing in excel** <br>
+7.41.6: The remove algorithm was ignoring the order of the nesting when removing nested tags, what may lead to changed nesting-order or changed nesting of bordering singular tags
+7.41.4: Excel reimport produced errors when a lot of nested tags were given
+7.37.7: Excel reimport lost tags when importing with track changes.
+
+
+## [7.41.5] - 2026-08-21
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5717](https://jira.translate5.net/browse/TRANSLATE-5717): Editor general, VisualReview / VisualTranslation - Error rowToEditOrigHeight** <br>
+Fixed bug which caused UI error in visual tasks time to time
+
+**[TRANSLATE-5716](https://jira.translate5.net/browse/TRANSLATE-5716): MatchAnalysis & Pretranslation - Match analysis: wrong categorization in the Trados-compatible XML report** <br>
+Filter out and ignore invalid segment match rates from resources.
+
+**[TRANSLATE-5701](https://jira.translate5.net/browse/TRANSLATE-5701): Export - SDLXLIFF Export: Fix redundant structure tag generated during track changes export** <br>
+SDLXLIFF Export: Fix redundant structure tag generated during track changes export
+
+**[TRANSLATE-5700](https://jira.translate5.net/browse/TRANSLATE-5700): Editor general - "Show repetitions and hide first" works incorrectly** <br>
+Now first segment to hide in repetition filtering always chosen by segment number in task.
+
+**[TRANSLATE-5699](https://jira.translate5.net/browse/TRANSLATE-5699): InstantTranslate - InstantTranslate: Error in check if task is pretranslated** <br>
+InstantTranslate: Fixed checking if file translation is fully pretranslated and can be downloaded
+
+**[TRANSLATE-5640](https://jira.translate5.net/browse/TRANSLATE-5640): Editor general, TrackChanges - Tag is duplicated when drag'n'dropping it to different location** <br>
+Fixed bug which may produce tag dupplicates in some cases when drag'n'drop a tag to a different location within the same segment
+
+**[TRANSLATE-5519](https://jira.translate5.net/browse/TRANSLATE-5519): Editor general - for some segments status "reviewed, unchanged" broken** <br>
+Fix setting of segment status for Reviewer role
+
+
 ## [7.41.4] - 2026-08-20
 
 ### Important Notes:
