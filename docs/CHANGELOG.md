@@ -13,6 +13,62 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.42.0] - 2026-08-27
+
+### Important Notes:
+#### [TRANSLATE-5426](https://jira.translate5.net/browse/TRANSLATE-5426)
+If not finished in 7.40.x, then a backport will be required! See MITTAGQI-577!
+ 
+
+
+### Added
+**[TRANSLATE-5572](https://jira.translate5.net/browse/TRANSLATE-5572): translate5 AI - MQM-based TQE: AI marks MQM issues, translate5 calculates the match rate** <br>
+New feature where AI will suggest translation issues in the segments and with the help of MQM tags those issues are marked visible in editor.
+
+**[TRANSLATE-5455](https://jira.translate5.net/browse/TRANSLATE-5455): VisualReview / VisualTranslation - Visual: Option for Synchrounous scrolling** <br>
+Visual: Add option to scroll the visual synchronously
+
+**[TRANSLATE-5454](https://jira.translate5.net/browse/TRANSLATE-5454): VisualReview / VisualTranslation - Align order of workfiles on the visual** <br>
+Visual: Align the order of workfiles on the visual
+
+
+### Changed
+**[TRANSLATE-5721](https://jira.translate5.net/browse/TRANSLATE-5721): General - Broken tests + wrong symlink** <br>
+Improve internal testing system
+
+**[TRANSLATE-5693](https://jira.translate5.net/browse/TRANSLATE-5693): General - Update JS libraries reported by npm audit** <br>
+Updated some JS dependencies
+
+**[TRANSLATE-5650](https://jira.translate5.net/browse/TRANSLATE-5650): job coordinator - Create user jobs from default coordinator user jobs when Coordinator job is created** <br>
+Create user jobs from default coord user jobs when Coordinator job is created
+
+**[TRANSLATE-5614](https://jira.translate5.net/browse/TRANSLATE-5614): TermTagger integration - Use TermTagger as word finder** <br>
+Redo Term Tagger integration logic.
+
+**[TRANSLATE-5602](https://jira.translate5.net/browse/TRANSLATE-5602): VisualReview / VisualTranslation - Visual: Add warning that with mixed format Imports a PDF will be exported as HTML** <br>
+Visual improvement: Add a warning if a PDF is used as workfile together with other formats when the visual PDF import is active. In case of mixed workfiles the PDF would be exported as HTML.
+
+
+### Bugfixes
+**[TRANSLATE-5724](https://jira.translate5.net/browse/TRANSLATE-5724): Workflows - Coordinator is prohibited to open first job in task** <br>
+Allow Coordinator to open his first job in task with "no workflow" step.
+
+**[TRANSLATE-5704](https://jira.translate5.net/browse/TRANSLATE-5704): TBX-Import - TBX import fails on existing transacGrp with empty person link** <br>
+Fixed TBX re-import failures caused by legacy transaction metadata with missing person links.
+
+**[TRANSLATE-5593](https://jira.translate5.net/browse/TRANSLATE-5593): LanguageResources - Review security of ExtJS iframe file upload responses (jsontext / text/html)** <br>
+Enhanced content type handling to improve system security.   
+
+**[TRANSLATE-5587](https://jira.translate5.net/browse/TRANSLATE-5587): Security Related - JS lib DOMPurify is outdated** <br>
+The DOMpurify library for content sanitation was outdated. 
+
+**[TRANSLATE-5426](https://jira.translate5.net/browse/TRANSLATE-5426): Import/Export - BUG: "Remove framing tags" feature may leave leading/trailing whitespace in the segment** <br>
+FIX: The "ignoreFramingTags" option in the import may left leading/trailing whitespace in the segment
+
+**[TRANSLATE-5347](https://jira.translate5.net/browse/TRANSLATE-5347): job coordinator, User Management, Workflows - Copy default user assignments not respecting job type** <br>
+Fixed bugs with default user assignments copying
+
+
 ## [7.41.6] - 2026-08-25
 
 ### Important Notes:
