@@ -13,11 +13,26 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.42.1] - 2026-08-28
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5454](https://jira.translate5.net/browse/TRANSLATE-5454): VisualReview / VisualTranslation - Align order of workfiles on the visual** <br>
+7.42.0: Visual: Align the order of workfiles on the visual
+7.42.1:  Fix for loading of visual files in the UI
+
+
+### Bugfixes
+**[TRANSLATE-5726](https://jira.translate5.net/browse/TRANSLATE-5726): General, MatchAnalysis & Pretranslation, translate5 AI - AI pre-translation fails when a term ends with a quote character** <br>
+FIX: pre-translation with AI may fails when a text/segment was ending with a quote 
+
+
 ## [7.42.0] - 2026-08-27
 
 ### Important Notes:
-#### [TRANSLATE-5426](https://jira.translate5.net/browse/TRANSLATE-5426)
-If not finished in 7.40.x, then a backport will be required! See MITTAGQI-577!
  
 
 
