@@ -13,6 +13,20 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.42.2] - 2026-08-31
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5728](https://jira.translate5.net/browse/TRANSLATE-5728): General - Too few arguments to function in SynchronisationService::create** <br>
+Fix problem where terminology synchronization produces error.
+
+**[TRANSLATE-5727](https://jira.translate5.net/browse/TRANSLATE-5727): Excel ex- and re-import - Error appears in case Excel reimport generates error on the backend** <br>
+Fixed UI crash that might apper in case Excel reimport produces error
+
+
 ## [7.42.1] - 2026-08-28
 
 ### Important Notes:
