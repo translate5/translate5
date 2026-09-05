@@ -13,6 +13,22 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.42.3] - 2026-09-05
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5730](https://jira.translate5.net/browse/TRANSLATE-5730): Package Ex and Re-Import, TermTagger integration, TrackChanges - Sequence of tags may cause error on term tagging** <br>
+Fix tag sequence issues
+
+
+### Bugfixes
+**[TRANSLATE-5736](https://jira.translate5.net/browse/TRANSLATE-5736): TermTagger integration - Tags have invalid overlapping start positions** <br>
+Fix term tagging in segments with html entities
+
+
 ## [7.42.2] - 2026-08-31
 
 ### Important Notes:
