@@ -13,6 +13,37 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.43.0] - 2026-09-14
+
+### Important Notes:
+#### [TRANSLATE-5525](https://jira.translate5.net/browse/TRANSLATE-5525)
+on premise: docker pull on pdfconverter image - must be updated to latest (which is 1.6 at the moment)
+
+This feature changes the sort order behaviour of visual files on import!
+ 
+
+
+### Added
+**[TRANSLATE-5409](https://jira.translate5.net/browse/TRANSLATE-5409): VisualReview / VisualTranslation - Add a "open in native PDF viewer" Button to the visual to be able to rotate the PDF** <br>
+Visual: Add optional Button to open the source-PDFs in the browsers native PDF viewer
+
+
+### Changed
+**[TRANSLATE-5733](https://jira.translate5.net/browse/TRANSLATE-5733): InstantTranslate - InstantTranslate client selection for text field** <br>
+Introduce client selection for text based InstantTranslate - same as already exists for filebased InstantTranslate
+
+**[TRANSLATE-5525](https://jira.translate5.net/browse/TRANSLATE-5525): VisualReview / VisualTranslation - Visual: Make uploaded/exchanged File List in frontend orderable** <br>
+Enhancement: Make Visual sources added in the import-wizard orderable by dragging the items & clicking the file-header. Please note, that this changes the old behaviour of a forced order by name.
+
+**[TRANSLATE-5473](https://jira.translate5.net/browse/TRANSLATE-5473): t5memory - Create checkbox in TM import window to transform TMX languages** <br>
+Added a checkbox in TM import window to convert not matching sub languages to the TM language. Example: if TM has only en as language but TMX contains en-GB entries they can now be imported instead dropped.
+
+
+### Bugfixes
+**[TRANSLATE-5743](https://jira.translate5.net/browse/TRANSLATE-5743): TM Maintenance - Layout error in TMMaintenance** <br>
+Fixed layout issue in TM Maintenance which may cause sometimes header to overflow the search form.
+
+
 ## [7.42.4] - 2026-09-14
 
 ### Important Notes:
