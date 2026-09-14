@@ -13,6 +13,50 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.42.4] - 2026-09-14
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5193](https://jira.translate5.net/browse/TRANSLATE-5193): Editor general - Search and replace improvement** <br>
+Improved search and replace usability
+
+
+### Bugfixes
+**[TRANSLATE-5753](https://jira.translate5.net/browse/TRANSLATE-5753): Task Management - segment finish count filter not working due wrong rounding** <br>
+Due wrong rounding the finish count filter of the task list was not working properly.
+
+**[TRANSLATE-5752](https://jira.translate5.net/browse/TRANSLATE-5752): TermTagger integration - Termtagger includes additional characters into terms** <br>
+Fixed character processing of content protection placeholders in TermTagger integration
+
+**[TRANSLATE-5748](https://jira.translate5.net/browse/TRANSLATE-5748): General, translate5 AI - AI terminology lookup fails for edited segments (duplicate "target" field)** <br>
+Fix problem where terminology was ignored when requesting translations and TQE.
+
+**[TRANSLATE-5747](https://jira.translate5.net/browse/TRANSLATE-5747): Configuration - 3.9 Config controller did not check properly config name (I1.1)** <br>
+When passing invalid configuration names to the config API that did lead to strange errors not properly logged but disclosing some server paths.
+
+**[TRANSLATE-5729](https://jira.translate5.net/browse/TRANSLATE-5729): Import/Export - "annotates source column" for empty comment** <br>
+Empty XLF notes were creating empty comments on import, now empty notes are just ignored.
+
+**[TRANSLATE-5718](https://jira.translate5.net/browse/TRANSLATE-5718): Main back-end mechanisms (Worker, Logging, etc.) - Fix possibility to get and manipulate data on server side** <br>
+Fix possibility to get and manipulate data on server side
+
+
+**[TRANSLATE-5705](https://jira.translate5.net/browse/TRANSLATE-5705): Workflows - Task workflow step calculated incorrectly** <br>
+Fix task workflow step recalculation in some specific cases.
+
+**[TRANSLATE-5668](https://jira.translate5.net/browse/TRANSLATE-5668): Export - COTI Export for connected tasks exports only last finished task correctly** <br>
+COTI: Fix export of connected tasks
+
+**[TRANSLATE-5388](https://jira.translate5.net/browse/TRANSLATE-5388): TermPortal - CrossReference-attributes problem** <br>
+FIXED: unstable validity detection for attributes of type 'crossReference' at termEntry-level
+
+**[TRANSLATE-4060](https://jira.translate5.net/browse/TRANSLATE-4060): Editor general - selection of tag-view mode in editor should be persistent** <br>
+FIXED: Segment tags visibility mode is now persisted into user preferences
+
+
 ## [7.42.3] - 2026-09-05
 
 ### Important Notes:
