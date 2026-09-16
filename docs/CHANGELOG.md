@@ -13,6 +13,64 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.44.0] - 2026-09-16
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5599](https://jira.translate5.net/browse/TRANSLATE-5599): Workflows - Add custom fields to workflow mails** <br>
+Add a new custom field type for tasks so that the field data can be rendered in workflow mails
+
+**[TRANSLATE-5408](https://jira.translate5.net/browse/TRANSLATE-5408): Workflows - Dedicated email history view** <br>
+Added outgoing mail log: system-wide in Preferences, and task-related in the new task tab.
+
+
+### Changed
+**[TRANSLATE-5621](https://jira.translate5.net/browse/TRANSLATE-5621): Main back-end mechanisms (Worker, Logging, etc.) - log audit logs for filetype settings and segmentation rules** <br>
+Added audit logging for the file filters:
+Bconf lifecycle: upload, clone, create, update (name/description/customer), delete
+Bconf defaults: set as instance default; default bconf per client
+Segmentation: SRX upload (including purpose source/target and file name)
+Pipeline: pipeline upload
+Custom filters: create, change (name/extensions), delete
+Filter settings: .fprm saved via the filter editor, .fprm uploaded
+Extension mapping: extensions changed, filter removed from the mapping
+
+**[TRANSLATE-5565](https://jira.translate5.net/browse/TRANSLATE-5565): Main back-end mechanisms (Worker, Logging, etc.) - Log audit logs for changing configs via UI or cmd** <br>
+Log audit logs for User model
+
+**[TRANSLATE-5563](https://jira.translate5.net/browse/TRANSLATE-5563): Main back-end mechanisms (Worker, Logging, etc.) - Log audit logs for all attempts to illegally increase access privileges (priviledge escalation)** <br>
+Log audit logs for User model
+
+**[TRANSLATE-5559](https://jira.translate5.net/browse/TRANSLATE-5559): Main back-end mechanisms (Worker, Logging, etc.) - Log audit logs for language resources** <br>
+Log audit logs for User model
+
+**[TRANSLATE-5470](https://jira.translate5.net/browse/TRANSLATE-5470): VisualReview / VisualTranslation, Workflows - Update translation approval completion email** <br>
+Several smaller changes and fixes in the PM visual approved notification e-mail of the VisualApprover workflow
+
+**[TRANSLATE-5396](https://jira.translate5.net/browse/TRANSLATE-5396): Main back-end mechanisms (Worker, Logging, etc.) - Add audit log for all failed login attempts** <br>
+Add audit log for all failed login attempts
+
+**[TRANSLATE-5395](https://jira.translate5.net/browse/TRANSLATE-5395): Main back-end mechanisms (Worker, Logging, etc.) - Log audit logs for Task model** <br>
+Log audit logs for Task model
+
+**[TRANSLATE-5394](https://jira.translate5.net/browse/TRANSLATE-5394): Main back-end mechanisms (Worker, Logging, etc.) - Log audit logs for Customer model** <br>
+Log audit logs for Customer model
+
+**[TRANSLATE-5393](https://jira.translate5.net/browse/TRANSLATE-5393): Main back-end mechanisms (Worker, Logging, etc.) - Log audit logs for User model** <br>
+Log audit logs for User model
+
+**[TRANSLATE-3806](https://jira.translate5.net/browse/TRANSLATE-3806): Main back-end mechanisms (Worker, Logging, etc.) - Log specific additional system events for warranty reasons / audit log** <br>
+Add specific or additional log entries for crucial actions, see the several sub issues for details.
+
+
+### Bugfixes
+**[TRANSLATE-5440](https://jira.translate5.net/browse/TRANSLATE-5440): LanguageResources - concordance search will find forbidden terms** <br>
+FIXED: added missing status icons with tooltips for terminology-based results in 'Concordance search'-tab, for Status and Process status x for Source and Target terms
+
+
 ## [7.43.1] - 2026-09-16
 
 ### Important Notes:

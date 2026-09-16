@@ -2374,7 +2374,7 @@ Licenses Used: Apache-2.0
    limitations under the License.
 
 
-### google/protobuf (Version v5.35.1 | 55bb4a7)
+### google/protobuf (Version v5.36.0 | 9c10510)
 proto library for PHP
 Homepage: https://developers.google.com/protocol-buffers/
 Licenses Used: BSD-3-Clause
@@ -2790,6 +2790,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+
+### hubersen/mitey (Version dev-master | bcdbec3)
+PHP Wrapper for the mite API
+Homepage: Not configured.
+Licenses Used: Not configured.
+Copyright (c) 2007-2012 Stefan Pasch <stefan.pasch@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 ### ifsnop/mysqldump-php (Version v2.13 | d328c86)
 PHP version of mysqldump cli that comes with MySQL
