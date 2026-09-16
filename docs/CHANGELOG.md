@@ -13,6 +13,29 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.43.1] - 2026-09-16
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5463](https://jira.translate5.net/browse/TRANSLATE-5463): Export - Preserve Content Protection in Export(Package export)** <br>
+7.43.1: Fix when config preserveGeneratedXlfFiles is disabled
+7.40.5: New feature where we can configure if the protected content will be exported as tags or un-protected.
+
+
+### Bugfixes
+**[TRANSLATE-5756](https://jira.translate5.net/browse/TRANSLATE-5756): Editor general - PHP Error: E9999 TypeErrorTermData::sameTermEntry()** <br>
+PHP error fixed
+
+**[TRANSLATE-5605](https://jira.translate5.net/browse/TRANSLATE-5605): translate5 AI - translate5 AI: TQE fails to parse a very simple response, After 5 retries Server error is presented to the user** <br>
+FIX: Improve parsing of TQE responses, avoid presenting a server error to the user
+
+**[TRANSLATE-4753](https://jira.translate5.net/browse/TRANSLATE-4753): LanguageResources - languages for term collection in task's resource tab are incorrect** <br>
+FIXED: source and target languages for TermCollections shown in task's 'Language resources' tab - are now best matching to task's ones, where possible
+
+
 ## [7.43.0] - 2026-09-14
 
 ### Important Notes:
