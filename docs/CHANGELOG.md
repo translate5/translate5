@@ -13,6 +13,55 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.44.1] - 2026-09-23
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5719](https://jira.translate5.net/browse/TRANSLATE-5719): InstantTranslate - InstantTranslate: configurable disclaimer text in the portal footer** <br>
+New configs where admins can configure footer disclaimer in instant-translate.
+
+**[TRANSLATE-5599](https://jira.translate5.net/browse/TRANSLATE-5599): Workflows - Add custom fields to workflow mails** <br>
+7.44.1: Fix line breaks and change to forgotten mail template
+7.44.0: Add a new custom field type for tasks so that the field data can be rendered in workflow mails
+
+
+### Changed
+**[TRANSLATE-5608](https://jira.translate5.net/browse/TRANSLATE-5608): translate5 AI - translate5 AI: Add instruction not to answer meta-comments to our default prompts** <br>
+Enhancement: Add instruction to not answer with meta-comments to the system default prompts
+
+
+### Bugfixes
+**[TRANSLATE-5764](https://jira.translate5.net/browse/TRANSLATE-5764): Hotfolder Import - COTI Upload fails** <br>
+Fix foreign index handling and export problems due worker concurrency.
+
+**[TRANSLATE-5762](https://jira.translate5.net/browse/TRANSLATE-5762): Editor general - [E9999 core] TypeError: SpecifyTerms::getBestTermData(): Return value must be of type TermData** <br>
+PHP error fixed
+
+**[TRANSLATE-5758](https://jira.translate5.net/browse/TRANSLATE-5758): Editor general - UI error in false positive controller** <br>
+Fixed UI error which may appear for some segments containing false-positive QA errors.
+
+**[TRANSLATE-5750](https://jira.translate5.net/browse/TRANSLATE-5750): Editor general - ContentProtection for elements with & will destroy (OKAPI) export** <br>
+Fix rendering and processing of protected html entities
+
+**[TRANSLATE-5745](https://jira.translate5.net/browse/TRANSLATE-5745): TermTagger integration - Handle HTML-escaped characters (e.g. `>` to `&gt;`) in TermTagger responses without skipping terminology markup** <br>
+Fix processing of segments with characters that may be escaped by TermTagger
+
+**[TRANSLATE-5740](https://jira.translate5.net/browse/TRANSLATE-5740): Configuration - System configuration value refresh** <br>
+FIXED: updated value in Preferences > Configuration is now visible immediately
+
+**[TRANSLATE-5739](https://jira.translate5.net/browse/TRANSLATE-5739): Configuration - Whitespace problem in system configuration search field** <br>
+FIXED: white-spaces are not replaced by %20 anymore in search field in Preferences > System configuration
+
+**[TRANSLATE-5648](https://jira.translate5.net/browse/TRANSLATE-5648): Editor general - Tags are flipped when deleting** <br>
+Fix bug which might cause tags flip when deleting a tag between two already deleted tags
+
+**[TRANSLATE-5513](https://jira.translate5.net/browse/TRANSLATE-5513): Editor general - shortcut "ALT + 0" will open accessibility help** <br>
+Fixed handling of the ALT+0 shortcut
+
+
 ## [7.44.0] - 2026-09-16
 
 ### Important Notes:
