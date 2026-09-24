@@ -13,6 +13,20 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.44.2] - 2026-09-24
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5769](https://jira.translate5.net/browse/TRANSLATE-5769): Editor general - [E9999 core] TypeError: CreateTbxFileResponse::__construct(): Argument #1 ($uuid) must be of type string, null given** <br>
+PHP error fixed
+
+**[TRANSLATE-5768](https://jira.translate5.net/browse/TRANSLATE-5768): Editor general - [E9999 core.mail.audit] TypeError: MailAudit::rawContent()** <br>
+PHP error fixed in the context of mail audit logging
+
+
 ## [7.44.1] - 2026-09-23
 
 ### Important Notes:
