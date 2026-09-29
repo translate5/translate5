@@ -13,6 +13,17 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.44.3] - 2026-09-29
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5771](https://jira.translate5.net/browse/TRANSLATE-5771): MatchAnalysis & Pretranslation, TermTagger integration, translate5 AI - AI pre-translation and TQE are slow for tasks with large term collections** <br>
+Improve pre-translation and tqe speeds when terminology is assigned to a task.
+
+
 ## [7.44.2] - 2026-09-24
 
 ### Important Notes:
