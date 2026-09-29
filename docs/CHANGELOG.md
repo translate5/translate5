@@ -13,6 +13,35 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.45.0] - 2026-09-29
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5599](https://jira.translate5.net/browse/TRANSLATE-5599): Workflows - Add custom fields to workflow mails** <br>
+7.45.0: Another template fix
+7.44.1: Fix line breaks and change to forgotten mail template
+7.44.0: Add a new custom field type for tasks so that the field data can be rendered in workflow mails
+
+**[TRANSLATE-5556](https://jira.translate5.net/browse/TRANSLATE-5556): translate5 AI - Azure API key on client level** <br>
+Added possibility to override system configs for Translate5AI plugin on a client level
+
+
+### Changed
+**[TRANSLATE-5610](https://jira.translate5.net/browse/TRANSLATE-5610): file format settings - exclude white space options for Office filetypes** <br>
+Remove (disable) Okapi internal handling of tabs/line breaks in favour of the translate5 whitespace handling and recognition as internal tags.
+
+**[TRANSLATE-4487](https://jira.translate5.net/browse/TRANSLATE-4487): job coordinator - Restrict Jobcoordinator access to workflow steps** <br>
+Restrict Job Сoordinator access to workflow steps
+
+
+### Bugfixes
+**[TRANSLATE-4428](https://jira.translate5.net/browse/TRANSLATE-4428): Workflows - admin or PM cannot open task in their role when assigned an editor job and job not ready** <br>
+Fixed workflow handling for PMs and admins: Open workflow jobs assigned to them are now opened in the editor role, while they retain their PM role for jobs in any other state.
+
+
 ## [7.44.3] - 2026-09-29
 
 ### Important Notes:
