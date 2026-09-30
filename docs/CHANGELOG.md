@@ -13,6 +13,26 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.45.1] - 2026-09-30
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5776](https://jira.translate5.net/browse/TRANSLATE-5776): LanguageResources - language resource creation faulty** <br>
+Fixed bug which may prevent new language resource to be created when there are no client config overrides for the current user
+
+**[TRANSLATE-5775](https://jira.translate5.net/browse/TRANSLATE-5775): PlunetConnector - Plugin PlunetConnnector: error on create task** <br>
+Added debug code to identify dedicated problems
+
+**[TRANSLATE-5772](https://jira.translate5.net/browse/TRANSLATE-5772): Editor general - [E9999 core] TypeError: ZfExtended_Models_User::customersToCustomerIds(): Argument #1 ($customers) must be of type string, null given** <br>
+PHP error fixed
+
+**[TRANSLATE-5649](https://jira.translate5.net/browse/TRANSLATE-5649): Editor general - MQM tag can be deleted completely** <br>
+Fixed bug which allowed MQM tag to be deleted completely out of the segment omitting tracked changes
+
+
 ## [7.45.0] - 2026-09-29
 
 ### Important Notes:
