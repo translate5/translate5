@@ -1,0 +1,12 @@
+translate5
+Copyright (c) 2012-2026, Marc Mittag, translate5
+All rights reserved.
+info (ATT) translate5.net
+https://www.translate5.net/
+Open Source License
+------------------------------------------------------------------------------------------
+This version of translate5 is licensed under the terms of the Open Source GNU GENERAL PUBLIC LICENSE version 3.
+A copy of GPL can be found in the same folder as this document and at
+http://www.gnu.org/licenses/gpl.html
+--
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT OF THIRD-PARTY INTELLECTUAL PROPERTY RIGHTS.  See the GNU General Public License for more details.
