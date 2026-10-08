@@ -13,6 +13,20 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.46.1] - 2026-10-08
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5798](https://jira.translate5.net/browse/TRANSLATE-5798): I10N - UI language stuck to fallback language English** <br>
+The initialisation of the UI language used by the user was at a to late place, leading now to that language stuck.
+
+**[TRANSLATE-5778](https://jira.translate5.net/browse/TRANSLATE-5778): Editor general - Clear cache after enabling plugins** <br>
+Enabling plugins now refreshes cached frontend and localization data automatically to prevent stale translation data and JavaScript loading errors.
+
+
 ## [7.46.0] - 2026-10-07
 
 ### Important Notes:
