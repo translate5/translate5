@@ -13,6 +13,26 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.46.2] - 2026-10-13
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5802](https://jira.translate5.net/browse/TRANSLATE-5802): TermTagger integration, TrackChanges - Inserted or moved tags with track changes mark the rest of the segment as inserted** <br>
+Fix problem where moving tags with track changes mark the rest of the segment as new insertion.
+
+**[TRANSLATE-5795](https://jira.translate5.net/browse/TRANSLATE-5795): LanguageResources - Unconfigured resources are not listed in the list anymore** <br>
+Fixed the issue which might cause unconfigured resources to not be listed in the select when creating a new language resource
+
+**[TRANSLATE-5792](https://jira.translate5.net/browse/TRANSLATE-5792): Editor general - Error in segment grid** <br>
+Fixed error that might have occurred randomly when filtering segments in the task
+
+**[TRANSLATE-5788](https://jira.translate5.net/browse/TRANSLATE-5788): Editor general - Cannot read properties of undefined (reading 'mqmNotSupporterTooltip')** <br>
+Fixed UI crash that might have appeared when using replace all in task with manual QA
+
+
 ## [7.46.1] - 2026-10-08
 
 ### Important Notes:
