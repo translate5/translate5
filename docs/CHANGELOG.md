@@ -23,6 +23,11 @@ Automatic deletion of additional files is planned but disabled at the moment - s
 
 
 ### Changed
+**[TRANSLATE-5820](https://jira.translate5.net/browse/TRANSLATE-5820): Main back-end mechanisms (Worker, Logging, etc.) - replace external javascript error monitoring with internal solution** <br>
+The external UI error monitoring was replaced by an pure internal solution.
+If logger was disabled in the past, it remains disabled. 
+No video logging is possible anymore, config is removed.
+
 **[TRANSLATE-5810](https://jira.translate5.net/browse/TRANSLATE-5810): Okapi integration - New okapi version** <br>
 Introduce Okapi 149-snapshot-3
 
