@@ -13,7 +13,47 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
-## [7.46.2] - 2026-10-13
+## [7.46.3] - 2026-10-15
+
+### Important Notes:
+#### [TRANSLATE-1626](https://jira.translate5.net/browse/TRANSLATE-1626)
+On Update the installer lists now modified files and files not belonging to the install package being installed - asking if update should be proceeded or not.
+Automatic deletion of additional files is planned but disabled at the moment - so its save to continue on update.
+ 
+
+
+### Changed
+**[TRANSLATE-5810](https://jira.translate5.net/browse/TRANSLATE-5810): Okapi integration - New okapi version** <br>
+Introduce Okapi 149-snapshot-3
+
+
+### Bugfixes
+**[TRANSLATE-5818](https://jira.translate5.net/browse/TRANSLATE-5818): OpenId Connect - Fix user editable flag validation after save** <br>
+Fixed user editable flag validation after saving a user.
+
+**[TRANSLATE-5816](https://jira.translate5.net/browse/TRANSLATE-5816): OpenId Connect - [E9999 core] Syntax error or access violation - error in SQL syntax** <br>
+PHP error fixed
+
+**[TRANSLATE-5811](https://jira.translate5.net/browse/TRANSLATE-5811): InstantTranslate - InstantTranslate: outdated description of the footer disclaimer configuration** <br>
+Improve instant-translate footer disclaimer config description.
+
+**[TRANSLATE-5807](https://jira.translate5.net/browse/TRANSLATE-5807): PlunetConnector - add additional role "Task-Overview" to new created user** <br>
+Plugin PlunetConnector: add additional role "Task Overview" to users created by plugin.
+
+**[TRANSLATE-5797](https://jira.translate5.net/browse/TRANSLATE-5797): Export - Nested track changes exported incorrectly in SDLXLIFF export** <br>
+SDLXLIFF Export: Fix invalid tag structure on segments with nested track changes
+
+**[TRANSLATE-5767](https://jira.translate5.net/browse/TRANSLATE-5767): Editor general - CTRL+Enter shows same behaviour as CTRL+Alt+Enter** <br>
+Fixed behavior of the CTRL+Enter shortcut
+
+**[TRANSLATE-5760](https://jira.translate5.net/browse/TRANSLATE-5760): Editor general - UI error when saving content in editor** <br>
+Fix the error which may caused difficulties while editing a segment containing a text with <,> or & symbols
+
+**[TRANSLATE-1626](https://jira.translate5.net/browse/TRANSLATE-1626): Installation & Update - Installer must be able to clean up translate5 installations** <br>
+7.46.3: The installer lists now modified files and files not belonging to the install package being installed - asking if update should be proceeded or not. Automatic deletion of additional files is disabled at the moment.
+
+
+## [7.46.2] - 2026-10-12
 
 ### Important Notes:
  
