@@ -13,6 +13,108 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.46.4] - 2026-10-27
+
+### Important Notes:
+#### [TRANSLATE-5853](https://jira.translate5.net/browse/TRANSLATE-5853)
+**Security update for visual converter containers** (PHP CVE-2026-109618 / CVE-2026-109619 and Brotli CVE-2026-111497).
+**On-premise installations:** Pull the latest images (`translate5/visualconverter`, `translate5/pdfconverter`, `translate5/officeconverter`) and recreate the containers using `docker compose up -d`. If specific image tags are pinned in your Docker Compose configuration, update them to `latest` first.
+The `visualconverter` image now uses Ubuntu 22.04 with a current Google Chrome instead of the outdated browserless/Chrome image (Chromium 98 / Node.js 18). No configuration changes are required.
+
+#### [TRANSLATE-5821](https://jira.translate5.net/browse/TRANSLATE-5821)
+The previous external UI error logger has been replaced with a solution hosted within our own infrastructure.
+JavaScript errors are now automatically reported to our central logging system without user confirmation, as screenshots and videos are no longer captured.
+Error logging can be disabled via `runtimeOptions.debug.enableJsLogger`, although we strongly recommend keeping it enabled. Existing disabled configurations remain unchanged.
+**On-premise:** Disable via configuration.  
+**Hosted:** Contact our support team to disable logging.
+ 
+
+
+### Changed
+**[TRANSLATE-5853](https://jira.translate5.net/browse/TRANSLATE-5853): VisualReview / VisualTranslation - Update PHP images of visual containers** <br>
+Updated converter containers (visualconverter, pdfconverter, officeconverter, browserconverter) with security fixes for PHP and Brotli (CVE-2026-109618, CVE-2026-109619, CVE-2026-111497). The visualconverter now uses an Ubuntu 22.04 base with a current Google Chrome. PHP session upload progress has been disabled in all converter containers.
+
+**[TRANSLATE-5829](https://jira.translate5.net/browse/TRANSLATE-5829): Editor general - Make the error E1381  not to produce a crash** <br>
+Error E1381 doesn't produce a UI crash anymore
+
+**[TRANSLATE-5821](https://jira.translate5.net/browse/TRANSLATE-5821): Editor general - Changes to JavaScript Error Logging** <br>
+Replaced the external JavaScript error logger with a self-hosted solution. Errors are now reported automatically without user confirmation. Screenshots and videos are no longer captured.
+
+**[TRANSLATE-5819](https://jira.translate5.net/browse/TRANSLATE-5819): TermPortal - Autostart search for any terms** <br>
+Wildcard search is now auto-started in TermPortal
+
+**[TRANSLATE-5812](https://jira.translate5.net/browse/TRANSLATE-5812): TermPortal - Same image upload problem** <br>
+FIXED: same image can be uploaded for multiple term entries one by one
+
+**[TRANSLATE-5754](https://jira.translate5.net/browse/TRANSLATE-5754): translate5 AI - Improve display of MQM TQE reasoning** <br>
+Improve MQM-TQE reasoning. Suggestions will be listed for the detected error by the AI.
+
+
+### Bugfixes
+**[TRANSLATE-5834](https://jira.translate5.net/browse/TRANSLATE-5834): Workflows - User cannot approve job in a task where he is PM** <br>
+Fix for: User cannot approve job in a task where he is PM
+
+**[TRANSLATE-5831](https://jira.translate5.net/browse/TRANSLATE-5831): t5memory - TMX import correct src-language for skipings** <br>
+Use correct src-language for TMX filtering on import
+
+**[TRANSLATE-5828](https://jira.translate5.net/browse/TRANSLATE-5828): VisualReview / VisualTranslation - VisualReview: opening a task crashes when the split (source/pivot) visual cannot be loaded** <br>
+Fixed error that might have appeared in case visual pivot is failed to load for some reason
+
+**[TRANSLATE-5826](https://jira.translate5.net/browse/TRANSLATE-5826): localization, TermPortal - Label of button in Termportal and InstantTranslate** <br>
+FIXED: default UI labels are now used when client-specific ones are missing for TermPortal
+
+**[TRANSLATE-5825](https://jira.translate5.net/browse/TRANSLATE-5825): Editor general - Error when repositioning the editor on the screen** <br>
+Fixed error that might have appear when repositioning the editor on the screen
+
+**[TRANSLATE-5824](https://jira.translate5.net/browse/TRANSLATE-5824): Editor general - Error in spellcheck** <br>
+Improved handling timeouts for spellcheck. Now it doesn't produce error.
+
+**[TRANSLATE-5817](https://jira.translate5.net/browse/TRANSLATE-5817): Workflows - Workflow: competitive assignment: step on "waiting" instead of "open"** <br>
+Fix change of job status on job confirmation
+
+**[TRANSLATE-5814](https://jira.translate5.net/browse/TRANSLATE-5814): InstantTranslate - InstantTranslate: send to human revision will not show in project overview** <br>
+InstantTranslate project becomes a visible human-revision project when a task is sent to human revision
+
+**[TRANSLATE-5805](https://jira.translate5.net/browse/TRANSLATE-5805): Content Protection, Editor general - [Bug] Editor: QS category "Space after line break" / "Segment begins with a tag followed by a space"** <br>
+Fixed issue with "Space after line break" QA error if segment contains protected numbers
+
+**[TRANSLATE-5803](https://jira.translate5.net/browse/TRANSLATE-5803): Editor general - [Bug] Editor: Visibility of spaces** <br>
+Fixed issue which caused invisible characters to disappear on first segment open for editing
+
+**[TRANSLATE-5801](https://jira.translate5.net/browse/TRANSLATE-5801): Editor general - Scrolling in editable, long segment not possible** <br>
+FIXED: tall segment content is now scrollable in editor to fit into grid viewport
+
+**[TRANSLATE-5799](https://jira.translate5.net/browse/TRANSLATE-5799): Editor general, theRootCause - Task list: Filter order date produces crash** <br>
+FIXED: problem with pre-saved filters on date-columns in Task overview
+
+**[TRANSLATE-5789](https://jira.translate5.net/browse/TRANSLATE-5789): VisualReview / VisualTranslation - Unresolved T5VisualSegmentUpdater is not defined error** <br>
+Fixed error that might have appeared while loading visual review
+
+**[TRANSLATE-5786](https://jira.translate5.net/browse/TRANSLATE-5786): translate5 AI - AI language resources: newer GPT models (GPT-6 and later) are not recognized and get the unsupported max_tokens parameter** <br>
+Update moder models matching logic for old not supported API parameters.
+
+**[TRANSLATE-5740](https://jira.translate5.net/browse/TRANSLATE-5740): Configuration - System configuration value refresh** <br>
+FIXED: updated value in Preferences > Configuration is now visible immediately
+
+**[TRANSLATE-5738](https://jira.translate5.net/browse/TRANSLATE-5738): TermTagger integration, translate5 AI - Pivot pre-translation with AI resources uses task target-language terminology in the pivot prompt** <br>
+FIX: AI pretransation: Evaluated Terminology for the Pivot language may not be accurate
+
+**[TRANSLATE-5735](https://jira.translate5.net/browse/TRANSLATE-5735): MatchAnalysis & Pretranslation - Repetition match is not used when master translation cannot be applied** <br>
+In pre-translation repetition match was not used when master translation cannot be applied. Now it is used.
+
+**[TRANSLATE-5734](https://jira.translate5.net/browse/TRANSLATE-5734): Editor general, translate5 AI - MQM-based TQE: fixes from the first test round** <br>
+Additional improvements to MQM - TQE.
+
+**[TRANSLATE-5671](https://jira.translate5.net/browse/TRANSLATE-5671): Editor general - copy source to target will not copy edited source** <br>
+When copying source to target with CTRL+. shortcut and source editing is enabled for a task now "edited source" is copied instead of "source at the time of import"
+
+**[TRANSLATE-5604](https://jira.translate5.net/browse/TRANSLATE-5604): translate5 AI - translate5 AI: TQE sends not the edited segment when requesting a TQE refresh after editing** <br>
+FIX: Requesting the TQE when editing a segment did not request the last edited version
+
+**[TRANSLATE-5540](https://jira.translate5.net/browse/TRANSLATE-5540): Import/Export - Short tag number assigned incorrectly** <br>
+Fix assignment of short tag number for internal tags
+
+
 ## [7.46.3] - 2026-10-15
 
 ### Important Notes:
