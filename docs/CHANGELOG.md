@@ -13,6 +13,26 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.46.5] - 2026-10-28
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5856](https://jira.translate5.net/browse/TRANSLATE-5856): translate5 AI - Azure: client level config ignored when creating/deleting deployment of client level language resource** <br>
+Fixed Azure language resources with client level API key creating their model deployment with the system level Azure configuration.
+
+**[TRANSLATE-5841](https://jira.translate5.net/browse/TRANSLATE-5841): Security Related - Frontend error tracking: session ID is sent to Bugsink in clear text** <br>
+Improved logging some errors into bugreporting system
+
+**[TRANSLATE-5822](https://jira.translate5.net/browse/TRANSLATE-5822): Editor general - Error when copying segment text containing complex markup** <br>
+Fixed error which might have appeared when copying segment content containing complex markup
+
+**[TRANSLATE-5791](https://jira.translate5.net/browse/TRANSLATE-5791): Editor general - Error when saving editor content** <br>
+Improved reliability of the frontend in case editor fails to open.
+
+
 ## [7.46.4] - 2026-10-27
 
 ### Important Notes:
