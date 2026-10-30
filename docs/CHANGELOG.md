@@ -13,6 +13,20 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
 
+## [7.46.6] - 2026-10-30
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5823](https://jira.translate5.net/browse/TRANSLATE-5823): Editor general - Error in track changes** <br>
+Fixed error which might have appeared when editing a segment containing tracked changes with "Display tracked changes" unchecked
+
+**[TRANSLATE-5790](https://jira.translate5.net/browse/TRANSLATE-5790): LanguageResources - Unresolved val is not iterable error in filters** <br>
+Fixed error which might have appeared while filtering tasks by languages
+
+
 ## [7.46.5] - 2026-10-28
 
 ### Important Notes:
