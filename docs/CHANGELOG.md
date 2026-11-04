@@ -12,6 +12,65 @@ We follow semantic versioning MAJOR.MINOR.PATCH, with the following definition:
 - PATCH version change: Only bug fixes and small enhancements
 
 All bugfix and feature updates are (downwards) compatible! If not, this is a major update and it is listed in the important release notes.
+r.
+
+
+## [7.46.7] - 2026-11-04
+
+### Important Notes:
+#### [TRANSLATE-5830](https://jira.translate5.net/browse/TRANSLATE-5830)
+On Premise: Please docker pull and update the frontendmessagebus image / container.
+ 
+
+
+### Changed
+**[TRANSLATE-5863](https://jira.translate5.net/browse/TRANSLATE-5863): TermTagger integration - TermTagger: use the URL pools by segment processing mode** <br>
+TermTagger now uses separate configured services for editing and imports, reducing competition between these operations.
+
+**[TRANSLATE-5830](https://jira.translate5.net/browse/TRANSLATE-5830): Editor general - Make "No access on job anymore" not to produce crash and not to logout user anymore** <br>
+Opening the same task in multiple tabs or briefly losing your connection no longer causes unexpected “No access on job anymore” errors or logs you out. 
+
+
+### Bugfixes
+**[TRANSLATE-5876](https://jira.translate5.net/browse/TRANSLATE-5876): TermTagger integration - Task terminology gets switched off permanently after a failed TBX load: Re-check leaves terms untagged** <br>
+After a temporary terminology load failure, Re-check can retry term tagging without requiring term collections to be reassigned
+
+**[TRANSLATE-5874](https://jira.translate5.net/browse/TRANSLATE-5874): Editor Length Check - Editor: length restriction spanning multiple segments does not turn red when exceeded** <br>
+Length limits spanning several segments now use their combined length and show an error when the limit is exceeded.
+
+**[TRANSLATE-5873](https://jira.translate5.net/browse/TRANSLATE-5873): t5memory - t5memory TMX import: silent 1-hour status polling timeout leaves incomplete or empty TM without error log** <br>
+Long-running t5memory imports now report timeouts instead of silently leaving an incomplete or empty translation memory.
+
+**[TRANSLATE-5871](https://jira.translate5.net/browse/TRANSLATE-5871): TermTagger integration - TermTagger: TBX unloaded while in use by parallel workers, term finder lock files accumulate** <br>
+TermTagger now avoids unloading terminology while parallel processes use it and limits the growth of lock files.
+
+**[TRANSLATE-5870](https://jira.translate5.net/browse/TRANSLATE-5870): TermTagger integration - TermTagger: concurrent upload of the same TBX fails with E1116** <br>
+Parallel processing no longer fails simply because the same terminology file is being loaded into TermTagger at the same time.
+
+**[TRANSLATE-5859](https://jira.translate5.net/browse/TRANSLATE-5859): LanguageResources - Language resource log fails to load when an event's extra data exceeds 64 KB** <br>
+Language resource logs remain accessible when an event contains unusually large extra data.
+
+**[TRANSLATE-5857](https://jira.translate5.net/browse/TRANSLATE-5857): Editor general - Automatically repair missing user roles implied by ACL rules** <br>
+Missing automatically assigned user roles are now repaired during installation and updates.
+
+**[TRANSLATE-5855](https://jira.translate5.net/browse/TRANSLATE-5855): SpellCheck (LanguageTool integration) - SpellCheck: false typographical errors at content protection placeholders** <br>
+Fixed false SpellCheck errors reported at protected content, e.g. the french hyphen/dash rule.
+
+**[TRANSLATE-5845](https://jira.translate5.net/browse/TRANSLATE-5845): Repetition editor - Prevent duplicate repetition saves from crashing the editor** <br>
+Confirming repetitions during a segment save no longer causes duplicate saves that can crash the editor.
+
+**[TRANSLATE-5837](https://jira.translate5.net/browse/TRANSLATE-5837): Task Management - Closing the browser tab throws "task.getId is not a function" and does not unlock the task if opening it failed** <br>
+Closing or reloading a tab after a task fails to open no longer causes an error or leaves an opened task locked.
+
+**[TRANSLATE-5827](https://jira.translate5.net/browse/TRANSLATE-5827): VisualReview / VisualTranslation - VisualReview: editing a segment with a protected number crashes the editor (replaceNumbers TypeError)** <br>
+Editing segments with protected numbers while VisualReview is open no longer crashes the editor.
+
+**[TRANSLATE-5813](https://jira.translate5.net/browse/TRANSLATE-5813): Editor general - Secure Content-Disposition filename handling for downloads** <br>
+Downloads now provide usable filenames when task or file names contain special or Unicode characters.
+
+**[TRANSLATE-5793](https://jira.translate5.net/browse/TRANSLATE-5793): t5memory - Some invalid XML character result in t5memory import error** <br>
+TMX files with uppercase hexadecimal character references can now be imported into t5memory without an XML error.
+
 
 ## [7.46.6] - 2026-10-30
 

@@ -3495,9 +3495,9 @@ Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
 
 
-### joshtronic/php-loremipsum (Version 3.0.0 | 61f25cb)
+### joshtronic/php-loremipsum (Version 3.0.1 | 8f76d6b)
 Lorem ipsum generator in PHP without dependencies
-Homepage: https://git.sherver.org/joshtronic/php-loremipsum
+Homepage: https://gitlab.com/joshtronic/php-loremipsum
 Licenses Used: GPL-3.0-only
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
