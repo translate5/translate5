@@ -15,6 +15,22 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 r.
 
 
+## [7.46.8] - 2026-11-05
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5566](https://jira.translate5.net/browse/TRANSLATE-5566): translate5 AI - Configurable TQE batch size in the language resource settings** <br>
+The number of segments sent to the AI in one TQE request can now be set per AI language resource with the new "Max. batch size for TQE" field in the resource settings (default 10, as before).
+
+
+### Bugfixes
+**[TRANSLATE-5877](https://jira.translate5.net/browse/TRANSLATE-5877): TermTagger integration - TermTagger: retry requests while the load balancer reports the service as temporarily unavailable** <br>
+Temporary TermTagger service interruptions are now retried automatically, reducing failed terminology processing.
+
+
 ## [7.46.7] - 2026-11-04
 
 ### Important Notes:
