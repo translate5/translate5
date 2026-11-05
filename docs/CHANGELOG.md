@@ -15,6 +15,41 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 r.
 
 
+## [7.47.0] - 2026-11-05
+
+### Important Notes:
+#### [TRANSLATE-5731](https://jira.translate5.net/browse/TRANSLATE-5731)
+Tracked changes are now enabled by default for Japanese JA , Korean KO, and Chinese ZH.
+ 
+
+
+### Added
+**[TRANSLATE-5617](https://jira.translate5.net/browse/TRANSLATE-5617): TermPortal, translate5 AI - make attributes from TermCollections selectable to send to LLM** <br>
+You can now choose which term collection attributes are sent to AI during pre-translation, giving it more context for selecting the right terms.
+
+**[TRANSLATE-5261](https://jira.translate5.net/browse/TRANSLATE-5261): InstantTranslate, translate5 AI - InstantTranslate & translate5 AI: Support Term-RAG for AI-based translations text-field translations** <br>
+InstantTranslate can now use available term collections for AI text translations, helping keep terminology consistent.
+
+
+### Changed
+**[TRANSLATE-5744](https://jira.translate5.net/browse/TRANSLATE-5744): Editor general - Editor: Renaming of "Show/hide visual" check box in "Settings" menu** <br>
+"Show/hide visuals" renamed to "Hide visuals" in dropdown menu
+
+**[TRANSLATE-5731](https://jira.translate5.net/browse/TRANSLATE-5731): Configuration - include Asian languages per default for tracked changes** <br>
+Tracked changes are now enabled by default for Japanese, Korean, and Chinese.
+
+
+### Bugfixes
+**[TRANSLATE-5862](https://jira.translate5.net/browse/TRANSLATE-5862): t5memory - t5memory TMX import: invalid character in tu attribute becomes t5:n tag on one-line TUs and breaks XML** <br>
+TMX imports now handle invalid characters in attributes of compact translation units without breaking the XML.
+
+**[TRANSLATE-5742](https://jira.translate5.net/browse/TRANSLATE-5742): InstantTranslate - InstantTranslate show only languages where resources are available** <br>
+In InstantTranslate, the language lists now show only combinations supported by available translation resources. Selecting a source or target language narrows the other list, helping you avoid combinations that cannot be translated.
+
+**[TRANSLATE-5551](https://jira.translate5.net/browse/TRANSLATE-5551): User Management, Workflows - InstantTranslate users selectable for job assignment** <br>
+Job assignment now lists only users who can access and edit tasks, so jobs cannot be assigned to users who cannot work on them.
+
+
 ## [7.46.8] - 2026-11-05
 
 ### Important Notes:
