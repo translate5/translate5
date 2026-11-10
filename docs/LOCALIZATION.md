@@ -97,6 +97,45 @@ class LocalizationExample
 * Typographical Apostroph: ’ (won’t), Quotes: ’, “, ”, “quoted”
 * JSON files will be converted to ZXLIFF (with the primary locale as source) for the localization tasks and automatically be imported back into the JSONs.
 
+### Frontend localization with `l10n.php` files
+* Strings for the ExtJS frontend live in `l10n.php` files. Each one returns a nested PHP array whose leaves are english source strings:
+  * Editor module: `application/modules/editor/views/scripts/index/l10n.php`
+  * Plugins: `<PluginDir>/views/l10n.php`
+```
+<?php
+
+return [
+    'MyPlugin' => [
+        'windowTitle' => 'My window',
+        'grid' => [
+            'nameColumn' => 'Name',
+        ],
+    ],
+];
+```
+* The editor file is registered in `Editor_IndexController::indexAction`. A plugin registers its own file in a handler for the `afterIndexAction` event of `Editor_IndexController`:
+```
+$this->eventManager->attach('Editor_IndexController', 'afterIndexAction', [$this, 'initJsTranslations']);
+
+public function initJsTranslations(Zend_EventManager_Event $event): void
+{
+    $event->getParam('view')->l10NBuilder()->addPath($this->getPluginPath() . '/views/l10n.php');
+}
+```
+* The view helper `ZfExtended_View_Helper_L10NBuilder` loads all registered files, merges them with `array_merge_recursive` and translates every leaf into the current user's locale. The JSON result is written to `Editor.data.l10n` in `index.phtml`
+* Outside development mode the result is cached for 24 hours per application version and user locale. A new release therefore invalidates it, but a hotfix deployed under the same version needs a cache clear
+* In the frontend the strings are reached through `Editor.data.l10n.MyPlugin.windowTitle`. The viewport view models expose the tree as `l10n`, so it can be bound directly: `bind: { title: '{l10n.MyPlugin.windowTitle}' }`
+* Use a top-level key named after the plugin or feature. Files are merged recursively, so if two files define the same leaf key the value turns into an array instead of being overridden
+* Leaf values must be strings. Concatenation with `.` is fine because the file is evaluated as PHP
+* By default a whole leaf is one localization string. When a leaf contains markup (for example a long tooltip), wrap each translatable part in `<translate>…</translate>`. Then only those parts get translated and extracted, and the markup in between is kept as is:
+```
+'tooltip' => '<h2><translate>Overview</translate></h2><translate>The first paragraph.</translate>' .
+    '<br/><br/><translate>The second paragraph.</translate>',
+```
+* `<translate>` parts must not span line breaks, and they cannot be nested
+* The general rules from “How Localization strings look like” apply to all leaves and `<translate>` parts
+* `t5 l10n:update` extracts the strings via `UiPhpExtractor`: the editor `l10n.php` goes into the editor ZXLIFFs, a plugin’s `views/l10n.php` into that plugin’s ZXLIFFs. Strings that already exist in the editor ZXLIFFs are not duplicated into plugin ZXLIFFs
+
 ### Translating the localizations with translate5
 * `t5 l10n:extract -e` will create proper import-zips in the folder /data/l10n for each locale defined in `/MaintenanceCli/L10n/L10nConfiguration`
 * With `t5 l10n:taskcreate` tasks can be generated for selected or all locales on the current instance. naming-scheme is "Translate5-localization-<version>-<locale>"

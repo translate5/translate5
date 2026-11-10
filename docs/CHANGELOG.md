@@ -15,6 +15,50 @@ All bugfix and feature updates are (downwards) compatible! If not, this is a maj
 r.
 
 
+
+
+## [7.47.1] - 2026-11-10
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-5682](https://jira.translate5.net/browse/TRANSLATE-5682): Import/Export - External preprocessing of import files before task import** <br>
+Task imports can optionally be paused for external preprocessing before the actual import starts.
+
+
+### Changed
+**[TRANSLATE-5842](https://jira.translate5.net/browse/TRANSLATE-5842): Hotfolder Import - COTI import: optionally set job deadlines from the COTI project due-date** <br>
+A new optional customer setting calculates job deadlines from the COTI project’s delivery date, making deadlines visible to translators and language service providers without manual entry. The setting is called runtimeOptions.import.projectDeadline.jobDeadlineFraction and is disabled by default.
+
+**[TRANSLATE-5838](https://jira.translate5.net/browse/TRANSLATE-5838): Editor general - On JavaScript errors reload the application instead of logging out the user** <br>
+After an application error, translate5 now reloads instead of logging you out, so you do not have to sign in again.
+
+
+### Bugfixes
+**[TRANSLATE-5901](https://jira.translate5.net/browse/TRANSLATE-5901): SpellCheck (LanguageTool integration) - Edited segment is not saved when LanguageTool is not available** <br>
+Edited segments and their repetitions are now saved even when LanguageTool is unavailable or fails to respond. A warning informs users when spelling could not be checked.
+
+**[TRANSLATE-5900](https://jira.translate5.net/browse/TRANSLATE-5900): TermTagger integration - Edited segment is not saved when the TermTagger is not reachable** <br>
+Edited segments are now saved even when the TermTagger is unavailable or fails to respond. Existing term markings are preserved, and a warning informs users when terminology could not be checked.
+
+**[TRANSLATE-5897](https://jira.translate5.net/browse/TRANSLATE-5897): Editor general - Segment saves that lose the edited content are not detected reliably** <br>
+Fixed an issue that could discard segment edits when saving, particularly in segments with source terminology. Optional diagnostic logging now identifies saving problems more accurately.
+
+**[TRANSLATE-5895](https://jira.translate5.net/browse/TRANSLATE-5895): t5memory - TMX import into t5memory slows down and gets terminated when author names are longer than 39 bytes** <br>
+TMX files with long author names now import into t5memory without the severe slowdowns and failures previously caused by those names.
+
+**[TRANSLATE-5883](https://jira.translate5.net/browse/TRANSLATE-5883): Authentication, Security Related - Login reuses an API session of the user: CSRF protection switched off in the browser** <br>
+Browser login now excludes API sessions and expired sessions when reusing an existing session, preserving CSRF protection and preventing related page-loading failures, immediate logouts and single sign-on loops.
+
+**[TRANSLATE-5868](https://jira.translate5.net/browse/TRANSLATE-5868): TermPortal - Bugsink: Cannot read properties of undefined (reading 'length')** <br>
+Fixed an error that could occur when opening a term for editing in the TermPortal.
+
+**[TRANSLATE-5535](https://jira.translate5.net/browse/TRANSLATE-5535): Content Protection - Placeables: Detection of placeables fails if opening replaced tags are referenced** <br>
+Fixed placeable detection when the referenced opening tags are represented as placeholders in XLIFF files.
+
+
 ## [7.47.0] - 2026-11-05
 
 ### Important Notes:
