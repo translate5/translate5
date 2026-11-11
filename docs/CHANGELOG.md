@@ -17,6 +17,29 @@ r.
 
 
 
+## [7.47.2] - 2026-11-11
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-5908](https://jira.translate5.net/browse/TRANSLATE-5908): Content Protection, Import/Export - XLIFF import assigns duplicate tag numbers after removing framing tags** <br>
+Fixed duplicate tag numbers introduced during XLIFF import when surrounding tags were removed, preventing save errors and content loss when tag errors were ignored. Administrators can check existing tasks and repair affected protected-number tags with “t5 patch:duplicate-tag-numbers”; other affected segments require reimporting or manual correction.
+
+**[TRANSLATE-5891](https://jira.translate5.net/browse/TRANSLATE-5891): Editor general - ExtJS: "Cannot read properties of null (reading 'contains')" in QuickTip onTargetOver when a tooltip target was removed** <br>
+Fixed an error that could repeatedly occur when moving the mouse over the editor and prevent tooltips from appearing.
+
+**[TRANSLATE-5890](https://jira.translate5.net/browse/TRANSLATE-5890): TermPortal - TermPortal: UnhandledRejection with value undefined from ExtJS cached rejected promise** <br>
+Prevented an unnecessary browser error from being logged during TermPortal searches; search functionality is unchanged.
+
+**[TRANSLATE-5888](https://jira.translate5.net/browse/TRANSLATE-5888): Editor general - HtmlEditor: "can't access property maxOffset" in replaceDataT5Format when editor root is empty** <br>
+Fixed an occasional error that prevented matches from being inserted into a segment using Ctrl+number.
+
+**[TRANSLATE-5886](https://jira.translate5.net/browse/TRANSLATE-5886): TM Maintenance - TM Maintenance: "nothing to repeat" when highlighting search text with special characters** <br>
+TM Maintenance now displays search results and correctly highlights matching text when searches contain special characters such as asterisks or parentheses.
+
+
 ## [7.47.1] - 2026-11-10
 
 ### Important Notes:
