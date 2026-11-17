@@ -16,6 +16,82 @@ r.
 
 
 
+ saving a segment.
+
+
+
+## [7.47.3] - 2026-11-17
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3361](https://jira.translate5.net/browse/TRANSLATE-3361): Main back-end mechanisms (Worker, Logging, etc.) - Speed up initial loading of translate5** <br>
+7.47.3: Added a tool to check bundled JavaScript files
+7.41.1: BETA role out build JS files for faster application loading - currently disabled must be enabled in application.ini
+
+
+### Changed
+**[TRANSLATE-5878](https://jira.translate5.net/browse/TRANSLATE-5878): Content Protection - Content Protection: support exponent numbers with plus sign like 1,00E+02** <br>
+Content Protection now recognizes scientific notation with an explicit positive exponent, such as 1.00E+02, and correctly converts scientific notation using custom number formats.
+
+
+
+### Bugfixes
+**[TRANSLATE-5929](https://jira.translate5.net/browse/TRANSLATE-5929): Export - SDLXLIFF export with track changes fails on deleted paired tags split over several marks** <br>
+Fixed SDLXLIFF export with tracked changes when matching opening and closing tags were deleted in separate changes.
+
+
+**[TRANSLATE-5918](https://jira.translate5.net/browse/TRANSLATE-5918): Editor general - Forward PHP E9999 errors to Bugsink through a configurable log writer** <br>
+Administrators can now configure PHP error reporting to central error reporting system, including error details, application version, and installation information to help diagnose problems.
+
+**[TRANSLATE-5917](https://jira.translate5.net/browse/TRANSLATE-5917): MatchAnalysis & Pretranslation, t5memory - Concurrent TMX import disables the t5memory resource for running match analyses** <br>
+Match analysis and pre-translation now wait for a concurrent TMX import to finish instead of disabling the affected t5memory language resource for the remainder of the analysis.
+
+**[TRANSLATE-5914](https://jira.translate5.net/browse/TRANSLATE-5914): MatchAnalysis & Pretranslation, t5memory - Match analysis with t5memory is slow: status calls, exclusive lock and missing cache hits on every query** <br>
+Improved the speed of match analysis and pre-translation with t5memory, especially when several tasks use the same translation memory simultaneously.
+
+
+**[TRANSLATE-5913](https://jira.translate5.net/browse/TRANSLATE-5913): Editor general - Editor: "can't access property 'isMasked', me.getViewport() is undefined" on key press after window close fallback** <br>
+Fixed a keyboard error on the “Application left successfully” screen when the browser tab could not be closed automatically.
+
+**[TRANSLATE-5912](https://jira.translate5.net/browse/TRANSLATE-5912): Task Management - Task management: "can't access property 'get', this.task is undefined" when selecting a user assignment with no task selected** <br>
+The project overview now clears the previous task’s user assignments when no task is selected, preventing errors when switching projects.
+
+
+**[TRANSLATE-5911](https://jira.translate5.net/browse/TRANSLATE-5911): Task Management - Task management: "Cannot read properties of null (reading 'select')" when user assignment panel is closed while loading users** <br>
+Fixed an error when closing a user assignment panel or the import wizard while the list of users or coordinators was still loading.
+
+
+**[TRANSLATE-5893](https://jira.translate5.net/browse/TRANSLATE-5893): TrackChanges - TrackChanges: "can't access property tagName, item is undefined" in findNextTag on Accept/Reject and next** <br>
+Fixed an error that interrupted tracked-change review when “Accept and next” or “Reject and next” was used rapidly or after the segment content changed.
+
+
+**[TRANSLATE-5892](https://jira.translate5.net/browse/TRANSLATE-5892): Task Management - Task management: "Cannot read properties of undefined (reading 'isTranslatorPackageAvailable')" on loading task properties** <br>
+Fixed an intermittent error that prevented task properties from opening in the project overview, particularly when following a direct link to a task.
+
+
+**[TRANSLATE-5889](https://jira.translate5.net/browse/TRANSLATE-5889): translate5 AI - OpenAI: "Cannot read properties of null (reading 'isLoading')" when opening RAG window without prompt management right** <br>
+RAG and fine-tuning actions for AI language resources are now hidden from users without prompt management permission, preventing errors when opening these functions.
+
+
+**[TRANSLATE-5885](https://jira.translate5.net/browse/TRANSLATE-5885): TermPortal - TermPortal: "can't access property 'toLowerCase'" in doQueryResultClick on search URL hash navigation** <br>
+Fixed an error that could leave TermPortal term details stuck loading when opening a direct link to search results.
+
+
+**[TRANSLATE-5884](https://jira.translate5.net/browse/TRANSLATE-5884): TermPortal - TermPortal: "Cannot read properties of undefined (reading 'type')" in onTermFieldFocusLeave on pasted input** <br>
+Fixed an error when pasting text or selecting a browser autocomplete suggestion while proposing a term in TermPortal.
+
+
+**[TRANSLATE-5875](https://jira.translate5.net/browse/TRANSLATE-5875): Editor general - Editor: batch 'Set to final processing status' / 'Set to draft' does nothing when task option lockLocked is off** <br>
+Fixed the batch actions “Set to final processing status” and “Set to draft state” for tasks imported with the SDLXLIFF option to preserve segment locks disabled.
+
+
+**[TRANSLATE-5844](https://jira.translate5.net/browse/TRANSLATE-5844): Editor general - ExtJS: "Cannot read properties of null (reading 'style')" in Element.unmask when a tooltip is re-enabled** <br>
+Fixed a rare editor error when clicking while a tooltip was visible, for example when saving a segment.
+
+
 
 ## [7.47.2] - 2026-11-11
 
