@@ -19,6 +19,120 @@ r.
  saving a segment.
 
 
+r pair intact.
+
+
+
+## [7.47.4] - 2026-11-25
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3361](https://jira.translate5.net/browse/TRANSLATE-3361): Main back-end mechanisms (Worker, Logging, etc.) - Speed up initial loading of translate5** <br>
+7.74.4: general role out
+7.47.3: Added a tool to check bundled JavaScript files
+7.41.1: BETA role out build JS files for faster application loading - currently disabled must be enabled in application.ini
+
+
+### Changed
+**[TRANSLATE-5936](https://jira.translate5.net/browse/TRANSLATE-5936): TermTagger integration, TrackChanges - Term tagging: allow internal tags and track changes inside term tags** <br>
+The editor can now highlight terms that contain inline tags, and tracked insertions and deletions remain fully visible inside highlighted terms.
+
+
+**[TRANSLATE-5846](https://jira.translate5.net/browse/TRANSLATE-5846): Editor general, usability editor - Tag handling in translate5 editor** <br>
+The editor now warns you immediately when you use a keyboard shortcut to insert a tag that is already in the segment.
+
+
+
+### Bugfixes
+**[TRANSLATE-5973](https://jira.translate5.net/browse/TRANSLATE-5973): VisualReview / VisualTranslation - Update ghostscript in pdfconverter** <br>
+Visual pdfconverter: Fix vulnerability in ghostscript (CVE-2026-125396)
+
+**[TRANSLATE-5960](https://jira.translate5.net/browse/TRANSLATE-5960): User Management, VisualReview / VisualTranslation - HOTFIX Show visual in PDF viewer of browser not allowed** <br>
+When enabled, “Show PDF in Browser” now works for editors and is available during print approval.
+
+
+**[TRANSLATE-5959](https://jira.translate5.net/browse/TRANSLATE-5959): VisualReview / VisualTranslation - HOTFIX: Reflow-Errors do not lead to generating a visual without WYSIWYG** <br>
+If PDF text reflow fails, the task still imports without WYSIWYG editing and the task log records the problem.
+
+
+**[TRANSLATE-5949](https://jira.translate5.net/browse/TRANSLATE-5949): Content Protection - Active input rule is created when confirmation is declined** <br>
+Choosing “No” when asked to confirm a new active input rule now keeps the form open so you can continue editing or cancel without creating the rule.
+
+
+**[TRANSLATE-5946](https://jira.translate5.net/browse/TRANSLATE-5946): VisualReview / VisualTranslation - VisualReview: JS error "reading 'scrollLeft'" when the split visual is reloaded before the main visual** <br>
+Fixed an error that could reload the editor when the split view in Visual Review finished loading before the main view.
+
+
+**[TRANSLATE-5945](https://jira.translate5.net/browse/TRANSLATE-5945): Editor general - Editor: JS error in the server error handling when a failed request returns JSON without error details** <br>
+The editor now shows a general error message when a server request fails without providing details.
+
+**[TRANSLATE-5944](https://jira.translate5.net/browse/TRANSLATE-5944): Editor general - Editor: "getVisibleGridColumns" error when the task is left while the segment grid scrolls to a segment** <br>
+Fixed an error that could occur when leaving the editor while it was scrolling to a segment.
+
+**[TRANSLATE-5943](https://jira.translate5.net/browse/TRANSLATE-5943): Editor general - Editor: JS error "mask" when the message bus connection drops after the application was left** <br>
+Fixed an error that could appear if the connection for live updates dropped after you left translate5 with the browser tab still open.
+
+
+**[TRANSLATE-5941](https://jira.translate5.net/browse/TRANSLATE-5941): Editor general - Editor: JS error 'isSynchronized' on message dialogs after the application was left** <br>
+Messages such as session expiration notices now display correctly if the browser tab stays open after you leave translate5.
+
+
+**[TRANSLATE-5940](https://jira.translate5.net/browse/TRANSLATE-5940): Editor general - Editor: JS error after failed segment save when access to the job was lost** <br>
+If your access to a job is withdrawn while you save a segment, the editor now shows the access message and returns you to the task overview without a second error.
+
+
+**[TRANSLATE-5939](https://jira.translate5.net/browse/TRANSLATE-5939): Editor general - Editor: segment action menu "Don't save, open previous/next segment" throws JS error and does nothing** <br>
+The editor’s current segment menu now lets you jump to a segment or move to the previous or next unconfirmed editable segment without saving.
+
+
+**[TRANSLATE-5934](https://jira.translate5.net/browse/TRANSLATE-5934): Editor general - Editor: "grid.headerCt" error when the task is left while a segment save is running** <br>
+Fixed an error that could occur when a task closed while the editor was saving one segment before opening the next.
+
+
+**[TRANSLATE-5933](https://jira.translate5.net/browse/TRANSLATE-5933): VisualReview / VisualTranslation - Visual: import fails with TypeError in SpecialChars::convertChars for HTML with big embedded images** <br>
+Fixed an issue that prevented HTML files with large embedded images from being imported for Visual Review.
+
+**[TRANSLATE-5931](https://jira.translate5.net/browse/TRANSLATE-5931): Task Management - Job save: "Cannot read properties of undefined (reading 'status')" when server answer is no valid JSON** <br>
+When you save or delete a job and translate5 cannot read the server’s response, it now shows an error message.
+
+
+**[TRANSLATE-5930](https://jira.translate5.net/browse/TRANSLATE-5930): TrackChanges - Track changes: deletion directly before a deletion inside a term or spellcheck mark is undone with an error** <br>
+Track Changes now correctly records a character deletion immediately before previously deleted text within a highlighted term or spelling error.
+
+
+**[TRANSLATE-5928](https://jira.translate5.net/browse/TRANSLATE-5928): TM Maintenance - TM Maintenance: search crashes and reloads the page ("Cannot read properties of null (reading 'replace')")** <br>
+TM Maintenance now lists translation memory entries when you search with empty text fields, without reloading the page.
+
+
+**[TRANSLATE-5924](https://jira.translate5.net/browse/TRANSLATE-5924): Editor general - Editor: "document-selection-wrong-position" crash when copying source to target** <br>
+Fixed an issue that could reload the editor when you copied source text into the target segment.
+
+
+**[TRANSLATE-5923](https://jira.translate5.net/browse/TRANSLATE-5923): Editor general, TermTagger integration - Editor terminology panel: terms of different term entries shown as one entry, term images shown as escaped HTML** <br>
+The editor’s terminology panel now keeps separate entries from different collections distinct and displays term images in the details tooltip.
+
+
+**[TRANSLATE-5902](https://jira.translate5.net/browse/TRANSLATE-5902): Editor general - Failed segment save is shown as saved and the changes are lost on Esc** <br>
+If a segment fails to save, the editor marks it as unsaved and keeps your edits so you can retry before leaving the task or reloading the segments.
+
+**[TRANSLATE-5894](https://jira.translate5.net/browse/TRANSLATE-5894): LanguageResources - ExtJS: "Cannot set properties of null (setting 'component')" in finishRender when opening language resources overview** <br>
+Fixed an issue that could leave the Language Resources overview only partially displayed when opened.
+
+
+**[TRANSLATE-5887](https://jira.translate5.net/browse/TRANSLATE-5887): SpellCheck (LanguageTool integration) - SpellCheck: "h.items is null" in tooltip after cancelling leave task** <br>
+You can use the spell check menu as usual after cancelling the “Leave task” dialog.
+
+
+**[TRANSLATE-5882](https://jira.translate5.net/browse/TRANSLATE-5882): file format settings - Several smaller fixes for Pipeline / Steps and FPRMs in Bconfs** <br>
+You can now update BCONF pipelines that use XSLT and add steps such as Search and Replace. Importing a BCONF also preserves OpenXML Code Finder rules.
+
+**[TRANSLATE-5847](https://jira.translate5.net/browse/TRANSLATE-5847): Editor general, usability editor - Tag handling in translate5 editor - tag pairs** <br>
+When the same tag pair appears twice in a segment, deleting one tag now removes its matching partner and leaves the other pair intact.
+
+
 
 ## [7.47.3] - 2026-11-17
 
