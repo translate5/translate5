@@ -23,6 +23,38 @@ r pair intact.
 
 
 
+## [7.47.5] - 2026-11-26
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-5995](https://jira.translate5.net/browse/TRANSLATE-5995): API - No job is created on external job-creation via API** <br>
+7.47.5: translate5 now logs more details when character encoding errors prevent external connectors from creating jobs, making these failures easier to investigate - not solved yet
+
+**[TRANSLATE-5697](https://jira.translate5.net/browse/TRANSLATE-5697): Authentication - Improve SSO secret expiration communication to the client** <br>
+translate5 now tells users when an expired single sign-on key is preventing them from signing in.
+
+
+### Bugfixes
+**[TRANSLATE-5986](https://jira.translate5.net/browse/TRANSLATE-5986): Main back-end mechanisms (Worker, Logging, etc.), MatchAnalysis & Pretranslation - Workers run without DB metadata cache: repeated DESCRIBE queries slow down match analysis** <br>
+Match analysis and other background jobs run faster by avoiding repeated database lookups.
+
+
+**[TRANSLATE-5979](https://jira.translate5.net/browse/TRANSLATE-5979): Editor general - DeepL translation requests can block workers indefinitely** <br>
+If DeepL stops responding, translate5 reports an error after a limited number of attempts so pre-translation can stop waiting.
+
+
+**[TRANSLATE-5932](https://jira.translate5.net/browse/TRANSLATE-5932): LanguageResources - DeepL glossary sync ignores customer term process status config and does not prefer finalized terms** <br>
+When syncing a customer’s glossary to DeepL, translate5 uses that customer’s term process status settings and gives finalized translations priority when several terms qualify.
+
+
+**[TRANSLATE-5910](https://jira.translate5.net/browse/TRANSLATE-5910): Main back-end mechanisms (Worker, Logging, etc.), MatchAnalysis & Pretranslation - Task import cancelled after 48 hours: match analysis queued twice on import and dead worker processes stay running for 24 hours** <br>
+Task imports avoid duplicate match analysis and pre-translation, apply the latest import wizard settings while analysis is still queued, and detect interrupted processing sooner.
+
+
+
 ## [7.47.4] - 2026-11-25
 
 ### Important Notes:
